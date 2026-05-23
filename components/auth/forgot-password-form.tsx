@@ -37,7 +37,11 @@ export function ForgotPasswordForm() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${ROUTES.resetPassword}`,
+        // Routes Supabase via /auth/callback so the PKCE `code` is exchanged
+        // for a session before landing on the reset-password screen.
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+          ROUTES.resetPassword,
+        )}`,
       });
       if (error) {
         toast.error("Envoi impossible", { description: error.message });

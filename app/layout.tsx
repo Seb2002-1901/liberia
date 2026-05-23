@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     "stress financier",
     "fonds d'urgence",
   ],
-  metadataBase: process.env.NEXT_PUBLIC_APP_URL
-    ? new URL(process.env.NEXT_PUBLIC_APP_URL)
-    : undefined,
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  ),
   openGraph: {
     title: `${APP_NAME} — ${APP_TAGLINE}`,
     description: APP_DESCRIPTION,

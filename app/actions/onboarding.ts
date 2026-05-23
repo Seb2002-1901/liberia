@@ -61,7 +61,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
     cashflow,
   });
 
-  const fpUpsert = supabase.from("financial_profiles").upsert(
+  const fpRes = await supabase.from("financial_profiles").upsert(
     {
       user_id: user.id,
       situation: v.situation,
@@ -76,14 +76,14 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
     },
     { onConflict: "user_id" },
   );
+  if (fpRes.error) return { ok: false, error: fpRes.error.message };
 
-  const profileUpdate = supabase
+  // Mark onboarding complete only after the financial profile is persisted —
+  // otherwise the user can be flagged as onboarded with no underlying data.
+  const profileRes = await supabase
     .from("profiles")
     .update({ onboarding_completed: true })
     .eq("id", user.id);
-
-  const [fpRes, profileRes] = await Promise.all([fpUpsert, profileUpdate]);
-  if (fpRes.error) return { ok: false, error: fpRes.error.message };
   if (profileRes.error) return { ok: false, error: profileRes.error.message };
 
   revalidatePath("/dashboard");

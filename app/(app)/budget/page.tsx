@@ -6,21 +6,21 @@ import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
-import { EXPENSE_CATEGORIES, FREQUENCIES } from "@/lib/constants";
+import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import {
   calculateExpenseRatio,
   calculateNetCashflow,
   calculateSavingsRate,
 } from "@/lib/calculations/finance";
+import {
+  aggregateMonthlyByCategory,
+  frequencyMultiplier,
+} from "@/lib/calculations/aggregate";
 
 export const metadata: Metadata = {
   title: "Budget",
 };
-
-function frequencyMultiplier(id: string) {
-  return FREQUENCIES.find((f) => f.id === id)?.multiplier ?? 1;
-}
 
 export default async function BudgetPage() {
   const data = await getFinanceData();
@@ -42,7 +42,7 @@ export default async function BudgetPage() {
     );
   const nonEssentialTotal = monthlyExpenses - essentialTotal;
 
-  const byCategory = aggregate(data.expenses);
+  const byCategory = aggregateMonthlyByCategory(data.expenses);
 
   return (
     <div className="space-y-6">
@@ -147,11 +147,3 @@ function BudgetBar({
   );
 }
 
-function aggregate(list: Array<{ amount: number; frequency: string; category: string }>) {
-  const map = new Map<string, number>();
-  for (const e of list) {
-    const monthly = e.amount * frequencyMultiplier(e.frequency);
-    map.set(e.category, (map.get(e.category) ?? 0) + monthly);
-  }
-  return Array.from(map.entries()).map(([category, total]) => ({ category, total }));
-}

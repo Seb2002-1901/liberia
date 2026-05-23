@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 
 interface CashflowChartProps {
@@ -19,8 +20,10 @@ interface CashflowChartProps {
 }
 
 export function CashflowChart({ income, expenses, currency = "EUR" }: CashflowChartProps) {
-  // Simulated 6-month projection (Phase 1: deterministic preview).
-  const months = ["Mois -5", "Mois -4", "Mois -3", "Mois -2", "Mois -1", "Maintenant"];
+  // Phase 1: lissage déterministe à des fins d'illustration tant que
+  // l'historique mensuel n'est pas collecté. Remplacé par la série réelle
+  // dès que les transactions horodatées seront accumulées.
+  const months = ["−5 mois", "−4 mois", "−3 mois", "−2 mois", "−1 mois", "Ce mois"];
   const data = months.map((m, i) => {
     const wobble = Math.sin(i * 0.7) * 0.05;
     return {
@@ -32,8 +35,9 @@ export function CashflowChart({ income, expenses, currency = "EUR" }: CashflowCh
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Flux financier</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle>Flux mensuel</CardTitle>
+        <Badge variant="secondary" className="font-normal">Aperçu lissé</Badge>
       </CardHeader>
       <CardContent>
         <div className="h-72">

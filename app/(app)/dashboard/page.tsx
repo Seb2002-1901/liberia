@@ -28,6 +28,7 @@ import {
 } from "@/lib/calculations/finance";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 
 export const metadata: Metadata = {
   title: "Tableau de bord",
@@ -61,7 +62,7 @@ export default async function DashboardPage() {
     cashflow,
   });
 
-  const expenseByCategory = aggregateBy(data.expenses, "category");
+  const expenseByCategory = aggregateMonthlyByCategory(data.expenses);
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
@@ -69,7 +70,7 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Vue d'ensemble"
-        title={`Salut, ${firstName} 👋`}
+        title={`Salut, ${firstName}`}
         description="Voici ta photo financière du moment. Tu peux ajuster tes revenus, dépenses et objectifs à tout moment."
         actions={
           <>
@@ -132,11 +133,13 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <CashflowChart
-          income={monthlyIncome}
-          expenses={monthlyExpenses}
-          currency={data.profile.currency}
-        />
+        <div className="lg:col-span-2">
+          <CashflowChart
+            income={monthlyIncome}
+            expenses={monthlyExpenses}
+            currency={data.profile.currency}
+          />
+        </div>
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Alertes</CardTitle>
@@ -178,19 +181,6 @@ export default async function DashboardPage() {
       </div>
     </div>
   );
-}
-
-function aggregateBy(
-  list: Array<{ amount: number; frequency: string; category: string }>,
-  key: "category",
-) {
-  const map = new Map<string, number>();
-  for (const item of list) {
-    const multiplier = item.frequency === "yearly" ? 1 / 12 : item.frequency === "weekly" ? 52 / 12 : item.frequency === "one_time" ? 0 : 1;
-    const monthly = item.amount * multiplier;
-    map.set(item[key], (map.get(item[key]) ?? 0) + monthly);
-  }
-  return Array.from(map.entries()).map(([category, total]) => ({ category, total }));
 }
 
 function Alert({

@@ -13,11 +13,12 @@ import { Label } from "@/components/ui/label";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
+import { safeRedirectPath } from "@/lib/utils/redirect";
 
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || ROUTES.dashboard;
+  const next = safeRedirectPath(params.get("next"), ROUTES.dashboard);
   const [submitting, setSubmitting] = React.useState(false);
 
   const {

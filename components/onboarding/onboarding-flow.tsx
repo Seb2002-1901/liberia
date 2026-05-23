@@ -26,7 +26,7 @@ import {
   STRESS_LEVELS,
 } from "@/lib/constants";
 import { onboardingSchema } from "@/lib/validations/finance";
-import { completeOnboarding } from "@/app/actions/onboarding";
+import { completeOnboarding, skipOnboarding } from "@/app/actions/onboarding";
 
 type StepKey = "situation" | "income" | "expenses" | "savings" | "goal" | "stress";
 
@@ -128,13 +128,14 @@ export function OnboardingFlow() {
     <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-10">
       <div className="flex items-center justify-between">
         <BrandMark />
-        <button
-          type="button"
-          onClick={() => router.push(ROUTES.dashboard)}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          Passer pour l'instant
-        </button>
+        <form action={skipOnboarding}>
+          <button
+            type="submit"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            Passer pour l'instant
+          </button>
+        </form>
       </div>
 
       <div className="mt-8 space-y-2">

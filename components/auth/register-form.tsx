@@ -46,22 +46,33 @@ export function RegisterForm() {
     setSubmitting(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
           data: { full_name: values.name },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+            ROUTES.onboarding,
+          )}`,
         },
       });
       if (error) {
         toast.error("Inscription impossible", { description: error.message });
         return;
       }
-      toast.success("Compte créé.", {
-        description: "Vérifie ta boîte mail pour confirmer ton adresse.",
-      });
-      router.push(ROUTES.onboarding);
+
+      // Two possible Supabase configs:
+      //  - "Confirm email" ON: signUp returns user but no session.
+      //  - "Confirm email" OFF: signUp returns user + session, user is signed in.
+      if (!data.session) {
+        toast.success("Compte créé.", {
+          description: "Vérifie ta boîte mail pour confirmer ton adresse.",
+        });
+        router.push(ROUTES.login);
+      } else {
+        toast.success("Bienvenue dans LIBERIA.");
+        router.push(ROUTES.onboarding);
+      }
       router.refresh();
     } finally {
       setSubmitting(false);

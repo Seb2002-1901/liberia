@@ -1,8 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { FREQUENCIES } from "@/lib/constants";
 import { normalizeToMonthly } from "@/lib/calculations/finance";
+import { frequencyMultiplier } from "@/lib/calculations/aggregate";
 import {
   demoExpenses,
   demoFinancialProfile,
@@ -20,7 +20,9 @@ import type {
 } from "@/types/database";
 
 export type FinanceData = {
-  profile: Pick<Profile, "full_name" | "email" | "avatar_url" | "currency" | "locale">;
+  profile: Pick<Profile, "full_name" | "email" | "avatar_url" | "currency" | "locale"> & {
+    onboarding_completed: boolean;
+  };
   subscription: { plan: "free" | "premium" };
   financialProfile: FinancialProfile | null;
   incomes: Income[];
@@ -28,10 +30,6 @@ export type FinanceData = {
   goals: Goal[];
   isDemo: boolean;
 };
-
-function frequencyMultiplier(frequencyId: string): number {
-  return FREQUENCIES.find((f) => f.id === frequencyId)?.multiplier ?? 1;
-}
 
 export function totalMonthly(entries: Array<{ amount: number; frequency: string }>): number {
   return entries.reduce(
@@ -56,7 +54,7 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
     const [profileRes, subRes, fpRes, incRes, expRes, goalsRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("full_name, email, avatar_url, currency, locale")
+        .select("full_name, email, avatar_url, currency, locale, onboarding_completed")
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -93,6 +91,7 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
         avatar_url: profileRes.data?.avatar_url ?? null,
         currency: profileRes.data?.currency ?? "EUR",
         locale: profileRes.data?.locale ?? "fr-FR",
+        onboarding_completed: profileRes.data?.onboarding_completed ?? false,
       },
       subscription: { plan: (subRes.data?.plan as "free" | "premium") ?? "free" },
       financialProfile: (fpRes.data as FinancialProfile | null) ?? null,
@@ -114,6 +113,7 @@ function buildDemoData(): FinanceData {
       avatar_url: demoProfile.avatar_url,
       currency: demoProfile.currency,
       locale: demoProfile.locale,
+      onboarding_completed: true,
     },
     subscription: { plan: "free" },
     financialProfile: demoFinancialProfile,

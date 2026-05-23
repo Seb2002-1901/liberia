@@ -74,27 +74,33 @@ export function AppShell({
             {NAV.map((item) => (
               <SidebarLink
                 key={item.href}
-                href={item.href}
+                href={isDemo ? "/demo" : item.href}
                 label={item.label}
                 icon={item.icon}
-                active={isActive(pathname, item.href)}
+                active={
+                  isActive(pathname, item.href) ||
+                  (isDemo === true && pathname === "/demo" && item.href === ROUTES.dashboard)
+                }
+                disabled={isDemo === true && item.href !== ROUTES.dashboard}
               />
             ))}
           </SidebarSection>
-          <SidebarSection title="Compte">
-            {SECONDARY.map((item) => (
-              <SidebarLink
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                icon={item.icon}
-                active={isActive(pathname, item.href)}
-              />
-            ))}
-          </SidebarSection>
+          {!isDemo && (
+            <SidebarSection title="Compte">
+              {SECONDARY.map((item) => (
+                <SidebarLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  active={isActive(pathname, item.href)}
+                />
+              ))}
+            </SidebarSection>
+          )}
         </nav>
         <div className="p-3">
-          <UpgradeCard plan={plan} />
+          {isDemo ? <DemoUpsellCard /> : <UpgradeCard plan={plan} />}
         </div>
       </aside>
 
@@ -113,7 +119,8 @@ export function AppShell({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-1.5 py-1.5 transition-colors hover:bg-card"
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-1.5 py-1.5 transition-colors hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label="Menu compte"
                 >
                   <Avatar className="h-7 w-7">
@@ -138,22 +145,39 @@ export function AppShell({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href={ROUTES.profile}>
-                    <User className="h-4 w-4" /> Profil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={ROUTES.settings}>
-                    <Settings className="h-4 w-4" /> Paramètres
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={ROUTES.subscription}>
-                    <Sparkles className="h-4 w-4" /> Abonnement
-                  </Link>
-                </DropdownMenuItem>
-                {onSignOut && (
+                {isDemo ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href={ROUTES.register}>
+                        <Sparkles className="h-4 w-4" /> Créer mon compte
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={ROUTES.login}>
+                        <User className="h-4 w-4" /> Se connecter
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href={ROUTES.profile}>
+                        <User className="h-4 w-4" /> Profil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={ROUTES.settings}>
+                        <Settings className="h-4 w-4" /> Paramètres
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={ROUTES.subscription}>
+                        <Sparkles className="h-4 w-4" /> Abonnement
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {onSignOut && !isDemo && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -180,28 +204,39 @@ export function AppShell({
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-5">
-          {NAV.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex flex-col items-center gap-1 py-3 text-[11px] transition-colors",
-                  active ? "text-foreground" : "text-muted-foreground",
-                )}
-                aria-current={active ? "page" : undefined}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{shortLabel(item.label)}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {isDemo ? (
+        <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden">
+          <div className="container flex items-center justify-between py-3">
+            <p className="text-xs text-muted-foreground">Mode démo · lecture seule</p>
+            <Button asChild size="sm" variant="gold">
+              <Link href={ROUTES.register}>Créer mon compte</Link>
+            </Button>
+          </div>
+        </nav>
+      ) : (
+        <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl lg:hidden">
+          <div className="grid grid-cols-5">
+            {NAV.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex flex-col items-center gap-1 py-3 text-[11px] transition-colors",
+                    active ? "text-foreground" : "text-muted-foreground",
+                  )}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{shortLabel(item.label)}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
@@ -228,12 +263,28 @@ function SidebarLink({
   label,
   icon: Icon,
   active,
+  disabled,
 }: {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   active: boolean;
+  disabled?: boolean;
 }) {
+  if (disabled) {
+    return (
+      <span
+        aria-disabled
+        title="Disponible avec un compte"
+        className="group flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground/50"
+      >
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/30 text-muted-foreground/60">
+          <Icon className="h-4 w-4" />
+        </span>
+        {label}
+      </span>
+    );
+  }
   return (
     <Link
       href={href}
@@ -257,6 +308,23 @@ function SidebarLink({
       </span>
       {label}
     </Link>
+  );
+}
+
+function DemoUpsellCard() {
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.08)] to-transparent p-4">
+      <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
+        <Sparkles className="h-4 w-4" />
+        <p className="text-xs font-semibold uppercase tracking-wider">Démo</p>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Crée ton compte pour piloter tes vraies données.
+      </p>
+      <Button asChild size="sm" variant="gold" className="mt-3 w-full">
+        <Link href={ROUTES.register}>Créer mon compte</Link>
+      </Button>
+    </div>
   );
 }
 

@@ -1,7 +1,9 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const AUTH_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];
+// NB: /reset-password is intentionally NOT here — the password-recovery
+// flow lands authenticated and would otherwise be bounced to /dashboard.
+const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/budget",

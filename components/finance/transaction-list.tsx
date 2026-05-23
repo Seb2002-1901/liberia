@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Lock, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ROUTES } from "@/lib/constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +57,12 @@ export function TransactionList({
   const categories = kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   const handleOpen = (item?: Item) => {
+    if (isDemo) {
+      toast.info("Mode démo · crée un compte pour sauvegarder.", {
+        action: { label: "Créer", onClick: () => (window.location.href = ROUTES.register) },
+      });
+      return;
+    }
     setEditing(item ?? null);
     setOpen(true);
   };
@@ -83,8 +91,24 @@ export function TransactionList({
 
   return (
     <>
-      <div className="flex justify-end pb-3">
-        <Button variant="gold" size="sm" onClick={() => handleOpen()}>
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+        {isDemo ? (
+          <p className="text-xs text-muted-foreground">
+            <Lock className="mr-1 inline-block h-3 w-3" /> Mode démo · lecture seule.{" "}
+            <Link href={ROUTES.register} className="font-medium text-foreground hover:underline">
+              Crée ton compte
+            </Link>{" "}
+            pour ajouter tes données.
+          </p>
+        ) : (
+          <span />
+        )}
+        <Button
+          variant="gold"
+          size="sm"
+          onClick={() => handleOpen()}
+          disabled={isDemo}
+        >
           {kind === "income" ? "Ajouter un revenu" : "Ajouter une dépense"}
         </Button>
       </div>

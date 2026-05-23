@@ -34,6 +34,7 @@ import {
 } from "@/lib/calculations/finance";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 
 export const metadata: Metadata = {
   title: "Mode démo",
@@ -66,7 +67,7 @@ export default function DemoDashboardPage() {
     cashflow,
   });
 
-  const byCategory = aggregate(demoExpenses);
+  const byCategory = aggregateMonthlyByCategory(demoExpenses);
 
   return (
     <div className="space-y-6">
@@ -113,19 +114,35 @@ export default function DemoDashboardPage() {
         <StatCard label="Revenus mensuels" value={formatCurrency(monthlyIncome)} icon={<ArrowUpCircle className="h-4 w-4" />} tone="gold" />
         <StatCard label="Dépenses mensuelles" value={formatCurrency(monthlyExpenses)} icon={<ArrowDownCircle className="h-4 w-4" />} />
         <StatCard label="Reste à vivre" value={formatCurrency(cashflow)} tone={cashflow >= 0 ? "positive" : "negative"} icon={<Wallet className="h-4 w-4" />} hint={`Taux d'épargne ${formatPercent(savingsRate)}`} />
-        <StatCard label="Fonds d'urgence" value={`${runway.toFixed(1)} mois`} icon={<PiggyBank className="h-4 w-4" />} hint={formatCurrency(currentSavings)} />
+        <StatCard
+          label="Fonds d'urgence"
+          value={Number.isFinite(runway) ? `${runway.toFixed(1)} mois` : "∞"}
+          icon={<PiggyBank className="h-4 w-4" />}
+          hint={formatCurrency(currentSavings)}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <CashflowChart income={monthlyIncome} expenses={monthlyExpenses} />
+        <div className="lg:col-span-2">
+          <CashflowChart income={monthlyIncome} expenses={monthlyExpenses} />
+        </div>
         <Card>
           <CardHeader>
             <CardTitle>Recommandations</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <p>📌 Vise 1 mois de dépenses en fonds d'urgence d'ici 6 mois.</p>
-            <p>🪙 Réduis 1 abonnement non essentiel ce mois-ci.</p>
-            <p>📈 Bloque un virement automatique mensuel vers l'épargne, même symbolique.</p>
+            <RecoTip
+              label="Court terme"
+              text="Vise 1 mois de dépenses en fonds d'urgence d'ici 6 mois."
+            />
+            <RecoTip
+              label="Allègement"
+              text="Réduis 1 abonnement non essentiel ce mois-ci."
+            />
+            <RecoTip
+              label="Automatisation"
+              text="Bloque un virement automatique mensuel vers l'épargne, même symbolique."
+            />
           </CardContent>
         </Card>
       </div>
@@ -138,13 +155,14 @@ export default function DemoDashboardPage() {
   );
 }
 
-function aggregate(list: Array<{ amount: number; frequency: string; category: string }>) {
-  const map = new Map<string, number>();
-  for (const e of list) {
-    const multiplier =
-      e.frequency === "yearly" ? 1 / 12 : e.frequency === "weekly" ? 52 / 12 : e.frequency === "one_time" ? 0 : 1;
-    const monthly = e.amount * multiplier;
-    map.set(e.category, (map.get(e.category) ?? 0) + monthly);
-  }
-  return Array.from(map.entries()).map(([category, total]) => ({ category, total }));
+function RecoTip({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--gold))]" />
+      <p>
+        <span className="font-medium text-foreground">{label}.</span> {text}
+      </p>
+    </div>
+  );
 }
+
