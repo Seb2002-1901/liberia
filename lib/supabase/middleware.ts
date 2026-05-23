@@ -44,9 +44,16 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getUser() validates the JWT with the Supabase auth server. A transient
+  // network failure shouldn't 500 every page on the site — degrade gracefully
+  // by treating the user as anonymous (protected routes then redirect to /login).
+  let user: { id: string } | null = null;
+  try {
+    const res = await supabase.auth.getUser();
+    user = res.data.user;
+  } catch {
+    user = null;
+  }
 
   const { pathname } = request.nextUrl;
   // Segment-boundary match so /dashboard never accidentally captures

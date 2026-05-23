@@ -205,13 +205,27 @@ drop policy if exists "profiles_self_insert" on public.profiles;
 create policy "profiles_self_insert" on public.profiles
   for insert with check (auth.uid() = id);
 
--- Generic per-user-table policies
+-- subscriptions: read-only for users; all writes go through the
+-- handle_new_user trigger (SECURITY DEFINER, runs at signup) and the
+-- Stripe webhook (Phase 2, service-role client which bypasses RLS).
+-- Letting users INSERT/UPDATE/DELETE here would allow self-promotion
+-- to plan='premium' from the browser and bypass billing entirely.
+drop policy if exists "subscriptions_self_select" on public.subscriptions;
+create policy "subscriptions_self_select" on public.subscriptions
+  for select using (auth.uid() = user_id);
+
+-- Explicitly drop any prior permissive write policies that earlier
+-- versions of this schema may have created.
+drop policy if exists "subscriptions_self_insert" on public.subscriptions;
+drop policy if exists "subscriptions_self_update" on public.subscriptions;
+drop policy if exists "subscriptions_self_delete" on public.subscriptions;
+
+-- Generic per-user-table policies for tables the user fully owns
 do $$
 declare
   t text;
 begin
   for t in select unnest(array[
-    'subscriptions',
     'financial_profiles',
     'incomes',
     'expenses',

@@ -21,6 +21,16 @@ export function LoginForm() {
   const next = safeRedirectPath(params.get("next"), ROUTES.dashboard);
   const [submitting, setSubmitting] = React.useState(false);
 
+  // Surface auth-callback failures (expired email link, etc.) on arrival.
+  const errorParam = params.get("error");
+  React.useEffect(() => {
+    if (errorParam === "auth_callback") {
+      toast.error("Lien invalide ou expiré", {
+        description: "Reconnecte-toi ou demande un nouveau lien.",
+      });
+    }
+  }, [errorParam]);
+
   const {
     register,
     handleSubmit,
