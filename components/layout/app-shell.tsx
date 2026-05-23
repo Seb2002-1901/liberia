@@ -203,9 +203,13 @@ export function AppShell({
         </div>
       </main>
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — pb-[env(safe-area-inset-bottom)] keeps the
+          tap targets above the iOS home indicator */}
       {isDemo ? (
-        <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden">
+        <nav
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           <div className="container flex items-center justify-between py-3">
             <p className="text-xs text-muted-foreground">Mode démo · lecture seule</p>
             <Button asChild size="sm" variant="gold">
@@ -214,7 +218,10 @@ export function AppShell({
           </div>
         </nav>
       ) : (
-        <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl lg:hidden">
+        <nav
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl lg:hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           <div className="grid grid-cols-5">
             {NAV.map((item) => {
               const Icon = item.icon;

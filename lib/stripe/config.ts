@@ -18,9 +18,11 @@ export const STRIPE_PLANS = {
 
 export type StripePlanId = keyof typeof STRIPE_PLANS;
 
+/**
+ * True when Stripe is wired up enough for /api/stripe/checkout to attempt
+ * a Checkout Session. Only checks the secret key — the publishable key is
+ * reserved for Phase 2 when we mount Stripe.js client-side.
+ */
 export function isStripeConfigured(): boolean {
-  return Boolean(
-    process.env.STRIPE_SECRET_KEY &&
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-  );
+  return Boolean(process.env.STRIPE_SECRET_KEY);
 }

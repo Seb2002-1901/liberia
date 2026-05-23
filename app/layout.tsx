@@ -54,6 +54,9 @@ export const viewport: Viewport = {
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
+  // Enables env(safe-area-inset-*) on iOS so the bottom nav clears the
+  // home indicator and notches don't crop the hero / topbar.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

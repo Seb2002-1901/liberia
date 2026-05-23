@@ -22,9 +22,8 @@ Dans **Project Settings → Environment Variables**, ajoute :
 | `NEXT_PUBLIC_SUPABASE_URL` | tous |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | tous |
 | `SUPABASE_SERVICE_ROLE_KEY` | **production uniquement** |
-| `STRIPE_SECRET_KEY` | tous |
-| `STRIPE_WEBHOOK_SECRET` | tous |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | tous |
+| `STRIPE_SECRET_KEY` | tous (Phase 1 : peut rester vide en preview) |
+| `STRIPE_WEBHOOK_SECRET` | tous (Phase 1 : peut rester vide en preview) |
 | `NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY` | tous |
 | `NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY` | tous |
 

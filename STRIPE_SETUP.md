@@ -18,10 +18,14 @@ Dans `.env.local` :
 ```
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...   # voir étape 3
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY=price_...
 NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY=price_...
 ```
+
+> Le `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` n'est volontairement pas requis en
+> Phase 1 — on ne charge pas Stripe.js côté client, le Checkout passe par
+> `stripe.checkout.sessions.create()` server-side. Il sera ajouté en Phase 2
+> avec le Customer Portal et Elements éventuels.
 
 ## 3. Webhook local (Stripe CLI)
 
