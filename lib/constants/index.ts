@@ -128,8 +128,6 @@ export const PLANS = {
     ],
     limits: {
       goals: 1,
-      incomes: 5,
-      expenses: 20,
     },
   },
   premium: {
@@ -141,7 +139,6 @@ export const PLANS = {
     features: [
       "Tout du plan Gratuit",
       "Objectifs financiers illimités",
-      "Revenus & dépenses illimités",
       "Catégories personnalisées",
       "Historique complet",
       "Accès anticipé aux fonctions IA",
@@ -150,8 +147,6 @@ export const PLANS = {
     badge: "Le plus choisi",
     limits: {
       goals: Infinity,
-      incomes: Infinity,
-      expenses: Infinity,
     },
   },
 } as const;

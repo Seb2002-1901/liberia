@@ -73,6 +73,7 @@ create table if not exists public.financial_profiles (
   current_savings numeric(12,2) not null default 0,
   monthly_debt numeric(12,2) not null default 0,
   has_emergency_fund boolean not null default false,
+  main_goal text,
   perceived_stress integer not null default 3 check (perceived_stress between 1 and 5),
   stability_score integer not null default 0 check (stability_score between 0 and 100),
   stress_score integer not null default 0 check (stress_score between 0 and 100),
@@ -80,6 +81,9 @@ create table if not exists public.financial_profiles (
   updated_at timestamptz not null default timezone('utc', now()),
   unique (user_id)
 );
+
+-- Idempotent column addition for databases provisioned before main_goal existed.
+alter table public.financial_profiles add column if not exists main_goal text;
 
 create index if not exists idx_financial_profiles_user on public.financial_profiles(user_id);
 

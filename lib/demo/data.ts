@@ -12,6 +12,7 @@ export const demoFinancialProfile: FinancialProfile = {
   current_savings: 1200,
   monthly_debt: 220,
   has_emergency_fund: false,
+  main_goal: "emergency_fund",
   perceived_stress: 4,
   stability_score: 42,
   stress_score: 64,

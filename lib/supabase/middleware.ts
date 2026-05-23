@@ -49,7 +49,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+  // Segment-boundary match so /dashboard never accidentally captures
+  // a future /dashboard-public or /onboardingfoo route.
+  const isProtected = PROTECTED_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   if (!user && isProtected) {

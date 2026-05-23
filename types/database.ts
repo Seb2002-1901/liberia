@@ -49,6 +49,7 @@ export interface FinancialProfile {
   current_savings: number;
   monthly_debt: number;
   has_emergency_fund: boolean;
+  main_goal: string | null;
   perceived_stress: number;
   stability_score: number;
   stress_score: number;

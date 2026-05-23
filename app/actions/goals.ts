@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { goalSchema, type GoalInput } from "@/lib/validations/finance";
+import { PLANS } from "@/lib/constants";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -24,6 +25,29 @@ export async function createGoal(input: GoalInput): Promise<ActionResult> {
   if (!userId) return { ok: false, error: "Authentification requise (ou mode démo)." };
 
   const supabase = await createClient();
+
+  // Free-plan cap on simultaneous active goals (advertised on pricing page).
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("plan")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const plan = (sub?.plan as "free" | "premium") ?? "free";
+  const limit = PLANS[plan].limits.goals;
+  if (Number.isFinite(limit)) {
+    const { count } = await supabase
+      .from("goals")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("is_completed", false);
+    if ((count ?? 0) >= limit) {
+      return {
+        ok: false,
+        error: `Plan ${plan === "free" ? "Gratuit" : "Premium"} : ${limit} objectif${limit > 1 ? "s" : ""} actif${limit > 1 ? "s" : ""} maximum. Passe Premium pour des objectifs illimités.`,
+      };
+    }
+  }
+
   const { error } = await supabase.from("goals").insert({
     user_id: userId,
     title: parsed.data.title,

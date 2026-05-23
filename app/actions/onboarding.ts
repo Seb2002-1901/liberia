@@ -70,6 +70,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
       current_savings: v.currentSavings,
       monthly_debt: v.monthlyDebt,
       has_emergency_fund: v.hasEmergencyFund,
+      main_goal: v.mainGoal,
       perceived_stress: v.perceivedStress,
       stability_score: stability,
       stress_score: stress,
