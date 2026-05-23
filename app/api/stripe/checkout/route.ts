@@ -55,10 +55,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
   }
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    request.headers.get("origin") ??
-    "http://localhost:3000";
+  // NEXT_PUBLIC_APP_URL is the only trusted origin for Stripe redirects.
+  // Never fall back to the Origin header — an attacker controls it and could
+  // redirect the user back to a malicious domain after payment.
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   try {
     const stripe = getStripe();

@@ -80,10 +80,18 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
 
   // Mark onboarding complete only after the financial profile is persisted —
   // otherwise the user can be flagged as onboarded with no underlying data.
+  // Upsert (vs. update) so the user can self-heal if handle_new_user trigger
+  // ever failed to provision the profile row.
   const profileRes = await supabase
     .from("profiles")
-    .update({ onboarding_completed: true })
-    .eq("id", user.id);
+    .upsert(
+      {
+        id: user.id,
+        email: user.email ?? "",
+        onboarding_completed: true,
+      },
+      { onConflict: "id" },
+    );
   if (profileRes.error) return { ok: false, error: profileRes.error.message };
 
   revalidatePath("/dashboard");
@@ -99,10 +107,14 @@ export async function skipOnboarding() {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) {
-    await supabase
-      .from("profiles")
-      .update({ onboarding_completed: true })
-      .eq("id", user.id);
+    await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        email: user.email ?? "",
+        onboarding_completed: true,
+      },
+      { onConflict: "id" },
+    );
   }
   redirect("/dashboard");
 }
