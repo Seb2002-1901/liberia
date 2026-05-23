@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light fallback (we ship dark-first) */
+    --background: 240 10% 98%;
+    --foreground: 240 10% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 6%;
+    --primary: 240 10% 6%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 6%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 240 10% 6%;
+    --radius: 0.75rem;
+    --gold: 40 50% 62%;
+    --gold-foreground: 240 10% 6%;
+    --gold-muted: 35 35% 50%;
+    --success: 152 60% 48%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 56%;
+    --warning-foreground: 240 10% 6%;
+  }
+
+  .dark,
+  :root {
+    /* Liberia premium dark — noir profond, anthracite, accent or */
+    --background: 240 8% 5%;
+    --foreground: 40 12% 95%;
+    --card: 240 8% 7%;
+    --card-foreground: 40 12% 95%;
+    --popover: 240 8% 7%;
+    --popover-foreground: 40 12% 95%;
+    --primary: 40 30% 88%;
+    --primary-foreground: 240 10% 6%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 40 12% 95%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 60%;
+    --accent: 40 40% 60%;
+    --accent-foreground: 240 10% 6%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 14%;
+    --input: 240 6% 14%;
+    --ring: 40 40% 60%;
+    --radius: 0.875rem;
+    --gold: 40 50% 65%;
+    --gold-foreground: 240 10% 6%;
+    --gold-muted: 35 30% 45%;
+    --success: 152 55% 50%;
+    --success-foreground: 240 10% 6%;
+    --warning: 38 90% 60%;
+    --warning-foreground: 240 10% 6%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+  ::selection {
+    background: hsl(var(--gold) / 0.25);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--card) / 0.7) 0%,
+      hsl(var(--card) / 0.4) 100%
+    );
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+
+  .premium-card {
+    @apply rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm;
+    background-image: radial-gradient(
+      1200px circle at var(--mx, 50%) var(--my, 0%),
+      hsl(var(--gold) / 0.04),
+      transparent 40%
+    );
+  }
+
+  .gold-text {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--gold)) 0%,
+      hsl(var(--gold-muted)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hairline {
+    @apply border border-white/[0.06];
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(
+      ellipse at top,
+      black 30%,
+      transparent 70%
+    );
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+}
