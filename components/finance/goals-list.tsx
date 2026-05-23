@@ -64,9 +64,12 @@ export function GoalsList({
     return id ? onUpdate(id, values) : onCreate(values);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, title: string) => {
     if (isDemo) {
       toast.error("Mode démo : connecte-toi pour supprimer.");
+      return;
+    }
+    if (typeof window !== "undefined" && !window.confirm(`Supprimer l'objectif « ${title} » ? Cette action est définitive.`)) {
       return;
     }
     startTransition(async () => {
@@ -140,7 +143,7 @@ export function GoalsList({
                           <Pencil className="h-4 w-4" /> Modifier
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onSelect={() => handleDelete(g.id)}
+                          onSelect={() => handleDelete(g.id, g.title)}
                           disabled={pending}
                           className="text-[hsl(var(--destructive))]"
                         >

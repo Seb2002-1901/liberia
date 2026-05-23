@@ -87,7 +87,10 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
     return {
       profile: {
         full_name: profileRes.data?.full_name ?? null,
-        email: profileRes.data?.email ?? user.email ?? "",
+        // Trust auth.users.email (validated by Supabase) over profiles.email,
+        // which the user could in principle mutate via the JS SDK since the
+        // profiles row is theirs to update.
+        email: user.email ?? profileRes.data?.email ?? "",
         avatar_url: profileRes.data?.avatar_url ?? null,
         currency: profileRes.data?.currency ?? "EUR",
         locale: profileRes.data?.locale ?? "fr-FR",

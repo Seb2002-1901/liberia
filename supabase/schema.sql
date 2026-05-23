@@ -162,6 +162,22 @@ create trigger set_updated_at_goals
 before update on public.goals
 for each row execute function public.handle_updated_at();
 
+-- is_completed is derived from the amounts. Computing it server-side
+-- prevents a Free-plan user from "completing" a goal via the JS SDK
+-- (which would otherwise free a slot under the active-goals limit).
+create or replace function public.goals_set_is_completed()
+returns trigger language plpgsql as $$
+begin
+  new.is_completed := new.current_amount >= new.target_amount;
+  return new;
+end;
+$$;
+
+drop trigger if exists goals_compute_is_completed on public.goals;
+create trigger goals_compute_is_completed
+before insert or update on public.goals
+for each row execute function public.goals_set_is_completed();
+
 -- =====================================================
 -- user_settings
 -- =====================================================

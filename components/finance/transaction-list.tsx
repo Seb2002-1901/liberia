@@ -77,9 +77,13 @@ export function TransactionList({
     return id ? onUpdate(id, values) : onCreate(values);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, label: string) => {
     if (isDemo) {
       toast.error("Mode démo : connecte-toi pour supprimer.");
+      return;
+    }
+    const what = kind === "income" ? "ce revenu" : "cette dépense";
+    if (typeof window !== "undefined" && !window.confirm(`Supprimer ${what} « ${label} » ?`)) {
       return;
     }
     startTransition(async () => {
@@ -164,7 +168,7 @@ export function TransactionList({
                         <Pencil className="h-4 w-4" /> Modifier
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onSelect={() => handleDelete(item.id)}
+                        onSelect={() => handleDelete(item.id, item.label)}
                         className="text-[hsl(var(--destructive))]"
                         disabled={pending}
                       >
