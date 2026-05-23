@@ -16,9 +16,26 @@
 ## Row-Level Security (Postgres)
 
 Toutes les tables métier ont RLS **activée**. Les policies forcent
-`auth.uid() = user_id` (ou `auth.uid() = id` pour `profiles`) sur :
+`auth.uid() = user_id` (ou `auth.uid() = id` pour `profiles`).
 
-- `select`, `insert`, `update`, `delete`
+Tables que l'utilisateur possède et édite :
+`profiles`, `financial_profiles`, `incomes`, `expenses`, `goals`,
+`user_settings` — policies `select`, `insert`, `update`, `delete` self.
+
+Table en **lecture seule côté utilisateur** : `subscriptions`. Toutes les
+écritures passent par :
+- le trigger `handle_new_user` (SECURITY DEFINER) qui seed le plan free
+  à l'inscription ;
+- le webhook Stripe (Phase 2, client `service_role` qui bypass RLS).
+
+Cela ferme le bypass "fake Premium" qui aurait sinon été possible via
+`supabase.from('subscriptions').update({plan: 'premium'})` depuis la
+console du navigateur.
+
+Trigger BEFORE INSERT/UPDATE sur `goals` qui dérive `is_completed` à
+partir de `current_amount >= target_amount` — empêche un utilisateur de
+"compléter" un objectif via le SDK pour libérer un slot sous la limite
+Free 1 objectif actif.
 
 Aucune route ou requête ne peut contourner ces règles, même si le code
 applicatif est compromis.
