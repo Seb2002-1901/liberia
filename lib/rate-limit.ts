@@ -45,6 +45,12 @@ export type RateLimitResult = {
  * Best-effort rate-limit check. Returns `success: true` when Upstash
  * is not configured (dev / preview fallback) — callers should still
  * inspect `success` so they can short-circuit when limits are enforced.
+ *
+ * Fails OPEN on transport errors: if Upstash itself is unreachable we'd
+ * rather let the request through than take the whole app down. Brief
+ * abuse window during an outage is preferable to a hard outage; the
+ * underlying endpoints still have auth gates + webhook signature
+ * verification as the real security boundary.
  */
 export async function checkRateLimit(
   key: LimiterKey,
@@ -54,5 +60,9 @@ export async function checkRateLimit(
   if (!limiter) {
     return { success: true, limit: 0, remaining: 0, reset: 0 };
   }
-  return limiter.limit(identifier);
+  try {
+    return await limiter.limit(identifier);
+  } catch {
+    return { success: true, limit: 0, remaining: 0, reset: 0 };
+  }
 }

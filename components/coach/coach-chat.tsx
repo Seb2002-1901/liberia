@@ -38,10 +38,18 @@ export function CoachChat({
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   const abortRef = React.useRef<AbortController | null>(null);
 
+  // Reset the local message buffer ONLY when the user navigates to a
+  // different conversation. We deliberately do NOT depend on
+  // `initialMessages`: it gets a new array reference on every parent
+  // re-render (including router.refresh()), which would wipe optimistic
+  // messages the user just typed while the previous stream's refresh
+  // raced through. The user's local state is the source of truth for
+  // the active session; multi-tab sync requires a manual refresh.
   React.useEffect(() => {
     setMessages(initialMessages);
     setStreamedText("");
-  }, [conversationId, initialMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
 
   React.useEffect(() => {
     const el = scrollRef.current;
@@ -67,7 +75,7 @@ export function CoachChat({
       if (!content.trim() || disabled) return;
 
       const optimisticUser: CoachMessage = {
-        id: `local-${Date.now()}`,
+        id: `local-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`}`,
         role: "user",
         content,
         created_at: new Date().toISOString(),
@@ -136,7 +144,7 @@ export function CoachChat({
         setMessages((prev) => [
           ...prev,
           {
-            id: `local-asst-${Date.now()}`,
+            id: `local-asst-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`}`,
             role: "assistant",
             content: assembled,
             created_at: new Date().toISOString(),
