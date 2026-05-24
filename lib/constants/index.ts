@@ -137,14 +137,18 @@ export const PLANS = {
     name: "Premium",
     priceMonthly: 9.9,
     priceYearly: 89,
-    description: "Tout LIBERIA, sans aucune limite.",
+    description: "Soutiens le projet et débloque l'usage sans limite.",
+    // Premium currently differentiates on the goal cap (Free = 1 active goal,
+    // Premium = unlimited) and a higher AI rate-limit envelope for the
+    // weekly cron + coach. Items listed here MUST reflect what the code
+    // actually delivers — no marketing-only claims. Anything else is on the
+    // Phase 4 backlog.
     features: [
       "Tout du plan Gratuit",
       "Objectifs financiers illimités",
-      "Catégories personnalisées",
-      "Historique complet",
-      "Accès anticipé aux fonctions IA",
-      "Support prioritaire",
+      "Historique de conversations sans limite",
+      "Récap hebdo enrichi par email",
+      "Tu finances le développement de LIBERIA",
     ],
     badge: "Le plus choisi",
     limits: {

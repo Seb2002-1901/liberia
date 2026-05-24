@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/layout/brand-mark";
-import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { UnsubscribeForm } from "@/components/unsubscribe/unsubscribe-form";
+import { isAdminConfigured } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -18,19 +19,10 @@ interface PageProps {
 export default async function UnsubscribePage({ searchParams }: PageProps) {
   const { token } = await searchParams;
 
-  let result: "ok" | "invalid" | "config" = "invalid";
-  if (!isAdminConfigured()) {
-    result = "config";
-  } else if (token && typeof token === "string" && token.length > 8) {
-    const admin = getAdminClient();
-    const { data, error } = await admin
-      .from("user_settings")
-      .update({ email_weekly_summary: false })
-      .eq("email_unsubscribe_token", token)
-      .select("user_id")
-      .maybeSingle();
-    if (!error && data) result = "ok";
-  }
+  // GET requests don't unsubscribe by themselves — email link previewers
+  // (Gmail, Slack, Twitter, antivirus link checkers) crawl every URL and
+  // would auto-trigger the action. The actual unsubscribe happens via a
+  // server action invoked by a form submit (POST) inside UnsubscribeForm.
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -38,20 +30,7 @@ export default async function UnsubscribePage({ searchParams }: PageProps) {
         <BrandMark />
       </div>
       <div className="container my-auto max-w-md text-center">
-        {result === "ok" ? (
-          <>
-            <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-              Désinscription
-            </p>
-            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-              C'est fait.
-            </h1>
-            <p className="mt-3 text-muted-foreground">
-              Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le
-              réactiver à tout moment depuis tes paramètres.
-            </p>
-          </>
-        ) : result === "config" ? (
+        {!isAdminConfigured() ? (
           <>
             <h1 className="font-display text-2xl font-semibold tracking-tight">
               Service indisponible
@@ -62,16 +41,18 @@ export default async function UnsubscribePage({ searchParams }: PageProps) {
               préférences emails.
             </p>
           </>
-        ) : (
+        ) : !token ? (
           <>
             <h1 className="font-display text-2xl font-semibold tracking-tight">
               Lien invalide
             </h1>
             <p className="mt-3 text-muted-foreground">
-              Ce lien de désinscription n'est pas reconnu. Ouvre tes paramètres
+              Ce lien de désinscription est incomplet. Ouvre tes paramètres
               dans LIBERIA pour gérer tes préférences emails.
             </p>
           </>
+        ) : (
+          <UnsubscribeForm token={token} />
         )}
         <Button asChild variant="gold" size="lg" className="mt-7">
           <Link href="/">Retour à LIBERIA</Link>
