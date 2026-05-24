@@ -30,13 +30,20 @@ import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
+import { PlanTeaser } from "@/components/dashboard/plan-teaser";
+import { getActivePlan } from "@/lib/services/plan";
+import { isAnthropicConfigured } from "@/lib/env";
+import { isAdminConfigured } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Tableau de bord",
 };
 
 export default async function DashboardPage() {
-  const data = await getFinanceData();
+  const [data, activePlan] = await Promise.all([
+    getFinanceData(),
+    getActivePlan(),
+  ]);
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
   const monthlyExpenses =
@@ -180,6 +187,12 @@ export default async function DashboardPage() {
         <ExpenseBreakdown data={expenseByCategory} currency={data.profile.currency} />
         <GoalsSummary goals={data.goals} currency={data.profile.currency} />
       </div>
+
+      <PlanTeaser
+        plan={activePlan?.plan ?? null}
+        steps={activePlan?.steps ?? []}
+        aiReady={isAnthropicConfigured() && isAdminConfigured()}
+      />
 
       <CoachTeaser
         data={data}

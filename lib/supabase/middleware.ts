@@ -11,6 +11,7 @@ const PROTECTED_PREFIXES = [
   "/expenses",
   "/goals",
   "/coach",
+  "/plan",
   "/profile",
   "/settings",
   "/onboarding",

@@ -24,6 +24,7 @@ export const ROUTES = {
   expenses: "/expenses",
   goals: "/goals",
   coach: "/coach",
+  plan: "/plan",
   profile: "/profile",
   settings: "/settings",
   subscription: "/settings/subscription",

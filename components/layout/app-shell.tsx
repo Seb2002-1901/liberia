@@ -8,6 +8,7 @@ import {
   ArrowUpCircle,
   LayoutDashboard,
   LogOut,
+  Map,
   MessageSquare,
   Settings,
   Sparkles,
@@ -32,9 +33,21 @@ import { cn, getInitials } from "@/lib/utils";
 const NAV = [
   { href: ROUTES.dashboard, label: "Tableau de bord", icon: LayoutDashboard },
   { href: ROUTES.coach, label: "Coach IA", icon: MessageSquare },
+  { href: ROUTES.plan, label: "Plan", icon: Map },
   { href: ROUTES.budget, label: "Budget", icon: Wallet },
   { href: ROUTES.incomes, label: "Revenus", icon: ArrowUpCircle },
   { href: ROUTES.expenses, label: "Dépenses", icon: ArrowDownCircle },
+  { href: ROUTES.goals, label: "Objectifs", icon: Target },
+];
+
+// On mobile the bottom-nav keeps the 5 most-used entries so each tap
+// target stays comfortable on small screens. Less-used items remain in
+// the sidebar dropdown / direct URL.
+const MOBILE_NAV = [
+  { href: ROUTES.dashboard, label: "Accueil", icon: LayoutDashboard },
+  { href: ROUTES.coach, label: "Coach", icon: MessageSquare },
+  { href: ROUTES.plan, label: "Plan", icon: Map },
+  { href: ROUTES.budget, label: "Budget", icon: Wallet },
   { href: ROUTES.goals, label: "Objectifs", icon: Target },
 ];
 
@@ -224,8 +237,8 @@ export function AppShell({
           className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl lg:hidden"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          <div className="grid grid-cols-6">
-            {NAV.map((item) => {
+          <div className="grid grid-cols-5">
+            {MOBILE_NAV.map((item) => {
               const Icon = item.icon;
               const active = isActive(pathname, item.href);
               return (
@@ -371,7 +384,10 @@ function isActive(pathname: string | null, href: string) {
 function shortLabel(label: string) {
   const map: Record<string, string> = {
     "Tableau de bord": "Accueil",
+    Accueil: "Accueil",
+    Coach: "Coach",
     "Coach IA": "Coach",
+    Plan: "Plan",
     Revenus: "Revenus",
     Dépenses: "Dépenses",
     Objectifs: "Objectifs",

@@ -360,6 +360,99 @@ create policy "ai_messages_self_delete" on public.ai_messages
   for delete using (auth.uid() = user_id);
 
 -- =====================================================
+-- financial_plans (Phase 3) — IA-generated 30/60/90 day plans
+-- =====================================================
+create table if not exists public.financial_plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  horizon_days integer not null default 90 check (horizon_days in (30, 60, 90)),
+  title text not null default 'Mon plan financier',
+  summary text,
+  model text,
+  generation_input jsonb,        -- snapshot of finance context used (audit trail)
+  is_active boolean not null default true,
+  generated_at timestamptz not null default timezone('utc', now()),
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists idx_financial_plans_user_active
+  on public.financial_plans(user_id, generated_at desc)
+  where is_active = true;
+
+drop trigger if exists set_updated_at_financial_plans on public.financial_plans;
+create trigger set_updated_at_financial_plans
+before update on public.financial_plans
+for each row execute function public.handle_updated_at();
+
+-- =====================================================
+-- financial_plan_steps (Phase 3) — actionable items per plan
+-- =====================================================
+create table if not exists public.financial_plan_steps (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid not null references public.financial_plans(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  week_number integer not null check (week_number between 1 and 13),
+  focus text not null,
+  title text not null,
+  description text,
+  expected_impact_eur numeric(12,2),
+  category text,
+  is_completed boolean not null default false,
+  completed_at timestamptz,
+  position integer not null default 0,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists idx_financial_plan_steps_plan
+  on public.financial_plan_steps(plan_id, week_number asc, position asc);
+create index if not exists idx_financial_plan_steps_user
+  on public.financial_plan_steps(user_id);
+
+drop trigger if exists set_updated_at_plan_steps on public.financial_plan_steps;
+create trigger set_updated_at_plan_steps
+before update on public.financial_plan_steps
+for each row execute function public.handle_updated_at();
+
+-- RLS — plans + steps: self CRUD. Plan content is generated server-side
+-- via Anthropic tool-use; the server still has to be able to write via
+-- the user session for the initial insert, so we allow self INSERT.
+alter table public.financial_plans       enable row level security;
+alter table public.financial_plan_steps  enable row level security;
+
+drop policy if exists "financial_plans_self_select" on public.financial_plans;
+create policy "financial_plans_self_select" on public.financial_plans
+  for select using (auth.uid() = user_id);
+drop policy if exists "financial_plans_self_insert" on public.financial_plans;
+create policy "financial_plans_self_insert" on public.financial_plans
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "financial_plans_self_update" on public.financial_plans;
+create policy "financial_plans_self_update" on public.financial_plans
+  for update using (auth.uid() = user_id);
+drop policy if exists "financial_plans_self_delete" on public.financial_plans;
+create policy "financial_plans_self_delete" on public.financial_plans
+  for delete using (auth.uid() = user_id);
+
+drop policy if exists "financial_plan_steps_self_select" on public.financial_plan_steps;
+create policy "financial_plan_steps_self_select" on public.financial_plan_steps
+  for select using (auth.uid() = user_id);
+drop policy if exists "financial_plan_steps_self_insert" on public.financial_plan_steps;
+create policy "financial_plan_steps_self_insert" on public.financial_plan_steps
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "financial_plan_steps_self_update" on public.financial_plan_steps;
+create policy "financial_plan_steps_self_update" on public.financial_plan_steps
+  for update using (auth.uid() = user_id);
+drop policy if exists "financial_plan_steps_self_delete" on public.financial_plan_steps;
+create policy "financial_plan_steps_self_delete" on public.financial_plan_steps
+  for delete using (auth.uid() = user_id);
+
+-- Phase 3 columns on user_settings for email preferences + unsubscribe token.
+alter table public.user_settings
+  add column if not exists email_unsubscribe_token text unique default gen_random_uuid()::text,
+  add column if not exists last_weekly_sent_at timestamptz;
+
+-- =====================================================
 -- Row-Level Security
 -- =====================================================
 alter table public.profiles            enable row level security;

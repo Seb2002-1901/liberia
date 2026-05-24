@@ -163,8 +163,28 @@ Voir `SECURITY.md`.
 Setup pas-à-pas : [AI_SETUP.md](./AI_SETUP.md), [STRIPE_PHASE2.md](./STRIPE_PHASE2.md),
 [SENTRY_SETUP.md](./SENTRY_SETUP.md), [UPSTASH_SETUP.md](./UPSTASH_SETUP.md).
 
-## Prochaines phases
+## Phase 3 — état
 
-- **Phase 3** : plan 90 jours intelligent (Claude tool-use), génération de
-  revenus, optimisation investissement, notifications hebdo, customer portal
-  riche, multilangue.
+- ✅ **Plan IA 30/60/90 jours** (`/plan`) — génération via Anthropic
+  tool-use (Sonnet 4.6, JSON structuré strict validé Zod). Timeline par
+  semaine, validation des étapes, régénération.
+- ✅ **Notifications hebdo email** — Resend + cron Vercel chaque dimanche.
+  Préférences utilisateur + unsubscribe par lien (token RGPD-friendly).
+- ✅ **Settings RGPD** — export complet des données utilisateur (JSON),
+  suppression définitive du compte (cascade cleanup).
+- ✅ **Tests automatisés** — Vitest (34 unitaires : calculs, schémas,
+  redirects), Playwright (smoke 8 routes publiques), GitHub Actions CI.
+- ✅ **Dashboard widget plan** — montre la prochaine étape et la progression.
+
+Setup pas-à-pas : [PLAN_PHASE3.md](./PLAN_PHASE3.md),
+[EMAIL_SETUP.md](./EMAIL_SETUP.md), [TESTS_SETUP.md](./TESTS_SETUP.md).
+
+## Roadmap
+
+- Plan archives + comparaison
+- Streaming de la génération plan
+- Génération de revenus IA (coaching side-projects)
+- Customer Portal enrichi (changement plan in-app)
+- Internationalisation (en/es)
+- Realtime sync multi-tab
+- Mobile coach Sheet drawer natif

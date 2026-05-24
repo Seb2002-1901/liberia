@@ -102,6 +102,39 @@ export interface UserSettings {
   theme: "dark" | "light" | "system";
   email_weekly_summary: boolean;
   notification_alerts: boolean;
+  email_unsubscribe_token: string;
+  last_weekly_sent_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FinancialPlan {
+  id: string;
+  user_id: string;
+  horizon_days: 30 | 60 | 90;
+  title: string;
+  summary: string | null;
+  model: string | null;
+  generation_input: unknown | null;
+  is_active: boolean;
+  generated_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FinancialPlanStep {
+  id: string;
+  plan_id: string;
+  user_id: string;
+  week_number: number;
+  focus: string;
+  title: string;
+  description: string | null;
+  expected_impact_eur: number | null;
+  category: string | null;
+  is_completed: boolean;
+  completed_at: string | null;
+  position: number;
   created_at: string;
   updated_at: string;
 }

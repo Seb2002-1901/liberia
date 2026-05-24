@@ -1,24 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Sparkles, Shield, Bell, CreditCard } from "lucide-react";
+import { Bell, CreditCard, Database, Shield, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  DataExportButton,
+  DeleteAccountButton,
+  SettingsPreferences,
+} from "@/components/settings/settings-preferences";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { ROUTES } from "@/lib/constants";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Paramètres",
 };
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const prefs = await loadPreferences();
+
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Compte"
         title="Paramètres"
-        description="Ajuste ton expérience LIBERIA."
+        description="Ajuste tes préférences et gère tes données."
       />
 
       <Card>
@@ -27,20 +36,11 @@ export default function SettingsPage() {
             <Bell className="h-4 w-4 text-[hsl(var(--gold))]" /> Notifications
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
-          <Row
-            title="Résumé hebdomadaire par email"
-            description="Chaque dimanche, un récap court de ta semaine financière."
-            control={<Switch defaultChecked disabled />}
+        <CardContent>
+          <SettingsPreferences
+            weeklyEnabled={prefs.weekly}
+            alertsEnabled={prefs.alerts}
           />
-          <Row
-            title="Alertes importantes"
-            description="Reste à vivre négatif, objectifs en retard, etc."
-            control={<Switch defaultChecked disabled />}
-          />
-          <p className="text-xs text-muted-foreground">
-            Préférences fines disponibles dans la prochaine phase.
-          </p>
         </CardContent>
       </Card>
 
@@ -65,13 +65,36 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-[hsl(var(--gold))]" /> Sécurité & données
+            <Database className="h-4 w-4 text-[hsl(var(--gold))]" /> Données &
+            confidentialité
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Conformément au RGPD, tu peux exporter ou supprimer définitivement
+            l'ensemble de tes données.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <DataExportButton />
+            <DeleteAccountButton />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            L'export contient profil, revenus, dépenses, objectifs, plans IA et
+            historique des conversations.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-[hsl(var(--gold))]" /> Sécurité
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Tes données sont chiffrées et accessibles uniquement par toi. Tu peux exporter ou
-            supprimer ton compte en envoyant un email à <strong>privacy@liberia.app</strong>.
+            Tes données sont chiffrées et accessibles uniquement par toi (RLS
+            Postgres + RLS service-role isolé côté serveur).
           </p>
           <Separator />
           <p>
@@ -91,22 +114,20 @@ export default function SettingsPage() {
   );
 }
 
-function Row({
-  title,
-  description,
-  control,
-}: {
-  title: string;
-  description: string;
-  control: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-      {control}
-    </div>
-  );
+async function loadPreferences(): Promise<{ weekly: boolean; alerts: boolean }> {
+  if (!isSupabaseConfigured()) return { weekly: true, alerts: true };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { weekly: true, alerts: true };
+  const { data } = await supabase
+    .from("user_settings")
+    .select("email_weekly_summary, notification_alerts")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  return {
+    weekly: data?.email_weekly_summary ?? true,
+    alerts: data?.notification_alerts ?? true,
+  };
 }
