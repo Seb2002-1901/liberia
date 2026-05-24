@@ -53,7 +53,20 @@ export function CoachMobileTrigger({
           <DialogHeader className="border-b border-border/60 px-5 py-3">
             <DialogTitle>Mes conversations</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden" onClick={() => setOpen(false)}>
+          {/*
+            Close the dialog only when the user actually navigates to a
+            conversation (click target is an anchor). A blanket onClick
+            here would also fire for the per-row "..." menu trigger and
+            close the dialog before its dropdown could open.
+          */}
+          <div
+            className="flex-1 overflow-hidden"
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest("a[href]")) {
+                setOpen(false);
+              }
+            }}
+          >
             <CoachSidebar conversations={conversations} isDemo={isDemo} />
           </div>
         </DialogContent>

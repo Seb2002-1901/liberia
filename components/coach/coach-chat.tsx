@@ -51,10 +51,17 @@ export function CoachChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
+  // Auto-scroll the chat to the bottom, but ONLY when the user is
+  // already near the bottom — otherwise yanking them back down would
+  // interrupt them mid-reread of an earlier message. 120px slack handles
+  // small over-scroll and minor layout shift from the streaming cursor.
   React.useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollTop = el.scrollHeight;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceFromBottom < 120) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages, streamedText]);
 
   // Abort in-flight stream if the component unmounts or the user switches
