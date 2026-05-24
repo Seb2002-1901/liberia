@@ -263,38 +263,40 @@ drop policy if exists "stripe_events_no_user_insert" on public.stripe_events;
 drop policy if exists "stripe_events_no_user_update" on public.stripe_events;
 drop policy if exists "stripe_events_no_user_delete" on public.stripe_events;
 
--- ai_conversations + ai_messages: self CRUD
-do $$
-declare
-  t text;
-begin
-  for t in select unnest(array['ai_conversations', 'ai_messages'])
-  loop
-    execute format('drop policy if exists "%1$s_self_select" on public.%1$s;', t);
-    execute format(
-      'create policy "%1$s_self_select" on public.%1$s for select using (auth.uid() = user_id);',
-      t
-    );
+-- ai_conversations: full self CRUD (titles, archive, delete)
+drop policy if exists "ai_conversations_self_select" on public.ai_conversations;
+create policy "ai_conversations_self_select" on public.ai_conversations
+  for select using (auth.uid() = user_id);
+drop policy if exists "ai_conversations_self_insert" on public.ai_conversations;
+create policy "ai_conversations_self_insert" on public.ai_conversations
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "ai_conversations_self_update" on public.ai_conversations;
+create policy "ai_conversations_self_update" on public.ai_conversations
+  for update using (auth.uid() = user_id);
+drop policy if exists "ai_conversations_self_delete" on public.ai_conversations;
+create policy "ai_conversations_self_delete" on public.ai_conversations
+  for delete using (auth.uid() = user_id);
 
-    execute format('drop policy if exists "%1$s_self_insert" on public.%1$s;', t);
-    execute format(
-      'create policy "%1$s_self_insert" on public.%1$s for insert with check (auth.uid() = user_id);',
-      t
-    );
-
-    execute format('drop policy if exists "%1$s_self_update" on public.%1$s;', t);
-    execute format(
-      'create policy "%1$s_self_update" on public.%1$s for update using (auth.uid() = user_id);',
-      t
-    );
-
-    execute format('drop policy if exists "%1$s_self_delete" on public.%1$s;', t);
-    execute format(
-      'create policy "%1$s_self_delete" on public.%1$s for delete using (auth.uid() = user_id);',
-      t
-    );
-  end loop;
-end$$;
+-- ai_messages: users may read their own AND insert their own *user* turns.
+-- Assistant turns must come from the server (service-role) to prevent a
+-- user from forging fake assistant replies in their own conversation
+-- history — that history is fed back to the model on the next turn, so
+-- forged content would let the user poison their own LLM prompt and
+-- bootstrap a prompt-injection. Update/delete stay user-controlled (the
+-- user owns their conversation and can prune it).
+drop policy if exists "ai_messages_self_select" on public.ai_messages;
+create policy "ai_messages_self_select" on public.ai_messages
+  for select using (auth.uid() = user_id);
+drop policy if exists "ai_messages_self_insert_user" on public.ai_messages;
+drop policy if exists "ai_messages_self_insert" on public.ai_messages;
+create policy "ai_messages_self_insert_user" on public.ai_messages
+  for insert with check (auth.uid() = user_id and role = 'user');
+drop policy if exists "ai_messages_self_update" on public.ai_messages;
+create policy "ai_messages_self_update" on public.ai_messages
+  for update using (auth.uid() = user_id);
+drop policy if exists "ai_messages_self_delete" on public.ai_messages;
+create policy "ai_messages_self_delete" on public.ai_messages
+  for delete using (auth.uid() = user_id);
 
 -- =====================================================
 -- Row-Level Security

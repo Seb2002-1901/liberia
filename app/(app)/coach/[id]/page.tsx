@@ -4,6 +4,7 @@ import { CoachChat } from "@/components/coach/coach-chat";
 import { getConversation } from "@/lib/services/coach";
 import { getFinanceData } from "@/lib/services/finance";
 import { isAnthropicConfigured } from "@/lib/env";
+import { isAdminConfigured } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Coach IA",
@@ -24,7 +25,7 @@ export default async function CoachConversationPage({ params }: PageProps) {
     <CoachChat
       conversationId={id}
       initialMessages={conversation.messages}
-      isAiConfigured={isAnthropicConfigured()}
+      isAiConfigured={isAnthropicConfigured() && isAdminConfigured()}
       isDemo={data.isDemo}
     />
   );

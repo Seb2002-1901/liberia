@@ -4,12 +4,16 @@ import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
 import { chatMessageSchema, looksLikeAbuse } from "@/lib/ai/safety";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getFinanceData } from "@/lib/services/finance";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel Hobby caps Node functions at 10s by default. Bump to 60s so a
+// thinking-heavy answer can stream to the end. Pro plans support up to 300s.
+export const maxDuration = 60;
 
 const HISTORY_LIMIT = 40; // last N turns kept in context
 
@@ -19,6 +23,15 @@ export async function POST(request: Request) {
       {
         error:
           "Coach IA non configuré. Renseigne ANTHROPIC_API_KEY pour activer.",
+      },
+      { status: 501 },
+    );
+  }
+  if (!isAdminConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Coach IA non configuré côté serveur. SUPABASE_SERVICE_ROLE_KEY requis pour persister les réponses.",
       },
       { status: 501 },
     );
@@ -108,16 +121,20 @@ export async function POST(request: Request) {
   }
 
   // Load conversation history (now including the new user message).
-  const { data: history, error: histErr } = await supabase
+  // Fetch the MOST RECENT N turns ordered descending, then reverse for the
+  // model — ordering ascending + limiting would silently drop the latest
+  // turns once a conversation exceeded the cap.
+  const { data: historyDesc, error: histErr } = await supabase
     .from("ai_messages")
     .select("role, content, created_at")
     .eq("conversation_id", conversation.id)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .limit(HISTORY_LIMIT * 2);
   if (histErr) {
     return NextResponse.json({ error: histErr.message }, { status: 500 });
   }
+  const history = (historyDesc ?? []).slice().reverse();
 
   // Build finance context (read-only per-request snapshot).
   const financeData = await getFinanceData();
@@ -125,7 +142,7 @@ export async function POST(request: Request) {
 
   // If this is the first user message, derive a short title for the
   // sidebar (do this fire-and-forget; failure must not block streaming).
-  if (history && history.filter((m) => m.role === "user").length === 1) {
+  if (history.filter((m) => m.role === "user").length === 1) {
     const derivedTitle =
       parsed.data.content.slice(0, 60).replace(/\s+/g, " ").trim() ||
       "Nouvelle conversation";
@@ -148,10 +165,18 @@ export async function POST(request: Request) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let clientClosed = false;
       const send = (eventType: string, data: unknown) => {
-        controller.enqueue(
-          encoder.encode(`event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`),
-        );
+        if (clientClosed) return;
+        try {
+          controller.enqueue(
+            encoder.encode(`event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`),
+          );
+        } catch {
+          // Client navigated away or aborted — keep draining the upstream
+          // (Claude finishes generating, we still persist the result).
+          clientClosed = true;
+        }
       };
 
       try {
@@ -197,8 +222,13 @@ export async function POST(request: Request) {
         cacheRead = final.usage.cache_read_input_tokens ?? 0;
         cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
 
-        // Persist the assistant turn.
-        await supabase.from("ai_messages").insert({
+        // Persist the assistant turn via the service-role client. The
+        // ai_messages RLS policy restricts user-session inserts to
+        // role='user', so assistant turns only enter the table through
+        // this server-controlled path — a user cannot forge an assistant
+        // reply in their own conversation history (which would otherwise
+        // poison the next model call).
+        await getAdminClient().from("ai_messages").insert({
           conversation_id: conversation.id,
           user_id: user.id,
           role: "assistant",
@@ -222,13 +252,26 @@ export async function POST(request: Request) {
           tokens_out: tokensOut,
           cache_read_tokens: cacheRead,
         });
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          /* already closed by client */
+        }
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Erreur du coach IA";
         send("error", { message });
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          /* already closed */
+        }
       }
+    },
+    cancel() {
+      // Client disconnected. Anthropic's stream will continue until the
+      // response completes (we still want to persist it), but mark the
+      // channel closed so we stop trying to write into it.
     },
   });
 

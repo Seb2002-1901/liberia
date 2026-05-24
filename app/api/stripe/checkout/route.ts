@@ -69,16 +69,39 @@ export async function POST(request: Request) {
   // redirect the user back to a malicious domain after payment.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+  // Reuse the existing Stripe Customer if we've already provisioned one
+  // for this user (previous checkout, even if since cancelled). Without
+  // this, every new subscription creates a fresh Customer in Stripe and
+  // the lookup-by-customer-id fallback in the webhook breaks across
+  // resubscription cycles.
+  const { data: existingSub } = await supabase
+    .from("subscriptions")
+    .select("stripe_customer_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   try {
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      customer_email: user.email ?? undefined,
+      // Use the persisted customer when available, otherwise just hint the
+      // email so Stripe can pre-fill the form. Don't set both at once —
+      // Stripe rejects that combination.
+      ...(existingSub?.stripe_customer_id
+        ? { customer: existingSub.stripe_customer_id }
+        : { customer_email: user.email ?? undefined }),
       line_items: [{ price: plan.priceId, quantity: 1 }],
       success_url: `${baseUrl}/settings/subscription?status=success`,
       cancel_url: `${baseUrl}/settings/subscription?status=cancel`,
       client_reference_id: user.id,
       metadata: { user_id: user.id, plan: "premium" },
+      // CRITICAL: session metadata is NOT propagated to the eventual
+      // Subscription object. Set it explicitly via subscription_data so
+      // customer.subscription.* events carry user_id for the webhook
+      // dispatcher — no fragile customer_id lookup needed.
+      subscription_data: {
+        metadata: { user_id: user.id },
+      },
       allow_promotion_codes: true,
     });
 

@@ -49,6 +49,17 @@ export function CoachChat({
     el.scrollTop = el.scrollHeight;
   }, [messages, streamedText]);
 
+  // Abort in-flight stream if the component unmounts or the user switches
+  // conversation. Otherwise the SSE fetch keeps Anthropic tokens running
+  // even though the UI is gone — and the assistant message still persists
+  // server-side on completion.
+  React.useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+      abortRef.current = null;
+    };
+  }, [conversationId]);
+
   const disabled = streaming || isDemo || !isAiConfigured;
 
   const sendMessage = React.useCallback(

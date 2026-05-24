@@ -20,6 +20,13 @@ Sans cette variable :
 - `/api/ai/chat` renvoie `501` ;
 - aucune dépendance ne casse, le reste de l'app fonctionne normalement.
 
+> ⚠️ **`SUPABASE_SERVICE_ROLE_KEY` est aussi requis** pour le coach.
+> La RLS sur `ai_messages` n'autorise les inserts user-session que pour
+> `role='user'` — ferme la faille où un utilisateur pourrait forger des
+> messages assistant dans son propre historique et empoisonner la
+> conversation suivante. Les écritures assistant passent par le client
+> service-role. Sans cette variable, `/api/ai/chat` retourne 501.
+
 ## 2. Migrer la base de données
 
 Exécute `supabase/schema.sql` (il est idempotent). Les nouvelles tables Phase 2 :
