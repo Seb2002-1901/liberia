@@ -214,6 +214,61 @@ create index if not exists idx_stripe_events_type on public.stripe_events(type);
 alter table public.subscriptions
   add column if not exists last_event_at timestamptz;
 
+-- Atomic conditional upsert for Stripe subscription state.
+-- The naïve "SELECT last_event_at then UPDATE" pattern races when two
+-- webhooks for the same user land in parallel — both readers see the
+-- same last_event_at, both write, and the second writer wins even
+-- when it carries an older event. This function does the comparison
+-- inside a single SQL statement so Postgres serializes it for us.
+create or replace function public.apply_subscription_event(
+  p_user_id uuid,
+  p_customer_id text,
+  p_subscription_id text,
+  p_status text,
+  p_plan text,
+  p_current_period_end timestamptz,
+  p_cancel_at_period_end boolean,
+  p_event_at timestamptz
+) returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.subscriptions (
+    user_id,
+    stripe_customer_id,
+    stripe_subscription_id,
+    status,
+    plan,
+    current_period_end,
+    cancel_at_period_end,
+    last_event_at
+  )
+  values (
+    p_user_id,
+    p_customer_id,
+    p_subscription_id,
+    p_status,
+    p_plan,
+    p_current_period_end,
+    p_cancel_at_period_end,
+    p_event_at
+  )
+  on conflict (user_id) do update
+  set
+    stripe_customer_id     = excluded.stripe_customer_id,
+    stripe_subscription_id = excluded.stripe_subscription_id,
+    status                 = excluded.status,
+    plan                   = excluded.plan,
+    current_period_end     = excluded.current_period_end,
+    cancel_at_period_end   = excluded.cancel_at_period_end,
+    last_event_at          = excluded.last_event_at
+  where public.subscriptions.last_event_at is null
+     or public.subscriptions.last_event_at < excluded.last_event_at;
+end;
+$$;
+
 -- =====================================================
 -- ai_conversations (Phase 2)
 -- =====================================================

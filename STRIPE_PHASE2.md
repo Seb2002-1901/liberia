@@ -30,6 +30,13 @@ SUPABASE_SERVICE_ROLE_KEY=...
 En cas d'erreur applicative pendant le dispatch, le row `stripe_events` est
 supprimé pour que Stripe rejoue automatiquement.
 
+L'upsert lui-même passe par la fonction Postgres `apply_subscription_event()`
+définie dans `supabase/schema.sql`. Elle fait `INSERT … ON CONFLICT DO UPDATE
+WHERE last_event_at < new` en une seule instruction SQL atomique, ce qui
+empêche deux webhooks parallèles pour le même utilisateur d'écraser leurs
+écritures respectives (l'ancien event ne peut pas réécrire par-dessus le
+nouveau, peu importe l'ordre d'arrivée).
+
 L'écriture passe par `getAdminClient()` (service-role, bypass RLS). C'est la
 seule façon de toucher `subscriptions` côté serveur — la RLS bloque tout
 écrit user-side (anti-fake-Premium fermé en Phase 1, 6e passe d'audit).

@@ -162,35 +162,20 @@ async function upsertSubscription(
 ): Promise<void> {
   const customerId = typeof customer === "string" ? customer : customer?.id ?? null;
 
-  // Out-of-order webhook protection: Stripe delivers events independently,
-  // and a stale customer.subscription.updated can arrive AFTER a newer
-  // customer.subscription.deleted, which would silently re-promote a
-  // cancelled user back to Premium. Skip the write when the incoming
-  // event is older than the last one we successfully applied.
-  const { data: existing } = await admin
-    .from("subscriptions")
-    .select("last_event_at")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (
-    existing?.last_event_at &&
-    new Date(existing.last_event_at) > new Date(eventCreatedAt)
-  ) {
-    return;
-  }
-
-  const { error } = await admin.from("subscriptions").upsert(
-    {
-      user_id: userId,
-      stripe_customer_id: customerId,
-      stripe_subscription_id: sub.id,
-      status: sub.status,
-      plan: planFromSubscription(sub),
-      current_period_end: periodEndFromSubscription(sub),
-      cancel_at_period_end: sub.cancel_at_period_end ?? false,
-      last_event_at: eventCreatedAt,
-    },
-    { onConflict: "user_id" },
-  );
+  // Atomic conditional upsert via Postgres function. The function does
+  // INSERT ... ON CONFLICT DO UPDATE WHERE last_event_at < new, so two
+  // parallel webhooks for the same user can't race to overwrite each
+  // other — Postgres serializes the comparison + write in a single
+  // statement.
+  const { error } = await admin.rpc("apply_subscription_event", {
+    p_user_id: userId,
+    p_customer_id: customerId,
+    p_subscription_id: sub.id,
+    p_status: sub.status,
+    p_plan: planFromSubscription(sub),
+    p_current_period_end: periodEndFromSubscription(sub),
+    p_cancel_at_period_end: sub.cancel_at_period_end ?? false,
+    p_event_at: eventCreatedAt,
+  });
   if (error) throw error;
 }
