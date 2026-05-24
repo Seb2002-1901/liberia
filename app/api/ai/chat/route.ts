@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
-import { chatMessageSchema, looksLikeAbuse } from "@/lib/ai/safety";
+import {
+  MAX_CONVERSATION_TURNS,
+  chatMessageSchema,
+  looksLikeAbuse,
+} from "@/lib/ai/safety";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getFinanceData } from "@/lib/services/finance";
@@ -15,7 +19,7 @@ export const dynamic = "force-dynamic";
 // thinking-heavy answer can stream to the end. Pro plans support up to 300s.
 export const maxDuration = 60;
 
-const HISTORY_LIMIT = 40; // last N turns kept in context
+const HISTORY_LIMIT = MAX_CONVERSATION_TURNS; // last N turns kept in context
 
 export async function POST(request: Request) {
   if (!isAnthropicConfigured()) {
@@ -228,17 +232,22 @@ export async function POST(request: Request) {
         // this server-controlled path — a user cannot forge an assistant
         // reply in their own conversation history (which would otherwise
         // poison the next model call).
-        await getAdminClient().from("ai_messages").insert({
-          conversation_id: conversation.id,
-          user_id: user.id,
-          role: "assistant",
-          content: assistantBuffer,
-          model: COACH_MODEL,
-          tokens_in: tokensIn,
-          tokens_out: tokensOut,
-          cache_read_tokens: cacheRead,
-          cache_write_tokens: cacheWrite,
-        });
+        // Don't persist an empty reply (rare — model timeout or refusal
+        // returning no text). The conversation stays clean and the user
+        // can re-prompt.
+        if (assistantBuffer.trim().length > 0) {
+          await getAdminClient().from("ai_messages").insert({
+            conversation_id: conversation.id,
+            user_id: user.id,
+            role: "assistant",
+            content: assistantBuffer,
+            model: COACH_MODEL,
+            tokens_in: tokensIn,
+            tokens_out: tokensOut,
+            cache_read_tokens: cacheRead,
+            cache_write_tokens: cacheWrite,
+          });
+        }
 
         // Touch the conversation so the sidebar re-sorts.
         await supabase

@@ -208,6 +208,12 @@ create table if not exists public.stripe_events (
 );
 create index if not exists idx_stripe_events_type on public.stripe_events(type);
 
+-- Track the most recent Stripe event timestamp applied to each
+-- subscription row so we can ignore out-of-order deliveries.
+-- (Idempotent column add — safe for already-deployed Phase 2 databases.)
+alter table public.subscriptions
+  add column if not exists last_event_at timestamptz;
+
 -- =====================================================
 -- ai_conversations (Phase 2)
 -- =====================================================

@@ -35,9 +35,15 @@ export const listConversations = cache(
   },
 );
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getConversation(
   id: string,
 ): Promise<{ title: string; messages: CoachMessage[] } | null> {
+  // Pre-validate to avoid a Postgres "invalid input syntax for type uuid"
+  // round-trip when the URL segment is garbage.
+  if (!UUID_RE.test(id)) return null;
   if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const {

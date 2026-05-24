@@ -70,6 +70,9 @@ async function handleEvent(
   event: Stripe.Event,
   admin: ReturnType<typeof getAdminClient>,
 ): Promise<void> {
+  // event.created is in seconds; convert to ISO for monotonic comparison.
+  const eventCreatedAt = new Date(event.created * 1000).toISOString();
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -83,7 +86,7 @@ async function handleEvent(
         session.subscription as string,
       )) as Stripe.Subscription;
 
-      await upsertSubscription(admin, userId, subscription, session.customer);
+      await upsertSubscription(admin, userId, subscription, session.customer, eventCreatedAt);
       return;
     }
 
@@ -95,7 +98,7 @@ async function handleEvent(
         (subscription.metadata?.user_id as string | undefined) ??
         (await resolveUserIdFromCustomer(admin, subscription.customer));
       if (!userId) return;
-      await upsertSubscription(admin, userId, subscription, subscription.customer);
+      await upsertSubscription(admin, userId, subscription, subscription.customer, eventCreatedAt);
       return;
     }
 
@@ -110,7 +113,7 @@ async function handleEvent(
         (subscription.metadata?.user_id as string | undefined) ??
         (await resolveUserIdFromCustomer(admin, subscription.customer));
       if (!userId) return;
-      await upsertSubscription(admin, userId, subscription, subscription.customer);
+      await upsertSubscription(admin, userId, subscription, subscription.customer, eventCreatedAt);
       return;
     }
 
@@ -155,8 +158,27 @@ async function upsertSubscription(
   userId: string,
   sub: Stripe.Subscription,
   customer: string | Stripe.Customer | Stripe.DeletedCustomer | null,
+  eventCreatedAt: string,
 ): Promise<void> {
   const customerId = typeof customer === "string" ? customer : customer?.id ?? null;
+
+  // Out-of-order webhook protection: Stripe delivers events independently,
+  // and a stale customer.subscription.updated can arrive AFTER a newer
+  // customer.subscription.deleted, which would silently re-promote a
+  // cancelled user back to Premium. Skip the write when the incoming
+  // event is older than the last one we successfully applied.
+  const { data: existing } = await admin
+    .from("subscriptions")
+    .select("last_event_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (
+    existing?.last_event_at &&
+    new Date(existing.last_event_at) > new Date(eventCreatedAt)
+  ) {
+    return;
+  }
+
   const { error } = await admin.from("subscriptions").upsert(
     {
       user_id: userId,
@@ -166,6 +188,7 @@ async function upsertSubscription(
       plan: planFromSubscription(sub),
       current_period_end: periodEndFromSubscription(sub),
       cancel_at_period_end: sub.cancel_at_period_end ?? false,
+      last_event_at: eventCreatedAt,
     },
     { onConflict: "user_id" },
   );
