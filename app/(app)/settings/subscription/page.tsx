@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckoutButton } from "@/components/billing/checkout-button";
 import { CheckoutFeedback } from "@/components/billing/checkout-feedback";
+import { PortalButton } from "@/components/billing/portal-button";
 import { PLANS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { getFinanceData } from "@/lib/services/finance";
@@ -49,6 +50,11 @@ export default async function SubscriptionPage() {
               ? "Merci pour ton soutien — toutes les fonctions sont débloquées."
               : "Tu utilises LIBERIA gratuitement. Pour usage illimité, choisis Premium."}
           </p>
+          {isPremium && (
+            <div className="basis-full">
+              <PortalButton />
+            </div>
+          )}
         </CardContent>
       </Card>
 

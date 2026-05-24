@@ -29,6 +29,7 @@ import {
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
+import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 
 export const metadata: Metadata = {
   title: "Tableau de bord",
@@ -179,6 +180,15 @@ export default async function DashboardPage() {
         <ExpenseBreakdown data={expenseByCategory} currency={data.profile.currency} />
         <GoalsSummary goals={data.goals} currency={data.profile.currency} />
       </div>
+
+      <CoachTeaser
+        data={data}
+        monthlyIncome={monthlyIncome}
+        monthlyExpenses={monthlyExpenses}
+        cashflow={cashflow}
+        savingsRate={savingsRate}
+        runwayMonths={runway}
+      />
     </div>
   );
 }

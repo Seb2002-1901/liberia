@@ -198,6 +198,105 @@ before update on public.user_settings
 for each row execute function public.handle_updated_at();
 
 -- =====================================================
+-- stripe_events (Phase 2) — webhook idempotence ledger
+-- =====================================================
+create table if not exists public.stripe_events (
+  id text primary key,
+  type text not null,
+  processed_at timestamptz not null default timezone('utc', now()),
+  payload jsonb
+);
+create index if not exists idx_stripe_events_type on public.stripe_events(type);
+
+-- =====================================================
+-- ai_conversations (Phase 2)
+-- =====================================================
+create table if not exists public.ai_conversations (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null default 'Nouvelle conversation',
+  archived_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists idx_ai_conversations_user_updated
+  on public.ai_conversations(user_id, updated_at desc)
+  where archived_at is null;
+
+drop trigger if exists set_updated_at_ai_conversations on public.ai_conversations;
+create trigger set_updated_at_ai_conversations
+before update on public.ai_conversations
+for each row execute function public.handle_updated_at();
+
+-- =====================================================
+-- ai_messages (Phase 2)
+-- =====================================================
+create table if not exists public.ai_messages (
+  id uuid primary key default gen_random_uuid(),
+  conversation_id uuid not null references public.ai_conversations(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  role text not null check (role in ('user','assistant')),
+  content text not null,
+  model text,
+  tokens_in integer,
+  tokens_out integer,
+  cache_read_tokens integer,
+  cache_write_tokens integer,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists idx_ai_messages_conversation
+  on public.ai_messages(conversation_id, created_at asc);
+create index if not exists idx_ai_messages_user on public.ai_messages(user_id);
+
+-- =====================================================
+-- RLS — Phase 2 additions
+-- =====================================================
+alter table public.stripe_events       enable row level security;
+alter table public.ai_conversations    enable row level security;
+alter table public.ai_messages         enable row level security;
+
+-- stripe_events: no user-side access (only service_role via webhook)
+drop policy if exists "stripe_events_no_user_select" on public.stripe_events;
+drop policy if exists "stripe_events_no_user_insert" on public.stripe_events;
+drop policy if exists "stripe_events_no_user_update" on public.stripe_events;
+drop policy if exists "stripe_events_no_user_delete" on public.stripe_events;
+
+-- ai_conversations + ai_messages: self CRUD
+do $$
+declare
+  t text;
+begin
+  for t in select unnest(array['ai_conversations', 'ai_messages'])
+  loop
+    execute format('drop policy if exists "%1$s_self_select" on public.%1$s;', t);
+    execute format(
+      'create policy "%1$s_self_select" on public.%1$s for select using (auth.uid() = user_id);',
+      t
+    );
+
+    execute format('drop policy if exists "%1$s_self_insert" on public.%1$s;', t);
+    execute format(
+      'create policy "%1$s_self_insert" on public.%1$s for insert with check (auth.uid() = user_id);',
+      t
+    );
+
+    execute format('drop policy if exists "%1$s_self_update" on public.%1$s;', t);
+    execute format(
+      'create policy "%1$s_self_update" on public.%1$s for update using (auth.uid() = user_id);',
+      t
+    );
+
+    execute format('drop policy if exists "%1$s_self_delete" on public.%1$s;', t);
+    execute format(
+      'create policy "%1$s_self_delete" on public.%1$s for delete using (auth.uid() = user_id);',
+      t
+    );
+  end loop;
+end$$;
+
+-- =====================================================
 -- Row-Level Security
 -- =====================================================
 alter table public.profiles            enable row level security;

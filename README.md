@@ -129,7 +129,7 @@ Voir `DEPLOYMENT.md`.
 
 Voir `SECURITY.md`.
 
-## Phase 1 — état
+## Phase 1 — état (validée définitivement)
 
 - ✅ Landing + pricing + pages légales
 - ✅ Auth Supabase (login, register, forgot, reset, callback)
@@ -144,7 +144,27 @@ Voir `SECURITY.md`.
 - ✅ Validations Zod sur tous les inputs
 - ✅ Erreur 404, runtime error, loading states
 
-## Prochaines phases (à ne PAS commencer ici)
+## Phase 2 — état
 
-- **Phase 2** : assistant IA, analyses comportementales, plan 90 jours.
-- **Phase 3** : génération de revenus IA, optimisation investissement.
+- ✅ **Coach IA** (`/coach`) — chat streaming Claude Sonnet 4.6 avec prompt
+  caching, adaptive thinking, sidebar conversations, historique, renommage,
+  suppression. Contexte financier réel (revenus/dépenses/objectifs/scores) injecté
+  à chaque tour.
+- ✅ **Stripe persistance** — webhook signature-verified, idempotence via
+  `stripe_events`, écriture service-role dans `subscriptions`. Customer
+  Portal Stripe activable depuis `/settings/subscription`.
+- ✅ **Hardening** — Upstash rate-limit (Stripe 10/min, IA 30/min/user),
+  Sentry (server + client + edge avec PII strip), validation env Zod.
+- ✅ **Insights dashboard** — widget non-IA qui surface 3 repères concrets
+  + bouton vers le coach.
+- ✅ Tables IA : `ai_conversations`, `ai_messages` avec RLS self-only +
+  ledger `stripe_events` server-only.
+
+Setup pas-à-pas : [AI_SETUP.md](./AI_SETUP.md), [STRIPE_PHASE2.md](./STRIPE_PHASE2.md),
+[SENTRY_SETUP.md](./SENTRY_SETUP.md), [UPSTASH_SETUP.md](./UPSTASH_SETUP.md).
+
+## Prochaines phases
+
+- **Phase 3** : plan 90 jours intelligent (Claude tool-use), génération de
+  revenus, optimisation investissement, notifications hebdo, customer portal
+  riche, multilangue.

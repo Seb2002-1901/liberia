@@ -23,6 +23,7 @@ export const ROUTES = {
   incomes: "/incomes",
   expenses: "/expenses",
   goals: "/goals",
+  coach: "/coach",
   profile: "/profile",
   settings: "/settings",
   subscription: "/settings/subscription",

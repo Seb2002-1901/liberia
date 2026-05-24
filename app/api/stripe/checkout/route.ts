@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isStripeConfigured, STRIPE_PLANS, type StripePlanId } from "@/lib/stripe/config";
 import { getStripe } from "@/lib/stripe/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   planId: z.enum(["premium_monthly", "premium_yearly"]),
@@ -53,6 +54,14 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+  }
+
+  const rate = await checkRateLimit("stripe", user.id);
+  if (!rate.success) {
+    return NextResponse.json(
+      { error: "Trop de tentatives. Réessaye dans quelques instants." },
+      { status: 429 },
+    );
   }
 
   // NEXT_PUBLIC_APP_URL is the only trusted origin for Stripe redirects.
