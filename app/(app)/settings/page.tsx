@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bell, CreditCard, Database, Shield, Sparkles } from "lucide-react";
+import { Bell, BrainCircuit, CreditCard, Database, Shield, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,10 @@ import {
   DeleteAccountButton,
   SettingsPreferences,
 } from "@/components/settings/settings-preferences";
+import { CoachingMemoryCard } from "@/components/settings/coaching-memory";
+import { getMyUserMemory } from "@/lib/services/memory";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { ROUTES } from "@/lib/constants";
+import { ROUTES, type CoachingToneId, type RecurringChallengeId, type SpendingTriggerId } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,10 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
-  const prefs = await loadPreferences();
+  const [prefs, memory] = await Promise.all([
+    loadPreferences(),
+    getMyUserMemory(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -29,6 +34,27 @@ export default async function SettingsPage() {
         title="Paramètres"
         description="Ajuste tes préférences et gère tes données."
       />
+
+      <Card className="border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.04)] via-card/40 to-card/40">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BrainCircuit className="h-4 w-4 text-[hsl(var(--gold))]" />
+            Mémoire de coaching
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CoachingMemoryCard
+            initialTone={(memory?.coaching_tone as CoachingToneId | null) ?? null}
+            initialChallenges={
+              (memory?.recurring_challenges as RecurringChallengeId[] | undefined) ?? []
+            }
+            initialTriggers={
+              (memory?.spending_triggers as SpendingTriggerId[] | undefined) ?? []
+            }
+            initialNotes={memory?.progress_notes ?? null}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

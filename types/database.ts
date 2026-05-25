@@ -113,6 +113,22 @@ export interface UserSettings {
   updated_at: string;
 }
 
+export type CoachingTone = "calm" | "direct" | "structured" | "gentle";
+
+export interface UserMemory {
+  id: string;
+  user_id: string;
+  coaching_tone: CoachingTone | null;
+  financial_personality: string | null;
+  recurring_challenges: string[];
+  preferred_motivation_style: string | null;
+  spending_triggers: string[];
+  progress_notes: string | null;
+  last_coach_summary: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface FinancialPlan {
   id: string;
   user_id: string;

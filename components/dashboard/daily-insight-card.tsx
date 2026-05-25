@@ -16,6 +16,7 @@ interface DailyInsightCardProps {
   situation: "struggling" | "tight" | "stable" | "comfortable";
   mainGoal: string | null;
   behaviorTraits: string[];
+  coachingTone?: "calm" | "direct" | "structured" | "gentle";
   currency: string;
   aiReady: boolean;
 }
@@ -29,7 +30,10 @@ interface DailyInsightCardProps {
  * server-side call without any UI change.
  */
 export function DailyInsightCard(props: DailyInsightCardProps) {
-  const insight = generateLocalInsight(props);
+  const insight = generateLocalInsight({
+    ...props,
+    coachingTone: props.coachingTone,
+  });
 
   const toneAccent =
     insight.tone === "warning"

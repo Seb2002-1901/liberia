@@ -33,6 +33,7 @@ import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { PlanTeaser } from "@/components/dashboard/plan-teaser";
 import { getActivePlan } from "@/lib/services/plan";
+import { getMyUserMemory, resolveCoachingTone } from "@/lib/services/memory";
 import { isAnthropicConfigured } from "@/lib/env";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 
@@ -41,10 +42,15 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const [data, activePlan] = await Promise.all([
+  const [data, activePlan, memory] = await Promise.all([
     getFinanceData(),
     getActivePlan(),
+    getMyUserMemory(),
   ]);
+  const coachingTone = resolveCoachingTone(
+    memory?.coaching_tone ?? null,
+    data.financialProfile?.behavior_traits ?? [],
+  );
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
   const monthlyExpenses =
@@ -108,6 +114,7 @@ export default async function DashboardPage() {
         situation={data.financialProfile?.situation ?? "tight"}
         mainGoal={data.financialProfile?.main_goal ?? null}
         behaviorTraits={data.financialProfile?.behavior_traits ?? []}
+        coachingTone={coachingTone}
         currency={data.profile.currency}
         aiReady={isAnthropicConfigured() && isAdminConfigured()}
       />

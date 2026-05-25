@@ -556,6 +556,63 @@ alter table public.user_settings
   add column if not exists last_weekly_sent_at timestamptz;
 
 -- =====================================================
+-- user_memory (Phase 4) — IA personalization scaffolding
+-- =====================================================
+-- Lightweight 1-to-1 store for coaching preferences + structured notes
+-- that will feed the LLM context once Anthropic is wired up. Until
+-- then, the UI uses these fields to adapt dashboard tone and starter
+-- recommendations deterministically. RLS strict self-only.
+create table if not exists public.user_memory (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  coaching_tone text check (coaching_tone in ('calm','direct','structured','gentle')),
+  financial_personality text,
+  recurring_challenges text[] not null default '{}',
+  preferred_motivation_style text,
+  spending_triggers text[] not null default '{}',
+  progress_notes text,
+  last_coach_summary text,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (user_id)
+);
+
+create index if not exists idx_user_memory_user on public.user_memory(user_id);
+
+drop trigger if exists set_updated_at_user_memory on public.user_memory;
+create trigger set_updated_at_user_memory
+before update on public.user_memory
+for each row execute function public.handle_updated_at();
+
+-- Cap free-text fields at the DB level (mirror existing protections on
+-- ai_messages / incomes / goals). NOT VALID = future writes only,
+-- existing rows untouched, idempotent.
+do $$
+declare
+  spec record;
+begin
+  for spec in
+    select * from (values
+      ('user_memory', 'financial_personality',     'user_memory_personality_length',  280),
+      ('user_memory', 'preferred_motivation_style','user_memory_motivation_length',   280),
+      ('user_memory', 'progress_notes',            'user_memory_notes_length',       1000),
+      ('user_memory', 'last_coach_summary',        'user_memory_summary_length',     4000)
+    ) as t(table_name, column_name, constraint_name, max_len)
+  loop
+    if not exists (
+      select 1 from pg_constraint
+      where conrelid = ('public.' || spec.table_name)::regclass
+        and conname = spec.constraint_name
+    ) then
+      execute format(
+        'alter table public.%I add constraint %I check (%I is null or char_length(%I) <= %s) not valid',
+        spec.table_name, spec.constraint_name, spec.column_name, spec.column_name, spec.max_len
+      );
+    end if;
+  end loop;
+end$$;
+
+-- =====================================================
 -- Row-Level Security
 -- =====================================================
 alter table public.profiles            enable row level security;
@@ -565,6 +622,22 @@ alter table public.incomes             enable row level security;
 alter table public.expenses            enable row level security;
 alter table public.goals               enable row level security;
 alter table public.user_settings       enable row level security;
+alter table public.user_memory         enable row level security;
+
+-- user_memory: self-only CRUD. The data is sensitive personalization
+-- input — never shared, never cross-user-readable.
+drop policy if exists "user_memory_self_select" on public.user_memory;
+create policy "user_memory_self_select" on public.user_memory
+  for select using (auth.uid() = user_id);
+drop policy if exists "user_memory_self_insert" on public.user_memory;
+create policy "user_memory_self_insert" on public.user_memory
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "user_memory_self_update" on public.user_memory;
+create policy "user_memory_self_update" on public.user_memory
+  for update using (auth.uid() = user_id);
+drop policy if exists "user_memory_self_delete" on public.user_memory;
+create policy "user_memory_self_delete" on public.user_memory
+  for delete using (auth.uid() = user_id);
 
 -- profiles: each user reads/updates ONLY their own profile
 drop policy if exists "profiles_self_select" on public.profiles;

@@ -177,6 +177,62 @@ export const BEHAVIOR_TRAITS = [
 export type BehaviorTraitId = (typeof BEHAVIOR_TRAITS)[number]["id"];
 
 /**
+ * Coaching tone — picked once in /settings, drives the wording of the
+ * dashboard insight, plan suggestions and (later) the LLM system prompt.
+ */
+export const COACHING_TONES = [
+  {
+    id: "calm",
+    label: "Calme et rassurant",
+    description: "Doux, sans pression. Le rythme prime sur la performance.",
+  },
+  {
+    id: "direct",
+    label: "Direct et motivant",
+    description: "Clair, énergique, factuel. Pas de détour.",
+  },
+  {
+    id: "structured",
+    label: "Très structuré",
+    description: "Étapes nettes, checklists, jalons mesurables.",
+  },
+  {
+    id: "gentle",
+    label: "Doux et progressif",
+    description: "Petits pas, beaucoup de bienveillance.",
+  },
+] as const;
+
+export type CoachingToneId = (typeof COACHING_TONES)[number]["id"];
+
+export const RECURRING_CHALLENGES = [
+  { id: "irregular_income", label: "Revenus irréguliers" },
+  { id: "subscriptions", label: "Abonnements qui s'accumulent" },
+  { id: "impulse_shopping", label: "Achats impulsifs" },
+  { id: "social_pressure", label: "Pression sociale" },
+  { id: "emergencies", label: "Imprévus fréquents" },
+  { id: "debt_load", label: "Charge de dette élevée" },
+  { id: "tracking_fatigue", label: "Difficile de tout suivre" },
+  { id: "no_savings_habit", label: "Pas d'habitude d'épargne" },
+] as const;
+
+export type RecurringChallengeId =
+  (typeof RECURRING_CHALLENGES)[number]["id"];
+
+export const SPENDING_TRIGGERS = [
+  { id: "stress", label: "Stress" },
+  { id: "boredom", label: "Ennui" },
+  { id: "social", label: "Sorties et social" },
+  { id: "online", label: "Shopping en ligne" },
+  { id: "food", label: "Restaurants / livraisons" },
+  { id: "gifts", label: "Cadeaux pour les autres" },
+  { id: "fomo", label: "Peur de rater" },
+  { id: "rewards", label: "Récompense après effort" },
+] as const;
+
+export type SpendingTriggerId = (typeof SPENDING_TRIGGERS)[number]["id"];
+
+/**
  * Modèle business LIBERIA :
  *  - pas de plan gratuit permanent
  *  - essai gratuit 14 jours (carte requise à l'inscription)

@@ -23,6 +23,8 @@ export type InsightInput = {
   situation: "struggling" | "tight" | "stable" | "comfortable";
   mainGoal?: string | null;
   behaviorTraits?: readonly string[];
+  /** Picked in /settings → Coaching memory, or derived from traits. */
+  coachingTone?: "calm" | "direct" | "structured" | "gentle";
   currency?: string;
 };
 
@@ -45,15 +47,30 @@ export function generateLocalInsight(input: InsightInput): Insight {
     monthlyDebt,
     hasEmergencyFund,
     behaviorTraits = [],
+    coachingTone,
     currency = "CHF",
   } = input;
+
+  // Resolve the tone: explicit preference first, otherwise derive from
+  // traits — keeps the UI adaptive even before the user picks a style.
+  const traits = new Set(behaviorTraits);
+  const tone: "calm" | "direct" | "structured" | "gentle" =
+    coachingTone ??
+    (traits.has("anxious") || traits.has("avoidant")
+      ? "calm"
+      : traits.has("motivated")
+        ? "direct"
+        : traits.has("organized") || traits.has("disciplined")
+          ? "structured"
+          : traits.has("lost") || traits.has("rebuilding")
+            ? "gentle"
+            : "calm");
 
   const fmt = (n: number) => formatCurrency(n, currency);
   const cashflow = monthlyIncome - monthlyExpenses;
   const runway = monthlyExpenses > 0 ? currentSavings / monthlyExpenses : Infinity;
   const savingsRate = monthlyIncome > 0 ? cashflow / monthlyIncome : 0;
   const dti = monthlyIncome > 0 ? (monthlyDebt / monthlyIncome) * 100 : 0;
-  const traits = new Set(behaviorTraits);
 
   // Cashflow négatif → priorité absolue, ton calme.
   if (cashflow < 0) {
@@ -130,20 +147,32 @@ export function generateLocalInsight(input: InsightInput): Insight {
     };
   }
 
-  // Profil intermédiaire — encouragement + nudge.
+  // Profil intermédiaire — encouragement + nudge, adapté à la tonalité.
   const projection = round(cashflow * 12);
+  const intermediateBody =
+    tone === "direct"
+      ? "Tu as la base. Pose un cap chiffré sur 90 jours et passe à l'action."
+      : tone === "structured"
+        ? "Pose 1 habitude mesurable, donne-toi un jalon hebdo, mesure dans 30 jours."
+        : tone === "gentle"
+          ? "Petit à petit, des ajustements simples compoundent. Pas de pression, juste la régularité."
+          : traits.has("motivated")
+            ? "Tu sembles prêt·e à passer à l'action. On peut transformer cette énergie en habitudes simples qui tiennent."
+            : "Petit à petit, des ajustements simples compoundent. L'objectif n'est pas la perfection mais la régularité.";
   return {
     headline:
       projection > 0
         ? `Tu pourrais épargner environ ${fmt(projection)} sur 12 mois à ton rythme actuel.`
         : `Tu es à l'équilibre — c'est une base de travail saine.`,
-    body: traits.has("motivated")
-      ? "Tu sembles prêt·e à passer à l'action. On peut transformer cette énergie en habitudes simples qui tiennent."
-      : "Petit à petit, des ajustements simples compoundent. L'objectif n'est pas la perfection mais la régularité.",
+    body: intermediateBody,
     metric: projection > 0 ? fmt(projection) : fmt(0),
     metricLabel: projection > 0 ? "Projection 12 mois" : "Reste à vivre mensuel",
     tone: projection > 0 ? "positive" : "neutral",
     nextAction:
-      "Définis 1 habitude financière à tester pendant 30 jours — virement automatique, budget shopping, ou revue hebdo.",
+      tone === "structured"
+        ? "Définis 1 indicateur clé (taux d'épargne, runway) et trace-le chaque semaine pendant 30 jours."
+        : tone === "direct"
+          ? "Choisis 1 habitude financière concrète et lance-la cette semaine — virement automatique ou plafond shopping."
+          : "Définis 1 habitude financière à tester pendant 30 jours — virement automatique, budget shopping, ou revue hebdo.",
   };
 }
