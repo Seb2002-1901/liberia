@@ -3,6 +3,7 @@ import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
 import { generateLocalCoachReply } from "@/lib/coach/local";
+import { normalizeCoachReply } from "@/lib/ai/normalize";
 import {
   MAX_CONVERSATION_TURNS,
   chatMessageSchema,
@@ -270,15 +271,22 @@ export async function POST(request: Request) {
         // this server-controlled path — a user cannot forge an assistant
         // reply in their own conversation history (which would otherwise
         // poison the next model call).
+        //
+        // Normalize before persistence: trims excess whitespace, clamps
+        // to MAX_COACH_REPLY_CHARS (well under the DB CHECK at 16k),
+        // and scrubs any leaked credentials (sk-ant-*, sk_live_*,
+        // whsec_*, JWT) — defense-in-depth against future LLM mistakes.
+        //
         // Don't persist an empty reply (rare — model timeout or refusal
         // returning no text). The conversation stays clean and the user
         // can re-prompt.
-        if (assistantBuffer.trim().length > 0) {
+        const normalized = normalizeCoachReply(assistantBuffer);
+        if (normalized.length > 0) {
           await getAdminClient().from("ai_messages").insert({
             conversation_id: conversation.id,
             user_id: user.id,
             role: "assistant",
-            content: assistantBuffer,
+            content: normalized,
             model: useLLM ? COACH_MODEL : "liberia-local",
             tokens_in: tokensIn,
             tokens_out: tokensOut,

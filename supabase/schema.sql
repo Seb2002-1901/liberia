@@ -298,8 +298,12 @@ begin
     trial_ends_at          = coalesce(excluded.trial_ends_at, public.subscriptions.trial_ends_at),
     trial_used             = public.subscriptions.trial_used
                              or excluded.trial_used
+  -- `<=` (not `<`) so two distinct Stripe events with the same
+  -- `event.created` second both get applied (last-write-wins).
+  -- True duplicates are filtered upstream by the PK on
+  -- `stripe_events.id`, so we never double-process the same event.
   where public.subscriptions.last_event_at is null
-     or public.subscriptions.last_event_at < excluded.last_event_at;
+     or public.subscriptions.last_event_at <= excluded.last_event_at;
 end;
 $$;
 

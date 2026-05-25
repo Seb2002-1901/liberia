@@ -38,9 +38,9 @@ manipuler l'API privée.
 Dans **Stripe Dashboard → Settings → Payment methods**, active :
 
 - **Cards** (Visa / Mastercard / American Express) — actif par défaut
-- **Apple Pay** — actif par défaut, fonctionne dès qu'`automatic_payment_methods`
-  est activé côté API
-- **Google Pay** — actif par défaut, idem
+- **Apple Pay** — apparaît automatiquement au checkout pour les
+  appareils compatibles dès qu'il est activé dans le Dashboard
+- **Google Pay** — idem (compatible Chrome / Android)
 - **TWINT** — **doit être activé manuellement** dans le Dashboard avant
   d'être proposé au checkout. Stripe l'autorise pour les comptes basés en
   Suisse (CHF requis). Une fois activé, il apparaît automatiquement pour

@@ -102,10 +102,15 @@ export async function POST(request: Request) {
         ? { customer: existingSub.stripe_customer_id }
         : { customer_email: user.email ?? undefined }),
       line_items: [{ price: plan.priceId, quantity: 1 }],
-      // `automatic_payment_methods` lets Stripe surface every method
-      // enabled on the account for the customer's region: cards,
-      // Apple/Google Pay, plus TWINT for Swiss customers once it's
-      // activated in Dashboard → Settings → Payment methods.
+      // Note on payment methods: Stripe's `automatic_payment_methods`
+      // is NOT available in `mode: 'subscription'` (payment/setup
+      // modes only, per Stripe API 2024-12-18). In subscription mode
+      // the available methods come from the Stripe Dashboard
+      // configuration of the account + the Price. Operator must
+      // activate cards, Apple Pay, Google Pay and TWINT in
+      // Dashboard → Settings → Payment methods — they then appear
+      // automatically at checkout without code changes. See
+      // STRIPE_SETUP.md §3.
       payment_method_collection: "always",
       automatic_tax: { enabled: false },
       subscription_data: {
