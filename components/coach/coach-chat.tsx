@@ -13,24 +13,30 @@ import type { CoachMessage } from "@/lib/services/coach";
 interface CoachChatProps {
   conversationId: string;
   initialMessages: CoachMessage[];
-  isAiConfigured: boolean;
   isDemo: boolean;
+  /**
+   * Persona-aware prompt suggestions surfaced on the empty state.
+   * Computed server-side from the user's memory + financial snapshot.
+   * Falls back to `DEFAULT_SUGGESTIONS` when absent.
+   */
+  suggestions?: readonly string[];
 }
 
-const SUGGESTIONS = [
-  "Comment je peux économiser 100 CHF ce mois-ci ?",
-  "Comment construire un fonds d'urgence à mon rythme ?",
-  "Mes abonnements pèsent combien dans mon budget ?",
-  "Par où commencer pour réduire mon stress financier ?",
+const DEFAULT_SUGGESTIONS = [
+  "Que dois-je faire cette semaine ?",
+  "Comment réduire mon stress financier ?",
+  "Quelle dépense dois-je surveiller ?",
+  "Aide-moi à tenir mon plan.",
 ];
 
 export function CoachChat({
   conversationId,
   initialMessages,
-  isAiConfigured,
   isDemo,
+  suggestions,
 }: CoachChatProps) {
   const router = useRouter();
+  const promptList = suggestions && suggestions.length > 0 ? suggestions : DEFAULT_SUGGESTIONS;
   const [messages, setMessages] = React.useState<CoachMessage[]>(initialMessages);
   const [input, setInput] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
@@ -75,7 +81,10 @@ export function CoachChat({
     };
   }, [conversationId]);
 
-  const disabled = streaming || isDemo || !isAiConfigured;
+  // The coach is always reachable when not in demo: the server picks
+  // between the real LLM (when ANTHROPIC_API_KEY is set) and the local
+  // deterministic fallback. The premium gate is enforced server-side.
+  const disabled = streaming || isDemo;
 
   const sendMessage = React.useCallback(
     async (content: string) => {
@@ -197,8 +206,8 @@ export function CoachChat({
             <EmptyCoachState
               onPick={(s) => sendMessage(s)}
               disabled={disabled}
-              isAiConfigured={isAiConfigured}
               isDemo={isDemo}
+              suggestions={promptList}
             />
           )}
 
@@ -228,11 +237,9 @@ export function CoachChat({
               onKeyDown={onKeyDown}
               rows={1}
               placeholder={
-                isAiConfigured
-                  ? isDemo
-                    ? "Mode démo : crée un compte pour discuter avec le coach."
-                    : "Pose une question à ton coach…"
-                  : "Le coach IA arrive bientôt."
+                isDemo
+                  ? "Mode démo : crée un compte pour discuter avec le coach."
+                  : "Pose une question à ton coach…"
               }
               disabled={disabled}
               className="min-h-[44px] max-h-40 flex-1 resize-none"
@@ -299,13 +306,13 @@ function MessageBubble({
 function EmptyCoachState({
   onPick,
   disabled,
-  isAiConfigured,
   isDemo,
+  suggestions,
 }: {
   onPick: (s: string) => void;
   disabled: boolean;
-  isAiConfigured: boolean;
   isDemo: boolean;
+  suggestions: readonly string[];
 }) {
   return (
     <div className="space-y-6 py-8">
@@ -321,33 +328,18 @@ function EmptyCoachState({
         </h2>
         <p className="mx-auto max-w-md text-sm text-muted-foreground">
           Pose-lui une question concrète sur ta situation, tes dépenses ou tes objectifs.
-          Il s'appuie sur tes données réelles et propose des actions étape par étape.
+          Il s&apos;appuie sur tes données réelles et propose des actions étape par étape.
         </p>
       </div>
 
-      {!isAiConfigured && (
-        <div className="mx-auto max-w-md rounded-2xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.06)] via-card/40 to-card/40 p-4 text-left shadow-[0_20px_60px_-30px_hsl(var(--gold)/0.3)]">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[hsl(var(--gold))]">
-            Activation en cours
-          </p>
-          <p className="mt-1.5 text-sm font-medium">
-            Le coach IA arrive bientôt.
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            L&apos;assistant est en cours d&apos;activation. Tu pourras
-            discuter avec lui de tes finances dès qu&apos;il sera prêt.
-          </p>
-        </div>
-      )}
-
       {isDemo && (
         <div className="mx-auto max-w-md rounded-xl border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.06)] p-4 text-xs text-[hsl(var(--gold))]">
-          Mode démo : la conversation IA s'active après création d'un compte.
+          Mode démo : la conversation s&apos;active après création d&apos;un compte.
         </div>
       )}
 
       <div className="grid gap-2 sm:grid-cols-2">
-        {SUGGESTIONS.map((s) => (
+        {suggestions.map((s) => (
           <button
             key={s}
             type="button"

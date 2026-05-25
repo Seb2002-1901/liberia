@@ -4,14 +4,12 @@ import {
   COACHING_TONES,
   RECURRING_CHALLENGES,
   SPENDING_TRIGGERS,
-  type CoachingToneId,
 } from "@/lib/constants";
+import { resolveCoachingTone } from "@/lib/coach/tone";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import type {
-  CoachingTone,
-  FinancialProfile,
-  UserMemory,
-} from "@/types/database";
+import type { FinancialProfile, UserMemory } from "@/types/database";
+
+export { resolveCoachingTone };
 
 /**
  * Fetches the current user's memory row via the user-session client.
@@ -32,24 +30,6 @@ export const getMyUserMemory = cache(async (): Promise<UserMemory | null> => {
     .maybeSingle();
   return (data as UserMemory | null) ?? null;
 });
-
-/**
- * Derives a coaching tone even when the user hasn't explicitly picked
- * one. Uses behavior traits as the heuristic — keeps the dashboard
- * adaptive on day one.
- */
-export function resolveCoachingTone(
-  explicit: CoachingTone | null | undefined,
-  behaviorTraits: readonly string[] = [],
-): CoachingToneId {
-  if (explicit) return explicit;
-  const traits = new Set(behaviorTraits);
-  if (traits.has("anxious") || traits.has("avoidant")) return "calm";
-  if (traits.has("motivated")) return "direct";
-  if (traits.has("organized") || traits.has("disciplined")) return "structured";
-  if (traits.has("lost") || traits.has("rebuilding")) return "gentle";
-  return "calm";
-}
 
 /**
  * Assembles a stable, compact, LLM-ready context block describing the

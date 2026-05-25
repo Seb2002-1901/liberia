@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
+import { generateLocalCoachReply } from "@/lib/coach/local";
 import {
   MAX_CONVERSATION_TURNS,
   chatMessageSchema,
@@ -9,7 +10,8 @@ import {
 } from "@/lib/ai/safety";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
-import { getFinanceData } from "@/lib/services/finance";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { getMyUserMemory } from "@/lib/services/memory";
 import { requirePremiumAccess } from "@/lib/services/access";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -23,18 +25,15 @@ export const maxDuration = 60;
 const HISTORY_LIMIT = MAX_CONVERSATION_TURNS; // last N turns kept in context
 
 export async function POST(request: Request) {
-  if (!isAnthropicConfigured() || !isAdminConfigured()) {
+  // Admin client is required either path — assistant messages can only
+  // be written via service_role (the ai_messages RLS policy restricts
+  // user-side INSERTs to role='user').
+  if (!isAdminConfigured() || !isSupabaseConfigured()) {
     return NextResponse.json(
       {
         error: "Le coach IA arrive bientôt — il est en cours d'activation.",
       },
       { status: 501 },
-    );
-  }
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json(
-      { error: "Authentification requise." },
-      { status: 401 },
     );
   }
 
@@ -140,9 +139,13 @@ export async function POST(request: Request) {
   }
   const history = (historyDesc ?? []).slice().reverse();
 
-  // Build finance context (read-only per-request snapshot).
-  const financeData = await getFinanceData();
+  // Build finance + memory context (read-only per-request snapshot).
+  const [financeData, memory] = await Promise.all([
+    getFinanceData(),
+    getMyUserMemory(),
+  ]);
   const financeContext = buildFinanceContext(financeData);
+  const useLLM = isAnthropicConfigured();
 
   // If this is the first user message, derive a short title for the
   // sidebar (do this fire-and-forget; failure must not block streaming).
@@ -157,9 +160,11 @@ export async function POST(request: Request) {
       .eq("user_id", user.id);
   }
 
-  const claude = getAnthropic();
-
-  // Stream the response back as Server-Sent Events.
+  // Stream the response back as Server-Sent Events. Two paths share the
+  // same SSE protocol so the client doesn't care which engine answered:
+  //   - LLM path (Anthropic configured): real streaming tokens
+  //   - Local fallback path: deterministic French response in one chunk
+  // Both persist via the service-role admin client.
   const encoder = new TextEncoder();
   let assistantBuffer = "";
   let tokensIn = 0;
@@ -184,47 +189,80 @@ export async function POST(request: Request) {
       };
 
       try {
-        const apiMessages = (history ?? []).map((m) => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        }));
+        if (useLLM) {
+          const claude = getAnthropic();
+          const apiMessages = (history ?? []).map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          }));
 
-        const claudeStream = claude.messages.stream({
-          model: COACH_MODEL,
-          max_tokens: COACH_MAX_TOKENS,
-          system: [
-            {
-              type: "text",
-              text: COACH_SYSTEM_PROMPT,
-            },
-            {
-              type: "text",
-              text: financeContext,
-              // Cache the system + finance context together. The whole block
-              // typically lands above the 2048-token Sonnet 4.6 minimum once
-              // the user has any data; below that, the cache silently no-ops.
-              cache_control: { type: "ephemeral" },
-            },
-          ],
-          messages: apiMessages,
-          thinking: { type: "adaptive" },
-        });
+          const claudeStream = claude.messages.stream({
+            model: COACH_MODEL,
+            max_tokens: COACH_MAX_TOKENS,
+            system: [
+              {
+                type: "text",
+                text: COACH_SYSTEM_PROMPT,
+              },
+              {
+                type: "text",
+                text: financeContext,
+                // Cache the system + finance context together. The whole
+                // block typically lands above the 2048-token Sonnet 4.6
+                // minimum once the user has any data; below that, the
+                // cache silently no-ops.
+                cache_control: { type: "ephemeral" },
+              },
+            ],
+            messages: apiMessages,
+            thinking: { type: "adaptive" },
+          });
 
-        for await (const event of claudeStream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            assistantBuffer += event.delta.text;
-            send("delta", { text: event.delta.text });
+          for await (const event of claudeStream) {
+            if (
+              event.type === "content_block_delta" &&
+              event.delta.type === "text_delta"
+            ) {
+              assistantBuffer += event.delta.text;
+              send("delta", { text: event.delta.text });
+            }
           }
-        }
 
-        const final = await claudeStream.finalMessage();
-        tokensIn = final.usage.input_tokens ?? 0;
-        tokensOut = final.usage.output_tokens ?? 0;
-        cacheRead = final.usage.cache_read_input_tokens ?? 0;
-        cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
+          const final = await claudeStream.finalMessage();
+          tokensIn = final.usage.input_tokens ?? 0;
+          tokensOut = final.usage.output_tokens ?? 0;
+          cacheRead = final.usage.cache_read_input_tokens ?? 0;
+          cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
+        } else {
+          // Local fallback — deterministic, no LLM tokens, no external
+          // call. Same SSE shape as the LLM path so the client renders
+          // identically.
+          const monthlyIncome =
+            totalMonthly(financeData.incomes) ||
+            financeData.financialProfile?.monthly_income ||
+            0;
+          const monthlyExpenses =
+            totalMonthly(financeData.expenses) ||
+            financeData.financialProfile?.monthly_expenses ||
+            0;
+          const localReply = generateLocalCoachReply({
+            userMessage: parsed.data.content,
+            history: history.map((m) => ({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            })),
+            fullName: financeData.profile.full_name,
+            financialProfile: financeData.financialProfile,
+            memory,
+            monthlyIncome,
+            monthlyExpenses,
+            currentSavings: financeData.financialProfile?.current_savings ?? 0,
+            monthlyDebt: financeData.financialProfile?.monthly_debt ?? 0,
+            currency: financeData.profile.currency || "CHF",
+          });
+          assistantBuffer = localReply;
+          send("delta", { text: localReply });
+        }
 
         // Persist the assistant turn via the service-role client. The
         // ai_messages RLS policy restricts user-session inserts to
@@ -241,7 +279,7 @@ export async function POST(request: Request) {
             user_id: user.id,
             role: "assistant",
             content: assistantBuffer,
-            model: COACH_MODEL,
+            model: useLLM ? COACH_MODEL : "liberia-local",
             tokens_in: tokensIn,
             tokens_out: tokensOut,
             cache_read_tokens: cacheRead,
@@ -268,7 +306,9 @@ export async function POST(request: Request) {
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Erreur du coach IA";
+          err instanceof Error
+            ? err.message
+            : "Une erreur temporaire est survenue. Réessaie dans quelques instants.";
         send("error", { message });
         try {
           controller.close();
