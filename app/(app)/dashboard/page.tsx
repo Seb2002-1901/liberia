@@ -32,8 +32,12 @@ import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { PlanTeaser } from "@/components/dashboard/plan-teaser";
+import { ProactiveCoachCard } from "@/components/dashboard/proactive-coach-card";
+import { WeeklyRecapCard } from "@/components/dashboard/weekly-recap-card";
 import { getActivePlan } from "@/lib/services/plan";
 import { getMyUserMemory, resolveCoachingTone } from "@/lib/services/memory";
+import { generateWeeklyRecap } from "@/lib/recap/weekly";
+import { generateProactiveHint } from "@/lib/coach/proactive";
 import { isAnthropicConfigured } from "@/lib/env";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 
@@ -81,6 +85,36 @@ export default async function DashboardPage() {
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
+  // Weekly recap + proactive hint — both are pure derivations over
+  // data already loaded above. No extra DB hop.
+  const weeklyRecap = generateWeeklyRecap({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    planSteps: activePlan?.steps ?? [],
+    cashflow,
+    runway,
+    savingsRate,
+    stabilityScore: stability,
+    hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
+  });
+
+  const proactiveHint = generateProactiveHint({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    planSteps: activePlan?.steps ?? [],
+    cashflow,
+    runway,
+    savingsRate,
+    hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
+    monthlyExpenses,
+    currency: data.profile.currency,
+    behaviorTraits: data.financialProfile?.behavior_traits ?? [],
+    coachingTone: memory?.coaching_tone ?? null,
+    memory,
+  });
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -118,6 +152,10 @@ export default async function DashboardPage() {
         currency={data.profile.currency}
         aiReady={isAnthropicConfigured() && isAdminConfigured()}
       />
+
+      {proactiveHint && <ProactiveCoachCard hint={proactiveHint} />}
+
+      <WeeklyRecapCard recap={weeklyRecap} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <StabilityCard score={stability} className="lg:col-span-2" />

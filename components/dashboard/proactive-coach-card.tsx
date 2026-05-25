@@ -1,0 +1,50 @@
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import type { ProactiveHint } from "@/lib/coach/proactive";
+
+interface ProactiveCoachCardProps {
+  hint: ProactiveHint;
+}
+
+/**
+ * Calm "the coach noticed something" surface. Only rendered when the
+ * proactive generator returns a hint — silence is preferred over fake
+ * encouragement.
+ */
+export function ProactiveCoachCard({ hint }: ProactiveCoachCardProps) {
+  return (
+    <Card className="border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.04)]">
+      <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4 sm:p-5">
+        <div className="flex min-w-0 items-start gap-3">
+          <span
+            aria-hidden
+            className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
+              Coach
+            </p>
+            <p className="mt-1 text-sm font-medium leading-snug">
+              {hint.headline}
+            </p>
+            {hint.body && (
+              <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                {hint.body}
+              </p>
+            )}
+          </div>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={hint.action.href}>
+            {hint.action.label}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
