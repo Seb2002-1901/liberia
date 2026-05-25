@@ -15,8 +15,8 @@ const COLUMNS = [
     title: "Ressources",
     links: [
       { label: "FAQ", href: "/#faq" },
-      { label: "Sécurité", href: "/#security" },
-      { label: "Disclaimer", href: ROUTES.legal },
+      { label: "Sécurité & confiance", href: ROUTES.security },
+      { label: "Politique IA responsable", href: ROUTES.aiPolicy },
     ],
   },
   {
@@ -24,6 +24,7 @@ const COLUMNS = [
     links: [
       { label: "Confidentialité", href: ROUTES.privacy },
       { label: "Conditions", href: ROUTES.terms },
+      { label: "Disclaimer", href: ROUTES.legal },
     ],
   },
 ];

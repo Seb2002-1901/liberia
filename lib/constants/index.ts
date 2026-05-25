@@ -17,6 +17,8 @@ export const ROUTES = {
   privacy: "/privacy",
   terms: "/terms",
   legal: "/legal",
+  security: "/security",
+  aiPolicy: "/ai-policy",
   login: "/login",
   register: "/register",
   forgotPassword: "/forgot-password",
