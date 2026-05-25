@@ -4,6 +4,7 @@ import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
 import { generateLocalCoachReply } from "@/lib/coach/local";
 import { normalizeCoachReply } from "@/lib/ai/normalize";
+import { truncateMessagesForBudget } from "@/lib/ai/budget";
 import {
   MAX_CONVERSATION_TURNS,
   chatMessageSchema,
@@ -192,10 +193,17 @@ export async function POST(request: Request) {
       try {
         if (useLLM) {
           const claude = getAnthropic();
-          const apiMessages = (history ?? []).map((m) => ({
-            role: m.role as "user" | "assistant",
-            content: m.content,
-          }));
+          // Cost-control: cap aggregate history at SOFT_INPUT_BUDGET
+          // (~30k tokens ≈ 0.10 CHF / call). The history query already
+          // bounds count at 80; this bounds total tokens too. Drops
+          // oldest turns first, ALWAYS keeps the latest user message.
+          const { messages: budgetedHistory } = truncateMessagesForBudget(
+            (history ?? []).map((m) => ({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            })),
+          );
+          const apiMessages = budgetedHistory;
 
           const claudeStream = claude.messages.stream({
             model: COACH_MODEL,
