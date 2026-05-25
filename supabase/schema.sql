@@ -298,6 +298,23 @@ begin
 end;
 $$;
 
+-- CRITICAL: PostgREST exposes `public.*` functions via /rest/v1/rpc/{name}
+-- and Postgres grants EXECUTE to PUBLIC by default. Combined with
+-- SECURITY DEFINER, an authenticated user could otherwise call this
+-- RPC directly from the browser and:
+--   - set their own plan='premium' without paying
+--   - poison another user's last_event_at to block future webhook updates
+--   - cancel a competitor's subscription
+-- Only the Stripe webhook (service_role) is allowed to invoke it.
+revoke all on function public.apply_subscription_event(
+  uuid, text, text, text, text, timestamptz, boolean, timestamptz,
+  text, timestamptz, timestamptz
+) from public, anon, authenticated;
+grant execute on function public.apply_subscription_event(
+  uuid, text, text, text, text, timestamptz, boolean, timestamptz,
+  text, timestamptz, timestamptz
+) to service_role;
+
 -- =====================================================
 -- ai_conversations (Phase 2)
 -- =====================================================
@@ -593,3 +610,15 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
+
+-- Defense in depth: the auth.users INSERT trigger fires server-side and
+-- doesn't need EXECUTE granted to anyone except the trigger machinery.
+-- Strip the default PUBLIC grant so this SECURITY DEFINER function is
+-- not directly callable via PostgREST.
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+
+-- Trigger functions for updated_at / goal completion run as the calling
+-- user (no SECURITY DEFINER) so RLS still applies, but tightening the
+-- default grant keeps the RPC surface minimal.
+revoke all on function public.handle_updated_at() from public, anon, authenticated;
+revoke all on function public.goals_set_is_completed() from public, anon, authenticated;
