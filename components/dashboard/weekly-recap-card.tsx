@@ -70,9 +70,10 @@ export function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
           <Metric
             icon={<CheckCircle2 className="h-3.5 w-3.5" />}
             value={recap.stepsCompletedThisWeek}
-            label={
-              recap.stepsCompletedThisWeek > 1 ? "étapes validées" : "étape validée"
-            }
+            // Short label: "étapes validées" overflows the 3-col grid
+            // on iPhone SE (320px). Context comes from the "Cette
+            // semaine" eyebrow + the icon — short stays clear.
+            label={recap.stepsCompletedThisWeek > 1 ? "étapes" : "étape"}
           />
         </div>
 
@@ -107,10 +108,10 @@ function Metric({
   label: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-background/40 px-3 py-2.5">
-      <div className="flex items-center gap-1.5 text-[hsl(var(--gold))]">
-        {icon}
-        <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+    <div className="min-w-0 rounded-xl border border-border/60 bg-background/40 px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-1.5 text-[hsl(var(--gold))]">
+        <span className="shrink-0">{icon}</span>
+        <span className="truncate text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           {label}
         </span>
       </div>

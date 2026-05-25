@@ -213,32 +213,45 @@ export default async function DashboardPage() {
             <CardTitle>Alertes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <Alert
-              tone={cashflow < 0 ? "danger" : "neutral"}
-              title={cashflow < 0 ? "Tu dépenses plus que tu ne gagnes" : "Ton flux mensuel est positif"}
-              text={
-                cashflow < 0
-                  ? "Identifie 1 ou 2 dépenses non essentielles à réduire."
-                  : "Pense à automatiser une épargne mensuelle."
-              }
-            />
-            <Alert
-              tone={runway < 1 ? "warning" : runway >= 3 ? "success" : "neutral"}
-              title={
-                runway < 1
-                  ? "Fonds d'urgence très faible"
-                  : runway >= 3
-                  ? "Fonds d'urgence solide"
-                  : "Fonds d'urgence en construction"
-              }
-              text={
-                runway < 1
-                  ? "Objectif court terme : 1 mois de dépenses de côté."
-                  : runway >= 3
-                  ? "Continue à le préserver, c'est ta tranquillité."
-                  : "Vise progressivement 3 mois de dépenses."
-              }
-            />
+            {monthlyIncome === 0 && monthlyExpenses === 0 ? (
+              // No data yet — don't display misleading "solide" alerts
+              // computed from zeros (runway becomes Infinity, cashflow=0
+              // shows as "positive"). Surface a calm onboarding cue.
+              <Alert
+                tone="neutral"
+                title="Renseigne tes données pour démarrer"
+                text="Ajoute tes revenus et dépenses pour voir tes premières alertes — quelques minutes suffisent."
+              />
+            ) : (
+              <>
+                <Alert
+                  tone={cashflow < 0 ? "danger" : "neutral"}
+                  title={cashflow < 0 ? "Tu dépenses plus que tu ne gagnes" : "Ton flux mensuel est positif"}
+                  text={
+                    cashflow < 0
+                      ? "Identifie 1 ou 2 dépenses non essentielles à réduire."
+                      : "Pense à automatiser une épargne mensuelle."
+                  }
+                />
+                <Alert
+                  tone={runway < 1 ? "warning" : runway >= 3 ? "success" : "neutral"}
+                  title={
+                    runway < 1
+                      ? "Fonds d'urgence très faible"
+                      : runway >= 3
+                        ? "Fonds d'urgence solide"
+                        : "Fonds d'urgence en construction"
+                  }
+                  text={
+                    runway < 1
+                      ? "Objectif court terme : 1 mois de dépenses de côté."
+                      : runway >= 3
+                        ? "Continue à le préserver, c'est ta tranquillité."
+                        : "Vise progressivement 3 mois de dépenses."
+                  }
+                />
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
