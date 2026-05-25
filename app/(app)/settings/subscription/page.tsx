@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AlertTriangle, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,81 +16,17 @@ import { PricingPlans } from "@/components/billing/pricing-plans";
 import { TRIAL_DAYS } from "@/lib/stripe/config";
 import { formatDate } from "@/lib/utils";
 import { getFinanceData } from "@/lib/services/finance";
+import { inferBillingState } from "@/lib/billing/state";
 
 export const metadata: Metadata = {
   title: "Abonnement",
 };
 
-type BillingState =
-  | { kind: "none" }
-  | {
-      kind: "trial";
-      trialEndsAt: string | null;
-      daysLeft: number | null;
-      cancelAtPeriodEnd: boolean;
-    }
-  | {
-      kind: "active";
-      currentPeriodEnd: string | null;
-      cancelAtPeriodEnd: boolean;
-    }
-  | {
-      kind: "past_due";
-      currentPeriodEnd: string | null;
-    }
-  | {
-      kind: "lapsed";
-      status: string | null;
-    };
-
-function inferBillingState(
-  sub: Awaited<ReturnType<typeof getFinanceData>>["subscription"],
-): BillingState {
-  // No subscription row at all → registered user before checkout.
-  if (!sub.status) return { kind: "none" };
-
-  // Trialing: show the countdown even if trial_ends_at is null (legacy
-  // DB rows from before the column was tracked) — never let a trialing
-  // user fall through to a lapsed banner.
-  if (sub.status === "trialing") {
-    const endsTs = sub.trial_ends_at
-      ? new Date(sub.trial_ends_at).getTime()
-      : null;
-    const daysLeft = endsTs
-      ? Math.max(0, Math.ceil((endsTs - Date.now()) / (1000 * 60 * 60 * 24)))
-      : null;
-    return {
-      kind: "trial",
-      trialEndsAt: sub.trial_ends_at,
-      daysLeft,
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
-    };
-  }
-
-  // Trial-to-paid succeeded → access continues seamlessly. This is the
-  // golden path: never show a soft paywall here.
-  if (sub.status === "active")
-    return {
-      kind: "active",
-      currentPeriodEnd: sub.current_period_end,
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
-    };
-
-  // Payment failure during a renewal — soft paywall + portal CTA.
-  if (sub.status === "past_due" || sub.status === "unpaid")
-    return { kind: "past_due", currentPeriodEnd: sub.current_period_end };
-
-  // canceled / paused / incomplete / incomplete_expired → lapsed.
-  // Notably `paused` is what Stripe assigns when the trial ends without
-  // a valid payment method (we set trial_settings.end_behavior.missing
-  // _payment_method = "pause").
-  return { kind: "lapsed", status: sub.status };
-}
-
 export default async function SubscriptionPage() {
   const data = await getFinanceData();
   const sub = data.subscription;
   const billing = inferBillingState(sub);
+  const timeline = buildAccountTimeline(sub);
 
   return (
     <div className="space-y-6">
@@ -234,6 +176,42 @@ export default async function SubscriptionPage() {
         </CardContent>
       </Card>
 
+      {timeline.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CalendarClock className="h-4 w-4 text-[hsl(var(--gold))]" />
+              Activité du compte
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2.5">
+              {timeline.map((event, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/40 p-3"
+                >
+                  <span
+                    aria-hidden
+                    className="mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--gold))]"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium leading-snug">
+                      {event.label}
+                    </p>
+                    {event.detail && (
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {event.detail}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       <PricingPlans
         variant="in-app"
         isAuthenticated
@@ -247,4 +225,55 @@ export default async function SubscriptionPage() {
       </p>
     </div>
   );
+}
+
+/**
+ * Builds a short, human-readable list of key dates for the user's
+ * subscription. Returns [] when nothing meaningful exists (e.g. brand-
+ * new account before checkout) so the card is hidden rather than
+ * empty.
+ */
+function buildAccountTimeline(
+  sub: Awaited<ReturnType<typeof getFinanceData>>["subscription"],
+): Array<{ label: string; detail?: string }> {
+  const events: Array<{ label: string; detail?: string }> = [];
+
+  if (sub.trial_used) {
+    events.push({
+      label: "Essai gratuit utilisé",
+      detail: "Un seul essai par compte — anti-abus.",
+    });
+  }
+
+  if (sub.trial_ends_at) {
+    const label =
+      sub.status === "trialing"
+        ? `Fin de l'essai : ${formatDate(sub.trial_ends_at)}`
+        : `Essai terminé le ${formatDate(sub.trial_ends_at)}`;
+    events.push({ label });
+  }
+
+  if (sub.current_period_end && sub.status === "active") {
+    events.push({
+      label: sub.cancel_at_period_end
+        ? `Accès maintenu jusqu'au ${formatDate(sub.current_period_end)}`
+        : `Prochain renouvellement : ${formatDate(sub.current_period_end)}`,
+    });
+  }
+
+  if (sub.cancel_at_period_end && sub.status !== "active") {
+    events.push({
+      label: "Annulation programmée",
+      detail: "Tu peux la révoquer via le portail tant que la période n'est pas écoulée.",
+    });
+  }
+
+  if (sub.has_customer) {
+    events.push({
+      label: "Moyen de paiement enregistré chez Stripe",
+      detail: "Gérable depuis le portail client.",
+    });
+  }
+
+  return events;
 }

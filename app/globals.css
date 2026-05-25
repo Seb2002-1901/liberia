@@ -143,4 +143,29 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
   }
+  /* iOS safe-area bottom padding — opt-in via class so we don't add
+     padding to surfaces that already handle it via inline style. */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Honor the OS-level reduced-motion preference. We don't disable
+   transitions entirely (it would make some UI feel broken) — we just
+   slow them down to a near-instant value so animations stop being
+   distracting for users who explicitly opted out. Framer Motion
+   already inspects this preference internally and softens its
+   animations automatically. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
