@@ -119,6 +119,64 @@ export const GOAL_TYPES = [
 export type GoalTypeId = (typeof GOAL_TYPES)[number]["id"];
 
 /**
+ * Behavior traits captured during onboarding — informe la personnalisation
+ * future de l'IA et le ton des recommandations. Multi-select, jamais
+ * jugeant (les libellés sont neutres et bienveillants).
+ */
+export const BEHAVIOR_TRAITS = [
+  {
+    id: "impulsive",
+    label: "Achats impulsifs",
+    description: "Parfois je craque sans avoir prévu.",
+    icon: "Zap",
+  },
+  {
+    id: "avoidant",
+    label: "J'évite de regarder",
+    description: "Mes finances me stressent, je préfère ne pas y penser.",
+    icon: "EyeOff",
+  },
+  {
+    id: "organized",
+    label: "Plutôt organisé·e",
+    description: "Je tiens un suivi, j'aime savoir où ça va.",
+    icon: "ListChecks",
+  },
+  {
+    id: "anxious",
+    label: "Anxieux·se face à l'argent",
+    description: "Penser à l'argent me met sous tension.",
+    icon: "HeartPulse",
+  },
+  {
+    id: "motivated",
+    label: "Très motivé·e",
+    description: "Je veux passer à l'action, maintenant.",
+    icon: "Flame",
+  },
+  {
+    id: "lost",
+    label: "Un peu perdu·e",
+    description: "Je ne sais plus par où commencer.",
+    icon: "Compass",
+  },
+  {
+    id: "disciplined",
+    label: "Discipliné·e",
+    description: "Je tiens mes engagements quand je les pose.",
+    icon: "ShieldCheck",
+  },
+  {
+    id: "rebuilding",
+    label: "En reconstruction",
+    description: "Je sors d'une période difficile, je remonte la pente.",
+    icon: "Sparkles",
+  },
+] as const;
+
+export type BehaviorTraitId = (typeof BEHAVIOR_TRAITS)[number]["id"];
+
+/**
  * Modèle business LIBERIA :
  *  - pas de plan gratuit permanent
  *  - essai gratuit 14 jours (carte requise à l'inscription)

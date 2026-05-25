@@ -91,6 +91,11 @@ create table if not exists public.financial_profiles (
 -- Idempotent column addition for databases provisioned before main_goal existed.
 alter table public.financial_profiles add column if not exists main_goal text;
 
+-- Behavior traits captured during onboarding — feeds future IA personalization.
+-- Idempotent: safe to re-run.
+alter table public.financial_profiles
+  add column if not exists behavior_traits text[] not null default '{}';
+
 create index if not exists idx_financial_profiles_user on public.financial_profiles(user_id);
 
 drop trigger if exists set_updated_at_financial_profiles on public.financial_profiles;

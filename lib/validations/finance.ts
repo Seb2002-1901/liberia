@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  BEHAVIOR_TRAITS,
   EXPENSE_CATEGORIES,
   FREQUENCIES,
   GOAL_TYPES,
@@ -16,6 +17,7 @@ const expenseCategoryIds = EXPENSE_CATEGORIES.map((c) => c.id) as [
 ];
 const frequencyIds = FREQUENCIES.map((f) => f.id) as [string, ...string[]];
 const goalTypeIds = GOAL_TYPES.map((g) => g.id) as [string, ...string[]];
+const behaviorTraitIds = BEHAVIOR_TRAITS.map((b) => b.id) as [string, ...string[]];
 
 export const incomeSchema = z.object({
   label: z.string().min(1, "Libellé requis").max(80),
@@ -82,6 +84,7 @@ export const onboardingSchema = z.object({
   monthlyDebt: z.coerce.number().min(0).max(10_000_000).default(0),
   mainGoal: z.enum(goalTypeIds).default("emergency_fund"),
   perceivedStress: z.coerce.number().min(1).max(5),
+  behaviorTraits: z.array(z.enum(behaviorTraitIds)).max(8).default([]),
 });
 
 export type OnboardingInput = z.infer<typeof onboardingSchema>;

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlanGenerateButton } from "@/components/plan/plan-generate-button";
 import { PlanProgress } from "@/components/plan/plan-progress";
 import { PlanTimeline } from "@/components/plan/plan-timeline";
+import { StarterPlanView } from "@/components/plan/starter-plan";
 import { getActivePlan } from "@/lib/services/plan";
 import { getFinanceData } from "@/lib/services/finance";
 import { isAnthropicConfigured } from "@/lib/env";
@@ -29,12 +30,14 @@ export default async function PlanPage() {
       ? "Mode démo : crée un compte pour générer un plan."
       : undefined;
 
+  const situation = data.financialProfile?.situation ?? "tight";
+
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Plan"
         title="Ton plan financier"
-        description="Un plan d'actions concrètes, généré par le coach LIBERIA à partir de tes vraies données."
+        description="Un plan d'actions concrètes pour avancer semaine après semaine."
         actions={
           <PlanGenerateButton
             hasPlan={Boolean(active)}
@@ -44,41 +47,31 @@ export default async function PlanPage() {
         }
       />
 
-      {!active ? (
-        <EmptyState
-          icon={<Sparkles className="h-5 w-5" />}
-          title={
-            isDemo
-              ? "Le plan IA est réservé aux comptes"
-              : aiReady
-                ? "Tu n'as pas encore de plan actif"
-                : "Le plan IA arrive bientôt"
-          }
-          description={
-            isDemo
-              ? "Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles."
-              : aiReady
-                ? "Lance la génération : le coach analyse ta situation et propose une suite d'actions hebdomadaires."
-                : "On finalise l'activation de l'assistant. Dès qu'il sera prêt, tu pourras générer un plan d'actions sur 30, 60 ou 90 jours basé sur tes vraies données."
-          }
-          action={
-            isDemo ? (
-              <Button asChild variant="gold">
-                <Link href={ROUTES.register}>
-                  Créer mon compte
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            ) : aiReady ? (
-              <PlanGenerateButton hasPlan={false} />
-            ) : null
-          }
-        />
-      ) : (
+      {active ? (
         <>
           <PlanProgress plan={active.plan} steps={active.steps} />
           <PlanTimeline steps={active.steps} />
         </>
+      ) : isDemo ? (
+        <EmptyState
+          icon={<Sparkles className="h-5 w-5" />}
+          title="Le plan IA est réservé aux comptes"
+          description="Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles."
+          action={
+            <Button asChild variant="gold">
+              <Link href={ROUTES.register}>
+                Créer mon compte
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          }
+        />
+      ) : (
+        <StarterPlanView
+          situation={situation}
+          aiReady={aiReady}
+          isDemo={isDemo}
+        />
       )}
     </div>
   );

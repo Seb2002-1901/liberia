@@ -30,6 +30,7 @@ import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
+import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { PlanTeaser } from "@/components/dashboard/plan-teaser";
 import { getActivePlan } from "@/lib/services/plan";
 import { isAnthropicConfigured } from "@/lib/env";
@@ -95,6 +96,20 @@ export default async function DashboardPage() {
             </Button>
           </>
         }
+      />
+
+      <DailyInsightCard
+        monthlyIncome={monthlyIncome}
+        monthlyExpenses={monthlyExpenses}
+        currentSavings={currentSavings}
+        monthlyDebt={monthlyDebt}
+        hasEmergencyFund={data.financialProfile?.has_emergency_fund ?? false}
+        perceivedStress={data.financialProfile?.perceived_stress ?? 3}
+        situation={data.financialProfile?.situation ?? "tight"}
+        mainGoal={data.financialProfile?.main_goal ?? null}
+        behaviorTraits={data.financialProfile?.behavior_traits ?? []}
+        currency={data.profile.currency}
+        aiReady={isAnthropicConfigured() && isAdminConfigured()}
       />
 
       <div className="grid gap-4 lg:grid-cols-3">

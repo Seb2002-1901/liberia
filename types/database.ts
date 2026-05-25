@@ -58,6 +58,7 @@ export interface FinancialProfile {
   perceived_stress: number;
   stability_score: number;
   stress_score: number;
+  behavior_traits: string[];
   created_at: string;
   updated_at: string;
 }

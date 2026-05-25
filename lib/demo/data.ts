@@ -16,6 +16,7 @@ export const demoFinancialProfile: FinancialProfile = {
   perceived_stress: 4,
   stability_score: 42,
   stress_score: 64,
+  behavior_traits: ["anxious", "avoidant", "motivated"],
   created_at: NOW,
   updated_at: NOW,
 };

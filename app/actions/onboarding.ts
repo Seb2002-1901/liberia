@@ -78,6 +78,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
       perceived_stress: v.perceivedStress,
       stability_score: stability,
       stress_score: stress,
+      behavior_traits: v.behaviorTraits,
     },
     { onConflict: "user_id" },
   );
