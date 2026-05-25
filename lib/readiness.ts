@@ -122,6 +122,13 @@ export function getReadinessSummary(): ReadinessSummary {
       ok: envPresent("NEXT_PUBLIC_SENTRY_DSN") || envPresent("SENTRY_DSN"),
       hint: "Recommandé pour capturer les erreurs runtime en production.",
     },
+    {
+      id: "admin",
+      label: "Admin allowlist (/admin)",
+      status: "optional",
+      ok: envPresent("ADMIN_USER_IDS"),
+      hint: "Définis ADMIN_USER_IDS (CSV de Supabase user UUIDs) pour voir /admin. Sans valeur, /admin renvoie 404 à tout le monde.",
+    },
   ];
 
   const counts = {
