@@ -27,6 +27,7 @@ export default async function AppLayout({
         email: data.profile.email,
       }}
       plan={data.subscription.plan}
+      trialUsed={data.subscription.trial_used}
       isDemo={data.isDemo}
       onSignOut={signOutAction}
     >

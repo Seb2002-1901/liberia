@@ -78,7 +78,7 @@ const planToolSchema: Anthropic.Tool.InputSchema = {
             type: ["number", "null"],
             minimum: 0,
             description:
-              "Impact attendu sur le reste à vivre, en euros par mois. Null si non chiffrable.",
+              "Impact attendu sur le reste à vivre, en valeur de la devise du contexte utilisateur (CHF par défaut), par mois. Null si non chiffrable. (Le nom du champ reste `expected_impact_eur` pour compatibilité avec le schéma existant.)",
           },
         },
         required: ["week_number", "focus", "title", "category"],

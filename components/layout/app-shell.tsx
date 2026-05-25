@@ -63,6 +63,7 @@ interface AppShellProps {
     email?: string | null;
   };
   plan?: "free" | "premium";
+  trialUsed?: boolean;
   isDemo?: boolean;
   onSignOut?: () => Promise<void> | void;
 }
@@ -71,6 +72,7 @@ export function AppShell({
   children,
   user,
   plan = "free",
+  trialUsed = false,
   isDemo,
   onSignOut,
 }: AppShellProps) {
@@ -115,7 +117,11 @@ export function AppShell({
           )}
         </nav>
         <div className="p-3">
-          {isDemo ? <DemoUpsellCard /> : <UpgradeCard plan={plan} />}
+          {isDemo ? (
+            <DemoUpsellCard />
+          ) : (
+            <UpgradeCard plan={plan} trialUsed={trialUsed} />
+          )}
         </div>
       </aside>
 
@@ -350,7 +356,13 @@ function DemoUpsellCard() {
   );
 }
 
-function UpgradeCard({ plan }: { plan: "free" | "premium" }) {
+function UpgradeCard({
+  plan,
+  trialUsed,
+}: {
+  plan: "free" | "premium";
+  trialUsed: boolean;
+}) {
   if (plan === "premium") {
     return (
       <div className="rounded-xl border border-border/60 bg-card/40 p-3 text-xs text-muted-foreground">
@@ -359,18 +371,21 @@ function UpgradeCard({ plan }: { plan: "free" | "premium" }) {
       </div>
     );
   }
+  const cta = trialUsed
+    ? "Reprendre mon abonnement"
+    : "Démarrer mon essai 14 jours";
+  const body = trialUsed
+    ? "Ton accès est en pause. Reprends ton abonnement à 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment."
+    : "14 jours gratuits, puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment.";
   return (
     <div className="relative overflow-hidden rounded-xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.08)] to-transparent p-4">
       <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
         <Sparkles className="h-4 w-4" />
         <p className="text-xs font-semibold uppercase tracking-wider">Premium</p>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        14 jours gratuits, puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à
-        tout moment.
-      </p>
+      <p className="mt-2 text-xs text-muted-foreground">{body}</p>
       <Button asChild size="sm" variant="gold" className="mt-3 w-full">
-        <Link href={ROUTES.subscription}>Démarrer l&apos;essai</Link>
+        <Link href={ROUTES.subscription}>{cta}</Link>
       </Button>
     </div>
   );

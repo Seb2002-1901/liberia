@@ -76,7 +76,7 @@ export default function DemoDashboardPage() {
           Tu explores LIBERIA en mode démo.
         </p>
         <p className="text-muted-foreground">
-          Les données affichées sont fictives. Crée un compte gratuit pour utiliser tes vraies données.
+          Les données affichées sont fictives. Crée ton compte pour piloter tes vraies données (14 jours d&apos;essai gratuit).
         </p>
         <div className="mt-3 flex gap-2">
           <Button asChild variant="gold" size="sm">

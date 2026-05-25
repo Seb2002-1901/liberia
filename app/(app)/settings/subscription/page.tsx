@@ -19,8 +19,8 @@ type BillingState =
   | { kind: "none" }
   | {
       kind: "trial";
-      trialEndsAt: string;
-      daysLeft: number;
+      trialEndsAt: string | null;
+      daysLeft: number | null;
       cancelAtPeriodEnd: boolean;
     }
   | {
@@ -40,13 +40,19 @@ type BillingState =
 function inferBillingState(
   sub: Awaited<ReturnType<typeof getFinanceData>>["subscription"],
 ): BillingState {
+  // No subscription row at all → registered user before checkout.
   if (!sub.status) return { kind: "none" };
-  if (sub.status === "trialing" && sub.trial_ends_at) {
-    const ends = new Date(sub.trial_ends_at).getTime();
-    const daysLeft = Math.max(
-      0,
-      Math.ceil((ends - Date.now()) / (1000 * 60 * 60 * 24)),
-    );
+
+  // Trialing: show the countdown even if trial_ends_at is null (legacy
+  // DB rows from before the column was tracked) — never let a trialing
+  // user fall through to a lapsed banner.
+  if (sub.status === "trialing") {
+    const endsTs = sub.trial_ends_at
+      ? new Date(sub.trial_ends_at).getTime()
+      : null;
+    const daysLeft = endsTs
+      ? Math.max(0, Math.ceil((endsTs - Date.now()) / (1000 * 60 * 60 * 24)))
+      : null;
     return {
       kind: "trial",
       trialEndsAt: sub.trial_ends_at,
@@ -54,14 +60,24 @@ function inferBillingState(
       cancelAtPeriodEnd: sub.cancel_at_period_end,
     };
   }
+
+  // Trial-to-paid succeeded → access continues seamlessly. This is the
+  // golden path: never show a soft paywall here.
   if (sub.status === "active")
     return {
       kind: "active",
       currentPeriodEnd: sub.current_period_end,
       cancelAtPeriodEnd: sub.cancel_at_period_end,
     };
+
+  // Payment failure during a renewal — soft paywall + portal CTA.
   if (sub.status === "past_due" || sub.status === "unpaid")
     return { kind: "past_due", currentPeriodEnd: sub.current_period_end };
+
+  // canceled / paused / incomplete / incomplete_expired → lapsed.
+  // Notably `paused` is what Stripe assigns when the trial ends without
+  // a valid payment method (we set trial_settings.end_behavior.missing
+  // _payment_method = "pause").
   return { kind: "lapsed", status: sub.status };
 }
 
@@ -89,12 +105,14 @@ export default async function SubscriptionPage() {
               <Clock className="mt-0.5 h-5 w-5 text-[hsl(var(--gold))]" />
               <div>
                 <p className="font-medium">
-                  Essai gratuit en cours — {billing.daysLeft}{" "}
-                  {billing.daysLeft > 1 ? "jours" : "jour"} restants
+                  {billing.daysLeft === null
+                    ? "Essai gratuit en cours"
+                    : `Essai gratuit en cours — ${billing.daysLeft} ${billing.daysLeft > 1 ? "jours" : "jour"} restants`}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Le prélèvement automatique commence le{" "}
-                  {formatDate(billing.trialEndsAt)}.{" "}
+                  {billing.trialEndsAt
+                    ? `Le prélèvement automatique commence le ${formatDate(billing.trialEndsAt)}. `
+                    : "Le prélèvement automatique se déclenchera en fin d'essai. "}
                   {billing.cancelAtPeriodEnd
                     ? "Tu as annulé : aucune facture ne sera prélevée."
                     : "Tu peux annuler à tout moment via le portail."}
@@ -186,7 +204,9 @@ export default async function SubscriptionPage() {
                 ? "gold"
                 : sub.status === "active"
                   ? "success"
-                  : "secondary"
+                  : sub.status === "past_due" || sub.status === "unpaid"
+                    ? "warning"
+                    : "secondary"
             }
           >
             {sub.status === "trialing"
@@ -195,9 +215,14 @@ export default async function SubscriptionPage() {
                 ? "Premium"
                 : sub.status === "past_due" || sub.status === "unpaid"
                   ? "Paiement en attente"
-                  : sub.status === "canceled"
-                    ? "Annulé"
-                    : "Aucun abonnement"}
+                  : sub.status === "paused"
+                    ? "Essai en pause"
+                    : sub.status === "canceled"
+                      ? "Annulé"
+                      : sub.status === "incomplete" ||
+                          sub.status === "incomplete_expired"
+                        ? "Paiement incomplet"
+                        : "Aucun abonnement"}
           </Badge>
           <p className="text-sm text-muted-foreground">
             {sub.trial_used && billing.kind === "lapsed"

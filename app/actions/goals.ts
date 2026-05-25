@@ -45,7 +45,7 @@ export async function createGoal(input: GoalInput): Promise<ActionResult> {
     if ((count ?? 0) >= LAPSED_ACCOUNT_GOAL_LIMIT) {
       return {
         ok: false,
-        error: `Ton accès est en pause : ${LAPSED_ACCOUNT_GOAL_LIMIT} objectif actif maximum. Réactive ton abonnement pour des objectifs illimités.`,
+        error: `Limite de ${LAPSED_ACCOUNT_GOAL_LIMIT} objectif actif atteinte. Démarre ton essai 14 jours (ou reprends ton abonnement) pour des objectifs illimités.`,
       };
     }
   }
