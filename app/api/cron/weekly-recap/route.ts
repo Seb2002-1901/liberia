@@ -27,12 +27,23 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
  * re-run within ~6 days (skips users sent recently).
  */
 export async function GET(request: Request) {
+  // Fail closed — never run this loop without explicit auth. If the
+  // operator forgets to set CRON_SECRET in env, the endpoint stays
+  // locked instead of becoming a public spam-trigger that walks every
+  // opted-in user. Vercel Cron sets CRON_SECRET automatically for
+  // scheduled jobs (it's a Vercel-managed env var).
   const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return NextResponse.json(
+      { error: "Cron not configured" },
+      { status: 503 },
+    );
+  }
   const provided =
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
     request.headers.get("x-cron-secret") ??
     new URL(request.url).searchParams.get("secret");
-  if (secret && provided !== secret) {
+  if (provided !== secret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -92,12 +103,22 @@ async function sendOneRecap(
   userId: string,
   unsubscribeToken: string | null,
 ): Promise<"sent" | "skipped"> {
+  // Pull the user's auth email via the admin auth API — never trust
+  // `profiles.email` for outbound mail. RLS allows the user to self-update
+  // their `profiles.email`, so otherwise we'd be a free spam relay
+  // (attacker sets profiles.email → victim@example.com → Vercel cron
+  // sends them a "LIBERIA récap" each Sunday).
+  const { data: authData, error: authErr } =
+    await admin.auth.admin.getUserById(userId);
+  const trustedEmail = authData?.user?.email;
+  if (authErr || !trustedEmail) return "skipped";
+
   // Pull the user's data with the admin client (cron has no user session).
   const [{ data: profile }, { data: incomes }, { data: expenses }, { data: fp }] =
     await Promise.all([
       admin
         .from("profiles")
-        .select("full_name, email")
+        .select("full_name")
         .eq("id", userId)
         .maybeSingle(),
       admin
@@ -114,8 +135,6 @@ async function sendOneRecap(
         .eq("user_id", userId)
         .maybeSingle(),
     ]);
-
-  if (!profile?.email) return "skipped";
 
   const monthlyIncome =
     totalMonthly((incomes ?? []) as Income[]) || fp?.monthly_income || 0;
@@ -165,7 +184,7 @@ async function sendOneRecap(
     ).length;
   }
 
-  const firstName = profile.full_name?.split(" ")[0] ?? "toi";
+  const firstName = profile?.full_name?.split(" ")[0] ?? "toi";
   const unsubscribeUrl = unsubscribeToken
     ? `${baseUrl}/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`
     : `${baseUrl}/settings`;
@@ -186,7 +205,7 @@ async function sendOneRecap(
   const resend = getResend();
   const { error } = await resend.emails.send({
     from: EMAIL_FROM,
-    to: profile.email,
+    to: trustedEmail,
     subject: email.subject,
     html: email.html,
     text: email.text,

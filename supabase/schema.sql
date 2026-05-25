@@ -357,6 +357,58 @@ create index if not exists idx_ai_messages_conversation
   on public.ai_messages(conversation_id, created_at asc);
 create index if not exists idx_ai_messages_user on public.ai_messages(user_id);
 
+-- Cap message length so a user cannot edit their own ai_messages rows
+-- (the RLS update policy lets them) and inflate the context replayed
+-- to Anthropic on the next chat call — bounded cost defense.
+-- 16000 chars ≈ 4000 tokens; combined with MAX_CONVERSATION_TURNS=40
+-- this caps the historical context at ~160k tokens (~0.50 CHF / call
+-- in the worst case). Idempotent: NOT VALID skips back-check on
+-- existing rows, the constraint still enforces all future writes.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.ai_messages'::regclass
+      and conname = 'ai_messages_content_length'
+  ) then
+    alter table public.ai_messages
+      add constraint ai_messages_content_length
+      check (char_length(content) <= 16000) not valid;
+  end if;
+end$$;
+
+-- Mirror Zod schema caps at the DB level so a user cannot bypass the
+-- server-side validation via direct supabase-js writes and bloat the
+-- finance context that buildFinanceContext() replays to Anthropic on
+-- every chat / plan-generation call. NOT VALID = future writes only.
+do $$
+declare
+  spec record;
+begin
+  for spec in
+    select * from (values
+      ('incomes',           'label',  'incomes_label_length',           80),
+      ('incomes',           'notes',  'incomes_notes_length',           280),
+      ('expenses',          'label',  'expenses_label_length',          80),
+      ('expenses',          'notes',  'expenses_notes_length',          280),
+      ('goals',             'title',  'goals_title_length',             80),
+      ('goals',             'notes',  'goals_notes_length',             280),
+      ('ai_conversations',  'title',  'ai_conversations_title_length',  120)
+    ) as t(table_name, column_name, constraint_name, max_len)
+  loop
+    if not exists (
+      select 1 from pg_constraint
+      where conrelid = ('public.' || spec.table_name)::regclass
+        and conname = spec.constraint_name
+    ) then
+      execute format(
+        'alter table public.%I add constraint %I check (char_length(%I) <= %s) not valid',
+        spec.table_name, spec.constraint_name, spec.column_name, spec.max_len
+      );
+    end if;
+  end loop;
+end$$;
+
 -- =====================================================
 -- RLS — Phase 2 additions
 -- =====================================================
