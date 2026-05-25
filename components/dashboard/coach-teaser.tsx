@@ -31,7 +31,7 @@ export function CoachTeaser({
     cashflow,
     savingsRate,
     runwayMonths,
-    currency: data.profile.currency || "EUR",
+    currency: data.profile.currency || "CHF",
   });
 
   return (

@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(
   amount: number,
-  currency = "EUR",
-  locale = "fr-FR",
+  currency = "CHF",
+  locale = "fr-CH",
 ): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -19,8 +19,8 @@ export function formatCurrency(
 
 export function formatCurrencyPrecise(
   amount: number,
-  currency = "EUR",
-  locale = "fr-FR",
+  currency = "CHF",
+  locale = "fr-CH",
 ): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -28,7 +28,7 @@ export function formatCurrencyPrecise(
   }).format(amount);
 }
 
-export function formatPercent(value: number, locale = "fr-FR"): string {
+export function formatPercent(value: number, locale = "fr-CH"): string {
   return new Intl.NumberFormat(locale, {
     style: "percent",
     maximumFractionDigits: 1,
@@ -37,7 +37,7 @@ export function formatPercent(value: number, locale = "fr-FR"): string {
 
 export function formatDate(
   date: string | Date,
-  locale = "fr-FR",
+  locale = "fr-CH",
 ): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat(locale, {

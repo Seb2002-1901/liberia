@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { TRIAL_DAYS } from "@/lib/stripe/config";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,8 +88,15 @@ export function RegisterForm() {
           Commence ta reconstruction.
         </h1>
         <p className="text-sm text-muted-foreground">
-          Création de compte en 30 secondes. Pas de carte requise.
+          Création de compte en 30 secondes.
         </p>
+        <div className="rounded-xl border border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.06)] px-3 py-2.5 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {TRIAL_DAYS} jours gratuits
+          </span>
+          , puis abonnement automatique selon le plan choisi. Annulable à tout
+          moment.
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -139,35 +148,64 @@ export function RegisterForm() {
           />
         </Field>
 
-        <div className="flex items-start gap-2 pt-1">
-          <Controller
-            control={control}
-            name="acceptTerms"
-            render={({ field }) => (
-              <Checkbox
-                id="acceptTerms"
-                checked={field.value === true}
-                onCheckedChange={(v) => field.onChange(v === true)}
-              />
-            )}
-          />
-          <Label htmlFor="acceptTerms" className="text-xs font-normal text-muted-foreground">
-            J'accepte les{" "}
-            <Link href={ROUTES.terms} className="text-foreground hover:underline">
-              conditions
-            </Link>{" "}
-            et la{" "}
-            <Link href={ROUTES.privacy} className="text-foreground hover:underline">
-              politique de confidentialité
-            </Link>
-            .
-          </Label>
-        </div>
-        {errors.acceptTerms && (
-          <p className="text-xs text-[hsl(var(--destructive))]">
-            {errors.acceptTerms.message}
-          </p>
-        )}
+        <Controller
+          control={control}
+          name="acceptTerms"
+          render={({ field }) => {
+            const checked = field.value === true;
+            const hasError = Boolean(errors.acceptTerms);
+            return (
+              <div>
+                <Label
+                  htmlFor="acceptTerms"
+                  className={cn(
+                    "flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm font-normal transition-colors",
+                    checked
+                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
+                      : hasError
+                        ? "border-[hsl(var(--destructive)/0.5)] bg-[hsl(var(--destructive)/0.04)]"
+                        : "border-border/60 bg-card/40 hover:border-border",
+                  )}
+                >
+                  <Checkbox
+                    id="acceptTerms"
+                    checked={checked}
+                    onCheckedChange={(v) => field.onChange(v === true)}
+                    className={cn(
+                      "mt-0.5 h-5 w-5 transition-colors",
+                      checked &&
+                        "border-[hsl(var(--gold))] bg-[hsl(var(--gold))] text-background",
+                    )}
+                  />
+                  <span className="text-xs leading-relaxed text-muted-foreground">
+                    J&apos;accepte les{" "}
+                    <Link
+                      href={ROUTES.terms}
+                      className="font-medium text-foreground underline-offset-2 hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      conditions d&apos;utilisation
+                    </Link>{" "}
+                    et la{" "}
+                    <Link
+                      href={ROUTES.privacy}
+                      className="font-medium text-foreground underline-offset-2 hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      politique de confidentialité
+                    </Link>
+                    .
+                  </span>
+                </Label>
+                {hasError && (
+                  <p className="mt-1.5 text-xs text-[hsl(var(--destructive))]">
+                    {errors.acceptTerms?.message}
+                  </p>
+                )}
+              </div>
+            );
+          }}
+        />
 
         <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}

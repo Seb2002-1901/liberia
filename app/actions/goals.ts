@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { goalSchema, type GoalInput } from "@/lib/validations/finance";
-import { PLANS } from "@/lib/constants";
+import { LAPSED_ACCOUNT_GOAL_LIMIT } from "@/lib/constants";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -26,24 +26,26 @@ export async function createGoal(input: GoalInput): Promise<ActionResult> {
 
   const supabase = await createClient();
 
-  // Free-plan cap on simultaneous active goals (advertised on pricing page).
+  // Soft paywall: trialing/active users have no cap. Lapsed accounts
+  // (no sub, canceled, past_due, unpaid…) keep read access to their data
+  // but can only maintain LAPSED_ACCOUNT_GOAL_LIMIT active goal — they
+  // need to resubscribe via the portal to unlock more.
   const { data: sub } = await supabase
     .from("subscriptions")
     .select("plan")
     .eq("user_id", userId)
     .maybeSingle();
-  const plan = (sub?.plan as "free" | "premium") ?? "free";
-  const limit = PLANS[plan].limits.goals;
-  if (Number.isFinite(limit)) {
+  const isPremium = sub?.plan === "premium";
+  if (!isPremium) {
     const { count } = await supabase
       .from("goals")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
       .eq("is_completed", false);
-    if ((count ?? 0) >= limit) {
+    if ((count ?? 0) >= LAPSED_ACCOUNT_GOAL_LIMIT) {
       return {
         ok: false,
-        error: `Plan ${plan === "free" ? "Gratuit" : "Premium"} : ${limit} objectif${limit > 1 ? "s" : ""} actif${limit > 1 ? "s" : ""} maximum. Passe Premium pour des objectifs illimités.`,
+        error: `Ton accès est en pause : ${LAPSED_ACCOUNT_GOAL_LIMIT} objectif actif maximum. Réactive ton abonnement pour des objectifs illimités.`,
       };
     }
   }

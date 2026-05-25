@@ -40,7 +40,7 @@ export default async function ProfilePage() {
               <p className="font-medium">{name}</p>
               <p className="text-sm text-muted-foreground">{data.profile.email}</p>
               <Badge variant={data.subscription.plan === "premium" ? "gold" : "secondary"} className="mt-1">
-                Plan {data.subscription.plan === "premium" ? "Premium" : "Gratuit"}
+                {data.subscription.plan === "premium" ? "Plan Premium" : "Sans abonnement actif"}
               </Badge>
             </div>
           </div>

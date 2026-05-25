@@ -186,6 +186,6 @@ export const demoProfile = {
   full_name: "Mode démo",
   email: "demo@liberia.app",
   avatar_url: null,
-  currency: "EUR",
-  locale: "fr-FR",
+  currency: "CHF",
+  locale: "fr-CH",
 };

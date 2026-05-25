@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isStripeConfigured, STRIPE_PLANS, type StripePlanId } from "@/lib/stripe/config";
+import {
+  STRIPE_PLANS,
+  TRIAL_DAYS,
+  isStripeConfigured,
+  type StripePlanId,
+} from "@/lib/stripe/config";
 import { getStripe } from "@/lib/stripe/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -73,12 +78,15 @@ export async function POST(request: Request) {
   // for this user (previous checkout, even if since cancelled). Without
   // this, every new subscription creates a fresh Customer in Stripe and
   // the lookup-by-customer-id fallback in the webhook breaks across
-  // resubscription cycles.
+  // resubscription cycles. Also pull `trial_used` so we can deny a 2nd
+  // free trial — once consumed, the user pays immediately on resubscribe.
   const { data: existingSub } = await supabase
     .from("subscriptions")
-    .select("stripe_customer_id")
+    .select("stripe_customer_id, trial_used")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  const trialDays = existingSub?.trial_used ? 0 : TRIAL_DAYS;
 
   try {
     const stripe = getStripe();
@@ -91,18 +99,42 @@ export async function POST(request: Request) {
         ? { customer: existingSub.stripe_customer_id }
         : { customer_email: user.email ?? undefined }),
       line_items: [{ price: plan.priceId, quantity: 1 }],
+      // `automatic_payment_methods` lets Stripe surface every method
+      // enabled on the account for the customer's region: cards,
+      // Apple/Google Pay, plus TWINT for Swiss customers once it's
+      // activated in Dashboard → Settings → Payment methods.
+      payment_method_collection: "always",
+      automatic_tax: { enabled: false },
+      subscription_data: {
+        // CRITICAL: session metadata is NOT propagated to the eventual
+        // Subscription object. Set it explicitly via subscription_data so
+        // customer.subscription.* events carry user_id for the webhook
+        // dispatcher — no fragile customer_id lookup needed.
+        metadata: { user_id: user.id },
+        // 14-day free trial — Stripe charges automatically when it
+        // ends. trial_days = 0 when the user already consumed their
+        // trial (anti-abuse, enforced server-side from `trial_used`).
+        ...(trialDays > 0
+          ? {
+              trial_period_days: trialDays,
+              trial_settings: {
+                end_behavior: {
+                  // If the user removes their card during the trial and we
+                  // can't charge at the end, pause Stripe's billing —
+                  // their access lapses cleanly until they fix it via the
+                  // Customer Portal.
+                  missing_payment_method: "pause",
+                },
+              },
+            }
+          : {}),
+      },
       success_url: `${baseUrl}/settings/subscription?status=success`,
       cancel_url: `${baseUrl}/settings/subscription?status=cancel`,
       client_reference_id: user.id,
-      metadata: { user_id: user.id, plan: "premium" },
-      // CRITICAL: session metadata is NOT propagated to the eventual
-      // Subscription object. Set it explicitly via subscription_data so
-      // customer.subscription.* events carry user_id for the webhook
-      // dispatcher — no fragile customer_id lookup needed.
-      subscription_data: {
-        metadata: { user_id: user.id },
-      },
+      metadata: { user_id: user.id, plan: "premium", price_id: plan.priceId },
       allow_promotion_codes: true,
+      locale: "fr",
     });
 
     return NextResponse.json({ url: session.url });

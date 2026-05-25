@@ -153,6 +153,15 @@ function periodEndFromSubscription(sub: Stripe.Subscription): string | null {
   return typeof ts === "number" ? new Date(ts * 1000).toISOString() : null;
 }
 
+function tsToIso(ts: number | null | undefined): string | null {
+  return typeof ts === "number" ? new Date(ts * 1000).toISOString() : null;
+}
+
+function priceIdFromSubscription(sub: Stripe.Subscription): string | null {
+  const item = sub.items?.data?.[0];
+  return item?.price?.id ?? null;
+}
+
 async function upsertSubscription(
   admin: ReturnType<typeof getAdminClient>,
   userId: string,
@@ -167,6 +176,13 @@ async function upsertSubscription(
   // parallel webhooks for the same user can't race to overwrite each
   // other — Postgres serializes the comparison + write in a single
   // statement.
+  //
+  // We also pass:
+  //  - the price_id (so the UI can tell monthly from yearly)
+  //  - trial_start / trial_end (Stripe timestamps in seconds)
+  // The RPC flips trial_used=true the moment the subscription lands in a
+  // trialing/active/past_due state — anti-abuse, so cancellation + new
+  // checkout can't ever grant a 2nd free trial.
   const { error } = await admin.rpc("apply_subscription_event", {
     p_user_id: userId,
     p_customer_id: customerId,
@@ -176,6 +192,9 @@ async function upsertSubscription(
     p_current_period_end: periodEndFromSubscription(sub),
     p_cancel_at_period_end: sub.cancel_at_period_end ?? false,
     p_event_at: eventCreatedAt,
+    p_price_id: priceIdFromSubscription(sub),
+    p_trial_started_at: tsToIso(sub.trial_start),
+    p_trial_ends_at: tsToIso(sub.trial_end),
   });
   if (error) throw error;
 }

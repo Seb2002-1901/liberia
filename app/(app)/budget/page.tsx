@@ -119,7 +119,7 @@ function BudgetBar({
   value,
   max,
   tone = "default",
-  currency = "EUR",
+  currency = "CHF",
 }: {
   label: string;
   value: number;

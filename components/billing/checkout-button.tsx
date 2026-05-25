@@ -3,13 +3,21 @@
 import * as React from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@/components/ui/button";
 
 interface CheckoutButtonProps {
   planId: "premium_monthly" | "premium_yearly";
+  label?: string;
+  variant?: ButtonProps["variant"];
+  className?: string;
 }
 
-export function CheckoutButton({ planId }: CheckoutButtonProps) {
+export function CheckoutButton({
+  planId,
+  label,
+  variant = "gold",
+  className,
+}: CheckoutButtonProps) {
   const [loading, setLoading] = React.useState(false);
 
   const onClick = async () => {
@@ -34,9 +42,17 @@ export function CheckoutButton({ planId }: CheckoutButtonProps) {
   };
 
   return (
-    <Button variant="gold" className="w-full" onClick={onClick} disabled={loading}>
+    <Button
+      variant={variant}
+      className={className ?? "w-full"}
+      onClick={onClick}
+      disabled={loading}
+    >
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-      Passer Premium
+      {label ??
+        (planId === "premium_yearly"
+          ? "Commencer l'essai annuel"
+          : "Commencer l'essai mensuel")}
     </Button>
   );
 }

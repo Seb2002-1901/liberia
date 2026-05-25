@@ -37,6 +37,10 @@ export interface Subscription {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   last_event_at: string | null;
+  price_id: string | null;
+  trial_used: boolean;
+  trial_started_at: string | null;
+  trial_ends_at: string | null;
   created_at: string;
   updated_at: string;
 }

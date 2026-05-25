@@ -366,10 +366,11 @@ function UpgradeCard({ plan }: { plan: "free" | "premium" }) {
         <p className="text-xs font-semibold uppercase tracking-wider">Premium</p>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Objectifs et catégories illimités. Accès anticipé à l'IA financière.
+        14 jours gratuits, puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à
+        tout moment.
       </p>
       <Button asChild size="sm" variant="gold" className="mt-3 w-full">
-        <Link href={ROUTES.subscription}>Passer Premium</Link>
+        <Link href={ROUTES.subscription}>Démarrer l&apos;essai</Link>
       </Button>
     </div>
   );

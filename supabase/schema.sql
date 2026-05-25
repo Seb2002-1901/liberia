@@ -24,12 +24,18 @@ create table if not exists public.profiles (
   email text not null,
   full_name text,
   avatar_url text,
-  locale text not null default 'fr-FR',
-  currency text not null default 'EUR',
+  locale text not null default 'fr-CH',
+  currency text not null default 'CHF',
   onboarding_completed boolean not null default false,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+-- LIBERIA est orientée Suisse — la valeur par défaut passe à CHF / fr-CH.
+-- Pour les bases déjà déployées on bascule UNIQUEMENT le DEFAULT (les
+-- profils existants gardent leur valeur stockée).
+alter table public.profiles alter column locale set default 'fr-CH';
+alter table public.profiles alter column currency set default 'CHF';
 
 drop trigger if exists set_updated_at_profiles on public.profiles;
 create trigger set_updated_at_profiles
@@ -212,7 +218,11 @@ create index if not exists idx_stripe_events_type on public.stripe_events(type);
 -- subscription row so we can ignore out-of-order deliveries.
 -- (Idempotent column add — safe for already-deployed Phase 2 databases.)
 alter table public.subscriptions
-  add column if not exists last_event_at timestamptz;
+  add column if not exists last_event_at timestamptz,
+  add column if not exists trial_used boolean not null default false,
+  add column if not exists trial_started_at timestamptz,
+  add column if not exists trial_ends_at timestamptz,
+  add column if not exists price_id text;
 
 -- Atomic conditional upsert for Stripe subscription state.
 -- The naïve "SELECT last_event_at then UPDATE" pattern races when two
@@ -228,7 +238,10 @@ create or replace function public.apply_subscription_event(
   p_plan text,
   p_current_period_end timestamptz,
   p_cancel_at_period_end boolean,
-  p_event_at timestamptz
+  p_event_at timestamptz,
+  p_price_id text default null,
+  p_trial_started_at timestamptz default null,
+  p_trial_ends_at timestamptz default null
 ) returns void
 language plpgsql
 security definer
@@ -243,7 +256,14 @@ begin
     plan,
     current_period_end,
     cancel_at_period_end,
-    last_event_at
+    last_event_at,
+    price_id,
+    trial_started_at,
+    trial_ends_at,
+    -- A user is considered to have "used" their trial the moment a
+    -- trialing or active subscription lands. We never reset this back
+    -- to false (so cancellation + resubscribe doesn't grant a 2nd trial).
+    trial_used
   )
   values (
     p_user_id,
@@ -253,7 +273,11 @@ begin
     p_plan,
     p_current_period_end,
     p_cancel_at_period_end,
-    p_event_at
+    p_event_at,
+    p_price_id,
+    p_trial_started_at,
+    p_trial_ends_at,
+    case when p_status in ('trialing', 'active', 'past_due') then true else false end
   )
   on conflict (user_id) do update
   set
@@ -263,7 +287,12 @@ begin
     plan                   = excluded.plan,
     current_period_end     = excluded.current_period_end,
     cancel_at_period_end   = excluded.cancel_at_period_end,
-    last_event_at          = excluded.last_event_at
+    last_event_at          = excluded.last_event_at,
+    price_id               = coalesce(excluded.price_id, public.subscriptions.price_id),
+    trial_started_at       = coalesce(excluded.trial_started_at, public.subscriptions.trial_started_at),
+    trial_ends_at          = coalesce(excluded.trial_ends_at, public.subscriptions.trial_ends_at),
+    trial_used             = public.subscriptions.trial_used
+                             or excluded.trial_used
   where public.subscriptions.last_event_at is null
      or public.subscriptions.last_event_at < excluded.last_event_at;
 end;

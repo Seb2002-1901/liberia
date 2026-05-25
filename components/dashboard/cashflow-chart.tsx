@@ -19,7 +19,7 @@ interface CashflowChartProps {
   currency?: string;
 }
 
-export function CashflowChart({ income, expenses, currency = "EUR" }: CashflowChartProps) {
+export function CashflowChart({ income, expenses, currency = "CHF" }: CashflowChartProps) {
   // Phase 1: lissage déterministe à des fins d'illustration tant que
   // l'historique mensuel n'est pas collecté. Remplacé par la série réelle
   // dès que les transactions horodatées seront accumulées.

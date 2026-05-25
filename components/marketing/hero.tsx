@@ -81,13 +81,13 @@ function DashboardPreview() {
             </p>
           </div>
           <div className="hidden gap-2 sm:flex">
-            <Pill label="Reste à vivre · 540 €" />
-            <Pill label="Épargne · +210 €" highlight />
+            <Pill label="Reste à vivre · 540 CHF" />
+            <Pill label="Épargne · +210 CHF" highlight />
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <MiniCard label="Revenus" value="2 450 €" trend="+0%" />
-          <MiniCard label="Dépenses" value="1 910 €" trend="-4%" tone="success" />
+          <MiniCard label="Revenus" value="2 450 CHF" trend="+0%" />
+          <MiniCard label="Dépenses" value="1 910 CHF" trend="-4%" tone="success" />
           <MiniCard label="Objectifs" value="2 actifs" trend="48%" tone="gold" />
         </div>
         <div className="mt-6 h-32 rounded-xl border border-border/40 bg-gradient-to-br from-[hsl(var(--gold)/0.08)] via-transparent to-transparent" />

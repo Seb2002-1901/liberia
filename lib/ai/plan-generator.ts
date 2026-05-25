@@ -53,7 +53,7 @@ const planToolSchema: Anthropic.Tool.InputSchema = {
           title: {
             type: "string",
             description:
-              "L'action concrète. Commence par un verbe à l'infinitif ou à l'impératif. Précise un montant ou un délai quand c'est possible. Ex. : « Bloque un virement automatique de 50 € chaque vendredi vers ton fonds d'urgence ».",
+              "L'action concrète. Commence par un verbe à l'infinitif ou à l'impératif. Précise un montant (dans la devise du contexte utilisateur, CHF par défaut) ou un délai quand c'est possible. Ex. : « Bloque un virement automatique de 50 CHF chaque vendredi vers ton fonds d'urgence ».",
           },
           description: {
             type: "string",

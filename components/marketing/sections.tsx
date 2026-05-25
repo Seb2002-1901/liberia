@@ -216,8 +216,16 @@ export function SecuritySection() {
 export function FaqSection() {
   const faqs = [
     {
-      q: "LIBERIA est-il vraiment gratuit ?",
-      a: "Oui. Le plan Gratuit te donne accès au dashboard, au suivi budget et à un objectif financier actif. Le plan Premium débloque les usages illimités et l'accès anticipé aux fonctions IA.",
+      q: "C'est vraiment gratuit ?",
+      a: "Tu démarres avec 14 jours d'essai gratuit (carte requise pour activer). Après l'essai, ton abonnement choisi se déclenche automatiquement : 14.99 CHF/mois ou 119.99 CHF/an. Tu peux annuler à tout moment depuis ton espace, sans question.",
+    },
+    {
+      q: "Que se passe-t-il si j'annule pendant l'essai ?",
+      a: "Aucun prélèvement. Ton accès continue jusqu'à la fin des 14 jours, puis ton compte passe en pause — tes données restent en sécurité et tu peux réactiver quand tu veux.",
+    },
+    {
+      q: "Quels moyens de paiement sont acceptés ?",
+      a: "Cartes Visa, Mastercard et American Express, Apple Pay, Google Pay, ainsi que TWINT (Suisse, selon activation Stripe Dashboard). Tout est géré par Stripe — chiffré et conforme PCI.",
     },
     {
       q: "Mes données sont-elles connectées à ma banque ?",

@@ -8,7 +8,7 @@ import { formatCurrency } from "@/lib/utils";
 import { ROUTES, GOAL_TYPES } from "@/lib/constants";
 import type { Goal } from "@/types/database";
 
-export function GoalsSummary({ goals, currency = "EUR" }: { goals: Goal[]; currency?: string }) {
+export function GoalsSummary({ goals, currency = "CHF" }: { goals: Goal[]; currency?: string }) {
   if (!goals.length) {
     return (
       <Card>

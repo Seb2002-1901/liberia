@@ -30,7 +30,7 @@ const COLORS = [
   "hsl(0, 0%, 55%)",
 ];
 
-export function ExpenseBreakdown({ data, currency = "EUR" }: ExpenseBreakdownProps) {
+export function ExpenseBreakdown({ data, currency = "CHF" }: ExpenseBreakdownProps) {
   const labelFor = (id: string) =>
     EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
 

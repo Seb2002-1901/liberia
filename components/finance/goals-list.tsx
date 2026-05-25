@@ -37,7 +37,7 @@ interface GoalsListProps {
 export function GoalsList({
   goals,
   isDemo,
-  currency = "EUR",
+  currency = "CHF",
   onCreate,
   onUpdate,
   onDelete,

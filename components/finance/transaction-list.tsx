@@ -45,7 +45,7 @@ export function TransactionList({
   kind,
   items,
   isDemo,
-  currency = "EUR",
+  currency = "CHF",
   onCreate,
   onUpdate,
   onDelete,

@@ -21,7 +21,7 @@ import type { FinanceData } from "@/lib/services/finance";
  * the per-model minimum.
  */
 export function buildFinanceContext(data: FinanceData): string {
-  const currency = data.profile.currency || "EUR";
+  const currency = data.profile.currency || "CHF";
   const monthlyIncome =
     totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
   const monthlyExpenses =

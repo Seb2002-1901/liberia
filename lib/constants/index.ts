@@ -3,8 +3,12 @@ export const APP_TAGLINE = "Reprends le contrôle de ton argent.";
 export const APP_DESCRIPTION =
   "LIBERIA t'aide à comprendre ta situation financière, réduire ton stress et construire une stabilité durable.";
 
-export const DEFAULT_CURRENCY = "EUR";
-export const DEFAULT_LOCALE = "fr-FR";
+// LIBERIA est orientée Suisse — devise par défaut CHF, locale fr-CH.
+// Les utilisateurs existants qui ont déjà une devise dans `profiles.currency`
+// conservent leur choix (les fallbacks `?? "CHF"` ne réécrivent que les valeurs
+// non-définies).
+export const DEFAULT_CURRENCY = "CHF";
+export const DEFAULT_LOCALE = "fr-CH";
 
 export const ROUTES = {
   home: "/",
@@ -114,47 +118,57 @@ export const GOAL_TYPES = [
 
 export type GoalTypeId = (typeof GOAL_TYPES)[number]["id"];
 
+/**
+ * Modèle business LIBERIA :
+ *  - pas de plan gratuit permanent
+ *  - essai gratuit 14 jours (carte requise à l'inscription)
+ *  - puis prélèvement automatique mensuel ou annuel
+ *
+ * `PLANS` ici sert au rendu UI marketing/abonnement uniquement. La source
+ * de vérité des prix Stripe est dans `lib/stripe/config.ts` (STRIPE_PLANS).
+ */
 export const PLANS = {
-  free: {
-    id: "free",
-    name: "Gratuit",
-    priceMonthly: 0,
-    priceYearly: 0,
-    description: "Pour commencer ta reconstruction financière.",
+  monthly: {
+    id: "premium_monthly",
+    name: "Mensuel",
+    priceCHF: 14.99,
+    monthlyEquivalentCHF: 14.99,
+    interval: "month",
+    description:
+      "Accès complet à LIBERIA. Annule à tout moment depuis ton espace.",
     features: [
-      "Dashboard financier complet",
-      "Suivi revenus & dépenses",
-      "1 objectif financier actif",
-      "Score de stabilité financière",
-      "Mode démo illimité",
+      "14 jours gratuits, sans engagement",
+      "Coach IA conversationnel",
+      "Plan financier IA personnalisé 30 / 60 / 90 jours",
+      "Suivi budget complet (revenus, dépenses, objectifs)",
+      "Récap hebdo par email",
+      "Annulable à tout moment",
     ],
-    limits: {
-      goals: 1,
-    },
   },
-  premium: {
-    id: "premium",
-    name: "Premium",
-    priceMonthly: 9.9,
-    priceYearly: 89,
-    description: "Soutiens le projet et débloque l'usage sans limite.",
-    // Premium currently differentiates on the goal cap (Free = 1 active goal,
-    // Premium = unlimited) and a higher AI rate-limit envelope for the
-    // weekly cron + coach. Items listed here MUST reflect what the code
-    // actually delivers — no marketing-only claims. Anything else is on the
-    // Phase 4 backlog.
+  yearly: {
+    id: "premium_yearly",
+    name: "Annuel",
+    priceCHF: 119.99,
+    monthlyEquivalentCHF: 9.99,
+    interval: "year",
+    description: "Soit ~9.99 CHF/mois — environ 60 CHF d'économie sur l'année.",
     features: [
-      "Tout du plan Gratuit",
-      "Objectifs financiers illimités",
-      "Historique de conversations sans limite",
-      "Récap hebdo enrichi par email",
-      "Tu finances le développement de LIBERIA",
+      "14 jours gratuits, sans engagement",
+      "Tout ce qu'il y a dans le Mensuel",
+      "Économise environ 60 CHF par an",
+      "Facturation une seule fois par an",
+      "Annulable à tout moment",
     ],
-    badge: "Le plus choisi",
-    limits: {
-      goals: Infinity,
-    },
+    badge: "Recommandé",
   },
 } as const;
 
 export type PlanId = keyof typeof PLANS;
+
+/**
+ * Limite goals active appliquée UNIQUEMENT aux comptes qui n'ont plus
+ * d'abonnement valide (trial expiré sans paiement, ou abonnement
+ * cancelled/unpaid). Les utilisateurs `trialing` et `active` ont accès
+ * illimité.
+ */
+export const LAPSED_ACCOUNT_GOAL_LIMIT = 1;

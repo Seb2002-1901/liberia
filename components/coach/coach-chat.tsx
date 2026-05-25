@@ -18,7 +18,7 @@ interface CoachChatProps {
 }
 
 const SUGGESTIONS = [
-  "Comment je peux économiser 100 € ce mois-ci ?",
+  "Comment je peux économiser 100 CHF ce mois-ci ?",
   "Comment construire un fonds d'urgence à mon rythme ?",
   "Mes abonnements pèsent combien dans mon budget ?",
   "Par où commencer pour réduire mon stress financier ?",
