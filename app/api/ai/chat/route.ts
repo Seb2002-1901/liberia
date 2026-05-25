@@ -10,6 +10,7 @@ import {
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getFinanceData } from "@/lib/services/finance";
+import { requirePremiumAccess } from "@/lib/services/access";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -78,6 +79,15 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+  }
+
+  // Premium gate — calls to Anthropic cost real money. Free / lapsed
+  // accounts can still read their existing conversations via the page
+  // (lib/services/coach is RLS-bound, not gated), but they cannot send
+  // new messages. 402 Payment Required is the right semantic.
+  const access = await requirePremiumAccess(supabase, user.id);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.reason }, { status: 402 });
   }
 
   // Rate limit per-user across all coach traffic.

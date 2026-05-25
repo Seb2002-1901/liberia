@@ -105,7 +105,7 @@ async function handleEvent(
     case "invoice.paid":
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
-      const subId = (invoice as unknown as { subscription?: string | null }).subscription;
+      const subId = invoiceSubscriptionId(invoice);
       if (!subId) return;
       const stripe = getStripe();
       const subscription = (await stripe.subscriptions.retrieve(subId)) as Stripe.Subscription;
@@ -160,6 +160,40 @@ function tsToIso(ts: number | null | undefined): string | null {
 function priceIdFromSubscription(sub: Stripe.Subscription): string | null {
   const item = sub.items?.data?.[0];
   return item?.price?.id ?? null;
+}
+
+/**
+ * Extract the subscription id from an Invoice across API versions.
+ *
+ *  - Pre-2024: top-level `invoice.subscription`
+ *  - 2024+   : `invoice.parent.subscription_details.subscription`
+ *  - Also handle the rare `invoice.lines.data[].subscription` fallback
+ *    that some older webhook payloads still carry.
+ *
+ * Returns null when the invoice is not tied to a subscription (one-off
+ * payment), in which case the caller skips the event.
+ */
+function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const top = (invoice as unknown as { subscription?: string | null })
+    .subscription;
+  if (typeof top === "string" && top) return top;
+
+  const parent = (
+    invoice as unknown as {
+      parent?: {
+        subscription_details?: { subscription?: string | null } | null;
+      } | null;
+    }
+  ).parent;
+  const fromParent = parent?.subscription_details?.subscription;
+  if (typeof fromParent === "string" && fromParent) return fromParent;
+
+  const lineSub = (
+    invoice.lines?.data?.[0] as unknown as { subscription?: string | null }
+  )?.subscription;
+  if (typeof lineSub === "string" && lineSub) return lineSub;
+
+  return null;
 }
 
 async function upsertSubscription(

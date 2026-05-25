@@ -132,3 +132,34 @@ customer.subscription.updated` ou avance l'horloge dans le sandbox Stripe.
   les requêtes sans signature valide (HTTP 400).
 - Les redirects Checkout utilisent `NEXT_PUBLIC_APP_URL` comme origine de
   confiance — jamais le header `Origin` (contrôlé par le client).
+
+## 9. Limitations connues
+
+### Double-checkout simultané
+
+Si un utilisateur clique « Mensuel » dans un onglet et « Annuel » dans un
+autre dans la même fraction de seconde, le rate-limit Upstash (10 req/min)
++ l'état `loading` du bouton CheckoutButton couvrent 99 % des cas, mais
+deux sessions Checkout peuvent en théorie être créées si la course est
+plus rapide que le premier round-trip. Le webhook met `subscriptions`
+unique par `user_id` donc une seule ligne en DB, mais Stripe pourrait
+facturer deux abonnements en parallèle. **Mitigation opérateur** :
+surveiller le Stripe Dashboard pour les abonnements doublons sur un
+même Customer, rembourser/annuler manuellement via le portail si
+détecté.
+
+### Suppression de compte ≠ suppression Stripe Customer
+
+`/api/settings → deleteAccount` supprime l'utilisateur Supabase (cascade
+sur toutes les tables) mais laisse le Stripe Customer + abonnement
+intacts (pour audit / éventuel remboursement post-suppression). Annuler
+le sub via Stripe Dashboard si nécessaire. Documenté côté SECURITY.md.
+
+### Anti-abus trial limité au compte LIBERIA
+
+`trial_used` est attaché au row `subscriptions` (unique par user_id).
+Un utilisateur qui supprime son compte LIBERIA puis se ré-inscrit avec
+une **adresse email différente** obtient un nouveau trial — l'anti-abus
+email-based est limité par nature (changement d'email facile). À
+durcir post-launch si on observe de l'abus (fingerprint device,
+fingerprint paiement Stripe Radar, etc.).

@@ -8,6 +8,7 @@ import { generatePlanRequestSchema } from "@/lib/ai/plan-schema";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isAnthropicConfigured } from "@/lib/env";
 import { getFinanceData } from "@/lib/services/finance";
+import { requirePremiumAccess } from "@/lib/services/access";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
@@ -40,6 +41,14 @@ export async function generateFinancialPlan(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Authentification requise." };
+
+  // Premium gate — plan generation costs LIBERIA real money. Block free
+  // / lapsed accounts before hitting Anthropic. Existing plans remain
+  // readable via /plan (lib/services/plan is RLS-bound, not gated).
+  const access = await requirePremiumAccess(supabase, user.id);
+  if (!access.ok) {
+    return { ok: false, error: access.reason };
+  }
 
   // Plan generation is expensive (Sonnet 4.6 tool-use, ~$0.05-0.10/req).
   // Cap to 3/hour/user via the "ai" rate-limit bucket (already 30/min via
