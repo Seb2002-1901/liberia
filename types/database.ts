@@ -113,6 +113,7 @@ export interface UserSettings {
   email_trial_reminders: boolean;
   email_goal_milestones: boolean;
   email_inactivity_followup: boolean;
+  analytics_opt_out: boolean;
   created_at: string;
   updated_at: string;
 }

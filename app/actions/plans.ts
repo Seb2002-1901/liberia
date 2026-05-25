@@ -11,6 +11,7 @@ import { getFinanceData } from "@/lib/services/finance";
 import { requirePremiumAccess } from "@/lib/services/access";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { track } from "@/lib/analytics/tracker";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -137,6 +138,18 @@ export async function generateFinancialPlan(input: {
     await admin.from("financial_plans").delete().eq("id", planId);
     return { ok: false, error: insertSteps.error.message };
   }
+
+  // Track the milestone — no-op sink today, no PII leaks (counts only).
+  await track(
+    {
+      name: "plan_generated",
+      properties: {
+        horizonDays: parsed.data.horizon_days,
+        stepCount: steps.length,
+      },
+    },
+    { userId: user.id },
+  );
 
   revalidatePath("/plan");
   revalidatePath("/dashboard");

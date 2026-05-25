@@ -82,6 +82,27 @@ export async function setEmailPreference(
 }
 
 /**
+ * Privacy-friendly product analytics opt-out toggle. Default false at
+ * the DB level (opted in) but the tracker itself is no-op until a
+ * provider is wired — this flag is forward-compatible plumbing so the
+ * user already controls their data the day analytics ship.
+ */
+export async function setAnalyticsOptOut(
+  optedOut: boolean,
+): Promise<ActionResult> {
+  const userId = await requireUserId();
+  if (!userId) return { ok: false, error: "Authentification requise." };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("user_settings")
+    .update({ analytics_opt_out: optedOut })
+    .eq("user_id", userId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/settings");
+  return { ok: true };
+}
+
+/**
  * RGPD-friendly export. Builds a JSON snapshot of everything the user
  * can see in the app and returns the bytes for the client to download.
  * Uses the user-session client (RLS already scopes to self).

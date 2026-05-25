@@ -70,6 +70,7 @@ export default async function SettingsPage() {
             trialRemindersEnabled={prefs.trial}
             goalMilestonesEnabled={prefs.milestones}
             inactivityFollowupEnabled={prefs.inactivity}
+            analyticsEnabled={prefs.analyticsEnabled}
           />
         </CardContent>
       </Card>
@@ -152,6 +153,8 @@ type Prefs = {
   trial: boolean;
   milestones: boolean;
   inactivity: boolean;
+  /** Inverted on the UI side: `true` = analytics enabled. */
+  analyticsEnabled: boolean;
 };
 
 async function loadPreferences(): Promise<Prefs> {
@@ -162,6 +165,7 @@ async function loadPreferences(): Promise<Prefs> {
     trial: true,
     milestones: true,
     inactivity: true,
+    analyticsEnabled: true,
   };
   if (!isSupabaseConfigured()) return DEFAULTS;
   const supabase = await createClient();
@@ -172,7 +176,7 @@ async function loadPreferences(): Promise<Prefs> {
   const { data } = await supabase
     .from("user_settings")
     .select(
-      "email_weekly_summary, notification_alerts, email_encouragement, email_trial_reminders, email_goal_milestones, email_inactivity_followup",
+      "email_weekly_summary, notification_alerts, email_encouragement, email_trial_reminders, email_goal_milestones, email_inactivity_followup, analytics_opt_out",
     )
     .eq("user_id", user.id)
     .maybeSingle();
@@ -183,5 +187,6 @@ async function loadPreferences(): Promise<Prefs> {
     trial: data?.email_trial_reminders ?? true,
     milestones: data?.email_goal_milestones ?? true,
     inactivity: data?.email_inactivity_followup ?? true,
+    analyticsEnabled: !(data?.analytics_opt_out ?? false),
   };
 }

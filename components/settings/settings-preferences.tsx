@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   deleteAccount,
   exportUserData,
+  setAnalyticsOptOut,
   setEmailPreference,
   setEmailWeeklySummary,
   setNotificationAlerts,
@@ -21,6 +22,8 @@ interface SettingsPreferencesProps {
   trialRemindersEnabled: boolean;
   goalMilestonesEnabled: boolean;
   inactivityFollowupEnabled: boolean;
+  /** Inverted UX: toggle is "Analytics activés" → false means opted-out. */
+  analyticsEnabled: boolean;
 }
 
 export function SettingsPreferences({
@@ -30,6 +33,7 @@ export function SettingsPreferences({
   trialRemindersEnabled,
   goalMilestonesEnabled,
   inactivityFollowupEnabled,
+  analyticsEnabled,
 }: SettingsPreferencesProps) {
   const [weekly, setWeekly] = React.useState(weeklyEnabled);
   const [alerts, setAlerts] = React.useState(alertsEnabled);
@@ -37,6 +41,7 @@ export function SettingsPreferences({
   const [trial, setTrial] = React.useState(trialRemindersEnabled);
   const [milestones, setMilestones] = React.useState(goalMilestonesEnabled);
   const [inactivity, setInactivity] = React.useState(inactivityFollowupEnabled);
+  const [analytics, setAnalytics] = React.useState(analyticsEnabled);
   const [pending, startTransition] = React.useTransition();
 
   const onWeeklyChange = (v: boolean) => {
@@ -141,6 +146,26 @@ export function SettingsPreferences({
           <Switch
             checked={trial}
             onCheckedChange={makePrefHandler("email_trial_reminders", setTrial)}
+            disabled={pending}
+          />
+        }
+      />
+      <Row
+        title="Analytique produit anonyme"
+        description="Compteurs agrégés (jamais nominatifs) pour améliorer LIBERIA. Aucune revente, aucun tracking publicitaire."
+        control={
+          <Switch
+            checked={analytics}
+            onCheckedChange={(v) => {
+              setAnalytics(v);
+              startTransition(async () => {
+                const res = await setAnalyticsOptOut(!v);
+                if (!res.ok) {
+                  setAnalytics(!v);
+                  toast.error(res.error);
+                }
+              });
+            }}
             disabled={pending}
           />
         }

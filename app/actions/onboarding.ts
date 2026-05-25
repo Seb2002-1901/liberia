@@ -14,6 +14,7 @@ import {
   calculateRunway,
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
+import { track } from "@/lib/analytics/tracker";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -99,6 +100,20 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
       { onConflict: "id" },
     );
   if (profileRes.error) return { ok: false, error: profileRes.error.message };
+
+  // Track the milestone — sink is no-op today, swallows errors anyway.
+  // Only enum-ish properties travel: no PII, no amounts.
+  await track(
+    {
+      name: "onboarding_completed",
+      properties: {
+        situation: v.situation,
+        mainGoal: v.mainGoal,
+        behaviorTraitCount: v.behaviorTraits.length,
+      },
+    },
+    { userId: user.id },
+  );
 
   revalidatePath("/dashboard");
   return { ok: true };

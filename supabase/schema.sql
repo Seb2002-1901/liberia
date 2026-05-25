@@ -565,6 +565,12 @@ alter table public.user_settings
   add column if not exists email_goal_milestones boolean not null default true,
   add column if not exists email_inactivity_followup boolean not null default true;
 
+-- Phase 6 — privacy-friendly product analytics opt-out. Default false
+-- (= opted in, but the tracker is itself no-op until a provider is
+-- wired up, so this is purely a future-proof toggle).
+alter table public.user_settings
+  add column if not exists analytics_opt_out boolean not null default false;
+
 -- =====================================================
 -- user_memory (Phase 4) — IA personalization scaffolding
 -- =====================================================
