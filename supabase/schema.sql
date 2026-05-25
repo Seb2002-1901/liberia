@@ -555,6 +555,16 @@ alter table public.user_settings
   add column if not exists email_unsubscribe_token text unique default gen_random_uuid()::text,
   add column if not exists last_weekly_sent_at timestamptz;
 
+-- Phase 5 — granular email preferences. All default true (opt-out
+-- model): user can disable specific categories from /settings while
+-- still receiving billing-critical emails (those don't have a toggle).
+-- Idempotent column add — safe to re-run.
+alter table public.user_settings
+  add column if not exists email_encouragement boolean not null default true,
+  add column if not exists email_trial_reminders boolean not null default true,
+  add column if not exists email_goal_milestones boolean not null default true,
+  add column if not exists email_inactivity_followup boolean not null default true;
+
 -- =====================================================
 -- user_memory (Phase 4) — IA personalization scaffolding
 -- =====================================================

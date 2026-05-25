@@ -8,21 +8,35 @@ import { Button } from "@/components/ui/button";
 import {
   deleteAccount,
   exportUserData,
+  setEmailPreference,
   setEmailWeeklySummary,
   setNotificationAlerts,
+  type EmailPreferenceKey,
 } from "@/app/actions/settings";
 
 interface SettingsPreferencesProps {
   weeklyEnabled: boolean;
   alertsEnabled: boolean;
+  encouragementEnabled: boolean;
+  trialRemindersEnabled: boolean;
+  goalMilestonesEnabled: boolean;
+  inactivityFollowupEnabled: boolean;
 }
 
 export function SettingsPreferences({
   weeklyEnabled,
   alertsEnabled,
+  encouragementEnabled,
+  trialRemindersEnabled,
+  goalMilestonesEnabled,
+  inactivityFollowupEnabled,
 }: SettingsPreferencesProps) {
   const [weekly, setWeekly] = React.useState(weeklyEnabled);
   const [alerts, setAlerts] = React.useState(alertsEnabled);
+  const [encouragement, setEncouragement] = React.useState(encouragementEnabled);
+  const [trial, setTrial] = React.useState(trialRemindersEnabled);
+  const [milestones, setMilestones] = React.useState(goalMilestonesEnabled);
+  const [inactivity, setInactivity] = React.useState(inactivityFollowupEnabled);
   const [pending, startTransition] = React.useTransition();
 
   const onWeeklyChange = (v: boolean) => {
@@ -47,6 +61,22 @@ export function SettingsPreferences({
     });
   };
 
+  const makePrefHandler =
+    (
+      key: EmailPreferenceKey,
+      setter: React.Dispatch<React.SetStateAction<boolean>>,
+    ) =>
+    (v: boolean) => {
+      setter(v);
+      startTransition(async () => {
+        const res = await setEmailPreference(key, v);
+        if (!res.ok) {
+          setter(!v);
+          toast.error(res.error);
+        }
+      });
+    };
+
   return (
     <div className="space-y-5">
       <Row
@@ -67,6 +97,50 @@ export function SettingsPreferences({
           <Switch
             checked={alerts}
             onCheckedChange={onAlertsChange}
+            disabled={pending}
+          />
+        }
+      />
+      <Row
+        title="Encouragements de progression"
+        description="Un email court quand le coach détecte une avancée notable."
+        control={
+          <Switch
+            checked={encouragement}
+            onCheckedChange={makePrefHandler("email_encouragement", setEncouragement)}
+            disabled={pending}
+          />
+        }
+      />
+      <Row
+        title="Rappels d'objectifs"
+        description="Quand un objectif franchit un palier (50 / 80 / 100%)."
+        control={
+          <Switch
+            checked={milestones}
+            onCheckedChange={makePrefHandler("email_goal_milestones", setMilestones)}
+            disabled={pending}
+          />
+        }
+      />
+      <Row
+        title="Suivi du coach"
+        description="Un email doux après plusieurs jours d'inactivité."
+        control={
+          <Switch
+            checked={inactivity}
+            onCheckedChange={makePrefHandler("email_inactivity_followup", setInactivity)}
+            disabled={pending}
+          />
+        }
+      />
+      <Row
+        title="Rappels d'essai et de paiement"
+        description="Avant la fin de l'essai et en cas de problème de paiement. Recommandé."
+        control={
+          <Switch
+            checked={trial}
+            onCheckedChange={makePrefHandler("email_trial_reminders", setTrial)}
             disabled={pending}
           />
         }

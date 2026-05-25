@@ -49,6 +49,39 @@ export async function setNotificationAlerts(
 }
 
 /**
+ * Allowlist of email-preference columns the user can flip from the UI.
+ * Stays in code (vs. taking the column name from the client) so a
+ * malicious SDK call can't toggle billing-critical flags. Each entry
+ * must be a real boolean column on `public.user_settings`.
+ */
+const EMAIL_PREF_KEYS = [
+  "email_encouragement",
+  "email_trial_reminders",
+  "email_goal_milestones",
+  "email_inactivity_followup",
+] as const;
+export type EmailPreferenceKey = (typeof EMAIL_PREF_KEYS)[number];
+
+export async function setEmailPreference(
+  key: EmailPreferenceKey,
+  enabled: boolean,
+): Promise<ActionResult> {
+  if (!EMAIL_PREF_KEYS.includes(key)) {
+    return { ok: false, error: "Préférence inconnue." };
+  }
+  const userId = await requireUserId();
+  if (!userId) return { ok: false, error: "Authentification requise." };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("user_settings")
+    .update({ [key]: enabled })
+    .eq("user_id", userId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/settings");
+  return { ok: true };
+}
+
+/**
  * RGPD-friendly export. Builds a JSON snapshot of everything the user
  * can see in the app and returns the bytes for the client to download.
  * Uses the user-session client (RLS already scopes to self).

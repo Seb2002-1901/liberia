@@ -66,6 +66,10 @@ export default async function SettingsPage() {
           <SettingsPreferences
             weeklyEnabled={prefs.weekly}
             alertsEnabled={prefs.alerts}
+            encouragementEnabled={prefs.encouragement}
+            trialRemindersEnabled={prefs.trial}
+            goalMilestonesEnabled={prefs.milestones}
+            inactivityFollowupEnabled={prefs.inactivity}
           />
         </CardContent>
       </Card>
@@ -141,20 +145,43 @@ export default async function SettingsPage() {
   );
 }
 
-async function loadPreferences(): Promise<{ weekly: boolean; alerts: boolean }> {
-  if (!isSupabaseConfigured()) return { weekly: true, alerts: true };
+type Prefs = {
+  weekly: boolean;
+  alerts: boolean;
+  encouragement: boolean;
+  trial: boolean;
+  milestones: boolean;
+  inactivity: boolean;
+};
+
+async function loadPreferences(): Promise<Prefs> {
+  const DEFAULTS: Prefs = {
+    weekly: true,
+    alerts: true,
+    encouragement: true,
+    trial: true,
+    milestones: true,
+    inactivity: true,
+  };
+  if (!isSupabaseConfigured()) return DEFAULTS;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { weekly: true, alerts: true };
+  if (!user) return DEFAULTS;
   const { data } = await supabase
     .from("user_settings")
-    .select("email_weekly_summary, notification_alerts")
+    .select(
+      "email_weekly_summary, notification_alerts, email_encouragement, email_trial_reminders, email_goal_milestones, email_inactivity_followup",
+    )
     .eq("user_id", user.id)
     .maybeSingle();
   return {
     weekly: data?.email_weekly_summary ?? true,
     alerts: data?.notification_alerts ?? true,
+    encouragement: data?.email_encouragement ?? true,
+    trial: data?.email_trial_reminders ?? true,
+    milestones: data?.email_goal_milestones ?? true,
+    inactivity: data?.email_inactivity_followup ?? true,
   };
 }

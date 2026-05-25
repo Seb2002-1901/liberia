@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { EMAIL_FROM, getResend, isResendConfigured } from "@/lib/email/resend";
+import { isResendConfigured } from "@/lib/email/resend";
+import { sendEmail } from "@/lib/email/send";
 import { renderWeeklyEmail } from "@/lib/email/templates";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import {
@@ -202,15 +203,12 @@ async function sendOneRecap(
     appUrl: baseUrl,
   });
 
-  const resend = getResend();
-  const { error } = await resend.emails.send({
-    from: EMAIL_FROM,
-    to: trustedEmail,
-    subject: email.subject,
-    html: email.html,
-    text: email.text,
-  });
-  if (error) throw new Error(error.message);
+  const sent = await sendEmail({ to: trustedEmail, render: email });
+  if (!sent.ok) throw new Error(sent.error);
+  // If Resend isn't configured we no-op silently but still bump the
+  // timestamp so the cron doesn't keep re-selecting the same users.
+  // (The outer route already short-circuits on `!isResendConfigured`,
+  // so we only reach this line when send was actually attempted.)
 
   await admin
     .from("user_settings")

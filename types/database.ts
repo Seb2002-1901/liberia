@@ -109,6 +109,10 @@ export interface UserSettings {
   notification_alerts: boolean;
   email_unsubscribe_token: string;
   last_weekly_sent_at: string | null;
+  email_encouragement: boolean;
+  email_trial_reminders: boolean;
+  email_goal_milestones: boolean;
+  email_inactivity_followup: boolean;
   created_at: string;
   updated_at: string;
 }
