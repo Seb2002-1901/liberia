@@ -59,7 +59,9 @@ export function ResetPasswordForm() {
 
   const onSubmit = async ({ password }: ResetPasswordInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("Configuration Supabase manquante");
+      toast.error("Service temporairement indisponible", {
+        description: "Réessaie dans quelques instants.",
+      });
       return;
     }
     setSubmitting(true);

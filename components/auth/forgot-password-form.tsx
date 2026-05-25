@@ -30,7 +30,9 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async ({ email }: ForgotPasswordInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("Configuration Supabase manquante");
+      toast.error("Service temporairement indisponible", {
+        description: "Réessaie dans quelques instants.",
+      });
       return;
     }
     setSubmitting(true);

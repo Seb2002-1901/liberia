@@ -93,8 +93,9 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Tes données sont chiffrées et accessibles uniquement par toi (RLS
-            Postgres + RLS service-role isolé côté serveur).
+            Tes données sont chiffrées au repos et en transit. Chaque
+            utilisateur n&apos;accède qu&apos;à ses propres données — isolation
+            stricte appliquée côté base.
           </p>
           <Separator />
           <p>

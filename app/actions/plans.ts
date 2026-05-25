@@ -19,11 +19,11 @@ type ActionResult<T = void> =
 export async function generateFinancialPlan(input: {
   horizonDays: 30 | 60 | 90;
 }): Promise<ActionResult<{ planId: string }>> {
-  if (!isAnthropicConfigured()) {
-    return { ok: false, error: "Anthropic non configuré." };
-  }
-  if (!isAdminConfigured()) {
-    return { ok: false, error: "Service-role Supabase non configuré." };
+  if (!isAnthropicConfigured() || !isAdminConfigured()) {
+    return {
+      ok: false,
+      error: "Le plan IA arrive bientôt — il est en cours d'activation.",
+    };
   }
   if (!isSupabaseConfigured()) {
     return { ok: false, error: "Authentification requise." };

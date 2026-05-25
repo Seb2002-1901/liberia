@@ -35,7 +35,7 @@ export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
           <Button asChild variant="gold" size="sm" disabled={!aiReady}>
             <Link href="/plan">
               <Sparkles className="h-3.5 w-3.5" />
-              {aiReady ? "Générer mon plan" : "Coach IA non configuré"}
+              {aiReady ? "Générer mon plan" : "Bientôt disponible"}
             </Link>
           </Button>
         </CardContent>

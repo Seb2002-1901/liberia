@@ -232,7 +232,7 @@ export function CoachChat({
                   ? isDemo
                     ? "Mode démo : crée un compte pour discuter avec le coach."
                     : "Pose une question à ton coach…"
-                  : "Coach IA non configuré (ANTHROPIC_API_KEY manquante)."
+                  : "Le coach IA arrive bientôt."
               }
               disabled={disabled}
               className="min-h-[44px] max-h-40 flex-1 resize-none"
@@ -326,8 +326,17 @@ function EmptyCoachState({
       </div>
 
       {!isAiConfigured && (
-        <div className="mx-auto max-w-md rounded-xl border border-[hsl(var(--warning)/0.3)] bg-[hsl(var(--warning)/0.06)] p-4 text-xs text-[hsl(var(--warning))]">
-          Le coach n'est pas encore activé sur cet environnement. Ajoute <code>ANTHROPIC_API_KEY</code> dans <code>.env.local</code> pour le brancher.
+        <div className="mx-auto max-w-md rounded-2xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.06)] via-card/40 to-card/40 p-4 text-left shadow-[0_20px_60px_-30px_hsl(var(--gold)/0.3)]">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[hsl(var(--gold))]">
+            Activation en cours
+          </p>
+          <p className="mt-1.5 text-sm font-medium">
+            Le coach IA arrive bientôt.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            L&apos;assistant est en cours d&apos;activation. Tu pourras
+            discuter avec lui de tes finances dès qu&apos;il sera prêt.
+          </p>
         </div>
       )}
 

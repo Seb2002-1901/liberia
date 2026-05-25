@@ -24,7 +24,7 @@ export default async function PlanPage() {
 
   const generationDisabled = !aiReady || isDemo;
   const disabledReason = !aiReady
-    ? "Coach IA non configuré sur cet environnement."
+    ? "Le plan IA arrive bientôt."
     : isDemo
       ? "Mode démo : crée un compte pour générer un plan."
       : undefined;
@@ -52,14 +52,14 @@ export default async function PlanPage() {
               ? "Le plan IA est réservé aux comptes"
               : aiReady
                 ? "Tu n'as pas encore de plan actif"
-                : "Le plan IA n'est pas activé sur cet environnement"
+                : "Le plan IA arrive bientôt"
           }
           description={
             isDemo
               ? "Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles."
               : aiReady
                 ? "Lance la génération : le coach analyse ta situation et propose une suite d'actions hebdomadaires."
-                : "Renseigne ANTHROPIC_API_KEY et SUPABASE_SERVICE_ROLE_KEY pour activer le coach IA."
+                : "On finalise l'activation de l'assistant. Dès qu'il sera prêt, tu pourras générer un plan d'actions sur 30, 60 ou 90 jours basé sur tes vraies données."
           }
           action={
             isDemo ? (

@@ -23,20 +23,10 @@ export const maxDuration = 60;
 const HISTORY_LIMIT = MAX_CONVERSATION_TURNS; // last N turns kept in context
 
 export async function POST(request: Request) {
-  if (!isAnthropicConfigured()) {
+  if (!isAnthropicConfigured() || !isAdminConfigured()) {
     return NextResponse.json(
       {
-        error:
-          "Coach IA non configuré. Renseigne ANTHROPIC_API_KEY pour activer.",
-      },
-      { status: 501 },
-    );
-  }
-  if (!isAdminConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Coach IA non configuré côté serveur. SUPABASE_SERVICE_ROLE_KEY requis pour persister les réponses.",
+        error: "Le coach IA arrive bientôt — il est en cours d'activation.",
       },
       { status: 501 },
     );

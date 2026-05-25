@@ -42,9 +42,8 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("Configuration Supabase manquante", {
-        description:
-          "Ajoute tes variables Supabase dans .env.local pour activer l'authentification.",
+      toast.error("L'authentification est en cours d'activation", {
+        description: "Réessaie dans quelques instants.",
       });
       return;
     }

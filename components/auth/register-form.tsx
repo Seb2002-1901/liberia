@@ -39,9 +39,8 @@ export function RegisterForm() {
 
   const onSubmit = async (values: RegisterInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("Configuration Supabase manquante", {
-        description:
-          "Ajoute tes variables Supabase dans .env.local pour activer l'inscription.",
+      toast.error("L'inscription est en cours d'activation", {
+        description: "Réessaie dans quelques instants.",
       });
       return;
     }

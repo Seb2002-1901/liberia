@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Paiement bientôt disponible. Configure les variables Stripe dans .env.local pour activer.",
+          "Les abonnements arrivent bientôt — le paiement est en cours d'activation.",
       },
       { status: 501 },
     );
@@ -41,14 +41,17 @@ export async function POST(request: Request) {
   const plan = STRIPE_PLANS[planId];
   if (!plan?.priceId) {
     return NextResponse.json(
-      { error: "Tarif Stripe non configuré pour ce plan." },
+      {
+        error:
+          "Ce plan sera disponible très bientôt. Réessaie dans quelques instants.",
+      },
       { status: 501 },
     );
   }
 
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
-      { error: "Authentification requise — configure Supabase." },
+      { error: "Authentification requise." },
       { status: 401 },
     );
   }

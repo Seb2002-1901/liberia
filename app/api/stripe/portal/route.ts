@@ -16,7 +16,10 @@ import { checkRateLimit } from "@/lib/rate-limit";
 export async function POST(_request: Request) {
   if (!isStripeConfigured()) {
     return NextResponse.json(
-      { error: "Stripe non configuré." },
+      {
+        error:
+          "Le portail d'abonnement arrive bientôt — il est en cours d'activation.",
+      },
       { status: 501 },
     );
   }

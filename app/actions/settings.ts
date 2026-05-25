@@ -129,7 +129,7 @@ export async function deleteAccount(): Promise<ActionResult> {
     return {
       ok: false,
       error:
-        "Suppression non disponible sur cet environnement (service-role manquant).",
+        "La suppression de compte sera disponible très bientôt. Contacte le support pour une demande immédiate.",
     };
   }
   const userId = await requireUserId();

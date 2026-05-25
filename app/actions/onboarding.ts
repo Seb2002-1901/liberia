@@ -24,7 +24,11 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
   }
 
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Configuration Supabase manquante." };
+    return {
+      ok: false,
+      error:
+        "L'enregistrement de ton profil sera disponible dans un instant. Réessaie.",
+    };
   }
 
   const supabase = await createClient();
