@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { getStripe } from "@/lib/stripe/server";
+import { isStripeConfigured } from "@/lib/stripe/config";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -176,10 +178,11 @@ export async function exportUserData(): Promise<
  * tables via the FK ON DELETE CASCADE chain (profiles, subscriptions,
  * financial_profiles, incomes, expenses, goals, financial_plans,
  * financial_plan_steps, ai_conversations, ai_messages, user_settings).
- * Stripe customer + subscription are NOT auto-deleted on the Stripe
- * side — flag them with metadata so the team can reconcile / refund
- * if requested. Hard delete of the Stripe Customer is reserved for an
- * admin script (not exposed here).
+ * Before deleting, cancel any active Stripe subscription so the card
+ * on file is never charged again after the user has rage-quit. The
+ * Stripe Customer record is left in place for accounting / refund
+ * history — hard delete of the Customer is reserved for an admin
+ * script (not exposed here).
  */
 export async function deleteAccount(): Promise<ActionResult> {
   if (!isAdminConfigured()) {
@@ -193,6 +196,31 @@ export async function deleteAccount(): Promise<ActionResult> {
   if (!userId) return { ok: false, error: "Authentification requise." };
 
   const admin = getAdminClient();
+
+  // Cancel the live Stripe subscription before we drop the local row.
+  // Without this, a deleted user would keep getting charged at every
+  // renewal until support manually intervenes in the Stripe Dashboard.
+  // We immediate-cancel (no proration) — the user explicitly chose to
+  // burn the account, so granting access until period_end is moot.
+  const { data: sub } = await admin
+    .from("subscriptions")
+    .select("stripe_subscription_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (
+    isStripeConfigured() &&
+    sub?.stripe_subscription_id &&
+    typeof sub.stripe_subscription_id === "string"
+  ) {
+    try {
+      const stripe = getStripe();
+      await stripe.subscriptions.cancel(sub.stripe_subscription_id);
+    } catch {
+      // Stripe outage / already-canceled subscription — proceed with the
+      // local delete anyway. Better to honour the user's deletion request
+      // than to hold their data hostage to Stripe's availability.
+    }
+  }
 
   // Mark the subscription as locally-deleted so we keep an audit trail.
   await admin

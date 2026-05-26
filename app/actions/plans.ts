@@ -91,13 +91,11 @@ export async function generateFinancialPlan(input: {
     return { ok: false, error: message };
   }
 
-  // Mark all previous plans inactive, then insert new one + steps.
+  // Insert new plan + steps FIRST, then flip old plans inactive once we
+  // know the new one is fully persisted. Deactivating first would leave
+  // the user with zero active plan if a downstream insert errors out —
+  // they'd see "no plan" even though their previous one was just fine.
   const admin = getAdminClient();
-  await admin
-    .from("financial_plans")
-    .update({ is_active: false })
-    .eq("user_id", user.id)
-    .eq("is_active", true);
 
   const insertPlan = await admin
     .from("financial_plans")
@@ -138,6 +136,17 @@ export async function generateFinancialPlan(input: {
     await admin.from("financial_plans").delete().eq("id", planId);
     return { ok: false, error: insertSteps.error.message };
   }
+
+  // Now that the new plan + steps are safely persisted, deactivate any
+  // previously-active plans. If this UPDATE itself races (e.g. webhook
+  // wrote inactive concurrently), the worst case is the dashboard briefly
+  // showing the most recent active plan (ordered by generated_at desc).
+  await admin
+    .from("financial_plans")
+    .update({ is_active: false })
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .neq("id", planId);
 
   // Track the milestone — no-op sink today, no PII leaks (counts only).
   await track(
