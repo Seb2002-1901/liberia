@@ -10,6 +10,7 @@ import {
 } from "@/lib/calculations/finance";
 import { totalMonthly } from "@/lib/services/finance";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { getAppBaseUrl } from "@/lib/url";
 import type { Expense, Income, FinancialPlanStep } from "@/types/database";
 
 export const runtime = "nodejs";
@@ -59,7 +60,7 @@ export async function GET(request: Request) {
   }
 
   const admin = getAdminClient();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const baseUrl = getAppBaseUrl();
   const recentCutoff = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString();
 
   // Fetch opted-in users who weren't sent recently.
