@@ -40,10 +40,13 @@ export async function GET(request: Request) {
       { status: 503 },
     );
   }
+  // Authentication via header only. We deliberately do NOT accept the
+  // secret as a URL query parameter — secrets in query strings end up
+  // in Vercel access logs, browser history, referer headers and proxy
+  // caches (CWE-598). Vercel Cron always uses Authorization: Bearer.
   const provided =
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-    request.headers.get("x-cron-secret") ??
-    new URL(request.url).searchParams.get("secret");
+    request.headers.get("x-cron-secret");
   if (provided !== secret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
