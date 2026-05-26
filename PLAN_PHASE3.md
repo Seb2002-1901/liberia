@@ -1,5 +1,8 @@
 # Plan 90 jours IA — Phase 3
 
+> **Doc historique de référence implémentation.** Le flow décrit ici reflète le
+> comportement actuel du `/plan`. Conservé pour onboarding développeur.
+
 Le coach LIBERIA peut maintenant générer un **plan financier structuré** sur
 30, 60 ou 90 jours via Anthropic tool-use, basé sur les vraies données de
 l'utilisateur.

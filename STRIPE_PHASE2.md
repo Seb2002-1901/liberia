@@ -1,5 +1,8 @@
 # Stripe — Phase 2 (production)
 
+> **Doc historique.** Pour la configuration Stripe actuelle (clés, webhook, Customer
+> Portal, trial, payment methods), suivre **STRIPE_SETUP.md** qui fait référence.
+
 La Phase 2 active la vraie monétisation : persistance subscription via webhook
 + Customer Portal.
 

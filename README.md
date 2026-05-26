@@ -5,16 +5,17 @@
 Une application SaaS premium qui aide les utilisateurs à comprendre leur situation
 financière, réduire le stress lié à l'argent et reconstruire une stabilité durable.
 
-**Phase 1** — fondations production-ready. Aucune logique IA active à ce stade :
-l'architecture, les calculs et le schéma de données sont conçus pour brancher
-rapidement les phases IA suivantes (assistant, plan 90 jours, recommandations).
+Stack production-ready : assistant IA avec abstraction de provider et fallback local,
+plan financier 90 jours, recommandations contextuelles, paiement Stripe (trial 14 jours,
+abonnement mensuel/annuel CHF, Customer Portal), emails Resend, RLS Supabase + RPC
+SECURITY DEFINER, cron récap hebdomadaire.
 
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript strict**
 - **Tailwind CSS** + composants type **shadcn/UI** (Radix Primitives)
 - **Supabase** (Auth, Postgres, RLS, triggers)
-- **Stripe** (préparation complète — checkout + webhook scaffold)
+- **Stripe** (checkout, webhook, Customer Portal, trial)
 - **Framer Motion** · **Recharts** · **React Hook Form** · **Zod** · **Sonner**
 
 ## Démarrer
