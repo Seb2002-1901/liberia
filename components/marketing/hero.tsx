@@ -47,7 +47,7 @@ export function Hero() {
           </div>
           <p className="mt-5 inline-flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Aucune carte requise · Données chiffrées · Sans pub
+            14 jours gratuits · Données chiffrées · Sans pub
           </p>
         </motion.div>
 
