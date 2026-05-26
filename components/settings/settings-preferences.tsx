@@ -249,11 +249,15 @@ export function DeleteAccountButton() {
       const res = await deleteAccount();
       if (res && !res.ok) {
         toast.error(res.error);
-        setPending(false);
       }
       // On success, deleteAccount() redirects — we won't get here.
     } catch {
-      // redirect() throws — this is the success path
+      // redirect() throws — this is the success path. A real network
+      // failure also lands here; the finally below ensures the button
+      // unlocks so the user can retry instead of staring at a forever
+      // spinner.
+    } finally {
+      setPending(false);
     }
   };
 
