@@ -149,10 +149,16 @@ export function generateProactiveHint(input: ProactiveInput): ProactiveHint | nu
 
   // 4. Solid progress — runway ≥ 3 mo and savings rate ≥ 15%.
   if (input.runway >= 3 && input.savingsRate >= 0.15) {
+    // Runway is currentSavings/monthlyExpenses — Infinity when expenses=0.
+    // Don't surface "Runway de Infinity mois" to the user; switch to a
+    // simpler savings-rate-only phrasing in that edge case.
+    const body = Number.isFinite(input.runway)
+      ? `Runway de ${input.runway.toFixed(1)} mois et taux d'épargne au-dessus de 15%.`
+      : "Taux d'épargne au-dessus de 15% et aucune charge récurrente — solide.";
     return {
       kind: "solid_progress",
       headline: "Tu avances dans la bonne direction.",
-      body: `Runway de ${input.runway.toFixed(1)} mois et taux d'épargne au-dessus de 15%.`,
+      body,
       action: { label: "Définir un objectif 12 mois", href: "/goals" },
     };
   }

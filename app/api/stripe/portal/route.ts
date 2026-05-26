@@ -3,6 +3,7 @@ import { getStripe } from "@/lib/stripe/server";
 import { isStripeConfigured } from "@/lib/stripe/config";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getAppBaseUrl } from "@/lib/url";
 
 /**
  * Customer Portal — opens Stripe's hosted portal for the user's
@@ -62,7 +63,9 @@ export async function POST(_request: Request) {
     );
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  // getAppBaseUrl() trims any trailing slash so return_url doesn't end up
+  // as `https://app.com//settings/subscription` (Stripe rejects malformed URLs).
+  const baseUrl = getAppBaseUrl();
 
   try {
     const stripe = getStripe();

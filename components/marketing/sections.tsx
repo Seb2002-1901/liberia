@@ -163,8 +163,8 @@ export function FeaturesSection() {
     },
     {
       icon: Sparkles,
-      title: "Prêt pour l'IA",
-      text: "Des fondations pensées pour les phases d'assistant intelligent.",
+      title: "Coach IA inclus",
+      text: "Un assistant qui comprend tes chiffres et te répond sans jargon.",
     },
   ];
   return (
@@ -237,7 +237,7 @@ export function FaqSection() {
     },
     {
       q: "Et l'IA dans tout ça ?",
-      a: "Cette phase pose des fondations solides. Les fonctions IA arrivent ensuite — assistant, plans de 90 jours, recommandations — sur cette base saine.",
+      a: "Le coach IA est déjà inclus : tu peux discuter de ta situation, demander un plan financier sur 30, 60 ou 90 jours, et obtenir des recommandations adaptées à tes vrais chiffres. Aucune donnée bancaire requise — tu lui parles comme à quelqu'un qui connaît ton dossier.",
     },
   ];
   return (
