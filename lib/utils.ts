@@ -28,6 +28,22 @@ export function formatCurrencyPrecise(
   }).format(amount);
 }
 
+/**
+ * Renders an amount using the user's profile preferences. Single entry
+ * point for every personal amount in the app — extends cleanly when a
+ * user picks a different (country, currency, locale) combo.
+ */
+export function formatUserCurrency(
+  amount: number,
+  profile: { currency?: string | null; locale?: string | null } | null | undefined,
+): string {
+  return formatCurrency(
+    amount,
+    profile?.currency ?? "CHF",
+    profile?.locale ?? "fr-CH",
+  );
+}
+
 export function formatPercent(value: number, locale = "fr-CH"): string {
   return new Intl.NumberFormat(locale, {
     style: "percent",

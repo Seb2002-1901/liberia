@@ -219,9 +219,10 @@ export default async function SubscriptionPage() {
       />
 
       <p className="text-xs text-muted-foreground">
-        Paiement géré par Stripe (chiffré, conforme PCI). Moyens acceptés :
-        cartes Visa / Mastercard / American Express, Apple Pay, Google Pay et
-        TWINT (Suisse, selon activation Stripe Dashboard).
+        Facturation en CHF pour le lancement, quel que soit ton pays. Paiement
+        géré par Stripe (chiffré, conforme PCI). Moyens acceptés : cartes Visa /
+        Mastercard / American Express, Apple Pay, Google Pay et TWINT (Suisse,
+        selon activation Stripe Dashboard).
       </p>
     </div>
   );

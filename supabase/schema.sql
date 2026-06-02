@@ -37,6 +37,57 @@ create table if not exists public.profiles (
 alter table public.profiles alter column locale set default 'fr-CH';
 alter table public.profiles alter column currency set default 'CHF';
 
+-- Pays du profil. Suisse par défaut pour le lancement. Idempotent.
+alter table public.profiles
+  add column if not exists country text not null default 'CH';
+
+-- One-shot data fix: les profils créés avant la bascule par défaut
+-- portaient currency='EUR' alors que le produit est suisse et que
+-- l'utilisateur n'a jamais choisi explicitement EUR. On les ramène à
+-- CHF UNIQUEMENT si le pays est CH (= valeur par défaut, jamais
+-- modifiée). Idempotent : aucune ligne ne correspond après le premier
+-- passage. Un utilisateur français qui aura mis country='FR' garde
+-- son choix EUR intact.
+update public.profiles
+   set currency = 'CHF'
+ where currency = 'EUR'
+   and country = 'CH';
+
+-- Whitelists soft (NOT VALID) — les écritures futures sont validées
+-- mais on ne bloque pas un éventuel profil existant avec une valeur
+-- hors liste, pour ne casser personne. Le formulaire profil limite
+-- l'utilisateur aux mêmes valeurs côté client.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and conname = 'profiles_currency_chk'
+  ) then
+    alter table public.profiles
+      add constraint profiles_currency_chk
+      check (currency in ('CHF','EUR','USD','GBP')) not valid;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and conname = 'profiles_locale_chk'
+  ) then
+    alter table public.profiles
+      add constraint profiles_locale_chk
+      check (locale in ('fr-CH','fr-FR','en-US','en-GB','de-DE','it-IT')) not valid;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and conname = 'profiles_country_chk'
+  ) then
+    alter table public.profiles
+      add constraint profiles_country_chk
+      check (country in ('CH','FR','BE','DE','IT','GB','US')) not valid;
+  end if;
+end$$;
+
 drop trigger if exists set_updated_at_profiles on public.profiles;
 create trigger set_updated_at_profiles
 before update on public.profiles

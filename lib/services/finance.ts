@@ -31,7 +31,10 @@ export type SubscriptionView = {
 };
 
 export type FinanceData = {
-  profile: Pick<Profile, "full_name" | "email" | "avatar_url" | "currency" | "locale"> & {
+  profile: Pick<
+    Profile,
+    "full_name" | "email" | "avatar_url" | "currency" | "locale" | "country"
+  > & {
     onboarding_completed: boolean;
   };
   subscription: SubscriptionView;
@@ -65,7 +68,9 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
     const [profileRes, subRes, fpRes, incRes, expRes, goalsRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("full_name, email, avatar_url, currency, locale, onboarding_completed")
+        .select(
+          "full_name, email, avatar_url, currency, locale, country, onboarding_completed",
+        )
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -110,6 +115,7 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
         // product).
         currency: profileRes.data?.currency ?? "CHF",
         locale: profileRes.data?.locale ?? "fr-CH",
+        country: profileRes.data?.country ?? "CH",
         onboarding_completed: profileRes.data?.onboarding_completed ?? false,
       },
       subscription: {
@@ -141,6 +147,7 @@ function buildDemoData(): FinanceData {
       avatar_url: demoProfile.avatar_url,
       currency: demoProfile.currency,
       locale: demoProfile.locale,
+      country: "CH",
       onboarding_completed: true,
     },
     subscription: {

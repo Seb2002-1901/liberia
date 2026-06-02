@@ -189,4 +189,5 @@ export const demoProfile = {
   avatar_url: null,
   currency: "CHF",
   locale: "fr-CH",
+  country: "CH",
 };

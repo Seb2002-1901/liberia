@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { LocaleForm } from "@/components/profile/locale-form";
 import { getFinanceData } from "@/lib/services/finance";
 import { getInitials } from "@/lib/utils";
 
@@ -50,14 +51,16 @@ export default async function ProfilePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <FormRow label="Nom complet" value={name} />
             <FormRow label="Email" value={data.profile.email} />
-            <FormRow label="Devise" value={data.profile.currency} />
-            <FormRow label="Langue" value={data.profile.locale} />
           </div>
+        </CardContent>
+      </Card>
 
-          <p className="text-xs text-muted-foreground">
-            La modification du profil sera enrichie dans la prochaine phase. Pour toute demande
-            urgente, contacte-nous à support@liberia.app.
-          </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Pays, devise et langue</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LocaleForm initialCountry={data.profile.country ?? "CH"} />
         </CardContent>
       </Card>
     </div>

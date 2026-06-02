@@ -22,6 +22,7 @@ export interface Profile {
   avatar_url: string | null;
   locale: string;
   currency: string;
+  country: string;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;

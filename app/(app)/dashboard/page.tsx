@@ -26,7 +26,7 @@ import {
   calculateSavingsRate,
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
-import { formatCurrency, formatPercent } from "@/lib/utils";
+import { formatPercent, formatUserCurrency } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
@@ -171,18 +171,18 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Revenus mensuels"
-          value={formatCurrency(monthlyIncome)}
+          value={formatUserCurrency(monthlyIncome, data.profile)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
         />
         <StatCard
           label="Dépenses mensuelles"
-          value={formatCurrency(monthlyExpenses)}
+          value={formatUserCurrency(monthlyExpenses, data.profile)}
           icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
           label="Reste à vivre"
-          value={formatCurrency(cashflow)}
+          value={formatUserCurrency(cashflow, data.profile)}
           tone={cashflow >= 0 ? "positive" : "negative"}
           icon={<Wallet className="h-4 w-4" />}
           hint={`Taux d'épargne ${formatPercent(savingsRate)}`}
@@ -196,7 +196,7 @@ export default async function DashboardPage() {
           }
           icon={<PiggyBank className="h-4 w-4" />}
           tone={runway >= 3 ? "positive" : "neutral"}
-          hint={formatCurrency(currentSavings)}
+          hint={formatUserCurrency(currentSavings, data.profile)}
         />
       </div>
 
