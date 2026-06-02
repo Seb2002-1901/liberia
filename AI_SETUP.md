@@ -94,7 +94,7 @@ ta vraie situation financière.
 
 - Sonnet 4.6 : `$3 / 1M` input, `$15 / 1M` output.
 - Cache read : ~0.1× input — ~90% d'économie sur le prefix répété entre messages.
-- Une conversation typique de 5-10 tours coûte ~0.01-0.03 €.
+- Une conversation typique de 5-10 tours coûte ~0.01-0.03 CHF.
 - Vérifie le cache via `usage.cache_read_input_tokens` (logué en base dans
   `ai_messages.cache_read_tokens`).
 

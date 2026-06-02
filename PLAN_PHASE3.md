@@ -78,7 +78,9 @@ gardée par RLS).
 - `/plan` → `PlanProgress` (header + barre progression) + `PlanTimeline`
   (groupé par semaine).
 - `PlanStepItem` → bouton check optimiste + categories iconées + impact
-  estimé en €/mois affiché si fourni.
+  estimé en CHF/mois affiché via `formatCurrency` si fourni (le champ
+  DB s'appelle encore `expected_impact_eur` pour compat schéma — legacy
+  nom, valeur rendue en CHF côté UI).
 - `PlanGenerateButton` → Dialog avec horizon picker, loading state, toast
   succès/erreur, refresh router.
 - Toggle d'étape → `toggleStep(stepId, isCompleted)` server action
