@@ -102,21 +102,51 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
         .order("created_at", { ascending: false }),
     ]);
 
+    // Schema drift fallback: if the profile select errored (typically a
+    // freshly-deployed migration referencing a column that hasn't been
+    // applied yet — see commit dd31420 which added profiles.country),
+    // retry with the legacy column set. Without this the function would
+    // hand back onboarding_completed=false to (app)/layout.tsx, which
+    // redirects to /onboarding, which queries onboarding_completed on
+    // its own (legacy SELECT succeeds), sees true, redirects back to
+    // /dashboard → ERR_TOO_MANY_REDIRECTS.
+    let profileData = profileRes.data as
+      | {
+          full_name?: string | null;
+          email?: string | null;
+          avatar_url?: string | null;
+          currency?: string | null;
+          locale?: string | null;
+          country?: string | null;
+          onboarding_completed?: boolean | null;
+        }
+      | null;
+    if (profileRes.error) {
+      const retry = await supabase
+        .from("profiles")
+        .select(
+          "full_name, email, avatar_url, currency, locale, onboarding_completed",
+        )
+        .eq("id", user.id)
+        .maybeSingle();
+      profileData = retry.data as typeof profileData;
+    }
+
     return {
       profile: {
-        full_name: profileRes.data?.full_name ?? null,
+        full_name: profileData?.full_name ?? null,
         // Trust auth.users.email (validated by Supabase) over profiles.email,
         // which the user could in principle mutate via the JS SDK since the
         // profiles row is theirs to update.
-        email: user.email ?? profileRes.data?.email ?? "",
-        avatar_url: profileRes.data?.avatar_url ?? null,
+        email: user.email ?? profileData?.email ?? "",
+        avatar_url: profileData?.avatar_url ?? null,
         // Preserve any currency the user has already chosen; fall back to
         // CHF for brand-new accounts (LIBERIA is positioned as a Swiss
         // product).
-        currency: profileRes.data?.currency ?? "CHF",
-        locale: profileRes.data?.locale ?? "fr-CH",
-        country: profileRes.data?.country ?? "CH",
-        onboarding_completed: profileRes.data?.onboarding_completed ?? false,
+        currency: profileData?.currency ?? "CHF",
+        locale: profileData?.locale ?? "fr-CH",
+        country: profileData?.country ?? "CH",
+        onboarding_completed: profileData?.onboarding_completed ?? false,
       },
       subscription: {
         plan: (subRes.data?.plan as "free" | "premium") ?? "free",
