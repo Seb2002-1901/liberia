@@ -85,7 +85,7 @@ au-dessus de ~2048 tokens (minimum Sonnet 4.6) — sinon il no-op silencieusemen
 2. `npm run dev`.
 3. Crée un compte, complète l'onboarding.
 4. Va sur **/coach** → "Démarrer une conversation".
-5. Pose une question concrète : "Comment économiser 100 € ce mois-ci ?".
+5. Pose une question concrète : "Comment économiser 100 CHF ce mois-ci ?".
 
 Tu devrais voir la réponse arriver en streaming, avec les chiffres tirés de
 ta vraie situation financière.
