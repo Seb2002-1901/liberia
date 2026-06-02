@@ -88,6 +88,14 @@ begin
   end if;
 end$$;
 
+-- Force PostgREST to refresh its schema cache so the newly-added
+-- `country` column (and the new CHECK constraints above) become
+-- visible to the supabase-js client immediately, without waiting for
+-- the periodic event-trigger reload. Without this, UPDATEs from the
+-- locale-form action error with "Could not find the 'country' column
+-- of 'profiles' in the schema cache" until the next cache cycle.
+notify pgrst, 'reload schema';
+
 drop trigger if exists set_updated_at_profiles on public.profiles;
 create trigger set_updated_at_profiles
 before update on public.profiles
