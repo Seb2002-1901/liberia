@@ -1,6 +1,18 @@
 {
   "appName": "LIBERIA",
   "tagline": "Reprends le contrôle de ton argent.",
+  "metadata": {
+    "description": "Reprends le contrôle de tes finances avec calme, sans jargon. LIBERIA t'aide à comprendre ta situation, structurer ton budget et avancer vers tes objectifs.",
+    "keywords": [
+      "finances personnelles",
+      "budget",
+      "épargne",
+      "stabilité financière",
+      "stress financier",
+      "fonds d'urgence"
+    ],
+    "openGraphLocale": "fr_CH"
+  },
   "actions": {
     "save": "Enregistrer",
     "cancel": "Annuler",

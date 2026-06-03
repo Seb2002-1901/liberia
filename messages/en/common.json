@@ -1,6 +1,18 @@
 {
   "appName": "LIBERIA",
   "tagline": "Take back control of your money.",
+  "metadata": {
+    "description": "Take back control of your finances calmly, without jargon. LIBERIA helps you understand your situation, structure your budget and move toward your goals.",
+    "keywords": [
+      "personal finance",
+      "budget",
+      "savings",
+      "financial stability",
+      "financial stress",
+      "emergency fund"
+    ],
+    "openGraphLocale": "en_US"
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",

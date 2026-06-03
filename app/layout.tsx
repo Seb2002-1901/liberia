@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Toaster } from "sonner";
-import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,51 +18,53 @@ const outfit = Outfit({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: `${APP_NAME} — ${APP_TAGLINE}`,
-    template: `%s · ${APP_NAME}`,
-  },
-  description: APP_DESCRIPTION,
-  applicationName: APP_NAME,
-  authors: [{ name: APP_NAME }],
-  keywords: [
-    "finances personnelles",
-    "budget",
-    "épargne",
-    "stabilité financière",
-    "stress financier",
-    "fonds d'urgence",
-  ],
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-  ),
-  openGraph: {
-    title: `${APP_NAME} — ${APP_TAGLINE}`,
-    description: APP_DESCRIPTION,
-    siteName: APP_NAME,
-    type: "website",
-    locale: "fr_CH",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: `${APP_NAME} — ${APP_TAGLINE}`,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${APP_NAME} — ${APP_TAGLINE}`,
-    description: APP_DESCRIPTION,
-    images: ["/og-image.png"],
-  },
-  category: "finance",
-  // Sensible default for marketing pages. /admin and /dashboard set
-  // their own robots:{ index: false } overrides via per-route metadata.
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const tCommon = await getTranslations("common");
+  const tMeta = await getTranslations("common.metadata");
+  const tagline = tCommon("tagline");
+  const description = tMeta("description");
+  const keywords = tMeta.raw("keywords") as string[];
+  const openGraphLocale = tMeta("openGraphLocale");
+
+  return {
+    title: {
+      default: `${APP_NAME} — ${tagline}`,
+      template: `%s · ${APP_NAME}`,
+    },
+    description,
+    applicationName: APP_NAME,
+    authors: [{ name: APP_NAME }],
+    keywords,
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+    ),
+    openGraph: {
+      title: `${APP_NAME} — ${tagline}`,
+      description,
+      siteName: APP_NAME,
+      type: "website",
+      locale: openGraphLocale,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${APP_NAME} — ${tagline}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${APP_NAME} — ${tagline}`,
+      description,
+      images: ["/og-image.png"],
+    },
+    category: "finance",
+    // Sensible default for marketing pages. /admin and /dashboard set
+    // their own robots:{ index: false } overrides via per-route metadata.
+    robots: { index: true, follow: true },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0c",
