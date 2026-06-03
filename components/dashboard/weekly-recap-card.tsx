@@ -6,6 +6,7 @@ import {
   ListChecks,
   Target,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ROUTES } from "@/lib/constants";
@@ -16,21 +17,16 @@ interface WeeklyRecapCardProps {
   recap: WeeklyRecap;
 }
 
-/**
- * "Cette semaine" — a calm, minimal recap rendered on the dashboard.
- * Surfaces measurable activity (days, entries, plan steps) plus one
- * victory line and one next priority. No badges, no streaks, no
- * gamification — premium consistency only.
- */
-export function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
+export async function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
+  const t = await getTranslations("dashboard.weeklyRecap");
   const delta = recap.entriesThisWeek - recap.entriesPreviousWeek;
   const deltaText =
     recap.entriesPreviousWeek > 0
       ? delta > 0
-        ? `+${delta} vs semaine précédente`
+        ? t("deltaUp", { delta })
         : delta < 0
-          ? `${delta} vs semaine précédente`
-          : "même rythme"
+          ? t("deltaDown", { delta })
+          : t("deltaSame")
       : null;
 
   return (
@@ -38,7 +34,7 @@ export function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
       <CardContent className="space-y-5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-            Cette semaine
+            {t("eyebrow")}
           </p>
           {deltaText && (
             <span
@@ -60,20 +56,17 @@ export function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
           <Metric
             icon={<Calendar className="h-3.5 w-3.5" />}
             value={recap.activeDays}
-            label={recap.activeDays > 1 ? "jours actifs" : "jour actif"}
+            label={recap.activeDays > 1 ? t("activeDays") : t("activeDay")}
           />
           <Metric
             icon={<ListChecks className="h-3.5 w-3.5" />}
             value={recap.entriesThisWeek}
-            label={recap.entriesThisWeek > 1 ? "mouvements" : "mouvement"}
+            label={recap.entriesThisWeek > 1 ? t("entries") : t("entry")}
           />
           <Metric
             icon={<CheckCircle2 className="h-3.5 w-3.5" />}
             value={recap.stepsCompletedThisWeek}
-            // Short label: "étapes validées" overflows the 3-col grid
-            // on iPhone SE (320px). Context comes from the "Cette
-            // semaine" eyebrow + the icon — short stays clear.
-            label={recap.stepsCompletedThisWeek > 1 ? "étapes" : "étape"}
+            label={recap.stepsCompletedThisWeek > 1 ? t("steps") : t("step")}
           />
         </div>
 
@@ -81,18 +74,22 @@ export function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
           <Row
             iconClassName="bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
             icon={<CheckCircle2 className="h-3 w-3" />}
-            label="On retient"
+            label={t("victoryLabel")}
             text={recap.victory}
           />
           <Row
             iconClassName="bg-secondary text-foreground"
             icon={<Target className="h-3 w-3" />}
-            label="Prochaine priorité"
+            label={t("nextPriorityLabel")}
             text={recap.nextPriority}
           />
         </div>
 
-        <QuickActions />
+        <QuickActions
+          checkin={t("actions.checkin")}
+          viewPlan={t("actions.viewPlan")}
+          myGoals={t("actions.myGoals")}
+        />
       </CardContent>
     </Card>
   );
@@ -153,25 +150,28 @@ function Row({
   );
 }
 
-/**
- * Compact strip of premium CTAs. Three actions max so the card stays
- * scannable on mobile. None of them are NEW routes — they all link
- * into existing surfaces.
- */
-function QuickActions() {
+function QuickActions({
+  checkin,
+  viewPlan,
+  myGoals,
+}: {
+  checkin: string;
+  viewPlan: string;
+  myGoals: string;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button asChild variant="gold" size="sm">
         <Link href={ROUTES.coach}>
-          Faire un check-in
+          {checkin}
           <ArrowRight className="h-3 w-3" />
         </Link>
       </Button>
       <Button asChild variant="outline" size="sm">
-        <Link href={ROUTES.plan}>Voir mon plan</Link>
+        <Link href={ROUTES.plan}>{viewPlan}</Link>
       </Button>
       <Button asChild variant="ghost" size="sm">
-        <Link href={ROUTES.goals}>Mes objectifs</Link>
+        <Link href={ROUTES.goals}>{myGoals}</Link>
       </Button>
     </div>
   );

@@ -7,6 +7,7 @@ import { generatePlan } from "@/lib/ai/plan-generator";
 import { generatePlanRequestSchema } from "@/lib/ai/plan-schema";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isAnthropicConfigured } from "@/lib/env";
+import { getLanguageEnglishName } from "@/lib/locale/languages";
 import { getFinanceData } from "@/lib/services/finance";
 import { requirePremiumAccess } from "@/lib/services/access";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
@@ -81,6 +82,7 @@ export async function generateFinancialPlan(input: {
       horizonDays: parsed.data.horizon_days,
       financeContext,
       model: COACH_MODEL,
+      languageName: getLanguageEnglishName(financeData.profile.locale),
     });
     plan = result.plan;
     tokensIn = result.tokensIn;

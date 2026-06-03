@@ -123,7 +123,7 @@ async function sendOneRecap(
     await Promise.all([
       admin
         .from("profiles")
-        .select("full_name")
+        .select("full_name, locale, currency")
         .eq("id", userId)
         .maybeSingle(),
       admin
@@ -194,7 +194,7 @@ async function sendOneRecap(
     ? `${baseUrl}/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`
     : `${baseUrl}/settings`;
 
-  const email = renderWeeklyEmail({
+  const email = await renderWeeklyEmail({
     firstName,
     monthlyIncome,
     monthlyExpenses,
@@ -205,6 +205,8 @@ async function sendOneRecap(
     planStepsRemaining,
     unsubscribeUrl,
     appUrl: baseUrl,
+    locale: profile?.locale ?? null,
+    currency: profile?.currency ?? "CHF",
   });
 
   const sent = await sendEmail({ to: trustedEmail, render: email });

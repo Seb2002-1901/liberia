@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { getStabilityTier, type ScoreTier } from "@/lib/calculations/finance";
+import { getStabilityTier, type ScoreTierColor } from "@/lib/calculations/finance";
 
 interface StabilityCardProps {
   score: number;
@@ -10,6 +11,7 @@ interface StabilityCardProps {
 }
 
 export function StabilityCard({ score, className }: StabilityCardProps) {
+  const t = useTranslations("dashboard.stability");
   const tier = getStabilityTier(score);
   const angle = (Math.min(Math.max(score, 0), 100) / 100) * 360;
 
@@ -28,10 +30,10 @@ export function StabilityCard({ score, className }: StabilityCardProps) {
         aria-hidden
       />
       <div className="relative flex items-center gap-6">
-        <ScoreRing score={score} angle={angle} tier={tier} />
+        <ScoreRing score={score} angle={angle} color={tier.color} />
         <div className="space-y-1">
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Stabilité financière
+            {t("label")}
           </p>
           <div className="flex items-baseline gap-1">
             <span className="font-display text-4xl font-semibold gold-text">
@@ -39,8 +41,10 @@ export function StabilityCard({ score, className }: StabilityCardProps) {
             </span>
             <span className="text-sm text-muted-foreground">/ 100</span>
           </div>
-          <p className="text-sm font-medium">{tier.label}</p>
-          <p className="text-xs text-muted-foreground">{tier.description}</p>
+          <p className="text-sm font-medium">{t(`tiers.${tier.color}.label`)}</p>
+          <p className="text-xs text-muted-foreground">
+            {t(`tiers.${tier.color}.description`)}
+          </p>
         </div>
       </div>
     </motion.div>
@@ -50,20 +54,20 @@ export function StabilityCard({ score, className }: StabilityCardProps) {
 function ScoreRing({
   score,
   angle,
-  tier,
+  color: tierColor,
 }: {
   score: number;
   angle: number;
-  tier: ScoreTier;
+  color: ScoreTierColor;
 }) {
   const color =
-    tier.color === "gold"
+    tierColor === "gold"
       ? "hsl(var(--gold))"
-      : tier.color === "success"
+      : tierColor === "success"
       ? "hsl(var(--success))"
-      : tier.color === "warning"
+      : tierColor === "warning"
       ? "hsl(var(--warning))"
-      : tier.color === "danger"
+      : tierColor === "danger"
       ? "hsl(var(--destructive))"
       : "hsl(var(--foreground))";
 

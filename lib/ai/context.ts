@@ -47,7 +47,18 @@ export function buildFinanceContext(data: FinanceData): string {
     runwayMonths: runway,
     cashflow,
   });
+  // For the AI context we still want a short qualitative tier — we
+  // keep a frozen FR mapping here because Anthropic reads the prompt;
+  // user-facing dashboards translate the same `tier.color` via
+  // `dashboard.stability.tiers.*`.
   const tier = getStabilityTier(stability);
+  const tierLabel = {
+    danger: "Tendu",
+    warning: "Fragile",
+    neutral: "En progression",
+    success: "Stable",
+    gold: "Solide",
+  }[tier.color];
 
   const fmt = (n: number) => formatCurrency(n, currency);
 
@@ -96,7 +107,7 @@ Mode : ${data.isDemo ? "démo (données fictives)" : "réel"}
 - Épargne disponible : ${fmt(currentSavings)}
 - Fonds d'urgence : ${Number.isFinite(runway) ? `${runway.toFixed(1)} mois de dépenses` : "couvert au-delà de 12 mois"}
 - Remboursement crédit mensuel : ${fmt(monthlyDebt)} (DTI ${formatPercent(dti)})
-- Score de stabilité : ${stability}/100 — ${tier.label}
+- Score de stabilité : ${stability}/100 — ${tierLabel}
 - Stress financier perçu : ${stress}/100
 
 ## Top dépenses mensuelles

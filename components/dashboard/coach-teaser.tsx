@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, MessageSquare, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
@@ -16,7 +17,7 @@ interface CoachTeaserProps {
   runwayMonths: number;
 }
 
-export function CoachTeaser({
+export async function CoachTeaser({
   data,
   monthlyIncome,
   monthlyExpenses,
@@ -24,6 +25,8 @@ export function CoachTeaser({
   savingsRate,
   runwayMonths,
 }: CoachTeaserProps) {
+  const t = await getTranslations("dashboard.coachTeaser");
+  const tCat = await getTranslations("dashboard.categories.expenses");
   const insights = computeInsights({
     expenses: data.expenses,
     monthlyIncome,
@@ -32,6 +35,8 @@ export function CoachTeaser({
     savingsRate,
     runwayMonths,
     currency: data.profile.currency || "CHF",
+    t,
+    tCat,
   });
 
   return (
@@ -45,24 +50,20 @@ export function CoachTeaser({
             >
               <Sparkles className="h-3.5 w-3.5" />
             </span>
-            Insights
+            {t("title")}
           </CardTitle>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Repères calculés sur tes données.
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/coach">
             <MessageSquare className="h-3.5 w-3.5" />
-            Coach
+            {t("coachCta")}
           </Link>
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
         {insights.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Ajoute quelques revenus et dépenses pour voir tes premiers insights.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
         ) : (
           <ul className="space-y-2.5">
             {insights.map((tip, i) => (
@@ -81,7 +82,7 @@ export function CoachTeaser({
         )}
         <Button asChild variant="ghost" size="sm" className="w-full justify-between">
           <Link href="/coach">
-            Pose une question au coach
+            {t("askCta")}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </Button>
@@ -100,6 +101,8 @@ function computeInsights({
   savingsRate,
   runwayMonths,
   currency,
+  t,
+  tCat,
 }: {
   expenses: FinanceData["expenses"];
   monthlyIncome: number;
@@ -108,6 +111,8 @@ function computeInsights({
   savingsRate: number;
   runwayMonths: number;
   currency: string;
+  t: Awaited<ReturnType<typeof getTranslations<"dashboard.coachTeaser">>>;
+  tCat: Awaited<ReturnType<typeof getTranslations<"dashboard.categories.expenses">>>;
 }): Insight[] {
   const insights: Insight[] = [];
   const fmt = (n: number) => formatCurrency(n, currency);
@@ -125,14 +130,16 @@ function computeInsights({
     (c) => !essentialIds.has(c.category as never) && c.total > 0,
   );
   if (topNonEssential && monthlyExpenses > 0) {
-    const label =
-      EXPENSE_CATEGORIES.find((c) => c.id === topNonEssential.category)?.label ??
-      topNonEssential.category;
+    const known = EXPENSE_CATEGORIES.find((c) => c.id === topNonEssential.category);
+    const label = known ? tCat(known.id) : topNonEssential.category;
     const pct = (topNonEssential.total / monthlyExpenses) * 100;
     if (pct >= 10) {
       insights.push({
         label,
-        text: `Ce poste représente ${pct.toFixed(0)}% de tes dépenses (${fmt(topNonEssential.total)}/mois). Tester −20% sur 1 mois ?`,
+        text: t("texts.categoryShare", {
+          pct: pct.toFixed(0),
+          amount: fmt(topNonEssential.total),
+        }),
       });
     }
   }
@@ -140,18 +147,18 @@ function computeInsights({
   // Cashflow tone.
   if (cashflow < 0) {
     insights.push({
-      label: "Reste à vivre négatif",
-      text: `Tu dépenses environ ${fmt(Math.abs(cashflow))} de plus que tu ne gagnes. On peut creuser ensemble où réduire.`,
+      label: t("labels.cashflowNegative"),
+      text: t("texts.cashflowNegative", { amount: fmt(Math.abs(cashflow)) }),
     });
   } else if (savingsRate < 5 && monthlyIncome > 0) {
     insights.push({
-      label: "Taux d'épargne faible",
-      text: `Actuellement ${formatPercent(savingsRate)}. Un virement automatique même symbolique sécurise le réflexe.`,
+      label: t("labels.savingsLow"),
+      text: t("texts.savingsLow", { rate: formatPercent(savingsRate) }),
     });
   } else if (savingsRate >= 15) {
     insights.push({
-      label: "Bonne marge",
-      text: `${formatPercent(savingsRate)} de taux d'épargne. Tu peux accélérer un objectif ou consolider le fonds d'urgence.`,
+      label: t("labels.savingsGood"),
+      text: t("texts.savingsGood", { rate: formatPercent(savingsRate) }),
     });
   }
 
@@ -159,13 +166,13 @@ function computeInsights({
   if (Number.isFinite(runwayMonths)) {
     if (runwayMonths < 1) {
       insights.push({
-        label: "Fonds d'urgence",
-        text: `Actuellement moins d'un mois de dépenses de côté. Premier palier : viser 1 mois.`,
+        label: t("labels.emergencyFund"),
+        text: t("texts.emergencyLow"),
       });
     } else if (runwayMonths < 3) {
       insights.push({
-        label: "Fonds d'urgence",
-        text: `${runwayMonths.toFixed(1)} mois couverts. Prochain palier solide : 3 mois.`,
+        label: t("labels.emergencyFund"),
+        text: t("texts.emergencyBuilding", { months: runwayMonths.toFixed(1) }),
       });
     }
   }

@@ -114,42 +114,25 @@ export function calculateFinancialStress({
   return clamp(Math.round(perceived + ratioComp + runwayComp + cashflowComp), 0, 100);
 }
 
-export type ScoreTier = {
-  label: string;
-  description: string;
-  color: "danger" | "warning" | "neutral" | "success" | "gold";
-};
+export type ScoreTierColor =
+  | "danger"
+  | "warning"
+  | "neutral"
+  | "success"
+  | "gold";
 
-export function getStabilityTier(score: number): ScoreTier {
-  if (score >= 80)
-    return {
-      label: "Solide",
-      description: "Tu construis sur des bases saines.",
-      color: "gold",
-    };
-  if (score >= 60)
-    return {
-      label: "Stable",
-      description: "Tu es sur la bonne voie.",
-      color: "success",
-    };
-  if (score >= 40)
-    return {
-      label: "En progression",
-      description: "Quelques ajustements feront la différence.",
-      color: "neutral",
-    };
-  if (score >= 20)
-    return {
-      label: "Fragile",
-      description: "Concentre-toi sur les dépenses essentielles.",
-      color: "warning",
-    };
-  return {
-    label: "Tendu",
-    description: "On reprend les choses étape par étape.",
-    color: "danger",
-  };
+/**
+ * Stability tier — pure mapping `score → bucket`. Labels and
+ * descriptions are translated at render time via
+ * `dashboard.stability.tiers.<color>.{label,description}` so the same
+ * function can power UI in any locale without forking.
+ */
+export function getStabilityTier(score: number): { color: ScoreTierColor } {
+  if (score >= 80) return { color: "gold" };
+  if (score >= 60) return { color: "success" };
+  if (score >= 40) return { color: "neutral" };
+  if (score >= 20) return { color: "warning" };
+  return { color: "danger" };
 }
 
 export function normalizeToMonthly(

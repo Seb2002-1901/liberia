@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import {
   type EmailRender,
@@ -20,9 +21,13 @@ export type WeeklyEmailInput = {
   planStepsRemaining: number;
   unsubscribeUrl: string;
   appUrl: string;
+  locale?: string | null;
+  currency?: string;
 };
 
-export function renderWeeklyEmail(input: WeeklyEmailInput): EmailRender {
+export async function renderWeeklyEmail(
+  input: WeeklyEmailInput,
+): Promise<EmailRender> {
   const {
     firstName,
     monthlyIncome,
@@ -34,64 +39,87 @@ export function renderWeeklyEmail(input: WeeklyEmailInput): EmailRender {
     planStepsRemaining,
     unsubscribeUrl,
     appUrl,
+    locale,
+    currency = "CHF",
   } = input;
 
-  const subject = `Ton récap LIBERIA — score ${stabilityScore}/100`;
-  const cashflowTone = cashflow >= 0 ? "positif" : "tendu";
+  const { t, intlLocale } = await createEmailTranslator(locale);
+
+  const subject = t("weekly.subject", { score: stabilityScore });
+  const toneText =
+    cashflow >= 0 ? t("weekly.tonePositive") : t("weekly.toneNegative");
 
   const planBlock =
     planStepsRemaining > 0
       ? noticeCard({
-          eyebrow: "Ton plan",
+          eyebrow: t("weekly.planEyebrow"),
           body:
-            (planStepsDoneThisWeek > 0
-              ? `Tu as validé <strong>${planStepsDoneThisWeek}</strong> ${planStepsDoneThisWeek > 1 ? "étapes" : "étape"} cette semaine. `
-              : "") +
-            `Il reste <strong>${planStepsRemaining}</strong> ${planStepsRemaining > 1 ? "étapes" : "étape"} à compléter — une à la fois, sans pression.`,
+            planStepsDoneThisWeek > 0
+              ? t("weekly.planBodyDoneAndRemaining", {
+                  done: planStepsDoneThisWeek,
+                  doneNoun:
+                    planStepsDoneThisWeek > 1
+                      ? t("weekly.stepPlural")
+                      : t("weekly.stepSingular"),
+                  remaining: planStepsRemaining,
+                  remainingNoun:
+                    planStepsRemaining > 1
+                      ? t("weekly.stepPlural")
+                      : t("weekly.stepSingular"),
+                })
+              : t("weekly.planBodyRemaining", {
+                  remaining: planStepsRemaining,
+                  remainingNoun:
+                    planStepsRemaining > 1
+                      ? t("weekly.stepPlural")
+                      : t("weekly.stepSingular"),
+                }),
         })
       : "";
 
+  const fmt = (n: number) => formatCurrency(n, currency, intlLocale);
+
   const inner =
     heroCard({
-      greeting: `Salut ${firstName},`,
-      body: `Voici ta photo financière de la semaine. Ton reste à vivre est ${escape(cashflowTone)}, ton score de stabilité est de <strong>${stabilityScore}/100</strong>.`,
+      greeting: t("common.greeting", { firstName }),
+      body: t("weekly.heroBody", { score: stabilityScore, tone: escape(toneText) }),
     }) +
     metricsTable([
-      { label: "Revenus", value: formatCurrency(monthlyIncome) },
-      { label: "Dépenses", value: formatCurrency(monthlyExpenses) },
+      { label: t("weekly.metrics.income"), value: fmt(monthlyIncome) },
+      { label: t("weekly.metrics.expenses"), value: fmt(monthlyExpenses) },
       {
-        label: "Reste à vivre",
-        value: formatCurrency(cashflow),
+        label: t("weekly.metrics.leftover"),
+        value: fmt(cashflow),
         tone: cashflow >= 0 ? "neutral" : "danger",
       },
-      { label: "Taux d'épargne", value: formatPercent(savingsRate) },
+      {
+        label: t("weekly.metrics.savingsRate"),
+        value: formatPercent(savingsRate, intlLocale),
+      },
     ]) +
     planBlock +
-    primaryButton({ label: "Ouvrir LIBERIA", href: `${appUrl}/dashboard` });
+    primaryButton({ label: t("weekly.cta"), href: `${appUrl}/dashboard` });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Récap de la semaine",
+    eyebrow: t("weekly.eyebrow"),
     inner,
     appUrl,
     unsubscribeUrl,
-    footerDisclaimer: `Tu reçois cet email parce que tu as activé le récap hebdo dans <a href="${escape(appUrl)}/settings" style="color:#9999a3;">tes paramètres</a>.`,
+    footerDisclaimer: t("weekly.footer"),
   });
 
-  const text = `Salut ${firstName},
+  const text = `${t("common.greeting", { firstName })}
 
-Voici ton récap LIBERIA de la semaine.
+${t("weekly.metrics.income")} : ${fmt(monthlyIncome)}
+${t("weekly.metrics.expenses")} : ${fmt(monthlyExpenses)}
+${t("weekly.metrics.leftover")} : ${fmt(cashflow)}
+${t("weekly.metrics.savingsRate")} : ${formatPercent(savingsRate, intlLocale)}
 
-Revenus : ${formatCurrency(monthlyIncome)}
-Dépenses : ${formatCurrency(monthlyExpenses)}
-Reste à vivre : ${formatCurrency(cashflow)}
-Taux d'épargne : ${formatPercent(savingsRate)}
-Score de stabilité : ${stabilityScore}/100
+${t("weekly.cta")} : ${appUrl}/dashboard
 
-${planStepsRemaining > 0 ? `Plan : ${planStepsDoneThisWeek > 0 ? `${planStepsDoneThisWeek} étape(s) validée(s) cette semaine. ` : ""}${planStepsRemaining} étape(s) à compléter.\n\n` : ""}Ouvre LIBERIA : ${appUrl}/dashboard
-
-LIBERIA n'est pas un conseil financier réglementé.
-Se désinscrire : ${unsubscribeUrl}`;
+${t("common.disclaimer")}
+${t("common.unsubscribe")} : ${unsubscribeUrl}`;
 
   return { subject, html, text };
 }

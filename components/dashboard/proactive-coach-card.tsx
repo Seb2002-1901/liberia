@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ProactiveHint } from "@/lib/coach/proactive";
@@ -8,12 +9,8 @@ interface ProactiveCoachCardProps {
   hint: ProactiveHint;
 }
 
-/**
- * Calm "the coach noticed something" surface. Only rendered when the
- * proactive generator returns a hint — silence is preferred over fake
- * encouragement.
- */
-export function ProactiveCoachCard({ hint }: ProactiveCoachCardProps) {
+export async function ProactiveCoachCard({ hint }: ProactiveCoachCardProps) {
+  const t = await getTranslations("dashboard.proactiveCard");
   return (
     <Card className="border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.04)]">
       <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4 sm:p-5">
@@ -26,7 +23,7 @@ export function ProactiveCoachCard({ hint }: ProactiveCoachCardProps) {
           </span>
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-              Coach
+              {t("eyebrow")}
             </p>
             <p className="mt-1 text-sm font-medium leading-snug">
               {hint.headline}

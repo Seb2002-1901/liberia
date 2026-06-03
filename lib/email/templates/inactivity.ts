@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import {
   type EmailRender,
   escape,
@@ -12,58 +13,59 @@ export type InactivityEmailInput = {
   firstName: string;
   appUrl: string;
   unsubscribeUrl: string;
-  /** Approximate days since last interaction (capped server-side). */
   daysSinceLast: number;
+  locale?: string | null;
 };
 
-/**
- * Sent after a configurable period of no activity. Tone: gentle and
- * non-judgmental — "on fait un point ?" not "you're slipping". Never
- * trigger more than once per cooldown window (caller's responsibility).
- */
-export function renderInactivityEmail(input: InactivityEmailInput): EmailRender {
-  const { firstName, appUrl, unsubscribeUrl, daysSinceLast } = input;
-  const subject = "On fait un point rapide ensemble ?";
+export async function renderInactivityEmail(
+  input: InactivityEmailInput,
+): Promise<EmailRender> {
+  const { firstName, appUrl, unsubscribeUrl, daysSinceLast, locale } = input;
+  const { t } = await createEmailTranslator(locale);
 
+  const subject = t("inactivity.subject");
   const sinceLine =
     daysSinceLast >= 21
-      ? `Ça fait quelques semaines qu'on s'est pas croisé·s.`
+      ? t("inactivity.since21")
       : daysSinceLast >= 14
-        ? `Ça fait deux semaines qu'on s'est pas vus.`
-        : `Ça fait quelques jours qu'on s'est pas vus.`;
+        ? t("inactivity.since14")
+        : t("inactivity.sinceShort");
 
   const inner =
     heroCard({
-      greeting: `Salut ${firstName},`,
-      body: `${escape(sinceLine)} Pas de souci — la régularité prime sur l'intensité. Si tu veux reprendre, ouvre LIBERIA et fais un check-in rapide. On reprend tranquillement.`,
+      greeting: t("common.greeting", { firstName }),
+      body: `${escape(sinceLine)} ${t("inactivity.heroBodyTail")}`,
     }) +
     noticeCard({
-      eyebrow: "Si tu veux",
-      body: `Pas envie d'ouvrir l'app ? Tu peux désactiver ces rappels d'un clic. LIBERIA reste là quand tu reviens.`,
+      eyebrow: t("inactivity.noticeEyebrow"),
+      body: t("inactivity.noticeBody"),
     }) +
     primaryButton({
-      label: "Faire un check-in avec le coach",
+      label: t("inactivity.ctaCoach"),
       href: `${appUrl}/coach`,
     }) +
-    secondaryButton({ label: "Ouvrir LIBERIA", href: `${appUrl}/dashboard` });
+    secondaryButton({
+      label: t("inactivity.ctaApp"),
+      href: `${appUrl}/dashboard`,
+    });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Reprise en douceur",
+    eyebrow: t("inactivity.eyebrow"),
     inner,
     appUrl,
     unsubscribeUrl,
-    footerDisclaimer: `Tu reçois cet email parce que les rappels de suivi sont activés dans <a href="${escape(appUrl)}/settings" style="color:#9999a3;">tes paramètres</a>.`,
+    footerDisclaimer: t("inactivity.footer"),
   });
 
-  const text = `Salut ${firstName},
+  const text = `${t("common.greeting", { firstName })}
 
-${sinceLine} Pas de souci — la régularité prime sur l'intensité. Si tu veux reprendre, ouvre LIBERIA et fais un check-in rapide.
+${sinceLine} ${t("inactivity.heroBodyTail")}
 
-Faire un check-in : ${appUrl}/coach
-Ouvrir LIBERIA : ${appUrl}/dashboard
+${t("inactivity.ctaCoach")} : ${appUrl}/coach
+${t("inactivity.ctaApp")} : ${appUrl}/dashboard
 
-Se désinscrire : ${unsubscribeUrl}`;
+${t("common.unsubscribe")} : ${unsubscribeUrl}`;
 
   return { subject, html, text };
 }

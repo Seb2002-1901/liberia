@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import { formatCurrency } from "@/lib/utils";
 import {
   type EmailRender,
@@ -12,54 +13,51 @@ export type EncouragementEmailInput = {
   firstName: string;
   appUrl: string;
   unsubscribeUrl: string;
-  /** Short headline computed server-side (e.g. "Ton runway a atteint 2 mois"). */
+  /** Short headline computed server-side. Stays in the caller's locale. */
   headline: string;
-  /** Optional metric to surface alongside the headline. */
   metric?: { label: string; value: number; currency?: string };
+  locale?: string | null;
 };
 
-/**
- * Sent when a positive milestone is detected (savings rate improving,
- * runway crossing a threshold, several plan steps completed in a row).
- * Calm, observational tone — never "well done!" / arcade vibes.
- */
-export function renderEncouragementEmail(
+export async function renderEncouragementEmail(
   input: EncouragementEmailInput,
-): EmailRender {
-  const { firstName, appUrl, unsubscribeUrl, headline, metric } = input;
-  const subject = "Tu avances dans la bonne direction";
+): Promise<EmailRender> {
+  const { firstName, appUrl, unsubscribeUrl, headline, metric, locale } = input;
+  const { t, intlLocale } = await createEmailTranslator(locale);
+
+  const subject = t("encouragement.subject");
 
   const metricBlock = metric
     ? noticeCard({
         eyebrow: metric.label,
-        body: `<strong style="font-size:18px;">${escape(formatCurrency(metric.value, metric.currency))}</strong>`,
+        body: `<strong style="font-size:18px;">${escape(formatCurrency(metric.value, metric.currency, intlLocale))}</strong>`,
       })
     : "";
 
   const inner =
     heroCard({
-      greeting: `Salut ${firstName},`,
-      body: escape(headline) + ` C'est le genre de progression qui compte sur la durée.`,
+      greeting: t("common.greeting", { firstName }),
+      body: `${escape(headline)} ${t("encouragement.heroBodyTail")}`,
     }) +
     metricBlock +
-    primaryButton({ label: "Voir mon tableau de bord", href: `${appUrl}/dashboard` });
+    primaryButton({ label: t("encouragement.cta"), href: `${appUrl}/dashboard` });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Progression",
+    eyebrow: t("encouragement.eyebrow"),
     inner,
     appUrl,
     unsubscribeUrl,
-    footerDisclaimer: `Tu reçois cet email parce que les encouragements sont activés dans <a href="${escape(appUrl)}/settings" style="color:#9999a3;">tes paramètres</a>.`,
+    footerDisclaimer: t("encouragement.footer"),
   });
 
-  const text = `Salut ${firstName},
+  const text = `${t("common.greeting", { firstName })}
 
-${headline} C'est le genre de progression qui compte sur la durée.${metric ? `\n\n${metric.label} : ${formatCurrency(metric.value, metric.currency)}` : ""}
+${headline} ${t("encouragement.heroBodyTail")}${metric ? `\n\n${metric.label} : ${formatCurrency(metric.value, metric.currency, intlLocale)}` : ""}
 
-Ouvre LIBERIA : ${appUrl}/dashboard
+${t("common.openApp")} : ${appUrl}/dashboard
 
-Se désinscrire : ${unsubscribeUrl}`;
+${t("common.unsubscribe")} : ${unsubscribeUrl}`;
 
   return { subject, html, text };
 }

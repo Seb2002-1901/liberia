@@ -1,1 +1,100 @@
-{}
+{
+  "common": {
+    "greeting": "Hi {firstName},",
+    "openApp": "Open LIBERIA",
+    "unsubscribe": "Unsubscribe",
+    "disclaimer": "LIBERIA is not regulated financial advice."
+  },
+  "welcome": {
+    "subject": "Welcome to LIBERIA",
+    "eyebrow": "Welcome",
+    "heroBody": "Good to have you. LIBERIA is your space to take back control of your finances — calmly, without judgement, at your own pace.",
+    "noticeEyebrow": "To get started",
+    "noticeBody": "Three minutes are enough: enter your income, your main expenses and your goal. We refine the rest together over the weeks.",
+    "cta": "Complete my profile",
+    "footer": "You received this email because you just created your LIBERIA account. Your preferences are editable in your settings.",
+    "textHero": "Good to have you in LIBERIA. It's your space to take back control of your finances — calmly, without judgement, at your own pace.",
+    "textNotice": "To get started: three minutes are enough. Enter your income, your main expenses and your goal. We refine the rest together.",
+    "textCtaLine": "Complete my profile"
+  },
+  "weekly": {
+    "subject": "Your LIBERIA recap — score {score}/100",
+    "eyebrow": "Weekly recap",
+    "heroBody": "Here's your financial snapshot for the week. Your take-home is {tone}, your stability score is <strong>{score}/100</strong>.",
+    "tonePositive": "positive",
+    "toneNegative": "tight",
+    "metrics": {
+      "income": "Income",
+      "expenses": "Expenses",
+      "leftover": "Take-home",
+      "savingsRate": "Savings rate"
+    },
+    "planEyebrow": "Your plan",
+    "planBodyDoneAndRemaining": "You've validated <strong>{done}</strong> {doneNoun} this week. <strong>{remaining}</strong> {remainingNoun} left to complete — one at a time, no pressure.",
+    "planBodyRemaining": "<strong>{remaining}</strong> {remainingNoun} left to complete — one at a time, no pressure.",
+    "stepSingular": "step",
+    "stepPlural": "steps",
+    "cta": "Open LIBERIA",
+    "footer": "You received this email because you turned on the weekly recap in your settings."
+  },
+  "encouragement": {
+    "subject": "You're moving in the right direction",
+    "eyebrow": "Progress",
+    "heroBodyTail": "That's the kind of progress that counts over time.",
+    "cta": "See my dashboard",
+    "footer": "You received this email because progress encouragement is enabled in your settings."
+  },
+  "goalMilestone": {
+    "subject100": "« {goal} » — goal reached",
+    "subject80": "« {goal} » — only 20% to go",
+    "subject50": "« {goal} » — 50% milestone crossed",
+    "eyebrow": "Goal",
+    "hero100": "Your goal <strong>« {goal} »</strong> is reached. {amount} set aside. That's locked in.",
+    "hero80": "You're at <strong>80%</strong> of your goal <strong>« {goal} »</strong>. Only {remaining} left.",
+    "hero50": "You've just crossed the <strong>50%</strong> milestone on <strong>« {goal} »</strong>. Half the way is done.",
+    "noticeEyebrow": "What's next",
+    "notice100": "You can either close this goal in LIBERIA or evolve it into a next tier — your call.",
+    "noticeRest": "Keep this pace. No forced acceleration needed — consistency does most of the work.",
+    "cta": "See my goals",
+    "footer": "You received this email because goal milestone reminders are enabled in your settings.",
+    "text100": "« {goal} » is reached. {amount} set aside.",
+    "text80": "You're at 80% of « {goal} ». Only {remaining} left.",
+    "text50": "You've just crossed 50% on « {goal} »."
+  },
+  "inactivity": {
+    "subject": "Should we do a quick check-in together?",
+    "eyebrow": "Gentle return",
+    "since21": "It's been a few weeks since we crossed paths.",
+    "since14": "It's been two weeks since we've seen each other.",
+    "sinceShort": "It's been a few days since we've seen each other.",
+    "heroBodyTail": "No worries — consistency beats intensity. If you want to pick up, open LIBERIA and do a quick check-in. We resume gently.",
+    "noticeEyebrow": "If you'd like",
+    "noticeBody": "Don't feel like opening the app? You can turn these reminders off in one click. LIBERIA stays here when you come back.",
+    "ctaCoach": "Do a check-in with the coach",
+    "ctaApp": "Open LIBERIA",
+    "footer": "You received this email because follow-up reminders are enabled in your settings."
+  },
+  "paymentFailed": {
+    "subject": "Your LIBERIA payment didn't go through",
+    "eyebrow": "Payment pending",
+    "heroBody": "The last charge on your subscription didn't go through. It's usually an expired or maxed-out payment method — nothing more.",
+    "noticeEyebrow": "Your data is safe",
+    "noticeBody": "Your goals, your plan and your history stay intact. Update your payment method whenever you want, and your access reactivates automatically.",
+    "cta": "Update my payment",
+    "footer": "This email is sent because it directly concerns your LIBERIA subscription."
+  },
+  "trialEnding": {
+    "subject1": "Your LIBERIA trial ends tomorrow",
+    "subject3": "Your LIBERIA trial ends in 3 days",
+    "eyebrow": "Free trial",
+    "hero1": "Your trial ends <strong>tomorrow ({date})</strong>. Your Premium subscription will take over automatically at <strong>{amount}/month</strong>, with no interruption.",
+    "hero3": "Your trial ends in <strong>3 days ({date})</strong>. Then your Premium subscription takes over automatically at <strong>{amount}/month</strong>.",
+    "noticeEyebrow": "You stay in control",
+    "noticeBody": "You can cancel any time from your subscription portal — no reason, no friction. If you continue, your access stays uninterrupted.",
+    "ctaManage": "Manage my subscription",
+    "ctaApp": "Open LIBERIA",
+    "footer": "This email is sent because it directly concerns your LIBERIA subscription. You can manage it from your subscription area.",
+    "text1": "Your LIBERIA trial ends tomorrow ({date}). Your Premium subscription takes over automatically at {amount}/month.",
+    "text3": "Your LIBERIA trial ends in 3 days ({date}). Then your Premium subscription takes over at {amount}/month."
+  }
+}

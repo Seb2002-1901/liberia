@@ -17,6 +17,7 @@ import { getMyUserMemory } from "@/lib/services/memory";
 import { requirePremiumAccess } from "@/lib/services/access";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getLanguageEnglishName } from "@/lib/locale/languages";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -205,6 +206,14 @@ export async function POST(request: Request) {
           );
           const apiMessages = budgetedHistory;
 
+          // Language injection: appended as the last system block so it
+          // takes precedence over any earlier nudge in the coach prompt
+          // or finance context (both currently French). Sonnet honours
+          // English meta-instructions reliably across locales.
+          const userLanguageName = getLanguageEnglishName(
+            financeData.profile.locale,
+          );
+
           const claudeStream = claude.messages.stream({
             model: COACH_MODEL,
             max_tokens: COACH_MAX_TOKENS,
@@ -221,6 +230,10 @@ export async function POST(request: Request) {
                 // minimum once the user has any data; below that, the
                 // cache silently no-ops.
                 cache_control: { type: "ephemeral" },
+              },
+              {
+                type: "text",
+                text: `Always respond exclusively in ${userLanguageName}. Match the user's tone in that language. Never switch to a different language even if the finance context above is in French — that is internal data, not a hint about the user's preferred language.`,
               },
             ],
             messages: apiMessages,

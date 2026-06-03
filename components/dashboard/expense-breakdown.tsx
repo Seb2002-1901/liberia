@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
@@ -31,8 +32,13 @@ const COLORS = [
 ];
 
 export function ExpenseBreakdown({ data, currency = "CHF" }: ExpenseBreakdownProps) {
-  const labelFor = (id: string) =>
-    EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
+  const t = useTranslations("dashboard.expenseBreakdown");
+  const tCat = useTranslations("dashboard.categories.expenses");
+
+  const labelFor = (id: string) => {
+    const known = EXPENSE_CATEGORIES.find((c) => c.id === id);
+    return known ? tCat(known.id) : id;
+  };
 
   const chartData = data
     .filter((d) => d.total > 0)
@@ -42,11 +48,11 @@ export function ExpenseBreakdown({ data, currency = "CHF" }: ExpenseBreakdownPro
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Répartition des dépenses</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex h-56 items-center justify-center text-sm text-muted-foreground">
-            Pas encore de dépenses enregistrées.
+            {t("empty")}
           </div>
         </CardContent>
       </Card>
@@ -56,7 +62,7 @@ export function ExpenseBreakdown({ data, currency = "CHF" }: ExpenseBreakdownPro
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Répartition des dépenses</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-72">

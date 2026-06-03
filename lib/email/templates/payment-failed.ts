@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import {
   EMAIL_THEME,
   type EmailRender,
@@ -10,52 +11,48 @@ import {
 export type PaymentFailedEmailInput = {
   firstName: string;
   appUrl: string;
-  /** Direct link to the Stripe Customer Portal (preferred) or settings. */
   portalUrl?: string;
+  locale?: string | null;
 };
 
-/**
- * Sent when Stripe reports `invoice.payment_failed` (sub → past_due).
- * Tone: factual + reassuring. No alarm, no blame. We tell the user
- * what happened and how to fix it in one click.
- */
-export function renderPaymentFailedEmail(
+export async function renderPaymentFailedEmail(
   input: PaymentFailedEmailInput,
-): EmailRender {
-  const { firstName, appUrl, portalUrl } = input;
-  const subject = "Ton paiement LIBERIA n'a pas abouti";
-  const t = EMAIL_THEME;
+): Promise<EmailRender> {
+  const { firstName, appUrl, portalUrl, locale } = input;
+  const { t } = await createEmailTranslator(locale);
+
+  const subject = t("paymentFailed.subject");
 
   const inner =
     heroCard({
-      greeting: `Salut ${firstName},`,
-      body: `Le dernier prélèvement de ton abonnement n'a pas abouti. C'est généralement dû à un moyen de paiement expiré ou plafonné — rien de plus.`,
+      greeting: t("common.greeting", { firstName }),
+      body: t("paymentFailed.heroBody"),
     }) +
     noticeCard({
-      eyebrow: "Tes données sont en sécurité",
-      body: `Tes objectifs, ton plan et ton historique restent intacts. Mets à jour ton moyen de paiement quand tu veux, et ton accès se réactive automatiquement.`,
-      toneColor: t.MUTED,
+      eyebrow: t("paymentFailed.noticeEyebrow"),
+      body: t("paymentFailed.noticeBody"),
+      toneColor: EMAIL_THEME.MUTED,
     }) +
     primaryButton({
-      label: "Mettre à jour mon paiement",
+      label: t("paymentFailed.cta"),
       href: portalUrl ?? `${appUrl}/settings/subscription`,
     });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Paiement en attente",
+    eyebrow: t("paymentFailed.eyebrow"),
     inner,
     appUrl,
-    footerDisclaimer: `Cet email t'est envoyé parce qu'il concerne directement ton abonnement LIBERIA.`,
+    footerDisclaimer: t("paymentFailed.footer"),
   });
 
-  const text = `Salut ${firstName},
+  const text = `${t("common.greeting", { firstName })}
 
-Le dernier prélèvement de ton abonnement LIBERIA n'a pas abouti. C'est généralement dû à un moyen de paiement expiré ou plafonné.
+${t("paymentFailed.heroBody")}
 
-Tes données restent en sécurité — objectifs, plan et historique sont intacts. Mets à jour ton moyen de paiement quand tu veux et ton accès se réactive automatiquement.
+${t("paymentFailed.noticeBody")}
 
-Mettre à jour mon paiement : ${portalUrl ?? `${appUrl}/settings/subscription`}`;
+${t("paymentFailed.cta")} : ${portalUrl ?? `${appUrl}/settings/subscription`}`;
 
   return { subject, html, text };
 }

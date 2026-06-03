@@ -1,1 +1,100 @@
-{}
+{
+  "common": {
+    "greeting": "Salut {firstName},",
+    "openApp": "Ouvrir LIBERIA",
+    "unsubscribe": "Se désinscrire",
+    "disclaimer": "LIBERIA n'est pas un conseil financier réglementé."
+  },
+  "welcome": {
+    "subject": "Bienvenue dans LIBERIA",
+    "eyebrow": "Bienvenue",
+    "heroBody": "Content de t'accueillir. LIBERIA est ton espace pour reprendre le contrôle de tes finances — calmement, sans jugement, à ton rythme.",
+    "noticeEyebrow": "Pour bien démarrer",
+    "noticeBody": "Trois minutes suffisent : renseigne tes revenus, tes dépenses principales et ton objectif. On affine le reste ensemble au fil des semaines.",
+    "cta": "Compléter mon profil",
+    "footer": "Tu reçois cet email parce que tu viens de créer ton compte LIBERIA. Tes préférences sont ajustables dans tes paramètres.",
+    "textHero": "Content de t'accueillir dans LIBERIA. C'est ton espace pour reprendre le contrôle de tes finances — calmement, sans jugement, à ton rythme.",
+    "textNotice": "Pour bien démarrer : trois minutes suffisent. Renseigne tes revenus, tes dépenses principales et ton objectif. On affine le reste ensemble.",
+    "textCtaLine": "Compléter mon profil"
+  },
+  "weekly": {
+    "subject": "Ton récap LIBERIA — score {score}/100",
+    "eyebrow": "Récap de la semaine",
+    "heroBody": "Voici ta photo financière de la semaine. Ton reste à vivre est {tone}, ton score de stabilité est de <strong>{score}/100</strong>.",
+    "tonePositive": "positif",
+    "toneNegative": "tendu",
+    "metrics": {
+      "income": "Revenus",
+      "expenses": "Dépenses",
+      "leftover": "Reste à vivre",
+      "savingsRate": "Taux d'épargne"
+    },
+    "planEyebrow": "Ton plan",
+    "planBodyDoneAndRemaining": "Tu as validé <strong>{done}</strong> {doneNoun} cette semaine. Il reste <strong>{remaining}</strong> {remainingNoun} à compléter — une à la fois, sans pression.",
+    "planBodyRemaining": "Il reste <strong>{remaining}</strong> {remainingNoun} à compléter — une à la fois, sans pression.",
+    "stepSingular": "étape",
+    "stepPlural": "étapes",
+    "cta": "Ouvrir LIBERIA",
+    "footer": "Tu reçois cet email parce que tu as activé le récap hebdo dans tes paramètres."
+  },
+  "encouragement": {
+    "subject": "Tu avances dans la bonne direction",
+    "eyebrow": "Progression",
+    "heroBodyTail": "C'est le genre de progression qui compte sur la durée.",
+    "cta": "Voir mon tableau de bord",
+    "footer": "Tu reçois cet email parce que les encouragements sont activés dans tes paramètres."
+  },
+  "goalMilestone": {
+    "subject100": "« {goal} » — objectif atteint",
+    "subject80": "« {goal} » — plus que 20% à parcourir",
+    "subject50": "« {goal} » — palier 50% franchi",
+    "eyebrow": "Objectif",
+    "hero100": "Ton objectif <strong>« {goal} »</strong> est atteint. {amount} mis de côté. C'est posé.",
+    "hero80": "Tu es à <strong>80%</strong> de ton objectif <strong>« {goal} »</strong>. Plus que {remaining} à parcourir.",
+    "hero50": "Tu viens de franchir le palier <strong>50%</strong> sur <strong>« {goal} »</strong>. La moitié du chemin est faite.",
+    "noticeEyebrow": "La suite",
+    "notice100": "Tu peux soit clôturer cet objectif dans LIBERIA, soit le faire évoluer vers un palier suivant — au choix.",
+    "noticeRest": "Continue à ce rythme. Pas d'accélération forcée nécessaire — la régularité fait l'essentiel du travail.",
+    "cta": "Voir mes objectifs",
+    "footer": "Tu reçois cet email parce que les rappels d'objectifs sont activés dans tes paramètres.",
+    "text100": "« {goal} » est atteint. {amount} mis de côté.",
+    "text80": "Tu es à 80% de « {goal} ». Plus que {remaining}.",
+    "text50": "Tu viens de franchir 50% sur « {goal} »."
+  },
+  "inactivity": {
+    "subject": "On fait un point rapide ensemble ?",
+    "eyebrow": "Reprise en douceur",
+    "since21": "Ça fait quelques semaines qu'on s'est pas croisé·s.",
+    "since14": "Ça fait deux semaines qu'on s'est pas vus.",
+    "sinceShort": "Ça fait quelques jours qu'on s'est pas vus.",
+    "heroBodyTail": "Pas de souci — la régularité prime sur l'intensité. Si tu veux reprendre, ouvre LIBERIA et fais un check-in rapide. On reprend tranquillement.",
+    "noticeEyebrow": "Si tu veux",
+    "noticeBody": "Pas envie d'ouvrir l'app ? Tu peux désactiver ces rappels d'un clic. LIBERIA reste là quand tu reviens.",
+    "ctaCoach": "Faire un check-in avec le coach",
+    "ctaApp": "Ouvrir LIBERIA",
+    "footer": "Tu reçois cet email parce que les rappels de suivi sont activés dans tes paramètres."
+  },
+  "paymentFailed": {
+    "subject": "Ton paiement LIBERIA n'a pas abouti",
+    "eyebrow": "Paiement en attente",
+    "heroBody": "Le dernier prélèvement de ton abonnement n'a pas abouti. C'est généralement dû à un moyen de paiement expiré ou plafonné — rien de plus.",
+    "noticeEyebrow": "Tes données sont en sécurité",
+    "noticeBody": "Tes objectifs, ton plan et ton historique restent intacts. Mets à jour ton moyen de paiement quand tu veux, et ton accès se réactive automatiquement.",
+    "cta": "Mettre à jour mon paiement",
+    "footer": "Cet email t'est envoyé parce qu'il concerne directement ton abonnement LIBERIA."
+  },
+  "trialEnding": {
+    "subject1": "Ton essai LIBERIA se termine demain",
+    "subject3": "Ton essai LIBERIA se termine dans 3 jours",
+    "eyebrow": "Essai gratuit",
+    "hero1": "Ton essai se termine <strong>demain ({date})</strong>. Ton abonnement Premium prendra automatiquement le relais à <strong>{amount}/mois</strong>, sans interruption d'accès.",
+    "hero3": "Ton essai se termine dans <strong>3 jours ({date})</strong>. Ensuite, ton abonnement Premium prendra automatiquement le relais à <strong>{amount}/mois</strong>.",
+    "noticeEyebrow": "Tu gardes le contrôle",
+    "noticeBody": "Tu peux annuler à tout moment depuis ton portail d'abonnement — aucune justification, aucune friction. Si tu poursuis, ton accès reste continu.",
+    "ctaManage": "Gérer mon abonnement",
+    "ctaApp": "Ouvrir LIBERIA",
+    "footer": "Cet email t'est envoyé parce qu'il concerne directement ton abonnement LIBERIA. Tu peux le gérer depuis ton espace abonnement.",
+    "text1": "Ton essai LIBERIA se termine demain ({date}). Ton abonnement Premium prendra automatiquement le relais à {amount}/mois.",
+    "text3": "Ton essai LIBERIA se termine dans 3 jours ({date}). Ensuite, ton abonnement Premium prendra le relais à {amount}/mois."
+  }
+}

@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import {
   type EmailRender,
   escape,
@@ -10,46 +11,53 @@ import {
 export type WelcomeEmailInput = {
   firstName: string;
   appUrl: string;
+  /** Profile locale ("fr-CH", "en", …). Falls back to EN when missing. */
+  locale?: string | null;
 };
 
 /**
  * Sent after account creation. Calm intro — no aggressive onboarding,
- * no upsell, just a warm "bienvenue".
+ * no upsell, just a warm welcome in the user's preferred language.
  */
-export function renderWelcomeEmail(input: WelcomeEmailInput): EmailRender {
-  const { firstName, appUrl } = input;
-  const subject = "Bienvenue dans LIBERIA";
+export async function renderWelcomeEmail(
+  input: WelcomeEmailInput,
+): Promise<EmailRender> {
+  const { firstName, appUrl, locale } = input;
+  const { t } = await createEmailTranslator(locale);
+
+  const subject = t("welcome.subject");
 
   const inner =
     heroCard({
-      greeting: `Salut ${firstName},`,
-      body: `Content de t'accueillir. LIBERIA est ton espace pour reprendre le contrôle de tes finances — calmement, sans jugement, à ton rythme.`,
+      greeting: t("common.greeting", { firstName }),
+      body: t("welcome.heroBody"),
     }) +
     noticeCard({
-      eyebrow: "Pour bien démarrer",
-      body: `Trois minutes suffisent : renseigne tes revenus, tes dépenses principales et ton objectif. On affine le reste ensemble au fil des semaines.`,
+      eyebrow: t("welcome.noticeEyebrow"),
+      body: t("welcome.noticeBody"),
     }) +
-    primaryButton({ label: "Compléter mon profil", href: `${appUrl}/onboarding` });
+    primaryButton({
+      label: t("welcome.cta"),
+      href: `${appUrl}/onboarding`,
+    });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Bienvenue",
+    eyebrow: t("welcome.eyebrow"),
     inner,
     appUrl,
-    footerDisclaimer: `Tu reçois cet email parce que tu viens de créer ton compte LIBERIA. Tes préférences sont ajustables dans <a href="${escape(appUrl)}/settings" style="color:#9999a3;">tes paramètres</a>.`,
+    footerDisclaimer: `${t("welcome.footer")} <a href="${escape(appUrl)}/settings" style="color:#9999a3;">→</a>`,
   });
 
-  const text = `Salut ${firstName},
+  const text = `${t("common.greeting", { firstName })}
 
-Content de t'accueillir dans LIBERIA.
+${t("welcome.textHero")}
 
-LIBERIA est ton espace pour reprendre le contrôle de tes finances — calmement, sans jugement, à ton rythme.
+${t("welcome.textNotice")}
 
-Pour bien démarrer : trois minutes suffisent. Renseigne tes revenus, tes dépenses principales et ton objectif. On affine le reste ensemble.
+${t("welcome.textCtaLine")} : ${appUrl}/onboarding
 
-Compléter mon profil : ${appUrl}/onboarding
-
-LIBERIA n'est pas un conseil financier réglementé.`;
+${t("common.disclaimer")}`;
 
   return { subject, html, text };
 }

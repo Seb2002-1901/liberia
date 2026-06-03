@@ -1,3 +1,4 @@
+import { createEmailTranslator } from "@/lib/email/i18n";
 import { formatCurrency } from "@/lib/utils";
 import {
   type EmailRender,
@@ -13,20 +14,16 @@ export type GoalMilestoneEmailInput = {
   appUrl: string;
   unsubscribeUrl: string;
   goalTitle: string;
-  /** Threshold reached: 50 / 80 / 100. */
   milestonePct: 50 | 80 | 100;
   currentAmount: number;
   targetAmount: number;
   currency: string;
+  locale?: string | null;
 };
 
-/**
- * Sent when a goal crosses 50 / 80 / 100% completion. Observational
- * tone — no confetti, no superlatives. Just "you crossed this line".
- */
-export function renderGoalMilestoneEmail(
+export async function renderGoalMilestoneEmail(
   input: GoalMilestoneEmailInput,
-): EmailRender {
+): Promise<EmailRender> {
   const {
     firstName,
     appUrl,
@@ -36,56 +33,72 @@ export function renderGoalMilestoneEmail(
     currentAmount,
     targetAmount,
     currency,
+    locale,
   } = input;
 
+  const { t, intlLocale } = await createEmailTranslator(locale);
   const remaining = Math.max(0, targetAmount - currentAmount);
 
-  const subject =
+  const subjectKey =
     milestonePct === 100
-      ? `« ${goalTitle} » — objectif atteint`
+      ? "goalMilestone.subject100"
       : milestonePct === 80
-        ? `« ${goalTitle} » — plus que 20% à parcourir`
-        : `« ${goalTitle} » — palier 50% franchi`;
-
-  const heroBody =
+        ? "goalMilestone.subject80"
+        : "goalMilestone.subject50";
+  const heroKey =
     milestonePct === 100
-      ? `Ton objectif <strong>« ${escape(goalTitle)} »</strong> est atteint. ${escape(formatCurrency(targetAmount, currency))} mis de côté. C'est posé.`
+      ? "goalMilestone.hero100"
       : milestonePct === 80
-        ? `Tu es à <strong>80%</strong> de ton objectif <strong>« ${escape(goalTitle)} »</strong>. Plus que ${escape(formatCurrency(remaining, currency))} à parcourir.`
-        : `Tu viens de franchir le palier <strong>50%</strong> sur <strong>« ${escape(goalTitle)} »</strong>. La moitié du chemin est faite.`;
+        ? "goalMilestone.hero80"
+        : "goalMilestone.hero50";
+  const textKey =
+    milestonePct === 100
+      ? "goalMilestone.text100"
+      : milestonePct === 80
+        ? "goalMilestone.text80"
+        : "goalMilestone.text50";
 
+  const subject = t(subjectKey, { goal: goalTitle });
+
+  const params = {
+    goal: escape(goalTitle),
+    amount: escape(formatCurrency(targetAmount, currency, intlLocale)),
+    remaining: escape(formatCurrency(remaining, currency, intlLocale)),
+  };
+
+  const heroBody = t(heroKey, params);
   const noticeBody =
     milestonePct === 100
-      ? `Tu peux soit clôturer cet objectif dans LIBERIA, soit le faire évoluer vers un palier suivant — au choix.`
-      : `Continue à ce rythme. Pas d'accélération forcée nécessaire — la régularité fait l'essentiel du travail.`;
+      ? t("goalMilestone.notice100")
+      : t("goalMilestone.noticeRest");
 
   const inner =
-    heroCard({ greeting: `Salut ${firstName},`, body: heroBody }) +
-    noticeCard({ eyebrow: "La suite", body: noticeBody }) +
-    primaryButton({ label: "Voir mes objectifs", href: `${appUrl}/goals` });
+    heroCard({ greeting: t("common.greeting", { firstName }), body: heroBody }) +
+    noticeCard({ eyebrow: t("goalMilestone.noticeEyebrow"), body: noticeBody }) +
+    primaryButton({ label: t("goalMilestone.cta"), href: `${appUrl}/goals` });
 
   const html = renderLayout({
     subject,
-    eyebrow: "Objectif",
+    eyebrow: t("goalMilestone.eyebrow"),
     inner,
     appUrl,
     unsubscribeUrl,
-    footerDisclaimer: `Tu reçois cet email parce que les rappels d'objectifs sont activés dans <a href="${escape(appUrl)}/settings" style="color:#9999a3;">tes paramètres</a>.`,
+    footerDisclaimer: t("goalMilestone.footer"),
   });
 
-  const text = `Salut ${firstName},
+  const textParams = {
+    goal: goalTitle,
+    amount: formatCurrency(targetAmount, currency, intlLocale),
+    remaining: formatCurrency(remaining, currency, intlLocale),
+  };
 
-${
-    milestonePct === 100
-      ? `« ${goalTitle} » est atteint. ${formatCurrency(targetAmount, currency)} mis de côté.`
-      : milestonePct === 80
-        ? `Tu es à 80% de « ${goalTitle} ». Plus que ${formatCurrency(remaining, currency)}.`
-        : `Tu viens de franchir 50% sur « ${goalTitle} ».`
-  }
+  const text = `${t("common.greeting", { firstName })}
 
-Voir mes objectifs : ${appUrl}/goals
+${t(textKey, textParams)}
 
-Se désinscrire : ${unsubscribeUrl}`;
+${t("goalMilestone.cta")} : ${appUrl}/goals
+
+${t("common.unsubscribe")} : ${unsubscribeUrl}`;
 
   return { subject, html, text };
 }

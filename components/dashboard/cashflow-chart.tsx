@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
@@ -20,24 +21,36 @@ interface CashflowChartProps {
 }
 
 export function CashflowChart({ income, expenses, currency = "CHF" }: CashflowChartProps) {
-  // Phase 1: lissage déterministe à des fins d'illustration tant que
-  // l'historique mensuel n'est pas collecté. Remplacé par la série réelle
-  // dès que les transactions horodatées seront accumulées.
-  const months = ["−5 mois", "−4 mois", "−3 mois", "−2 mois", "−1 mois", "Ce mois"];
+  const t = useTranslations("dashboard.cashflowChart");
+  // Deterministic smoothing until the monthly history is collected.
+  // Replaced by the real time series once horodated transactions are
+  // accumulated.
+  const months = [
+    t("monthsAgo", { n: 5 }),
+    t("monthsAgo", { n: 4 }),
+    t("monthsAgo", { n: 3 }),
+    t("monthsAgo", { n: 2 }),
+    t("monthsAgo", { n: 1 }),
+    t("thisMonth"),
+  ];
+  const incomeLabel = t("income");
+  const expensesLabel = t("expenses");
   const data = months.map((m, i) => {
     const wobble = Math.sin(i * 0.7) * 0.05;
     return {
       name: m,
-      Revenus: Math.round(income * (1 + wobble)),
-      Dépenses: Math.round(expenses * (1 - wobble * 0.6)),
+      [incomeLabel]: Math.round(income * (1 + wobble)),
+      [expensesLabel]: Math.round(expenses * (1 - wobble * 0.6)),
     };
   });
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle>Flux mensuel</CardTitle>
-        <Badge variant="secondary" className="font-normal">Aperçu lissé</Badge>
+        <CardTitle>{t("title")}</CardTitle>
+        <Badge variant="secondary" className="font-normal">
+          {t("preview")}
+        </Badge>
       </CardHeader>
       <CardContent>
         <div className="h-72">
@@ -82,14 +95,14 @@ export function CashflowChart({ income, expenses, currency = "CHF" }: CashflowCh
               />
               <Area
                 type="monotone"
-                dataKey="Revenus"
+                dataKey={incomeLabel}
                 stroke="hsl(var(--gold))"
                 strokeWidth={2}
                 fill="url(#liberiaIncome)"
               />
               <Area
                 type="monotone"
-                dataKey="Dépenses"
+                dataKey={expensesLabel}
                 stroke="hsl(var(--muted-foreground))"
                 strokeWidth={2}
                 fill="url(#liberiaExpense)"

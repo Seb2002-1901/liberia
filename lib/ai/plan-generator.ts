@@ -120,6 +120,12 @@ export type GeneratePlanArgs = {
   financeContext: string;
   model: string;
   maxTokens?: number;
+  /**
+   * English name of the language the plan steps must be written in
+   * (e.g. "English", "German", "Swiss French"). Resolved by the
+   * caller from `profile.locale` via `getLanguageEnglishName`.
+   */
+  languageName?: string;
 };
 
 export async function generatePlan({
@@ -127,6 +133,7 @@ export async function generatePlan({
   financeContext,
   model,
   maxTokens = 4096,
+  languageName = "French",
 }: GeneratePlanArgs): Promise<{
   plan: PlanInput;
   tokensIn: number;
@@ -138,6 +145,8 @@ export async function generatePlan({
   const userInstruction = `Génère un plan financier sur **${horizonDays} jours** (semaines 1 à ${horizonWeeks}) personnalisé pour cette personne. Appuie-toi sur le contexte ci-dessous pour chiffrer chaque action.
 
 ${financeContext}
+
+IMPORTANT: write the plan title, summary, and every step (focus, title, description) exclusively in ${languageName}. The finance context above may be in French — treat it as internal data, never as a language cue.
 
 Appelle maintenant l'outil \`${PLAN_TOOL_NAME}\` avec le plan complet.`;
 

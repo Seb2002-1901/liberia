@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Target } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -8,21 +9,29 @@ import { formatCurrency } from "@/lib/utils";
 import { ROUTES, GOAL_TYPES } from "@/lib/constants";
 import type { Goal } from "@/types/database";
 
-export function GoalsSummary({ goals, currency = "CHF" }: { goals: Goal[]; currency?: string }) {
+export async function GoalsSummary({
+  goals,
+  currency = "CHF",
+}: {
+  goals: Goal[];
+  currency?: string;
+}) {
+  const t = await getTranslations("dashboard.goalsSummary");
+  const tGoals = await getTranslations("onboarding.goals");
   if (!goals.length) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Objectifs</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <EmptyState
             icon={<Target className="h-5 w-5" />}
-            title="Aucun objectif"
-            description="Crée ton premier objectif financier pour avancer par paliers."
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
             action={
               <Button asChild variant="gold" size="sm">
-                <Link href={ROUTES.goals}>Créer un objectif</Link>
+                <Link href={ROUTES.goals}>{t("emptyCta")}</Link>
               </Button>
             }
           />
@@ -34,10 +43,10 @@ export function GoalsSummary({ goals, currency = "CHF" }: { goals: Goal[]; curre
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Objectifs en cours</CardTitle>
+        <CardTitle>{t("active")}</CardTitle>
         <Button asChild variant="ghost" size="sm">
           <Link href={ROUTES.goals}>
-            Tous <ArrowRight className="h-3.5 w-3.5" />
+            {t("all")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </Button>
       </CardHeader>
@@ -46,7 +55,8 @@ export function GoalsSummary({ goals, currency = "CHF" }: { goals: Goal[]; curre
           const ratio = g.target_amount
             ? Math.min(100, Math.round((g.current_amount / g.target_amount) * 100))
             : 0;
-          const typeLabel = GOAL_TYPES.find((t) => t.id === g.type)?.label ?? g.type;
+          const known = GOAL_TYPES.find((tp) => tp.id === g.type);
+          const typeLabel = known ? tGoals(known.id) : g.type;
           return (
             <div key={g.id} className="space-y-2">
               <div className="flex items-baseline justify-between gap-3">

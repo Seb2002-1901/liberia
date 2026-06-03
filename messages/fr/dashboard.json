@@ -35,5 +35,140 @@
     "runwaySolidText": "Continue à le préserver, c'est ta tranquillité.",
     "runwayBuildingTitle": "Fonds d'urgence en construction",
     "runwayBuildingText": "Vise progressivement 3 mois de dépenses."
+  },
+  "dailyInsight": {
+    "eyebrow": "Insight du jour",
+    "deepen": "Approfondir avec le coach",
+    "nextAction": "Prochaine action"
+  },
+  "weeklyRecap": {
+    "eyebrow": "Cette semaine",
+    "deltaUp": "+{delta} vs semaine précédente",
+    "deltaDown": "{delta} vs semaine précédente",
+    "deltaSame": "même rythme",
+    "activeDay": "jour actif",
+    "activeDays": "jours actifs",
+    "entry": "mouvement",
+    "entries": "mouvements",
+    "step": "étape",
+    "steps": "étapes",
+    "victoryLabel": "On retient",
+    "nextPriorityLabel": "Prochaine priorité",
+    "actions": {
+      "checkin": "Faire un check-in",
+      "viewPlan": "Voir mon plan",
+      "myGoals": "Mes objectifs"
+    }
+  },
+  "proactiveCard": {
+    "eyebrow": "Coach"
+  },
+  "planTeaser": {
+    "emptyTitle": "Ton plan financier",
+    "emptyDescription": "Un plan d'actions sur 30, 60 ou 90 jours basé sur tes données.",
+    "generate": "Générer mon plan",
+    "comingSoon": "Bientôt disponible",
+    "subtitle": "Plan {days} jours · {done}/{total} étapes",
+    "open": "Ouvrir",
+    "nextStepLabel": "Prochaine étape · semaine {week}"
+  },
+  "coachTeaser": {
+    "title": "Insights",
+    "subtitle": "Repères calculés sur tes données.",
+    "coachCta": "Coach",
+    "empty": "Ajoute quelques revenus et dépenses pour voir tes premiers insights.",
+    "askCta": "Pose une question au coach",
+    "labels": {
+      "cashflowNegative": "Reste à vivre négatif",
+      "savingsLow": "Taux d'épargne faible",
+      "savingsGood": "Bonne marge",
+      "emergencyFund": "Fonds d'urgence"
+    },
+    "texts": {
+      "categoryShare": "Ce poste représente {pct}% de tes dépenses ({amount}/mois). Tester −20% sur 1 mois ?",
+      "cashflowNegative": "Tu dépenses environ {amount} de plus que tu ne gagnes. On peut creuser ensemble où réduire.",
+      "savingsLow": "Actuellement {rate}. Un virement automatique même symbolique sécurise le réflexe.",
+      "savingsGood": "{rate} de taux d'épargne. Tu peux accélérer un objectif ou consolider le fonds d'urgence.",
+      "emergencyLow": "Actuellement moins d'un mois de dépenses de côté. Premier palier : viser 1 mois.",
+      "emergencyBuilding": "{months} mois couverts. Prochain palier solide : 3 mois."
+    }
+  },
+  "stability": {
+    "label": "Stabilité financière",
+    "tiers": {
+      "danger": {
+        "label": "Tendu",
+        "description": "On reprend les choses étape par étape."
+      },
+      "warning": {
+        "label": "Fragile",
+        "description": "Concentre-toi sur les dépenses essentielles."
+      },
+      "neutral": {
+        "label": "En progression",
+        "description": "Quelques ajustements feront la différence."
+      },
+      "success": {
+        "label": "Stable",
+        "description": "Tu es sur la bonne voie."
+      },
+      "gold": {
+        "label": "Solide",
+        "description": "Tu construis sur des bases saines."
+      }
+    }
+  },
+  "expenseBreakdown": {
+    "title": "Répartition des dépenses",
+    "empty": "Pas encore de dépenses enregistrées."
+  },
+  "goalsSummary": {
+    "title": "Objectifs",
+    "active": "Objectifs en cours",
+    "all": "Tous",
+    "emptyTitle": "Aucun objectif",
+    "emptyDescription": "Crée ton premier objectif financier pour avancer par paliers.",
+    "emptyCta": "Créer un objectif"
+  },
+  "cashflowChart": {
+    "title": "Flux mensuel",
+    "preview": "Aperçu lissé",
+    "monthsAgo": "−{n} mois",
+    "thisMonth": "Ce mois",
+    "income": "Revenus",
+    "expenses": "Dépenses"
+  },
+  "categories": {
+    "expenses": {
+      "housing": "Logement",
+      "food": "Alimentation",
+      "transport": "Transport",
+      "utilities": "Factures & énergie",
+      "insurance": "Assurances",
+      "health": "Santé",
+      "debt": "Crédits / Dettes",
+      "subscriptions": "Abonnements",
+      "leisure": "Loisirs",
+      "shopping": "Shopping",
+      "family": "Famille / Enfants",
+      "education": "Éducation",
+      "other": "Autre"
+    },
+    "frequencies": {
+      "monthly": "Mensuel",
+      "weekly": "Hebdomadaire",
+      "yearly": "Annuel",
+      "one_time": "Ponctuel"
+    },
+    "incomeCategories": {
+      "salary": "Salaire",
+      "freelance": "Freelance / Indépendant",
+      "investment": "Revenus de placements",
+      "pension": "Retraite",
+      "rental": "Locatif",
+      "benefits": "Allocations",
+      "side_hustle": "Activité secondaire",
+      "other": "Autre"
+    }
   }
 }

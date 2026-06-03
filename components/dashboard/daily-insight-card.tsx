@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Target } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -21,15 +22,8 @@ interface DailyInsightCardProps {
   aiReady: boolean;
 }
 
-/**
- * Premium "Insight du jour" card surfaced at the top of the dashboard.
- *
- * Uses the deterministic local generator so the card always renders —
- * including when ANTHROPIC_API_KEY isn't yet wired up. When the LLM is
- * configured later, the same `Insight` shape can be returned from a
- * server-side call without any UI change.
- */
-export function DailyInsightCard(props: DailyInsightCardProps) {
+export async function DailyInsightCard(props: DailyInsightCardProps) {
+  const t = await getTranslations("dashboard.dailyInsight");
   const insight = generateLocalInsight({
     ...props,
     coachingTone: props.coachingTone,
@@ -54,13 +48,13 @@ export function DailyInsightCard(props: DailyInsightCardProps) {
           <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
             <Sparkles className="h-4 w-4" />
             <p className="text-[11px] font-medium uppercase tracking-[0.22em]">
-              Insight du jour
+              {t("eyebrow")}
             </p>
           </div>
           {props.aiReady ? (
             <Button asChild variant="ghost" size="sm">
               <Link href={ROUTES.coach}>
-                Approfondir avec le coach
+                {t("deepen")}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Button>
@@ -91,7 +85,7 @@ export function DailyInsightCard(props: DailyInsightCardProps) {
             </span>
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                Prochaine action
+                {t("nextAction")}
               </p>
               <p className="mt-0.5 text-sm font-medium leading-snug">
                 {insight.nextAction}

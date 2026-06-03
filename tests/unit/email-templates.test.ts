@@ -11,6 +11,7 @@ import {
 
 const APP = "https://liberia-wine.vercel.app";
 const UNSUB = `${APP}/unsubscribe?token=opaque`;
+const LOCALE = "fr"; // tests below assert French wording
 
 function shapeOK(r: { subject: string; html: string; text: string }) {
   expect(r.subject).toBeTruthy();
@@ -22,14 +23,18 @@ function shapeOK(r: { subject: string; html: string; text: string }) {
 }
 
 describe("email templates — shape stability", () => {
-  it("renders welcome email", () => {
-    const r = renderWelcomeEmail({ firstName: "Sébastien", appUrl: APP });
+  it("renders welcome email", async () => {
+    const r = await renderWelcomeEmail({
+      firstName: "Sébastien",
+      appUrl: APP,
+      locale: LOCALE,
+    });
     shapeOK(r);
     expect(r.subject.toLowerCase()).toContain("bienvenue");
   });
 
-  it("renders weekly recap", () => {
-    const r = renderWeeklyEmail({
+  it("renders weekly recap", async () => {
+    const r = await renderWeeklyEmail({
       firstName: "Sam",
       monthlyIncome: 2400,
       monthlyExpenses: 2000,
@@ -40,39 +45,43 @@ describe("email templates — shape stability", () => {
       planStepsRemaining: 11,
       unsubscribeUrl: UNSUB,
       appUrl: APP,
+      locale: LOCALE,
     });
     shapeOK(r);
     expect(r.subject).toContain("62");
   });
 
-  it("renders encouragement with optional metric", () => {
-    const r = renderEncouragementEmail({
+  it("renders encouragement with optional metric", async () => {
+    const r = await renderEncouragementEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
       headline: "Ton runway a atteint 2 mois.",
       metric: { label: "Runway", value: 2400, currency: "CHF" },
+      locale: LOCALE,
     });
     shapeOK(r);
     expect(r.html).toContain("Runway");
   });
 
-  it("renders trial-ending J-3 vs J-1 with distinct copy", () => {
-    const a = renderTrialEndingEmail({
+  it("renders trial-ending J-3 vs J-1 with distinct copy", async () => {
+    const a = await renderTrialEndingEmail({
       firstName: "Sam",
       appUrl: APP,
       daysLeft: 3,
       trialEndsAt: "2025-12-01T10:00:00Z",
       monthlyAmount: 14.99,
       currency: "CHF",
+      locale: LOCALE,
     });
-    const b = renderTrialEndingEmail({
+    const b = await renderTrialEndingEmail({
       firstName: "Sam",
       appUrl: APP,
       daysLeft: 1,
       trialEndsAt: "2025-12-01T10:00:00Z",
       monthlyAmount: 14.99,
       currency: "CHF",
+      locale: LOCALE,
     });
     shapeOK(a);
     shapeOK(b);
@@ -81,19 +90,20 @@ describe("email templates — shape stability", () => {
     expect(b.subject.toLowerCase()).toContain("demain");
   });
 
-  it("renders payment-failed without alarming language", () => {
-    const r = renderPaymentFailedEmail({
+  it("renders payment-failed without alarming language", async () => {
+    const r = await renderPaymentFailedEmail({
       firstName: "Sam",
       appUrl: APP,
       portalUrl: "https://billing.stripe.com/session/test",
+      locale: LOCALE,
     });
     shapeOK(r);
     expect(r.html.toLowerCase()).toContain("paiement");
     expect(r.text.toLowerCase()).not.toMatch(/danger|urgent|critique|immédiatement/);
   });
 
-  it("renders goal-milestone for each threshold with right wording", () => {
-    const r50 = renderGoalMilestoneEmail({
+  it("renders goal-milestone for each threshold with right wording", async () => {
+    const r50 = await renderGoalMilestoneEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
@@ -102,8 +112,9 @@ describe("email templates — shape stability", () => {
       currentAmount: 500,
       targetAmount: 1000,
       currency: "CHF",
+      locale: LOCALE,
     });
-    const r80 = renderGoalMilestoneEmail({
+    const r80 = await renderGoalMilestoneEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
@@ -112,8 +123,9 @@ describe("email templates — shape stability", () => {
       currentAmount: 800,
       targetAmount: 1000,
       currency: "CHF",
+      locale: LOCALE,
     });
-    const r100 = renderGoalMilestoneEmail({
+    const r100 = await renderGoalMilestoneEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
@@ -122,6 +134,7 @@ describe("email templates — shape stability", () => {
       currentAmount: 1000,
       targetAmount: 1000,
       currency: "CHF",
+      locale: LOCALE,
     });
     shapeOK(r50);
     shapeOK(r80);
@@ -131,30 +144,42 @@ describe("email templates — shape stability", () => {
     expect(r100.subject.toLowerCase()).toContain("atteint");
   });
 
-  it("renders inactivity with soft tone (no FOMO, no pressure)", () => {
-    const r = renderInactivityEmail({
+  it("renders inactivity with soft tone (no FOMO, no pressure)", async () => {
+    const r = await renderInactivityEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
       daysSinceLast: 14,
+      locale: LOCALE,
     });
     shapeOK(r);
     expect(r.text.toLowerCase()).not.toMatch(/last chance|trop tard|tu rates|fomo|action immédiate/);
   });
+
+  it("renders welcome email in EN when locale is en", async () => {
+    const r = await renderWelcomeEmail({
+      firstName: "Alex",
+      appUrl: APP,
+      locale: "en",
+    });
+    shapeOK(r);
+    expect(r.subject.toLowerCase()).toContain("welcome");
+  });
 });
 
 describe("email templates — XSS hardening", () => {
-  it("escapes user-provided strings (firstName)", () => {
-    const r = renderWelcomeEmail({
+  it("escapes user-provided strings (firstName)", async () => {
+    const r = await renderWelcomeEmail({
       firstName: '<script>alert("x")</script>',
       appUrl: APP,
+      locale: LOCALE,
     });
     expect(r.html).not.toContain("<script>alert");
     expect(r.html).toContain("&lt;script&gt;");
   });
 
-  it("escapes goal titles", () => {
-    const r = renderGoalMilestoneEmail({
+  it("escapes goal titles", async () => {
+    const r = await renderGoalMilestoneEmail({
       firstName: "Sam",
       appUrl: APP,
       unsubscribeUrl: UNSUB,
@@ -163,6 +188,7 @@ describe("email templates — XSS hardening", () => {
       currentAmount: 800,
       targetAmount: 1000,
       currency: "CHF",
+      locale: LOCALE,
     });
     expect(r.html).not.toContain('<img onerror');
     expect(r.html).toContain("&lt;img");

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Map, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -11,7 +12,8 @@ interface PlanTeaserProps {
   aiReady: boolean;
 }
 
-export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
+export async function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
+  const t = await getTranslations("dashboard.planTeaser");
   if (!plan) {
     return (
       <Card>
@@ -24,10 +26,10 @@ export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
               >
                 <Map className="h-3.5 w-3.5" />
               </span>
-              Ton plan financier
+              {t("emptyTitle")}
             </CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
-              Un plan d'actions sur 30, 60 ou 90 jours basé sur tes données.
+              {t("emptyDescription")}
             </p>
           </div>
         </CardHeader>
@@ -35,7 +37,7 @@ export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
           <Button asChild variant="gold" size="sm" disabled={!aiReady}>
             <Link href="/plan">
               <Sparkles className="h-3.5 w-3.5" />
-              {aiReady ? "Générer mon plan" : "Bientôt disponible"}
+              {aiReady ? t("generate") : t("comingSoon")}
             </Link>
           </Button>
         </CardContent>
@@ -62,12 +64,12 @@ export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
             <span className="truncate">{plan.title}</span>
           </CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">
-            Plan {plan.horizon_days} jours · {done}/{total} étapes
+            {t("subtitle", { days: plan.horizon_days, done, total })}
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/plan">
-            Ouvrir <ArrowRight className="h-3.5 w-3.5" />
+            {t("open")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </Button>
       </CardHeader>
@@ -79,7 +81,7 @@ export function PlanTeaser({ plan, steps, aiReady }: PlanTeaserProps) {
         {nextStep && (
           <div className="rounded-xl border border-border/60 bg-secondary/30 p-3">
             <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-              Prochaine étape · semaine {nextStep.week_number}
+              {t("nextStepLabel", { week: nextStep.week_number })}
             </p>
             <p className="mt-1 text-sm font-medium">{nextStep.title}</p>
             {nextStep.description && (

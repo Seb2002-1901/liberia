@@ -58,6 +58,39 @@ export function isLanguageId(value: unknown): value is LanguageId {
 }
 
 /**
+ * English name for each supported language tag — used to inject a
+ * "Respond exclusively in {name}" line into the Coach IA system
+ * prompt. We keep this in English because Claude reliably honours
+ * English instructions across locales, regardless of which language
+ * the rest of the prompt is in.
+ */
+const ENGLISH_NAMES: Record<LanguageId, string> = {
+  fr: "French",
+  "fr-CH": "Swiss French",
+  "fr-FR": "French (France)",
+  en: "English",
+  "en-US": "English (US)",
+  "en-GB": "English (UK)",
+  de: "German",
+  it: "Italian",
+  es: "Spanish",
+  pt: "Portuguese",
+  hr: "Croatian",
+  sr: "Serbian",
+  bs: "Bosnian",
+  sq: "Albanian",
+  tr: "Turkish",
+  ar: "Arabic",
+};
+
+export function getLanguageEnglishName(
+  language: string | null | undefined,
+): string {
+  if (language && isLanguageId(language)) return ENGLISH_NAMES[language];
+  return ENGLISH_NAMES.en;
+}
+
+/**
  * Resolve a BCP-47 tag suitable for `Intl.NumberFormat` /
  * `Intl.DateTimeFormat`. If the language already carries a region
  * (e.g. `'fr-CH'`, `'en-GB'`) it is returned as-is. Otherwise, when

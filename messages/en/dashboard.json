@@ -35,5 +35,140 @@
     "runwaySolidText": "Keep it intact, that's your peace of mind.",
     "runwayBuildingTitle": "Emergency fund growing",
     "runwayBuildingText": "Aim progressively for 3 months of expenses."
+  },
+  "dailyInsight": {
+    "eyebrow": "Insight of the day",
+    "deepen": "Dig deeper with the coach",
+    "nextAction": "Next action"
+  },
+  "weeklyRecap": {
+    "eyebrow": "This week",
+    "deltaUp": "+{delta} vs last week",
+    "deltaDown": "{delta} vs last week",
+    "deltaSame": "same pace",
+    "activeDay": "active day",
+    "activeDays": "active days",
+    "entry": "movement",
+    "entries": "movements",
+    "step": "step",
+    "steps": "steps",
+    "victoryLabel": "Worth remembering",
+    "nextPriorityLabel": "Next priority",
+    "actions": {
+      "checkin": "Do a check-in",
+      "viewPlan": "View my plan",
+      "myGoals": "My goals"
+    }
+  },
+  "proactiveCard": {
+    "eyebrow": "Coach"
+  },
+  "planTeaser": {
+    "emptyTitle": "Your financial plan",
+    "emptyDescription": "A 30, 60 or 90-day action plan based on your data.",
+    "generate": "Generate my plan",
+    "comingSoon": "Coming soon",
+    "subtitle": "{days}-day plan · {done}/{total} steps",
+    "open": "Open",
+    "nextStepLabel": "Next step · week {week}"
+  },
+  "coachTeaser": {
+    "title": "Insights",
+    "subtitle": "Markers computed from your data.",
+    "coachCta": "Coach",
+    "empty": "Add some income and expenses to see your first insights.",
+    "askCta": "Ask the coach a question",
+    "labels": {
+      "cashflowNegative": "Negative take-home",
+      "savingsLow": "Low savings rate",
+      "savingsGood": "Good margin",
+      "emergencyFund": "Emergency fund"
+    },
+    "texts": {
+      "categoryShare": "This category is {pct}% of your expenses ({amount}/month). Try −20% for one month?",
+      "cashflowNegative": "You're spending about {amount} more than you earn. We can dig into where to cut.",
+      "savingsLow": "Currently {rate}. Even a symbolic automatic transfer secures the habit.",
+      "savingsGood": "{rate} savings rate. You can speed up a goal or consolidate the emergency fund.",
+      "emergencyLow": "Less than one month of expenses set aside. First step: aim for 1 month.",
+      "emergencyBuilding": "{months} months covered. Next solid tier: 3 months."
+    }
+  },
+  "stability": {
+    "label": "Financial stability",
+    "tiers": {
+      "danger": {
+        "label": "Strained",
+        "description": "We pick things back up step by step."
+      },
+      "warning": {
+        "label": "Fragile",
+        "description": "Focus on the essential expenses."
+      },
+      "neutral": {
+        "label": "Progressing",
+        "description": "A few adjustments will make the difference."
+      },
+      "success": {
+        "label": "Stable",
+        "description": "You're on the right track."
+      },
+      "gold": {
+        "label": "Solid",
+        "description": "You're building on healthy foundations."
+      }
+    }
+  },
+  "expenseBreakdown": {
+    "title": "Expense breakdown",
+    "empty": "No expenses recorded yet."
+  },
+  "goalsSummary": {
+    "title": "Goals",
+    "active": "Active goals",
+    "all": "All",
+    "emptyTitle": "No goals yet",
+    "emptyDescription": "Create your first financial goal to move forward step by step.",
+    "emptyCta": "Create a goal"
+  },
+  "cashflowChart": {
+    "title": "Monthly flow",
+    "preview": "Smoothed preview",
+    "monthsAgo": "−{n} mo",
+    "thisMonth": "This month",
+    "income": "Income",
+    "expenses": "Expenses"
+  },
+  "categories": {
+    "expenses": {
+      "housing": "Housing",
+      "food": "Food",
+      "transport": "Transport",
+      "utilities": "Bills & energy",
+      "insurance": "Insurance",
+      "health": "Health",
+      "debt": "Credit / Debt",
+      "subscriptions": "Subscriptions",
+      "leisure": "Leisure",
+      "shopping": "Shopping",
+      "family": "Family / Children",
+      "education": "Education",
+      "other": "Other"
+    },
+    "frequencies": {
+      "monthly": "Monthly",
+      "weekly": "Weekly",
+      "yearly": "Yearly",
+      "one_time": "One-off"
+    },
+    "incomeCategories": {
+      "salary": "Salary",
+      "freelance": "Freelance / Self-employed",
+      "investment": "Investment income",
+      "pension": "Pension",
+      "rental": "Rental",
+      "benefits": "Benefits",
+      "side_hustle": "Side hustle",
+      "other": "Other"
+    }
   }
 }
