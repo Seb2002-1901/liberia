@@ -19,11 +19,13 @@ interface DailyInsightCardProps {
   behaviorTraits: string[];
   coachingTone?: "calm" | "direct" | "structured" | "gentle";
   currency: string;
+  locale?: string;
   aiReady: boolean;
 }
 
 export async function DailyInsightCard(props: DailyInsightCardProps) {
   const t = await getTranslations("dashboard.dailyInsight");
+  const tInsight = await getTranslations("dashboard.insights");
   const insight = generateLocalInsight({
     ...props,
     coachingTone: props.coachingTone,
@@ -63,16 +65,18 @@ export async function DailyInsightCard(props: DailyInsightCardProps) {
 
         <div>
           <h2 className="font-display text-lg font-semibold leading-snug sm:text-xl">
-            {insight.headline}
+            {tInsight(insight.headlineKey, insight.params)}
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">{insight.body}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {tInsight(insight.bodyKey, insight.params)}
+          </p>
         </div>
 
         <div className="flex flex-wrap items-stretch gap-3">
-          {insight.metric && (
+          {insight.metric && insight.metricLabelKey && (
             <div className="inline-flex flex-col rounded-xl border border-border/60 bg-background/60 px-4 py-2.5">
               <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                {insight.metricLabel}
+                {tInsight(insight.metricLabelKey)}
               </span>
               <span className="mt-0.5 font-display text-base font-semibold text-[hsl(var(--gold))]">
                 {insight.metric}
@@ -88,7 +92,7 @@ export async function DailyInsightCard(props: DailyInsightCardProps) {
                 {t("nextAction")}
               </p>
               <p className="mt-0.5 text-sm font-medium leading-snug">
-                {insight.nextAction}
+                {tInsight(insight.nextActionKey, insight.params)}
               </p>
             </div>
           </div>

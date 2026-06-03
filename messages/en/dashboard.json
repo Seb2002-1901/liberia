@@ -41,6 +41,54 @@
     "deepen": "Dig deeper with the coach",
     "nextAction": "Next action"
   },
+  "insights": {
+    "cashflowNegative": {
+      "headline": "You're spending about {gap} more than you earn each month.",
+      "bodyAvoidant": "Uncomfortable to look at — that's normal. We'll go gently, one expense at a time.",
+      "bodyDefault": "Good news: it's measurable, so it's addressable. We aim at one category at a time.",
+      "metricLabel": "Monthly gap",
+      "nextAction": "Identify a recurring expense you can cut by about {targetCut} this month."
+    },
+    "highDti": {
+      "headline": "Your repayments are {pct}% of your income.",
+      "body": "Above 30%, they weigh heavily on your take-home. We can lower this ratio before targeting savings.",
+      "metricLabel": "Debt / income",
+      "nextAction": "List your loans by interest rate and concentrate on the most expensive one."
+    },
+    "emergencyFundFirst": {
+      "headline": "Your first milestone: build one month of expenses aside.",
+      "bodyAnxious": "A financial cushion reduces daily anxiety — even small, it changes everything.",
+      "bodyDefault": "An emergency fund protects you from surprises before aiming at more ambitious goals.",
+      "metricLabel": "Suggested automatic transfer",
+      "nextAction": "Schedule an automatic transfer of {monthlyTarget} at the start of the month to a separate account."
+    },
+    "lowSavings": {
+      "headline": "You could probably free up around {estimate} per month.",
+      "body": "Non-essential categories often represent 5-10% of expenses without you noticing. A quick review is enough.",
+      "metricLabel": "Estimated potential margin",
+      "nextAction": "Review your active subscriptions and cut those you haven't used this month."
+    },
+    "solidAcceleration": {
+      "headline": "You already save {pct}% of your income.",
+      "body": "Your base is solid. You can speed up a goal, consolidate your emergency fund, or start putting part of your savings to work.",
+      "metricLabel": "Monthly savings capacity",
+      "nextAction": "Pick a 6-to-12-month numbered goal and aim part of your take-home at it."
+    },
+    "intermediate": {
+      "headlinePositive": "You could save about {projection} over 12 months at your current pace.",
+      "headlineNeutral": "You're at balance — that's a healthy working base.",
+      "bodyDirect": "You have the base. Set a 90-day numbered target and act.",
+      "bodyStructured": "Set 1 measurable habit, give yourself a weekly milestone, measure in 30 days.",
+      "bodyGentle": "Little by little, simple adjustments compound. No pressure, just consistency.",
+      "bodyMotivated": "You seem ready to act. We can turn that energy into simple habits that stick.",
+      "bodyCalm": "Little by little, simple adjustments compound. The goal isn't perfection but consistency.",
+      "metricLabelPositive": "12-month projection",
+      "metricLabelNeutral": "Monthly take-home",
+      "nextActionStructured": "Set 1 key metric (savings rate, runway) and track it weekly for 30 days.",
+      "nextActionDirect": "Pick 1 concrete financial habit and launch it this week — automatic transfer or shopping cap.",
+      "nextActionCalm": "Set 1 financial habit to test for 30 days — automatic transfer, shopping budget, or weekly review."
+    }
+  },
   "weeklyRecap": {
     "eyebrow": "This week",
     "deltaUp": "+{delta} vs last week",
@@ -54,6 +102,24 @@
     "steps": "steps",
     "victoryLabel": "Worth remembering",
     "nextPriorityLabel": "Next priority",
+    "victories": {
+      "stepOne": "One plan step validated this week — every tier counts.",
+      "stepsMany": "{count} plan steps validated this week — solid consistency.",
+      "activeFive": "Steady presence this week — that's what makes the long-run difference.",
+      "activeThree": "Several active days this week — the rhythm is building.",
+      "runwaySolid": "Your emergency fund stays solid. Keep preserving it.",
+      "savingsRateHigh": "Your savings rate stays above 15% — that's rare and precious.",
+      "activeOne": "You came back this week. Consistency beats intensity.",
+      "presence": "You're here. That's already a first step — we resume gently."
+    },
+    "priorities": {
+      "cashflowNegative": "Pick one expense to cut this week — start with the easiest.",
+      "noEmergency": "Schedule an automatic transfer to a separate savings account.",
+      "planContinue": "Continue your plan — the next step is in the Plan tab.",
+      "subscriptions": "Review your active subscriptions — that's the highest-impact action.",
+      "twelveMonthGoal": "Pick a 12-month numbered goal and aim part of your take-home at it.",
+      "trackingHabit": "Log 1 or 2 expenses this week to keep the tracking reflex."
+    },
     "actions": {
       "checkin": "Do a check-in",
       "viewPlan": "View my plan",
@@ -61,7 +127,36 @@
     }
   },
   "proactiveCard": {
-    "eyebrow": "Coach"
+    "eyebrow": "Coach",
+    "longInactive": {
+      "headlineDirect": "It's been a few days — let's check in?",
+      "headlineStructured": "A few days without tracking — let's resume gently.",
+      "headlineCalm": "We haven't seen each other in a few days. Want to ease back in?",
+      "actionLabel": "Check in with the coach"
+    },
+    "goalClose": {
+      "headline": "Your goal « {title} » is at {pct}%.",
+      "body": "Only {remaining} left to close it.",
+      "actionLabel": "See my goals"
+    },
+    "tightMonth": {
+      "headlineDirect": "Your expenses exceed your income by about {gap}/month.",
+      "headlineCalm": "A tight month — about {gap} more than your income.",
+      "bodyGentle": "No panic. One expense at a time is enough.",
+      "bodyCalm": "We can tackle one category at a time, no pressure.",
+      "actionLabel": "Talk to the coach"
+    },
+    "solidProgress": {
+      "headline": "You're moving in the right direction.",
+      "body": "Runway of {months} months and savings rate above 15%.",
+      "bodyNoExpense": "Savings rate above 15% and no recurring charges — solid.",
+      "actionLabel": "Set a 12-month goal"
+    },
+    "emergencyGap": {
+      "headline": "You don't have a dedicated emergency fund yet.",
+      "body": "Starting small is enough — automation does the rest.",
+      "actionLabel": "See my plan"
+    }
   },
   "planTeaser": {
     "emptyTitle": "Your financial plan",

@@ -86,7 +86,7 @@ describe("generateProactiveHint — priority order", () => {
       goals: [goal({ current_amount: 850, target_amount: 1000 })],
     });
     expect(hint?.kind).toBe("goal_close");
-    expect(hint?.headline).toContain("85%");
+    expect(hint?.params.pct).toBe(85);
   });
 
   it("returns tight_month when cashflow is negative", () => {
@@ -168,6 +168,6 @@ describe("generateProactiveHint — tone adapts headline", () => {
       expenses: [expense({ created_at: TEN_DAYS_AGO, updated_at: TEN_DAYS_AGO })],
       coachingTone: "gentle",
     });
-    expect(direct?.headline).not.toBe(gentle?.headline);
+    expect(direct?.headlineKey).not.toBe(gentle?.headlineKey);
   });
 });

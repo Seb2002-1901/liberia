@@ -113,6 +113,7 @@ export default async function DashboardPage() {
     hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
     monthlyExpenses,
     currency: data.profile.currency,
+    locale: data.profile.locale,
     behaviorTraits: data.financialProfile?.behavior_traits ?? [],
     coachingTone: memory?.coaching_tone ?? null,
     memory,
@@ -153,6 +154,7 @@ export default async function DashboardPage() {
         behaviorTraits={data.financialProfile?.behavior_traits ?? []}
         coachingTone={coachingTone}
         currency={data.profile.currency}
+        locale={data.profile.locale}
         aiReady={isAnthropicConfigured() && isAdminConfigured()}
       />
 

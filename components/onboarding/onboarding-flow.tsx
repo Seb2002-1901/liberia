@@ -544,6 +544,7 @@ function StepContent({
 function InsightStep({ form }: { form: FormState }) {
   const t = useTranslations("onboarding.steps.insight");
   const tParent = useTranslations("onboarding");
+  const tInsight = useTranslations("dashboard.insights");
   const insight = React.useMemo(
     () =>
       generateLocalInsight({
@@ -582,13 +583,15 @@ function InsightStep({ form }: { form: FormState }) {
           </p>
         </div>
         <h2 className="mt-3 font-display text-xl font-semibold leading-snug sm:text-2xl">
-          {insight.headline}
+          {tInsight(insight.headlineKey, insight.params)}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{insight.body}</p>
-        {insight.metric && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          {tInsight(insight.bodyKey, insight.params)}
+        </p>
+        {insight.metric && insight.metricLabelKey && (
           <div className="mt-5 inline-flex flex-col rounded-xl border border-border/60 bg-background/60 px-4 py-3">
             <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              {insight.metricLabel}
+              {tInsight(insight.metricLabelKey)}
             </span>
             <span className="mt-0.5 font-display text-lg font-semibold text-[hsl(var(--gold))]">
               {insight.metric}
@@ -607,7 +610,7 @@ function InsightStep({ form }: { form: FormState }) {
               {t("nextAction")}
             </p>
             <p className="mt-1 text-sm font-medium leading-relaxed">
-              {insight.nextAction}
+              {tInsight(insight.nextActionKey, insight.params)}
             </p>
           </div>
         </div>

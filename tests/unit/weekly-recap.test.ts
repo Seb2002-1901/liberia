@@ -127,7 +127,7 @@ describe("generateWeeklyRecap — copy adapts to context", () => {
       planSteps: [step({ is_completed: true, completed_at: FIVE_DAYS_AGO })],
       now: NOW,
     });
-    expect(recap.victory.toLowerCase()).toMatch(/étape|palier/);
+    expect(recap.victory.key).toMatch(/victories\.step/);
   });
 
   it("priority targets cashflow when negative", () => {
@@ -140,7 +140,7 @@ describe("generateWeeklyRecap — copy adapts to context", () => {
       planSteps: [],
       now: NOW,
     });
-    expect(recap.nextPriority.toLowerCase()).toMatch(/dépense|réduire/);
+    expect(recap.nextPriority.key).toBe("priorities.cashflowNegative");
   });
 
   it("priority targets fund creation when none and cashflow positive", () => {
@@ -154,7 +154,7 @@ describe("generateWeeklyRecap — copy adapts to context", () => {
       planSteps: [],
       now: NOW,
     });
-    expect(recap.nextPriority.toLowerCase()).toMatch(/virement|épargne|fonds/);
+    expect(recap.nextPriority.key).toBe("priorities.noEmergency");
   });
 
   it("never emits NaN / undefined / null", () => {

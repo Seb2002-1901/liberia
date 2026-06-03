@@ -41,6 +41,54 @@
     "deepen": "Approfondir avec le coach",
     "nextAction": "Prochaine action"
   },
+  "insights": {
+    "cashflowNegative": {
+      "headline": "Tu dépenses environ {gap} de plus que tu ne gagnes chaque mois.",
+      "bodyAvoidant": "C'est inconfortable à regarder, c'est normal. On va y aller doucement, une dépense à la fois.",
+      "bodyDefault": "Bonne nouvelle : c'est mesurable, donc adressable. On va viser un poste à la fois.",
+      "metricLabel": "Écart mensuel",
+      "nextAction": "Identifie une dépense récurrente que tu peux réduire d'environ {targetCut} ce mois-ci."
+    },
+    "highDti": {
+      "headline": "Tes remboursements représentent {pct}% de tes revenus.",
+      "body": "Au-delà de 30%, ils pèsent fortement sur ton reste à vivre. On peut réduire ce ratio avant de viser l'épargne.",
+      "metricLabel": "Dette / revenus",
+      "nextAction": "Liste tes crédits par taux d'intérêt et concentre tes efforts sur le plus coûteux."
+    },
+    "emergencyFundFirst": {
+      "headline": "Ton premier palier : construire 1 mois de dépenses de côté.",
+      "bodyAnxious": "Un coussin financier réduit l'anxiété quotidienne — même petit, il change tout.",
+      "bodyDefault": "Un fonds d'urgence te protège des imprévus avant de viser des objectifs plus ambitieux.",
+      "metricLabel": "Virement automatique suggéré",
+      "nextAction": "Programme un virement automatique de {monthlyTarget} en début de mois vers un compte séparé."
+    },
+    "lowSavings": {
+      "headline": "Tu pourrais probablement libérer environ {estimate} par mois.",
+      "body": "Les postes non essentiels représentent souvent 5 à 10% des dépenses sans qu'on s'en rende compte. Une revue rapide suffit.",
+      "metricLabel": "Marge potentielle estimée",
+      "nextAction": "Passe en revue tes abonnements actifs et coupe ceux que tu n'as pas utilisés ce mois-ci."
+    },
+    "solidAcceleration": {
+      "headline": "Tu épargnes déjà {pct}% de tes revenus.",
+      "body": "Ta base est solide. Tu peux accélérer un objectif, consolider ton fonds d'urgence ou commencer à faire travailler une partie de l'épargne.",
+      "metricLabel": "Capacité d'épargne mensuelle",
+      "nextAction": "Choisis un objectif chiffré sur 6 à 12 mois et flèche-y une part de ton reste à vivre."
+    },
+    "intermediate": {
+      "headlinePositive": "Tu pourrais épargner environ {projection} sur 12 mois à ton rythme actuel.",
+      "headlineNeutral": "Tu es à l'équilibre — c'est une base de travail saine.",
+      "bodyDirect": "Tu as la base. Pose un cap chiffré sur 90 jours et passe à l'action.",
+      "bodyStructured": "Pose 1 habitude mesurable, donne-toi un jalon hebdo, mesure dans 30 jours.",
+      "bodyGentle": "Petit à petit, des ajustements simples compoundent. Pas de pression, juste la régularité.",
+      "bodyMotivated": "Tu sembles prêt·e à passer à l'action. On peut transformer cette énergie en habitudes simples qui tiennent.",
+      "bodyCalm": "Petit à petit, des ajustements simples compoundent. L'objectif n'est pas la perfection mais la régularité.",
+      "metricLabelPositive": "Projection 12 mois",
+      "metricLabelNeutral": "Reste à vivre mensuel",
+      "nextActionStructured": "Définis 1 indicateur clé (taux d'épargne, runway) et trace-le chaque semaine pendant 30 jours.",
+      "nextActionDirect": "Choisis 1 habitude financière concrète et lance-la cette semaine — virement automatique ou plafond shopping.",
+      "nextActionCalm": "Définis 1 habitude financière à tester pendant 30 jours — virement automatique, budget shopping, ou revue hebdo."
+    }
+  },
   "weeklyRecap": {
     "eyebrow": "Cette semaine",
     "deltaUp": "+{delta} vs semaine précédente",
@@ -54,6 +102,24 @@
     "steps": "étapes",
     "victoryLabel": "On retient",
     "nextPriorityLabel": "Prochaine priorité",
+    "victories": {
+      "stepOne": "Une étape de plan validée cette semaine — chaque palier compte.",
+      "stepsMany": "{count} étapes de plan validées cette semaine — belle régularité.",
+      "activeFive": "Présence régulière cette semaine — c'est ce qui fait la différence sur la durée.",
+      "activeThree": "Plusieurs jours d'activité cette semaine — la cadence se construit.",
+      "runwaySolid": "Ton fonds d'urgence reste solide. Continue à le préserver.",
+      "savingsRateHigh": "Ton taux d'épargne reste au-dessus de 15% — c'est rare et précieux.",
+      "activeOne": "Tu es revenu·e cette semaine. La régularité prime sur l'intensité.",
+      "presence": "Tu es là. C'est déjà un premier pas — on reprend tranquillement."
+    },
+    "priorities": {
+      "cashflowNegative": "Identifie une seule dépense à réduire cette semaine — on commence par la plus simple.",
+      "noEmergency": "Programme un virement automatique vers un compte épargne séparé.",
+      "planContinue": "Continue ton plan — la prochaine étape est dans l'onglet Plan.",
+      "subscriptions": "Passe en revue tes abonnements actifs — c'est l'action avec le meilleur impact.",
+      "twelveMonthGoal": "Choisis un objectif chiffré sur 12 mois et flèche-y une part de ton reste à vivre.",
+      "trackingHabit": "Note 1 ou 2 dépenses cette semaine pour garder le réflexe de suivi."
+    },
     "actions": {
       "checkin": "Faire un check-in",
       "viewPlan": "Voir mon plan",
@@ -61,7 +127,36 @@
     }
   },
   "proactiveCard": {
-    "eyebrow": "Coach"
+    "eyebrow": "Coach",
+    "longInactive": {
+      "headlineDirect": "Ça fait quelques jours — on fait le point ?",
+      "headlineStructured": "Quelques jours sans suivi — on reprend tranquillement.",
+      "headlineCalm": "On ne s'est pas vu·s depuis quelques jours. On reprend en douceur ?",
+      "actionLabel": "Faire le point avec le coach"
+    },
+    "goalClose": {
+      "headline": "Ton objectif « {title} » est à {pct}%.",
+      "body": "Plus que {remaining} pour le boucler.",
+      "actionLabel": "Voir mes objectifs"
+    },
+    "tightMonth": {
+      "headlineDirect": "Tes dépenses dépassent tes revenus d'environ {gap}/mois.",
+      "headlineCalm": "Mois un peu tendu — environ {gap} de plus que tes revenus.",
+      "bodyGentle": "Pas de panique. Une dépense à la fois suffit.",
+      "bodyCalm": "On peut s'attaquer à un poste à la fois, sans pression.",
+      "actionLabel": "Parler au coach"
+    },
+    "solidProgress": {
+      "headline": "Tu avances dans la bonne direction.",
+      "body": "Runway de {months} mois et taux d'épargne au-dessus de 15%.",
+      "bodyNoExpense": "Taux d'épargne au-dessus de 15% et aucune charge récurrente — solide.",
+      "actionLabel": "Définir un objectif 12 mois"
+    },
+    "emergencyGap": {
+      "headline": "Tu n'as pas encore de fonds d'urgence dédié.",
+      "body": "Démarrer petit suffit — l'important c'est l'automatisation.",
+      "actionLabel": "Voir mon plan"
+    }
   },
   "planTeaser": {
     "emptyTitle": "Ton plan financier",

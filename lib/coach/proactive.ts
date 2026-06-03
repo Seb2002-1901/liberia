@@ -13,6 +13,10 @@
  *
  * If nothing meaningful applies, returns null and the card is hidden —
  * silence is better than fake encouragement.
+ *
+ * Locale: the helper returns translation KEYS + params instead of raw
+ * strings. The rendering component (ProactiveCoachCard) looks them up
+ * via `dashboard.proactiveCard.*` in the user's locale.
  */
 import { resolveCoachingTone } from "@/lib/coach/tone";
 import { formatCurrency } from "@/lib/utils";
@@ -36,6 +40,7 @@ export type ProactiveInput = {
   hasEmergencyFund: boolean;
   monthlyExpenses: number;
   currency?: string;
+  locale?: string;
   behaviorTraits?: readonly string[];
   coachingTone?: CoachingTone | null;
   memory?: UserMemory | null;
@@ -52,12 +57,15 @@ export type ProactiveKind =
 
 export type ProactiveHint = {
   kind: ProactiveKind;
-  /** 1 short sentence — what the coach noticed. */
-  headline: string;
-  /** Optional 1-line context. */
-  body?: string;
-  /** Suggested CTA. */
-  action: { label: string; href: string };
+  /**
+   * Translation key under `dashboard.proactiveCard.*` (omits the
+   * leading namespace prefix the consumer scopes to).
+   */
+  headlineKey: string;
+  bodyKey?: string;
+  /** ICU params for headline / body. */
+  params: Record<string, string | number>;
+  action: { href: string; labelKey: string };
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -92,23 +100,25 @@ function lastActivityMs(input: ProactiveInput): number {
 export function generateProactiveHint(input: ProactiveInput): ProactiveHint | null {
   const now = (input.now ?? new Date()).getTime();
   const tone = resolveCoachingTone(input.coachingTone ?? null, input.behaviorTraits ?? []);
-  const fmt = (n: number) => formatCurrency(n, input.currency ?? "CHF");
+  const currency = input.currency ?? "CHF";
+  const fmt = (n: number) => formatCurrency(n, currency, input.locale);
 
-  // 1. Long inactive — no activity in the last 7 days. Requires the
-  // user to have at least some data (otherwise it's just a new account).
+  // 1. Long inactive — no activity in the last 7 days.
   const last = lastActivityMs(input);
   const hasAnyData =
     input.incomes.length + input.expenses.length + input.goals.length > 0;
   if (hasAnyData && Number.isFinite(last) && now - last > 7 * MS_PER_DAY) {
+    const headlineKey =
+      tone === "direct"
+        ? "longInactive.headlineDirect"
+        : tone === "structured"
+          ? "longInactive.headlineStructured"
+          : "longInactive.headlineCalm";
     return {
       kind: "long_inactive",
-      headline:
-        tone === "direct"
-          ? "Ça fait quelques jours — on fait le point ?"
-          : tone === "structured"
-            ? "Quelques jours sans suivi — on reprend tranquillement."
-            : "On ne s'est pas vu·s depuis quelques jours. On reprend en douceur ?",
-      action: { label: "Faire le point avec le coach", href: "/coach" },
+      headlineKey,
+      params: {},
+      action: { href: "/coach", labelKey: "longInactive.actionLabel" },
     };
   }
 
@@ -124,9 +134,14 @@ export function generateProactiveHint(input: ProactiveInput): ProactiveHint | nu
     const pct = Math.round((closeGoal.current_amount / closeGoal.target_amount) * 100);
     return {
       kind: "goal_close",
-      headline: `Ton objectif « ${closeGoal.title} » est à ${pct}%.`,
-      body: `Plus que ${fmt(closeGoal.target_amount - closeGoal.current_amount)} pour le boucler.`,
-      action: { label: "Voir mes objectifs", href: "/goals" },
+      headlineKey: "goalClose.headline",
+      bodyKey: "goalClose.body",
+      params: {
+        title: closeGoal.title,
+        pct,
+        remaining: fmt(closeGoal.target_amount - closeGoal.current_amount),
+      },
+      action: { href: "/goals", labelKey: "goalClose.actionLabel" },
     };
   }
 
@@ -135,31 +150,25 @@ export function generateProactiveHint(input: ProactiveInput): ProactiveHint | nu
     const gap = Math.abs(input.cashflow);
     return {
       kind: "tight_month",
-      headline:
+      headlineKey:
         tone === "direct"
-          ? `Tes dépenses dépassent tes revenus d'environ ${fmt(gap)}/mois.`
-          : `Mois un peu tendu — environ ${fmt(gap)} de plus que tes revenus.`,
-      body:
-        tone === "gentle"
-          ? "Pas de panique. Une dépense à la fois suffit."
-          : "On peut s'attaquer à un poste à la fois, sans pression.",
-      action: { label: "Parler au coach", href: "/coach" },
+          ? "tightMonth.headlineDirect"
+          : "tightMonth.headlineCalm",
+      bodyKey: tone === "gentle" ? "tightMonth.bodyGentle" : "tightMonth.bodyCalm",
+      params: { gap: fmt(gap) },
+      action: { href: "/coach", labelKey: "tightMonth.actionLabel" },
     };
   }
 
   // 4. Solid progress — runway ≥ 3 mo and savings rate ≥ 15%.
   if (input.runway >= 3 && input.savingsRate >= 0.15) {
-    // Runway is currentSavings/monthlyExpenses — Infinity when expenses=0.
-    // Don't surface "Runway de Infinity mois" to the user; switch to a
-    // simpler savings-rate-only phrasing in that edge case.
-    const body = Number.isFinite(input.runway)
-      ? `Runway de ${input.runway.toFixed(1)} mois et taux d'épargne au-dessus de 15%.`
-      : "Taux d'épargne au-dessus de 15% et aucune charge récurrente — solide.";
+    const finiteRunway = Number.isFinite(input.runway);
     return {
       kind: "solid_progress",
-      headline: "Tu avances dans la bonne direction.",
-      body,
-      action: { label: "Définir un objectif 12 mois", href: "/goals" },
+      headlineKey: "solidProgress.headline",
+      bodyKey: finiteRunway ? "solidProgress.body" : "solidProgress.bodyNoExpense",
+      params: finiteRunway ? { months: input.runway.toFixed(1) } : {},
+      action: { href: "/goals", labelKey: "solidProgress.actionLabel" },
     };
   }
 
@@ -167,9 +176,10 @@ export function generateProactiveHint(input: ProactiveInput): ProactiveHint | nu
   if (!input.hasEmergencyFund && input.cashflow > 0 && input.monthlyExpenses > 0) {
     return {
       kind: "emergency_gap",
-      headline: "Tu n'as pas encore de fonds d'urgence dédié.",
-      body: "Démarrer petit suffit — l'important c'est l'automatisation.",
-      action: { label: "Voir mon plan", href: "/plan" },
+      headlineKey: "emergencyGap.headline",
+      bodyKey: "emergencyGap.body",
+      params: {},
+      action: { href: "/plan", labelKey: "emergencyGap.actionLabel" },
     };
   }
 

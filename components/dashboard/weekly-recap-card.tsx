@@ -75,13 +75,13 @@ export async function WeeklyRecapCard({ recap }: WeeklyRecapCardProps) {
             iconClassName="bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
             icon={<CheckCircle2 className="h-3 w-3" />}
             label={t("victoryLabel")}
-            text={recap.victory}
+            text={t(recap.victory.key, recap.victory.params)}
           />
           <Row
             iconClassName="bg-secondary text-foreground"
             icon={<Target className="h-3 w-3" />}
             label={t("nextPriorityLabel")}
-            text={recap.nextPriority}
+            text={t(recap.nextPriority.key, recap.nextPriority.params)}
           />
         </div>
 

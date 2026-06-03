@@ -3,6 +3,7 @@ import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
 import { generateLocalCoachReply } from "@/lib/coach/local";
+import { getTranslations } from "next-intl/server";
 import { normalizeCoachReply } from "@/lib/ai/normalize";
 import { truncateMessagesForBudget } from "@/lib/ai/budget";
 import {
@@ -267,21 +268,29 @@ export async function POST(request: Request) {
             totalMonthly(financeData.expenses) ||
             financeData.financialProfile?.monthly_expenses ||
             0;
-          const localReply = generateLocalCoachReply({
-            userMessage: parsed.data.content,
-            history: history.map((m) => ({
-              role: m.role as "user" | "assistant",
-              content: m.content,
-            })),
-            fullName: financeData.profile.full_name,
-            financialProfile: financeData.financialProfile,
-            memory,
-            monthlyIncome,
-            monthlyExpenses,
-            currentSavings: financeData.financialProfile?.current_savings ?? 0,
-            monthlyDebt: financeData.financialProfile?.monthly_debt ?? 0,
-            currency: financeData.profile.currency || "CHF",
+          const localT = await getTranslations({
+            locale: financeData.profile.locale ?? "fr",
+            namespace: "app.coach.local",
           });
+          const localReply = generateLocalCoachReply(
+            {
+              userMessage: parsed.data.content,
+              history: history.map((m) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              })),
+              fullName: financeData.profile.full_name,
+              financialProfile: financeData.financialProfile,
+              memory,
+              monthlyIncome,
+              monthlyExpenses,
+              currentSavings: financeData.financialProfile?.current_savings ?? 0,
+              monthlyDebt: financeData.financialProfile?.monthly_debt ?? 0,
+              currency: financeData.profile.currency || "CHF",
+              locale: financeData.profile.locale ?? "fr",
+            },
+            localT,
+          );
           assistantBuffer = localReply;
           send("delta", { text: localReply });
         }

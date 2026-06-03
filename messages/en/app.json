@@ -204,6 +204,91 @@
       "openListLabel": "Open conversation list",
       "buttonLabel": "Conversations",
       "dialogTitle": "My conversations"
+    },
+    "local": {
+      "openLine": {
+        "direct": "{ack}",
+        "structured": "{ack} Here's how I'd see it.",
+        "gentle": "{ack} No rush, we move at your pace.",
+        "calm": "{ack}"
+      },
+      "closeLine": {
+        "direct": "Where do we start?",
+        "structured": "Want me to detail one step in particular?",
+        "gentle": "Just tell me how you feel about all this.",
+        "calm": "Want to dig into one point in particular?"
+      },
+      "greeting": {
+        "hello": "Hi {name},",
+        "helloNoName": "Hi,",
+        "statusPositive": "your monthly take-home is **{cashflow}**.",
+        "statusNegative": "you're currently **{gap} short** of your monthly expenses — it's measurable, so it's addressable.",
+        "statusEmpty": "we can start as soon as you've entered your income and expenses.",
+        "bridge": "good to see you again.",
+        "promptDirect": "What do we tackle today?",
+        "promptStructured": "We can review 1 priority, 1 risk or 1 action — your call.",
+        "promptDefault": "How can I help you today?"
+      },
+      "thanks": {
+        "direct": "My pleasure. Keep going — consistency does it all.",
+        "structured": "My pleasure. Remember to note the outcome in LIBERIA so the trace stays.",
+        "gentle": "Thank YOU. Take your time, I'm here whenever you need.",
+        "calm": "My pleasure. We pick up when you want."
+      },
+      "nextAction": {
+        "ack": "Good question.",
+        "cashflowNegative": "Your current priority is to **reduce your monthly gap**. Today, identify **one single recurring expense** you can lower by about **{cut}** — a subscription, a delivery, a shopping category. You don't need to change everything, just place **a first lock**.",
+        "highDti": "Your repayments are **{pct}%** of your income — that's what's weighing the most right now. This week, list your loans by interest rate and concentrate your next efforts on the most expensive one.",
+        "noFund": "You don't have an emergency fund yet. That's your first milestone. Schedule **an automatic transfer of {target}** at the start of the month to a separate account. Symbolic at first, structural later.",
+        "lowSavings": "Your savings rate is low. This week, **review your active subscriptions** and cut those you haven't used this month. That's the action with the best effort / impact ratio.",
+        "habit": "You have a healthy base. **Pick a habit to test for 30 days**: an automatic transfer, a weekly shopping cap, or a Sunday evening financial review."
+      },
+      "stress": {
+        "ackDirect": "Financial stress is measurable and reducible.",
+        "ackStructured": "Got it. We'll break down what's weighing.",
+        "ackCalm": "I get it. Having money pressure is hard — and very common.",
+        "bodyCashflow": "The most likely trigger of your stress is the gap between income and expenses: currently **{gap} more** than what comes in. We can tackle this **one expense at a time**, not all at once.",
+        "bodyNoFund": "Without a reserve, every surprise becomes a crisis. The best way to lower your stress is to **start an emergency fund** — even symbolic. A cushion of a few hundred already changes the daily feel significantly.",
+        "bodyMental": "You're not in financial red zone, but the mental load can still weigh. A short weekly financial review (10 minutes) is often enough to mentally regain control."
+      },
+      "subscription": {
+        "ack": "Good lead — that's often where the most small leaks hide.",
+        "body": "**Quick method**: open your last 3 bank statements, highlight every recurring line, and ask yourself ONE question per line — \"Did I use it this month?\". Cut without hesitation those you answer no — you can always resubscribe. Aim for **1 subscription cut this week**, not 5 — consistency beats performance."
+      },
+      "savings": {
+        "ack": "Very good.",
+        "bodyNegative": "To be able to save, you first need to **free up take-home** — trying to put aside when you're negative creates guilt without results. Let's focus on cutting an expense first, then we talk about savings.",
+        "bodyPositive": "Your take-home is **{cashflow}/month**. If you start modestly with **{target}** automatically transferred at the start of the month to a separate account, you build the habit without feeling it. That automatic move is what makes the difference at 12 months."
+      },
+      "debt": {
+        "ack": "Important to talk about it clearly.",
+        "bodyHigh": "Your repayments are **{pct}%** of your income — above 30%, it's heavy. Strategy: **list your loans by interest rate** (from most expensive to least) and concentrate extra repayments on the most expensive. The others stay at minimum until that one is paid off.",
+        "bodyManageable": "Your repayments are **{pct}%** of your income — manageable. As long as it's under 25%, you can keep balancing repayment and savings. Above that, repayment first.",
+        "bodyNone": "You don't have any repayment declared in LIBERIA right now. If you have an ongoing loan that isn't logged yet, add it on the Expenses side so we can track it together."
+      },
+      "budget": {
+        "ack": "Let's take stock.",
+        "bodyData": "You have **{cashflow}** of take-home per month ({rate}% of your income). {tail}\n\nFor a cleaner budget, I suggest **3 mental envelopes**:\n- Fixed (rent, bills, insurance)\n- Variable (groceries, transport, going out)\n- Set aside (savings, accelerated debt)\n\nThis week, just look at how much each envelope actually weighs.",
+        "tailPositive": "That's your room to manoeuvre — that's what we build with.",
+        "tailNegative": "The gap is negative — we'll work on reducing it before anything else.",
+        "bodyEmpty": "I don't have your income and expenses yet. Enter them in LIBERIA — even an estimate is enough to start."
+      },
+      "goal": {
+        "ack": "Having a heading is what makes the difference.",
+        "emergencyWithAmount": "Your first reasonable milestone: **1 month of expenses** set aside (which is around **{monthlyExpenses}** in your case). Once reached, we aim for 3 months, then 6. Step by step.",
+        "emergencyNoAmount": "Your first reasonable milestone: **1 month of expenses** set aside. Once reached, we aim for 3 months, then 6. Step by step.",
+        "debtPayoff": "Your goal is to reduce debt. Set yourself a measurable tier on 90 days (e.g. close a credit card) rather than a total goal — it's more motivating.",
+        "generic": "Define your goal with **3 criteria**: a target amount, a deadline, and a monthly amount to set aside. Without these 3, the goal stays fuzzy. Set them in LIBERIA and we tackle it."
+      },
+      "unclear": {
+        "ackDirect": "So we cut to the essentials, two options.",
+        "ackStructured": "A few possible angles.",
+        "ackDefault": "No worries. We can start from a simple angle.",
+        "summaryWithData": "Your take-home is **{cashflow}/month**{fundNote}.",
+        "summaryEmpty": "Your financial data isn't filled in yet — we can start there.",
+        "fundNoteMissing": " and you don't have an emergency fund yet",
+        "options": "- Want to **cut an expense**? Say \"which expense to watch this week\".\n- Want to **start saving**? Say \"how to build an emergency fund\".\n- Want to **manage debt**? Say \"what to pay off first\".\n- Want **a general check-in**? Say \"give me a quick recap\"."
+      }
     }
   },
   "plan": {

@@ -10,6 +10,11 @@
  *  - never invent numbers — only echo what we computed from real fields
  *  - keep tone calm and concrete, never judgmental
  *  - one headline + one supporting line + one concrete next action
+ *
+ * Locale: the helper returns translation KEYS (under
+ * `dashboard.insights.*`) plus ICU params. The rendering component
+ * (DailyInsightCard, InsightStep) does the t() lookup so the same
+ * function powers any locale.
  */
 import { formatCurrency } from "@/lib/utils";
 
@@ -26,15 +31,21 @@ export type InsightInput = {
   /** Picked in /settings → Coaching memory, or derived from traits. */
   coachingTone?: "calm" | "direct" | "structured" | "gentle";
   currency?: string;
+  locale?: string;
 };
 
 export type Insight = {
-  headline: string;
-  body: string;
+  /** Translation key under `dashboard.insights.*`. */
+  headlineKey: string;
+  bodyKey: string;
+  nextActionKey: string;
+  /** May be null when there's no metric box to render. */
+  metricLabelKey: string | null;
+  /** Pre-formatted display string (currency/percent in user locale). */
   metric: string | null;
-  metricLabel: string | null;
   tone: "warning" | "neutral" | "positive";
-  nextAction: string;
+  /** ICU params shared by headline / body / nextAction. */
+  params: Record<string, string | number>;
 };
 
 const round = (n: number) => Math.round(n);
@@ -49,10 +60,9 @@ export function generateLocalInsight(input: InsightInput): Insight {
     behaviorTraits = [],
     coachingTone,
     currency = "CHF",
+    locale,
   } = input;
 
-  // Resolve the tone: explicit preference first, otherwise derive from
-  // traits — keeps the UI adaptive even before the user picks a style.
   const traits = new Set(behaviorTraits);
   const tone: "calm" | "direct" | "structured" | "gentle" =
     coachingTone ??
@@ -66,113 +76,119 @@ export function generateLocalInsight(input: InsightInput): Insight {
             ? "gentle"
             : "calm");
 
-  const fmt = (n: number) => formatCurrency(n, currency);
+  const fmt = (n: number) => formatCurrency(n, currency, locale);
   const cashflow = monthlyIncome - monthlyExpenses;
   const runway = monthlyExpenses > 0 ? currentSavings / monthlyExpenses : Infinity;
   const savingsRate = monthlyIncome > 0 ? cashflow / monthlyIncome : 0;
   const dti = monthlyIncome > 0 ? (monthlyDebt / monthlyIncome) * 100 : 0;
 
-  // Cashflow négatif → priorité absolue, ton calme.
+  // Cashflow negative → highest priority.
   if (cashflow < 0) {
     const gap = Math.abs(cashflow);
     const targetCut = Math.max(20, round(gap * 0.5));
     return {
-      headline: `Tu dépenses environ ${fmt(gap)} de plus que tu ne gagnes chaque mois.`,
-      body: traits.has("avoidant")
-        ? "C'est inconfortable à regarder, c'est normal. On va y aller doucement, une dépense à la fois."
-        : "Bonne nouvelle : c'est mesurable, donc adressable. On va viser un poste à la fois.",
+      headlineKey: "cashflowNegative.headline",
+      bodyKey: traits.has("avoidant")
+        ? "cashflowNegative.bodyAvoidant"
+        : "cashflowNegative.bodyDefault",
+      nextActionKey: "cashflowNegative.nextAction",
+      metricLabelKey: "cashflowNegative.metricLabel",
       metric: fmt(gap),
-      metricLabel: "Écart mensuel",
       tone: "warning",
-      nextAction: `Identifie une dépense récurrente que tu peux réduire d'environ ${fmt(targetCut)} ce mois-ci.`,
+      params: { gap: fmt(gap), targetCut: fmt(targetCut) },
     };
   }
 
-  // Dette > 30% revenus → priorité dette.
+  // Debt > 30% of income → debt priority.
   if (dti >= 30 && monthlyDebt > 0) {
     return {
-      headline: `Tes remboursements représentent ${dti.toFixed(0)}% de tes revenus.`,
-      body:
-        "Au-delà de 30%, ils pèsent fortement sur ton reste à vivre. On peut réduire ce ratio avant de viser l'épargne.",
+      headlineKey: "highDti.headline",
+      bodyKey: "highDti.body",
+      nextActionKey: "highDti.nextAction",
+      metricLabelKey: "highDti.metricLabel",
       metric: `${dti.toFixed(0)}%`,
-      metricLabel: "Dette / revenus",
       tone: "warning",
-      nextAction:
-        "Liste tes crédits par taux d'intérêt et concentre tes efforts sur le plus coûteux.",
+      params: { pct: dti.toFixed(0) },
     };
   }
 
-  // Fonds d'urgence absent et reste à vivre positif → fondation.
+  // No emergency fund + positive cashflow → foundation.
   if (!hasEmergencyFund && runway < 1 && cashflow > 0) {
     const monthlyTarget = Math.max(50, round(cashflow * 0.3));
     return {
-      headline: `Ton premier palier : construire 1 mois de dépenses de côté.`,
-      body: traits.has("anxious")
-        ? "Un coussin financier réduit l'anxiété quotidienne — même petit, il change tout."
-        : "Un fonds d'urgence te protège des imprévus avant de viser des objectifs plus ambitieux.",
+      headlineKey: "emergencyFundFirst.headline",
+      bodyKey: traits.has("anxious")
+        ? "emergencyFundFirst.bodyAnxious"
+        : "emergencyFundFirst.bodyDefault",
+      nextActionKey: "emergencyFundFirst.nextAction",
+      metricLabelKey: "emergencyFundFirst.metricLabel",
       metric: fmt(monthlyTarget),
-      metricLabel: "Virement automatique suggéré",
       tone: "neutral",
-      nextAction: `Programme un virement automatique de ${fmt(monthlyTarget)} en début de mois vers un compte séparé.`,
+      params: { monthlyTarget: fmt(monthlyTarget) },
     };
   }
 
-  // Reste à vivre faible mais positif → optimisation douce.
+  // Low but positive cashflow → gentle optimisation.
   if (savingsRate < 0.05 && monthlyIncome > 0) {
     const estimate = round(monthlyExpenses * 0.08);
     return {
-      headline: `Tu pourrais probablement libérer environ ${fmt(estimate)} par mois.`,
-      body:
-        "Les postes non essentiels représentent souvent 5 à 10% des dépenses sans qu'on s'en rende compte. Une revue rapide suffit.",
+      headlineKey: "lowSavings.headline",
+      bodyKey: "lowSavings.body",
+      nextActionKey: "lowSavings.nextAction",
+      metricLabelKey: "lowSavings.metricLabel",
       metric: fmt(estimate),
-      metricLabel: "Marge potentielle estimée",
       tone: "neutral",
-      nextAction:
-        "Passe en revue tes abonnements actifs et coupe ceux que tu n'as pas utilisés ce mois-ci.",
+      params: { estimate: fmt(estimate) },
     };
   }
 
-  // Runway > 3 mois et savings rate ≥ 15% → tonalité positive, accélération.
+  // Runway > 3 months and savings rate ≥ 15% → acceleration.
   if (runway >= 3 && savingsRate >= 0.15) {
     const monthlyAvailable = round(cashflow);
     return {
-      headline: `Tu épargnes déjà ${(savingsRate * 100).toFixed(0)}% de tes revenus.`,
-      body:
-        "Ta base est solide. Tu peux accélérer un objectif, consolider ton fonds d'urgence ou commencer à faire travailler une partie de l'épargne.",
+      headlineKey: "solidAcceleration.headline",
+      bodyKey: "solidAcceleration.body",
+      nextActionKey: "solidAcceleration.nextAction",
+      metricLabelKey: "solidAcceleration.metricLabel",
       metric: fmt(monthlyAvailable),
-      metricLabel: "Capacité d'épargne mensuelle",
       tone: "positive",
-      nextAction:
-        "Choisis un objectif chiffré sur 6 à 12 mois et flèche-y une part de ton reste à vivre.",
+      params: { pct: (savingsRate * 100).toFixed(0) },
     };
   }
 
-  // Profil intermédiaire — encouragement + nudge, adapté à la tonalité.
+  // Intermediate — encouragement + tone-adapted nudge.
   const projection = round(cashflow * 12);
-  const intermediateBody =
+  const isPositive = projection > 0;
+
+  const bodyKey =
     tone === "direct"
-      ? "Tu as la base. Pose un cap chiffré sur 90 jours et passe à l'action."
+      ? "intermediate.bodyDirect"
       : tone === "structured"
-        ? "Pose 1 habitude mesurable, donne-toi un jalon hebdo, mesure dans 30 jours."
+        ? "intermediate.bodyStructured"
         : tone === "gentle"
-          ? "Petit à petit, des ajustements simples compoundent. Pas de pression, juste la régularité."
+          ? "intermediate.bodyGentle"
           : traits.has("motivated")
-            ? "Tu sembles prêt·e à passer à l'action. On peut transformer cette énergie en habitudes simples qui tiennent."
-            : "Petit à petit, des ajustements simples compoundent. L'objectif n'est pas la perfection mais la régularité.";
+            ? "intermediate.bodyMotivated"
+            : "intermediate.bodyCalm";
+
+  const nextActionKey =
+    tone === "structured"
+      ? "intermediate.nextActionStructured"
+      : tone === "direct"
+        ? "intermediate.nextActionDirect"
+        : "intermediate.nextActionCalm";
+
   return {
-    headline:
-      projection > 0
-        ? `Tu pourrais épargner environ ${fmt(projection)} sur 12 mois à ton rythme actuel.`
-        : `Tu es à l'équilibre — c'est une base de travail saine.`,
-    body: intermediateBody,
-    metric: projection > 0 ? fmt(projection) : fmt(0),
-    metricLabel: projection > 0 ? "Projection 12 mois" : "Reste à vivre mensuel",
-    tone: projection > 0 ? "positive" : "neutral",
-    nextAction:
-      tone === "structured"
-        ? "Définis 1 indicateur clé (taux d'épargne, runway) et trace-le chaque semaine pendant 30 jours."
-        : tone === "direct"
-          ? "Choisis 1 habitude financière concrète et lance-la cette semaine — virement automatique ou plafond shopping."
-          : "Définis 1 habitude financière à tester pendant 30 jours — virement automatique, budget shopping, ou revue hebdo.",
+    headlineKey: isPositive
+      ? "intermediate.headlinePositive"
+      : "intermediate.headlineNeutral",
+    bodyKey,
+    nextActionKey,
+    metricLabelKey: isPositive
+      ? "intermediate.metricLabelPositive"
+      : "intermediate.metricLabelNeutral",
+    metric: isPositive ? fmt(projection) : fmt(0),
+    tone: isPositive ? "positive" : "neutral",
+    params: { projection: fmt(projection) },
   };
 }

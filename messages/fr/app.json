@@ -204,6 +204,91 @@
       "openListLabel": "Ouvrir la liste des conversations",
       "buttonLabel": "Conversations",
       "dialogTitle": "Mes conversations"
+    },
+    "local": {
+      "openLine": {
+        "direct": "{ack}",
+        "structured": "{ack} Voilà comment je verrais les choses.",
+        "gentle": "{ack} Pas de précipitation, on avance à ton rythme.",
+        "calm": "{ack}"
+      },
+      "closeLine": {
+        "direct": "Tu veux qu'on attaque par où ?",
+        "structured": "Souhaites-tu qu'on détaille une étape en particulier ?",
+        "gentle": "Dis-moi simplement comment tu te sens vis-à-vis de tout ça.",
+        "calm": "Tu veux qu'on creuse un point en particulier ?"
+      },
+      "greeting": {
+        "hello": "Salut {name},",
+        "helloNoName": "Salut,",
+        "statusPositive": "ton reste à vivre mensuel est de **{cashflow}**.",
+        "statusNegative": "tu es actuellement à **{gap} de moins** que tes dépenses mensuelles — c'est mesurable, donc adressable.",
+        "statusEmpty": "on peut commencer dès que tu auras renseigné tes revenus et dépenses.",
+        "bridge": "content de te revoir.",
+        "promptDirect": "Qu'est-ce qu'on attaque aujourd'hui ?",
+        "promptStructured": "On peut faire le point sur 1 priorité, 1 risque ou 1 action — au choix.",
+        "promptDefault": "Comment je peux t'aider aujourd'hui ?"
+      },
+      "thanks": {
+        "direct": "Avec plaisir. Continue comme ça — la régularité fait tout.",
+        "structured": "Avec plaisir. Pense à noter le résultat dans LIBERIA pour que la trace reste.",
+        "gentle": "C'est moi qui te remercie. Prends ton temps, je suis là quand tu veux.",
+        "calm": "Avec plaisir. On reprend quand tu en as envie."
+      },
+      "nextAction": {
+        "ack": "Bonne question.",
+        "cashflowNegative": "Ta priorité du moment c'est de **réduire ton écart mensuel**. Aujourd'hui, identifie **une seule dépense récurrente** que tu peux baisser d'environ **{cut}** — un abonnement, une livraison, un poste shopping. Tu n'as pas besoin de tout changer, juste de poser **un premier verrou**.",
+        "highDti": "Tes remboursements représentent **{pct}%** de tes revenus — c'est ce qui pèse le plus actuellement. Cette semaine, liste tes crédits par taux d'intérêt et concentre tes prochains efforts sur le plus coûteux.",
+        "noFund": "Tu n'as pas encore de fonds d'urgence. C'est ton premier palier. Programme **un virement automatique de {target}** en début de mois vers un compte séparé. Symbolique au début, structurel ensuite.",
+        "lowSavings": "Ton taux d'épargne est faible. Cette semaine, **passe en revue tes abonnements actifs** et coupe ceux que tu n'as pas utilisés ce mois-ci. C'est l'action avec le meilleur ratio effort / impact.",
+        "habit": "Tu as une base saine. **Choisis une habitude à tester pendant 30 jours** : un virement automatique, un plafond shopping hebdo, ou une revue financière du dimanche soir."
+      },
+      "stress": {
+        "ackDirect": "Le stress financier, ça se mesure et ça se réduit.",
+        "ackStructured": "Compris. On va décomposer ce qui pèse.",
+        "ackCalm": "Je comprends. Avoir de la pression autour de l'argent, c'est dur — et c'est très courant.",
+        "bodyCashflow": "Le déclencheur le plus probable de ton stress c'est l'écart entre revenus et dépenses : actuellement **{gap} de plus** que ce qui rentre. On peut s'attaquer à ça **une dépense à la fois**, pas tout d'un coup.",
+        "bodyNoFund": "Sans réserve, chaque imprévu devient une crise. La meilleure façon de baisser ton stress, c'est de **commencer un fonds d'urgence** — même symbolique. Un coussin de quelques centaines change déjà beaucoup la sensation au quotidien.",
+        "bodyMental": "Tu n'es pas en zone rouge financièrement, mais la charge mentale peut quand même peser. Une revue financière courte chaque semaine (10 minutes) suffit souvent à reprendre la main mentalement."
+      },
+      "subscription": {
+        "ack": "Bonne piste — c'est souvent là que dorment le plus de petites fuites.",
+        "body": "**Méthode rapide** : ouvre tes 3 derniers relevés bancaires, surligne chaque ligne récurrente, et pose-toi UNE question par ligne — « Est-ce que je l'ai utilisé ce mois-ci ? ». Coupe sans hésiter ceux qui répondent non — tu peux toujours te réabonner. Vise **1 abonnement coupé cette semaine**, pas 5 — la régularité bat la performance."
+      },
+      "savings": {
+        "ack": "Très bien.",
+        "bodyNegative": "Pour pouvoir épargner, il faut d'abord **dégager du reste à vivre** — chercher à mettre de côté quand on est négatif crée de la culpabilité sans résultat. Concentrons-nous d'abord sur la réduction d'une dépense, puis on parle d'épargne.",
+        "bodyPositive": "Ton reste à vivre est de **{cashflow}/mois**. Si tu démarres modestement avec **{target}** virés automatiquement en début de mois vers un compte séparé, tu construis l'habitude sans la ressentir. C'est cette automaticité qui fait la différence à 12 mois."
+      },
+      "debt": {
+        "ack": "Important d'en parler clairement.",
+        "bodyHigh": "Tes remboursements représentent **{pct}%** de tes revenus — au-dessus de 30%, c'est lourd. Stratégie : **liste tes crédits par taux d'intérêt** (du plus cher au moins cher) et concentre les remboursements supplémentaires sur le plus coûteux. Les autres restent au minimum tant que celui-ci n'est pas soldé.",
+        "bodyManageable": "Tes remboursements représentent **{pct}%** de tes revenus — c'est gérable. Tant que c'est sous 25%, tu peux continuer à équilibrer remboursement et épargne. Au-dessus, priorité au remboursement.",
+        "bodyNone": "Tu n'as pas de remboursement déclaré dans LIBERIA actuellement. Si tu as un crédit en cours qui n'est pas encore enregistré, ajoute-le côté Dépenses pour qu'on puisse le suivre ensemble."
+      },
+      "budget": {
+        "ack": "Faisons le point.",
+        "bodyData": "Tu as **{cashflow}** de reste à vivre par mois ({rate}% de tes revenus). {tail}\n\nPour un budget plus net, je te suggère **3 enveloppes mentales** :\n- Fixes (loyer, factures, assurances)\n- Variables (courses, transport, sorties)\n- Mise de côté (épargne, dettes accélérées)\n\nCette semaine, regarde simplement combien chaque enveloppe pèse réellement.",
+        "tailPositive": "C'est ta marge de manœuvre — c'est avec ça qu'on construit.",
+        "tailNegative": "L'écart est négatif — on va travailler sur sa réduction avant tout le reste.",
+        "bodyEmpty": "Je n'ai pas encore tes revenus et dépenses. Renseigne-les dans LIBERIA — même une estimation suffit pour démarrer."
+      },
+      "goal": {
+        "ack": "Avoir un cap, c'est ce qui fait la différence.",
+        "emergencyWithAmount": "Ton premier palier raisonnable : **1 mois de dépenses** de côté (soit environ **{monthlyExpenses}** dans ton cas). Une fois atteint, on vise 3 mois, puis 6. Étape par étape.",
+        "emergencyNoAmount": "Ton premier palier raisonnable : **1 mois de dépenses** de côté. Une fois atteint, on vise 3 mois, puis 6. Étape par étape.",
+        "debtPayoff": "Ton objectif est de réduire la dette. Fixe-toi un palier mesurable sur 90 jours (par exemple solder une carte de crédit) plutôt qu'un objectif total — c'est plus motivant.",
+        "generic": "Définis ton objectif avec **3 critères** : un montant cible, une échéance, et un montant mensuel à mettre de côté. Sans ces 3 éléments, l'objectif reste flou. Pose-les dans LIBERIA et on l'attaque."
+      },
+      "unclear": {
+        "ackDirect": "Pour qu'on aille à l'essentiel, deux options.",
+        "ackStructured": "Quelques angles possibles.",
+        "ackDefault": "Pas de souci. On peut partir d'un angle simple.",
+        "summaryWithData": "Ton reste à vivre est de **{cashflow}/mois**{fundNote}.",
+        "summaryEmpty": "Tes données financières ne sont pas encore renseignées — on peut commencer par là.",
+        "fundNoteMissing": " et tu n'as pas encore de fonds d'urgence",
+        "options": "- Tu veux **réduire une dépense** ? Dis « quelle dépense surveiller cette semaine ».\n- Tu veux **commencer à épargner** ? Dis « comment construire un fonds d'urgence ».\n- Tu veux **gérer une dette** ? Dis « par quoi rembourser en priorité ».\n- Tu veux **un point général** ? Dis « fais-moi un bilan rapide »."
+      }
     }
   },
   "plan": {
