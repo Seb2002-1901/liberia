@@ -4,6 +4,7 @@ import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -46,6 +47,9 @@ interface GoalFormProps {
 }
 
 export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProps) {
+  const t = useTranslations("app.finance.form.goal");
+  const tErr = useTranslations();
+  const tGoalType = useTranslations("onboarding.goals");
   const {
     register,
     handleSubmit,
@@ -83,7 +87,7 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
       toast.error(res.error);
       return;
     }
-    toast.success(initial?.id ? "Objectif mis à jour." : "Objectif créé.");
+    toast.success(initial?.id ? t("toastUpdated") : t("toastCreated"));
     onOpenChange(false);
   });
 
@@ -91,27 +95,29 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{initial?.id ? "Modifier l'objectif" : "Nouvel objectif"}</DialogTitle>
-          <DialogDescription>
-            Choisis un objectif tangible et atteignable. Tu pourras l'ajuster.
-          </DialogDescription>
+          <DialogTitle>
+            {initial?.id ? t("titleEdit") : t("titleNew")}
+          </DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={submit} className="space-y-4" noValidate>
           <div className="space-y-1.5">
-            <Label htmlFor="title">Titre</Label>
+            <Label htmlFor="title">{t("title")}</Label>
             <Input
               id="title"
-              placeholder="Ex. Fonds d'urgence 1 mois"
+              placeholder={t("titlePlaceholder")}
               {...register("title")}
             />
-            {errors.title && (
-              <p className="text-xs text-[hsl(var(--destructive))]">{errors.title.message}</p>
+            {errors.title?.message && (
+              <p className="text-xs text-[hsl(var(--destructive))]">
+                {tErr(errors.title.message)}
+              </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label>Type</Label>
+            <Label>{t("type")}</Label>
             <Controller
               control={control}
               name="type"
@@ -121,9 +127,9 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {GOAL_TYPES.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.label}
+                    {GOAL_TYPES.map((g) => (
+                      <SelectItem key={g.id} value={g.id}>
+                        {tGoalType(g.id)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -134,7 +140,7 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="targetAmount">Cible</Label>
+              <Label htmlFor="targetAmount">{t("target")}</Label>
               <Input
                 id="targetAmount"
                 type="number"
@@ -143,12 +149,14 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
                 placeholder="0"
                 {...register("targetAmount")}
               />
-              {errors.targetAmount && (
-                <p className="text-xs text-[hsl(var(--destructive))]">{errors.targetAmount.message}</p>
+              {errors.targetAmount?.message && (
+                <p className="text-xs text-[hsl(var(--destructive))]">
+                  {tErr(errors.targetAmount.message)}
+                </p>
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="currentAmount">Déjà mis</Label>
+              <Label htmlFor="currentAmount">{t("current")}</Label>
               <Input
                 id="currentAmount"
                 type="number"
@@ -157,23 +165,32 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
                 placeholder="0"
                 {...register("currentAmount")}
               />
-              {errors.currentAmount && (
-                <p className="text-xs text-[hsl(var(--destructive))]">{errors.currentAmount.message}</p>
+              {errors.currentAmount?.message && (
+                <p className="text-xs text-[hsl(var(--destructive))]">
+                  {tErr(errors.currentAmount.message)}
+                </p>
               )}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="deadline">Échéance</Label>
+            <Label htmlFor="deadline">{t("deadline")}</Label>
             <Input id="deadline" type="date" {...register("deadline")} />
-            {errors.deadline && (
-              <p className="text-xs text-[hsl(var(--destructive))]">{errors.deadline.message}</p>
+            {errors.deadline?.message && (
+              <p className="text-xs text-[hsl(var(--destructive))]">
+                {tErr(errors.deadline.message)}
+              </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" rows={2} placeholder="Optionnel" {...register("notes")} />
+            <Label htmlFor="notes">{t("notes")}</Label>
+            <Textarea
+              id="notes"
+              rows={2}
+              placeholder={t("notesPlaceholder")}
+              {...register("notes")}
+            />
           </div>
 
           <DialogFooter>
@@ -183,11 +200,11 @@ export function GoalForm({ open, onOpenChange, initial, onSubmit }: GoalFormProp
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Annuler
+              {t("cancel")}
             </Button>
             <Button type="submit" variant="gold" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {initial?.id ? "Enregistrer" : "Créer"}
+              {initial?.id ? t("save") : t("create")}
             </Button>
           </DialogFooter>
         </form>

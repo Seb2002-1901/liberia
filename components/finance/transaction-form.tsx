@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -52,7 +53,10 @@ interface TransactionFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial?: Initial | null;
-  onSubmit: (values: IncomeInput | ExpenseInput, id?: string) => Promise<{ ok: true } | { ok: false; error: string }>;
+  onSubmit: (
+    values: IncomeInput | ExpenseInput,
+    id?: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
 export function TransactionForm({
@@ -62,6 +66,11 @@ export function TransactionForm({
   initial,
   onSubmit,
 }: TransactionFormProps) {
+  const t = useTranslations("app.finance.form.transaction");
+  const tErr = useTranslations();
+  const tFreq = useTranslations("dashboard.categories.frequencies");
+  const tIncomeCat = useTranslations("dashboard.categories.incomeCategories");
+  const tExpenseCat = useTranslations("dashboard.categories.expenses");
   const schema = kind === "income" ? incomeSchema : expenseSchema;
   const categories = kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
@@ -100,45 +109,56 @@ export function TransactionForm({
       toast.error(res.error);
       return;
     }
-    toast.success(initial?.id ? "Mis à jour." : "Ajouté avec succès.");
+    toast.success(initial?.id ? t("toastUpdated") : t("toastAdded"));
     onOpenChange(false);
   });
 
   const title =
     kind === "income"
       ? initial?.id
-        ? "Modifier le revenu"
-        : "Ajouter un revenu"
+        ? t("titleEditIncome")
+        : t("titleAddIncome")
       : initial?.id
-      ? "Modifier la dépense"
-      : "Ajouter une dépense";
+      ? t("titleEditExpense")
+      : t("titleAddExpense");
+
+  const labelForCategory = (id: string) => {
+    if (kind === "income") {
+      return INCOME_CATEGORIES.find((c) => c.id === id) ? tIncomeCat(id) : id;
+    }
+    return EXPENSE_CATEGORIES.find((c) => c.id === id) ? tExpenseCat(id) : id;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Renseigne le montant et sa fréquence. Tu pourras modifier à tout moment.
-          </DialogDescription>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={submit} className="space-y-4" noValidate>
           <div className="space-y-1.5">
-            <Label htmlFor="label">Libellé</Label>
+            <Label htmlFor="label">{t("label")}</Label>
             <Input
               id="label"
-              placeholder={kind === "income" ? "Ex. Salaire" : "Ex. Loyer"}
+              placeholder={
+                kind === "income"
+                  ? t("placeholderIncome")
+                  : t("placeholderExpense")
+              }
               {...register("label")}
             />
-            {errors.label && (
-              <p className="text-xs text-[hsl(var(--destructive))]">{errors.label.message}</p>
+            {errors.label?.message && (
+              <p className="text-xs text-[hsl(var(--destructive))]">
+                {tErr(errors.label.message)}
+              </p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="amount">Montant</Label>
+              <Label htmlFor="amount">{t("amount")}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -147,24 +167,26 @@ export function TransactionForm({
                 placeholder="0"
                 {...register("amount")}
               />
-              {errors.amount && (
-                <p className="text-xs text-[hsl(var(--destructive))]">{errors.amount.message}</p>
+              {errors.amount?.message && (
+                <p className="text-xs text-[hsl(var(--destructive))]">
+                  {tErr(errors.amount.message)}
+                </p>
               )}
             </div>
             <div className="space-y-1.5">
-              <Label>Fréquence</Label>
+              <Label>{t("frequency")}</Label>
               <Controller
                 control={control}
                 name="frequency"
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Fréquence" />
+                      <SelectValue placeholder={t("frequency")} />
                     </SelectTrigger>
                     <SelectContent>
                       {FREQUENCIES.map((f) => (
                         <SelectItem key={f.id} value={f.id}>
-                          {f.label}
+                          {tFreq(f.id)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -175,19 +197,19 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Catégorie</Label>
+            <Label>{t("category")}</Label>
             <Controller
               control={control}
               name="category"
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Catégorie" />
+                    <SelectValue placeholder={t("category")} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
-                        {c.label}
+                        {labelForCategory(c.id)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -197,11 +219,11 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t("notes")}</Label>
             <Textarea
               id="notes"
               rows={2}
-              placeholder="Optionnel"
+              placeholder={t("notesPlaceholder")}
               {...register("notes")}
             />
           </div>
@@ -213,11 +235,11 @@ export function TransactionForm({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Annuler
+              {t("cancel")}
             </Button>
             <Button type="submit" variant="gold" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {initial?.id ? "Enregistrer" : "Ajouter"}
+              {initial?.id ? t("save") : t("add")}
             </Button>
           </DialogFooter>
         </form>

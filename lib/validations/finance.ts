@@ -19,12 +19,20 @@ const frequencyIds = FREQUENCIES.map((f) => f.id) as [string, ...string[]];
 const goalTypeIds = GOAL_TYPES.map((g) => g.id) as [string, ...string[]];
 const behaviorTraitIds = BEHAVIOR_TRAITS.map((b) => b.id) as [string, ...string[]];
 
+// Validation messages are stable keys ("errors.validation.*"). Each
+// form passes the key through useTranslations("errors") so the user
+// sees the field error in their profile language. Keeping the keys
+// here (rather than the translated phrase) means the schema is the
+// same object whatever locale renders it.
 export const incomeSchema = z.object({
-  label: z.string().min(1, "Libellé requis").max(80),
+  label: z
+    .string()
+    .min(1, "errors.validation.labelRequired")
+    .max(80),
   amount: z.coerce
-    .number({ invalid_type_error: "Montant invalide" })
-    .min(0, "Montant positif")
-    .max(10_000_000, "Montant trop élevé"),
+    .number({ invalid_type_error: "errors.validation.amountInvalid" })
+    .min(0, "errors.validation.amountPositive")
+    .max(10_000_000, "errors.validation.amountTooHigh"),
   category: z.enum(incomeCategoryIds),
   frequency: z.enum(frequencyIds),
   notes: z.string().max(280).optional().nullable(),
@@ -33,11 +41,14 @@ export const incomeSchema = z.object({
 export type IncomeInput = z.infer<typeof incomeSchema>;
 
 export const expenseSchema = z.object({
-  label: z.string().min(1, "Libellé requis").max(80),
+  label: z
+    .string()
+    .min(1, "errors.validation.labelRequired")
+    .max(80),
   amount: z.coerce
-    .number({ invalid_type_error: "Montant invalide" })
-    .min(0, "Montant positif")
-    .max(10_000_000, "Montant trop élevé"),
+    .number({ invalid_type_error: "errors.validation.amountInvalid" })
+    .min(0, "errors.validation.amountPositive")
+    .max(10_000_000, "errors.validation.amountTooHigh"),
   category: z.enum(expenseCategoryIds),
   frequency: z.enum(frequencyIds),
   notes: z.string().max(280).optional().nullable(),
@@ -47,16 +58,19 @@ export type ExpenseInput = z.infer<typeof expenseSchema>;
 
 export const goalSchema = z
   .object({
-    title: z.string().min(1, "Titre requis").max(80),
+    title: z
+      .string()
+      .min(1, "errors.validation.titleRequired")
+      .max(80),
     type: z.enum(goalTypeIds),
     targetAmount: z.coerce
       .number()
-      .min(1, "Montant > 0")
-      .max(10_000_000, "Trop élevé"),
+      .min(1, "errors.validation.amountGtZero")
+      .max(10_000_000, "errors.validation.amountTooHighShort"),
     currentAmount: z.coerce
       .number()
-      .min(0, "Montant >= 0")
-      .max(10_000_000, "Trop élevé")
+      .min(0, "errors.validation.amountGteZero")
+      .max(10_000_000, "errors.validation.amountTooHighShort")
       .default(0),
     deadline: z
       .string()
@@ -64,12 +78,12 @@ export const goalSchema = z
       .nullable()
       .refine(
         (v) => !v || !Number.isNaN(new Date(v).getTime()),
-        "Date invalide",
+        "errors.validation.dateInvalid",
       ),
     notes: z.string().max(280).optional().nullable(),
   })
   .refine((data) => data.currentAmount <= data.targetAmount, {
-    message: "Le montant actuel ne peut dépasser l'objectif",
+    message: "errors.validation.currentExceedsTarget",
     path: ["currentAmount"],
   });
 

@@ -162,12 +162,11 @@
     },
     "incomeCategories": {
       "salary": "Salaire",
-      "freelance": "Freelance / Indépendant",
-      "investment": "Revenus de placements",
-      "pension": "Retraite",
-      "rental": "Locatif",
-      "benefits": "Allocations",
-      "side_hustle": "Activité secondaire",
+      "freelance": "Freelance",
+      "business": "Activité",
+      "investments": "Investissements",
+      "aid": "Aides / Allocations",
+      "rental": "Revenus locatifs",
       "other": "Autre"
     }
   }

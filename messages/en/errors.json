@@ -9,6 +9,16 @@
     "nameMax": "60 characters maximum",
     "confirmRequired": "Confirmation required",
     "passwordMismatch": "Passwords do not match",
-    "acceptTerms": "Please accept the terms to continue."
+    "acceptTerms": "Please accept the terms to continue.",
+    "labelRequired": "Label required",
+    "amountInvalid": "Invalid amount",
+    "amountPositive": "Positive amount",
+    "amountTooHigh": "Amount too high",
+    "titleRequired": "Title required",
+    "amountGtZero": "Amount > 0",
+    "amountGteZero": "Amount >= 0",
+    "amountTooHighShort": "Too high",
+    "dateInvalid": "Invalid date",
+    "currentExceedsTarget": "The current amount cannot exceed the target"
   }
 }

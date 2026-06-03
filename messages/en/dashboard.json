@@ -162,12 +162,11 @@
     },
     "incomeCategories": {
       "salary": "Salary",
-      "freelance": "Freelance / Self-employed",
-      "investment": "Investment income",
-      "pension": "Pension",
-      "rental": "Rental",
-      "benefits": "Benefits",
-      "side_hustle": "Side hustle",
+      "freelance": "Freelance",
+      "business": "Business",
+      "investments": "Investments",
+      "aid": "Benefits / Assistance",
+      "rental": "Rental income",
       "other": "Other"
     }
   }

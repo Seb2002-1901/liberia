@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Lock, MoreVertical, Pencil, Target, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
@@ -42,14 +43,19 @@ export function GoalsList({
   onUpdate,
   onDelete,
 }: GoalsListProps) {
+  const t = useTranslations("app.finance.list");
+  const tGoalType = useTranslations("onboarding.goals");
   const [open, setOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Goal | null>(null);
   const [pending, startTransition] = React.useTransition();
 
   const handleOpen = (goal?: Goal) => {
     if (isDemo) {
-      toast.info("Mode démo · crée un compte pour sauvegarder.", {
-        action: { label: "Créer", onClick: () => (window.location.href = ROUTES.register) },
+      toast.info(t("demoToastInfoTitle"), {
+        action: {
+          label: t("demoToastAction"),
+          onClick: () => (window.location.href = ROUTES.register),
+        },
       });
       return;
     }
@@ -59,23 +65,26 @@ export function GoalsList({
 
   const handleSubmit = async (values: GoalInput, id?: string) => {
     if (isDemo) {
-      return { ok: false as const, error: "Mode démo : connecte-toi pour enregistrer." };
+      return { ok: false as const, error: t("demoSaveError") };
     }
     return id ? onUpdate(id, values) : onCreate(values);
   };
 
   const handleDelete = (id: string, title: string) => {
     if (isDemo) {
-      toast.error("Mode démo : connecte-toi pour supprimer.");
+      toast.error(t("demoDeleteError"));
       return;
     }
-    if (typeof window !== "undefined" && !window.confirm(`Supprimer l'objectif « ${title} » ? Cette action est définitive.`)) {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(t("deleteConfirmGoal", { title }))
+    ) {
       return;
     }
     startTransition(async () => {
       const res = await onDelete(id);
       if (!res.ok) toast.error(res.error);
-      else toast.success("Objectif supprimé.");
+      else toast.success(t("deletedGoalToast"));
     });
   };
 
@@ -84,35 +93,38 @@ export function GoalsList({
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
         {isDemo ? (
           <p className="text-xs text-muted-foreground">
-            <Lock className="mr-1 inline-block h-3 w-3" /> Mode démo · lecture seule.{" "}
-            <Link href={ROUTES.register} className="font-medium text-foreground hover:underline">
-              Crée ton compte
-            </Link>{" "}
-            pour gérer tes objectifs.
+            <Lock className="mr-1 inline-block h-3 w-3" /> {t("demoBannerGoals")}{" "}
+            <Link
+              href={ROUTES.register}
+              className="font-medium text-foreground hover:underline"
+            >
+              {t("createAccountLink")}
+            </Link>
           </p>
         ) : (
           <span />
         )}
         <Button variant="gold" size="sm" onClick={() => handleOpen()} disabled={isDemo}>
-          Nouvel objectif
+          {t("newGoal")}
         </Button>
       </div>
 
       {goals.length === 0 ? (
         <EmptyState
           icon={<Target className="h-5 w-5" />}
-          title="Aucun objectif pour le moment"
-          description="Pose ta première marche : fonds d'urgence, dette à solder, projet."
+          title={t("emptyGoalsTitle")}
+          description={t("emptyGoalsDescription")}
           action={
             <Button variant="gold" size="sm" onClick={() => handleOpen()}>
-              Créer un objectif
+              {t("createGoal")}
             </Button>
           }
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {goals.map((g) => {
-            const type = GOAL_TYPES.find((t) => t.id === g.type);
+            const known = GOAL_TYPES.find((tp) => tp.id === g.type);
+            const typeLabel = known ? tGoalType(known.id) : g.type;
             const ratio = Math.min(
               100,
               Math.round((g.current_amount / Math.max(1, g.target_amount)) * 100),
@@ -125,29 +137,30 @@ export function GoalsList({
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="truncate font-medium">{g.title}</p>
-                        {done && <Badge variant="success">Terminé</Badge>}
+                        {done && <Badge variant="success">{t("goalDone")}</Badge>}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {type?.label ?? g.type}
-                        {g.deadline && ` · échéance ${formatDate(g.deadline)}`}
+                        {typeLabel}
+                        {g.deadline &&
+                          ` · ${t("goalDeadlinePrefix", { date: formatDate(g.deadline) })}`}
                       </p>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="Actions">
+                        <Button variant="ghost" size="icon" aria-label={t("actionsLabel")}>
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onSelect={() => handleOpen(g)}>
-                          <Pencil className="h-4 w-4" /> Modifier
+                          <Pencil className="h-4 w-4" /> {t("edit")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={() => handleDelete(g.id, g.title)}
                           disabled={pending}
                           className="text-[hsl(var(--destructive))]"
                         >
-                          <Trash2 className="h-4 w-4" /> Supprimer
+                          <Trash2 className="h-4 w-4" /> {t("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

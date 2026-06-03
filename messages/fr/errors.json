@@ -9,6 +9,16 @@
     "nameMax": "60 caractères maximum",
     "confirmRequired": "Confirmation requise",
     "passwordMismatch": "Les mots de passe ne correspondent pas",
-    "acceptTerms": "Merci d'accepter les conditions pour continuer."
+    "acceptTerms": "Merci d'accepter les conditions pour continuer.",
+    "labelRequired": "Libellé requis",
+    "amountInvalid": "Montant invalide",
+    "amountPositive": "Montant positif",
+    "amountTooHigh": "Montant trop élevé",
+    "titleRequired": "Titre requis",
+    "amountGtZero": "Montant > 0",
+    "amountGteZero": "Montant >= 0",
+    "amountTooHighShort": "Trop élevé",
+    "dateInvalid": "Date invalide",
+    "currentExceedsTarget": "Le montant actuel ne peut dépasser l'objectif"
   }
 }
