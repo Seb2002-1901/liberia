@@ -1,0 +1,14 @@
+{
+  "validation": {
+    "emailRequired": "Email required",
+    "emailInvalid": "Invalid email",
+    "passwordRequired": "Password required",
+    "passwordMin": "8 characters minimum",
+    "passwordMax": "72 characters maximum",
+    "nameMin": "2 characters minimum",
+    "nameMax": "60 characters maximum",
+    "confirmRequired": "Confirmation required",
+    "passwordMismatch": "Passwords do not match",
+    "acceptTerms": "Please accept the terms to continue."
+  }
+}

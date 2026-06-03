@@ -8,6 +8,7 @@ import {
   Sparkles,
   Wallet,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,11 +42,13 @@ import { generateProactiveHint } from "@/lib/coach/proactive";
 import { isAnthropicConfigured } from "@/lib/env";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 
-export const metadata: Metadata = {
-  title: "Tableau de bord",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("dashboard.metadata");
+  return { title: t("title") };
+}
 
 export default async function DashboardPage() {
+  const t = await getTranslations("dashboard");
   const [data, activePlan, memory] = await Promise.all([
     getFinanceData(),
     getActivePlan(),
@@ -118,21 +121,21 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Vue d'ensemble"
-        title={`Salut, ${firstName}`}
-        description="Voici ta photo financière du moment. Tu peux ajuster tes revenus, dépenses et objectifs à tout moment."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title", { firstName })}
+        description={t("header.description")}
         actions={
           <>
             {data.isDemo && (
               <Badge variant="gold" className="gap-1">
-                <Sparkles className="h-3 w-3" /> Mode démo
+                <Sparkles className="h-3 w-3" /> {t("header.demoBadge")}
               </Badge>
             )}
             <Button asChild variant="outline" size="sm">
-              <Link href={ROUTES.expenses}>Ajouter une dépense</Link>
+              <Link href={ROUTES.expenses}>{t("header.addExpense")}</Link>
             </Button>
             <Button asChild variant="gold" size="sm">
-              <Link href={ROUTES.incomes}>Ajouter un revenu</Link>
+              <Link href={ROUTES.incomes}>{t("header.addIncome")}</Link>
             </Button>
           </>
         }
@@ -160,38 +163,38 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <StabilityCard score={stability} className="lg:col-span-2" />
         <StatCard
-          label="Stress financier"
+          label={t("stats.stressLabel")}
           value={`${stress}/100`}
           icon={<HeartPulse className="h-4 w-4" />}
           tone={stress >= 60 ? "negative" : "neutral"}
-          hint={stress >= 60 ? "Concentre-toi sur l'essentiel ce mois-ci." : "Niveau gérable, garde le cap."}
+          hint={stress >= 60 ? t("stats.stressHintHigh") : t("stats.stressHintLow")}
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Revenus mensuels"
+          label={t("stats.income")}
           value={formatUserCurrency(monthlyIncome, data.profile)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
         />
         <StatCard
-          label="Dépenses mensuelles"
+          label={t("stats.expenses")}
           value={formatUserCurrency(monthlyExpenses, data.profile)}
           icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
-          label="Reste à vivre"
+          label={t("stats.leftover")}
           value={formatUserCurrency(cashflow, data.profile)}
           tone={cashflow >= 0 ? "positive" : "negative"}
           icon={<Wallet className="h-4 w-4" />}
-          hint={`Taux d'épargne ${formatPercent(savingsRate)}`}
+          hint={t("stats.leftoverHint", { rate: formatPercent(savingsRate) })}
         />
         <StatCard
-          label="Fonds d'urgence"
+          label={t("stats.emergency")}
           value={
             Number.isFinite(runway)
-              ? `${runway.toFixed(1)} mois`
+              ? t("stats.monthsSuffix", { months: runway.toFixed(1) })
               : "∞"
           }
           icon={<PiggyBank className="h-4 w-4" />}
@@ -210,7 +213,7 @@ export default async function DashboardPage() {
         </div>
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Alertes</CardTitle>
+            <CardTitle>{t("alerts.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {monthlyIncome === 0 && monthlyExpenses === 0 ? (
@@ -219,35 +222,31 @@ export default async function DashboardPage() {
               // shows as "positive"). Surface a calm onboarding cue.
               <Alert
                 tone="neutral"
-                title="Renseigne tes données pour démarrer"
-                text="Ajoute tes revenus et dépenses pour voir tes premières alertes — quelques minutes suffisent."
+                title={t("alerts.emptyTitle")}
+                text={t("alerts.emptyText")}
               />
             ) : (
               <>
                 <Alert
                   tone={cashflow < 0 ? "danger" : "neutral"}
-                  title={cashflow < 0 ? "Tu dépenses plus que tu ne gagnes" : "Ton flux mensuel est positif"}
-                  text={
-                    cashflow < 0
-                      ? "Identifie 1 ou 2 dépenses non essentielles à réduire."
-                      : "Pense à automatiser une épargne mensuelle."
-                  }
+                  title={cashflow < 0 ? t("alerts.cashflowNegativeTitle") : t("alerts.cashflowPositiveTitle")}
+                  text={cashflow < 0 ? t("alerts.cashflowNegativeText") : t("alerts.cashflowPositiveText")}
                 />
                 <Alert
                   tone={runway < 1 ? "warning" : runway >= 3 ? "success" : "neutral"}
                   title={
                     runway < 1
-                      ? "Fonds d'urgence très faible"
+                      ? t("alerts.runwayLowTitle")
                       : runway >= 3
-                        ? "Fonds d'urgence solide"
-                        : "Fonds d'urgence en construction"
+                        ? t("alerts.runwaySolidTitle")
+                        : t("alerts.runwayBuildingTitle")
                   }
                   text={
                     runway < 1
-                      ? "Objectif court terme : 1 mois de dépenses de côté."
+                      ? t("alerts.runwayLowText")
                       : runway >= 3
-                        ? "Continue à le préserver, c'est ta tranquillité."
-                        : "Vise progressivement 3 mois de dépenses."
+                        ? t("alerts.runwaySolidText")
+                        : t("alerts.runwayBuildingText")
                   }
                 />
               </>

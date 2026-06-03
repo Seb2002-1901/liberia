@@ -1,35 +1,38 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { ROUTES } from "@/lib/constants";
 
-const COLUMNS = [
-  {
-    title: "Produit",
-    links: [
-      { label: "Fonctionnalités", href: "/#features" },
-      { label: "Tarifs", href: ROUTES.pricing },
-      { label: "Mode démo", href: ROUTES.demo },
-    ],
-  },
-  {
-    title: "Ressources",
-    links: [
-      { label: "FAQ", href: "/#faq" },
-      { label: "Sécurité & confiance", href: ROUTES.security },
-      { label: "Politique IA responsable", href: ROUTES.aiPolicy },
-    ],
-  },
-  {
-    title: "Légal",
-    links: [
-      { label: "Confidentialité", href: ROUTES.privacy },
-      { label: "Conditions", href: ROUTES.terms },
-      { label: "Disclaimer", href: ROUTES.legal },
-    ],
-  },
-];
+export async function SiteFooter() {
+  const t = await getTranslations("marketing.footer");
 
-export function SiteFooter() {
+  const columns = [
+    {
+      title: t("columns.product"),
+      links: [
+        { label: t("links.features"), href: "/#features" },
+        { label: t("links.pricing"), href: ROUTES.pricing },
+        { label: t("links.demo"), href: ROUTES.demo },
+      ],
+    },
+    {
+      title: t("columns.resources"),
+      links: [
+        { label: t("links.faq"), href: "/#faq" },
+        { label: t("links.security"), href: ROUTES.security },
+        { label: t("links.aiPolicy"), href: ROUTES.aiPolicy },
+      ],
+    },
+    {
+      title: t("columns.legal"),
+      links: [
+        { label: t("links.privacy"), href: ROUTES.privacy },
+        { label: t("links.terms"), href: ROUTES.terms },
+        { label: t("links.disclaimer"), href: ROUTES.legal },
+      ],
+    },
+  ];
+
   return (
     <footer className="border-t border-border/60 bg-background/40">
       <div className="container py-16">
@@ -37,11 +40,10 @@ export function SiteFooter() {
           <div className="space-y-4">
             <BrandMark />
             <p className="max-w-xs text-sm text-muted-foreground">
-              Reprends le contrôle de ton argent.
-              LIBERIA t'aide à reconstruire ta stabilité financière, étape par étape.
+              {t("tagline")}
             </p>
           </div>
-          {COLUMNS.map((col) => (
+          {columns.map((col) => (
             <div key={col.title}>
               <p className="mb-3 text-sm font-semibold text-foreground">
                 {col.title}
@@ -63,10 +65,8 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} LIBERIA — Tous droits réservés.</p>
-          <p className="max-w-xl">
-            LIBERIA est un outil de pilotage personnel. Aucune des informations affichées ne constitue un conseil financier, fiscal ou d'investissement.
-          </p>
+          <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+          <p className="max-w-xl">{t("disclaimer")}</p>
         </div>
       </div>
     </footer>

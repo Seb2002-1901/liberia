@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,8 @@ import { ROUTES } from "@/lib/constants";
 type SessionState = "checking" | "ready" | "missing";
 
 export function ResetPasswordForm() {
+  const tForm = useTranslations("auth.reset");
+  const tErr = useTranslations();
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
   const [sessionState, setSessionState] = React.useState<SessionState>("checking");
@@ -59,8 +62,8 @@ export function ResetPasswordForm() {
 
   const onSubmit = async ({ password }: ResetPasswordInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("Service temporairement indisponible", {
-        description: "Réessaie dans quelques instants.",
+      toast.error(tForm("unavailableTitle"), {
+        description: tForm("unavailableBody"),
       });
       return;
     }
@@ -69,10 +72,10 @@ export function ResetPasswordForm() {
       const supabase = createClient();
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        toast.error("Mise à jour impossible", { description: error.message });
+        toast.error(tForm("failedTitle"), { description: error.message });
         return;
       }
-      toast.success("Mot de passe mis à jour.");
+      toast.success(tForm("successTitle"));
       router.push(ROUTES.dashboard);
       router.refresh();
     } finally {
@@ -84,7 +87,7 @@ export function ResetPasswordForm() {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Vérification du lien…
+        {tForm("checking")}
       </div>
     );
   }
@@ -93,14 +96,11 @@ export function ResetPasswordForm() {
     return (
       <div className="space-y-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          Lien invalide ou expiré.
+          {tForm("invalidTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Le lien de réinitialisation est invalide, déjà utilisé ou expiré.
-          Demande un nouvel email pour continuer.
-        </p>
+        <p className="text-sm text-muted-foreground">{tForm("invalidBody")}</p>
         <Button asChild variant="gold" size="lg">
-          <Link href={ROUTES.forgotPassword}>Demander un nouveau lien</Link>
+          <Link href={ROUTES.forgotPassword}>{tForm("requestNew")}</Link>
         </Button>
       </div>
     );
@@ -110,47 +110,45 @@ export function ResetPasswordForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          Nouveau mot de passe.
+          {tForm("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Choisis un mot de passe robuste, d'au moins 8 caractères.
-        </p>
+        <p className="text-sm text-muted-foreground">{tForm("subtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <div className="space-y-1.5">
-          <Label htmlFor="password">Mot de passe</Label>
+          <Label htmlFor="password">{tForm("labels.password")}</Label>
           <Input
             id="password"
             type="password"
             autoComplete="new-password"
-            placeholder="8 caractères minimum"
+            placeholder={tForm("placeholders.password")}
             {...register("password")}
           />
-          {errors.password && (
+          {errors.password?.message && (
             <p className="text-xs text-[hsl(var(--destructive))]">
-              {errors.password.message}
+              {tErr(errors.password.message)}
             </p>
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="confirmPassword">Confirmation</Label>
+          <Label htmlFor="confirmPassword">{tForm("labels.confirmPassword")}</Label>
           <Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
-            placeholder="Confirme ton mot de passe"
+            placeholder={tForm("placeholders.confirmPassword")}
             {...register("confirmPassword")}
           />
-          {errors.confirmPassword && (
+          {errors.confirmPassword?.message && (
             <p className="text-xs text-[hsl(var(--destructive))]">
-              {errors.confirmPassword.message}
+              {tErr(errors.confirmPassword.message)}
             </p>
           )}
         </div>
         <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          Mettre à jour
+          {tForm("submit")}
         </Button>
       </form>
     </div>

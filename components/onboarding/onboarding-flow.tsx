@@ -24,6 +24,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,48 +56,16 @@ type StepKey =
   | "stress"
   | "insight";
 
-const STEPS: { key: StepKey; title: string; subtitle: string }[] = [
-  {
-    key: "situation",
-    title: "Comment te sens-tu financièrement ?",
-    subtitle: "Aucun jugement, juste pour calibrer.",
-  },
-  {
-    key: "income",
-    title: "Tes revenus mensuels.",
-    subtitle: "Ce qui rentre vraiment, après impôts.",
-  },
-  {
-    key: "expenses",
-    title: "Tes dépenses mensuelles.",
-    subtitle: "Estimation honnête, c'est largement suffisant.",
-  },
-  {
-    key: "savings",
-    title: "Ton épargne disponible.",
-    subtitle: "Liquidités accessibles, hors immobilier.",
-  },
-  {
-    key: "goal",
-    title: "Quel objectif tu vises ?",
-    subtitle: "Un seul à la fois, c'est plus efficace.",
-  },
-  {
-    key: "behavior",
-    title: "Comment décrirais-tu ta relation à l'argent ?",
-    subtitle: "Sélectionne ce qui te ressemble (autant que tu veux).",
-  },
-  {
-    key: "stress",
-    title: "Ton niveau de stress.",
-    subtitle: "Pour suivre ta tranquillité dans le temps.",
-  },
-  {
-    key: "insight",
-    title: "Voilà ce qu'on en retient.",
-    subtitle: "Un premier aperçu de ta situation — on creusera ensemble.",
-  },
-];
+const STEP_KEYS: readonly StepKey[] = [
+  "situation",
+  "income",
+  "expenses",
+  "savings",
+  "goal",
+  "behavior",
+  "stress",
+  "insight",
+] as const;
 
 const GOAL_ICONS: Record<string, LucideIcon> = {
   ShieldCheck,
@@ -132,6 +101,7 @@ type FormState = {
 };
 
 export function OnboardingFlow() {
+  const t = useTranslations("onboarding");
   const router = useRouter();
   const [step, setStep] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
@@ -147,8 +117,8 @@ export function OnboardingFlow() {
     perceivedStress: 3,
   });
 
-  const current = STEPS[step];
-  const progress = ((step + 1) / STEPS.length) * 100;
+  const currentKey = STEP_KEYS[step];
+  const progress = ((step + 1) / STEP_KEYS.length) * 100;
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -157,15 +127,15 @@ export function OnboardingFlow() {
     setForm((prev) => ({
       ...prev,
       behaviorTraits: prev.behaviorTraits.includes(id)
-        ? prev.behaviorTraits.filter((t) => t !== id)
+        ? prev.behaviorTraits.filter((tr) => tr !== id)
         : [...prev.behaviorTraits, id],
     }));
 
-  const next = () => setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  const next = () => setStep((s) => Math.min(STEP_KEYS.length - 1, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const canContinue = (): boolean => {
-    switch (current.key) {
+    switch (currentKey) {
       case "situation":
         return Boolean(form.situation);
       case "income":
@@ -199,7 +169,7 @@ export function OnboardingFlow() {
     };
     const parsed = onboardingSchema.safeParse(payload);
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Données invalides");
+      toast.error(parsed.error.issues[0]?.message ?? t("submit.invalidPayload"));
       return;
     }
     setSubmitting(true);
@@ -209,8 +179,8 @@ export function OnboardingFlow() {
         toast.error(res.error);
         return;
       }
-      toast.success("Profil financier créé.", {
-        description: "On a tout ce qu'il faut pour démarrer.",
+      toast.success(t("submit.successTitle"), {
+        description: t("submit.successBody"),
       });
       router.push(ROUTES.dashboard);
       router.refresh();
@@ -228,7 +198,7 @@ export function OnboardingFlow() {
             type="submit"
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            Passer pour l&apos;instant
+            {t("skip")}
           </button>
         </form>
       </div>
@@ -236,7 +206,7 @@ export function OnboardingFlow() {
       <div className="mt-8 space-y-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
-            Étape {step + 1} / {STEPS.length}
+            {t("stepCounter", { current: step + 1, total: STEP_KEYS.length })}
           </span>
           <span>{Math.round(progress)} %</span>
         </div>
@@ -249,7 +219,7 @@ export function OnboardingFlow() {
       <div className="my-auto py-10">
         <AnimatePresence mode="wait">
           <motion.div
-            key={current.key}
+            key={currentKey}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -258,16 +228,20 @@ export function OnboardingFlow() {
           >
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-                {current.key === "insight" ? "Premier aperçu" : "Onboarding"}
+                {currentKey === "insight"
+                  ? t("eyebrowFirstInsight")
+                  : t("eyebrowOnboarding")}
               </p>
               <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                {current.title}
+                {t(`steps.${currentKey}.title`)}
               </h1>
-              <p className="text-sm text-muted-foreground">{current.subtitle}</p>
+              <p className="text-sm text-muted-foreground">
+                {t(`steps.${currentKey}.subtitle`)}
+              </p>
             </div>
 
             <StepContent
-              step={current.key}
+              step={currentKey}
               form={form}
               update={update}
               toggleTrait={toggleTrait}
@@ -283,16 +257,16 @@ export function OnboardingFlow() {
           onClick={back}
           disabled={step === 0 || submitting}
         >
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> {t("actions.back")}
         </Button>
-        {step < STEPS.length - 1 ? (
+        {step < STEP_KEYS.length - 1 ? (
           <Button
             variant="gold"
             size="lg"
             onClick={next}
             disabled={!canContinue()}
           >
-            Continuer <ArrowRight className="h-4 w-4" />
+            {t("actions.continue")} <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
           <Button
@@ -302,7 +276,7 @@ export function OnboardingFlow() {
             disabled={!canContinue() || submitting}
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Démarrer LIBERIA
+            {t("actions.finish")}
           </Button>
         )}
       </div>
@@ -321,6 +295,7 @@ function StepContent({
   update: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
   toggleTrait: (id: BehaviorTraitId) => void;
 }) {
+  const t = useTranslations("onboarding");
   switch (step) {
     case "situation":
       return (
@@ -342,8 +317,12 @@ function StepContent({
             >
               <RadioGroupItem value={opt.id} id={opt.id} className="mt-0.5" />
               <div>
-                <p className="text-sm font-medium">{opt.label}</p>
-                <p className="text-xs text-muted-foreground">{opt.description}</p>
+                <p className="text-sm font-medium">
+                  {t(`situations.${opt.id}.label`)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t(`situations.${opt.id}.description`)}
+                </p>
               </div>
             </label>
           ))}
@@ -352,13 +331,13 @@ function StepContent({
     case "income":
       return (
         <div className="space-y-3">
-          <Label htmlFor="income">Revenus mensuels nets</Label>
+          <Label htmlFor="income">{t("steps.income.label")}</Label>
           <Input
             id="income"
             type="number"
             min={0}
             step="0.01"
-            placeholder="2 400"
+            placeholder={t("steps.income.placeholder")}
             value={form.monthlyIncome}
             onChange={(e) =>
               update(
@@ -368,7 +347,7 @@ function StepContent({
             }
           />
           <p className="text-xs text-muted-foreground">
-            Indique le total qui rentre chaque mois, toutes sources confondues.
+            {t("steps.income.helper")}
           </p>
         </div>
       );
@@ -376,13 +355,13 @@ function StepContent({
       return (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="expenses">Dépenses mensuelles estimées</Label>
+            <Label htmlFor="expenses">{t("steps.expenses.expensesLabel")}</Label>
             <Input
               id="expenses"
               type="number"
               min={0}
               step="0.01"
-              placeholder="1 900"
+              placeholder={t("steps.expenses.expensesPlaceholder")}
               value={form.monthlyExpenses}
               onChange={(e) =>
                 update(
@@ -393,15 +372,13 @@ function StepContent({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="debt">
-              Remboursements crédits / dettes mensuels
-            </Label>
+            <Label htmlFor="debt">{t("steps.expenses.debtLabel")}</Label>
             <Input
               id="debt"
               type="number"
               min={0}
               step="0.01"
-              placeholder="0"
+              placeholder={t("steps.expenses.debtPlaceholder")}
               value={form.monthlyDebt}
               onChange={(e) =>
                 update(
@@ -417,13 +394,13 @@ function StepContent({
       return (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="savings">Épargne disponible</Label>
+            <Label htmlFor="savings">{t("steps.savings.label")}</Label>
             <Input
               id="savings"
               type="number"
               min={0}
               step="0.01"
-              placeholder="1 200"
+              placeholder={t("steps.savings.placeholder")}
               value={form.currentSavings}
               onChange={(e) =>
                 update(
@@ -440,11 +417,10 @@ function StepContent({
             />
             <div>
               <p className="text-sm font-medium">
-                J&apos;ai un fonds d&apos;urgence dédié
+                {t("steps.savings.emergencyFundTitle")}
               </p>
               <p className="text-xs text-muted-foreground">
-                Un montant séparé, intouchable sauf urgence (3-6 mois de
-                dépenses idéalement).
+                {t("steps.savings.emergencyFundHelper")}
               </p>
             </div>
           </label>
@@ -478,7 +454,7 @@ function StepContent({
                 >
                   <Icon className="h-4 w-4" />
                 </span>
-                <span className="text-sm font-medium">{g.label}</span>
+                <span className="text-sm font-medium">{t(`goals.${g.id}`)}</span>
               </button>
             );
           })}
@@ -487,14 +463,14 @@ function StepContent({
     case "behavior":
       return (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {BEHAVIOR_TRAITS.map((t) => {
-            const Icon = BEHAVIOR_ICONS[t.icon] ?? Sparkles;
-            const active = form.behaviorTraits.includes(t.id);
+          {BEHAVIOR_TRAITS.map((tr) => {
+            const Icon = BEHAVIOR_ICONS[tr.icon] ?? Sparkles;
+            const active = form.behaviorTraits.includes(tr.id);
             return (
               <button
-                key={t.id}
+                key={tr.id}
                 type="button"
-                onClick={() => toggleTrait(t.id)}
+                onClick={() => toggleTrait(tr.id)}
                 aria-pressed={active}
                 className={cn(
                   "flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors",
@@ -514,9 +490,11 @@ function StepContent({
                   <Icon className="h-3.5 w-3.5" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium">{t.label}</span>
+                  <span className="block text-sm font-medium">
+                    {t(`traits.${tr.id}.label`)}
+                  </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {t.description}
+                    {t(`traits.${tr.id}.description`)}
                   </span>
                 </span>
               </button>
@@ -547,7 +525,9 @@ function StepContent({
                   value={String(s.value)}
                   id={`stress-${s.value}`}
                 />
-                <span className="text-sm font-medium">{s.label}</span>
+                <span className="text-sm font-medium">
+                  {t(`stressLevels.${s.value}`)}
+                </span>
               </span>
               <span className="text-xs text-muted-foreground">
                 {s.value}/5
@@ -562,6 +542,8 @@ function StepContent({
 }
 
 function InsightStep({ form }: { form: FormState }) {
+  const t = useTranslations("onboarding.steps.insight");
+  const tParent = useTranslations("onboarding");
   const insight = React.useMemo(
     () =>
       generateLocalInsight({
@@ -596,7 +578,7 @@ function InsightStep({ form }: { form: FormState }) {
         <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
           <Sparkles className="h-4 w-4" />
           <p className="text-[11px] font-medium uppercase tracking-[0.22em]">
-            Premier insight
+            {tParent("eyebrowFirstInsight")}
           </p>
         </div>
         <h2 className="mt-3 font-display text-xl font-semibold leading-snug sm:text-2xl">
@@ -622,7 +604,7 @@ function InsightStep({ form }: { form: FormState }) {
           </span>
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              Prochaine action concrète
+              {t("nextAction")}
             </p>
             <p className="mt-1 text-sm font-medium leading-relaxed">
               {insight.nextAction}
@@ -631,11 +613,7 @@ function InsightStep({ form }: { form: FormState }) {
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Ces premiers chiffres sont calculés à partir de tes réponses. Au fur
-        et à mesure que tu enregistreras tes vraies données, le coach affinera
-        ses recommandations.
-      </p>
+      <p className="text-xs text-muted-foreground">{t("footnote")}</p>
     </div>
   );
 }

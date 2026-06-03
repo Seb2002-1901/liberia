@@ -16,29 +16,19 @@ import {
   Target,
   Wallet,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
 export function ProblemSection() {
+  const t = useTranslations("marketing.problem");
   const items = [
-    {
-      icon: HeartPulse,
-      title: "Tu te sens dépassé·e par tes finances",
-      text: "Comptes éparpillés, dépenses floues, fin de mois tendue — c'est épuisant mentalement.",
-    },
-    {
-      icon: LineChart,
-      title: "Tu as l'impression de courir après l'argent",
-      text: "Tu travailles dur mais tu n'arrives pas à savoir où il part vraiment.",
-    },
-    {
-      icon: Compass,
-      title: "Tu n'as pas de direction claire",
-      text: "Tu veux avancer, mais sans plan tangible chaque mois ressemble au précédent.",
-    },
+    { icon: HeartPulse, title: t("items.overwhelmed.title"), text: t("items.overwhelmed.text") },
+    { icon: LineChart, title: t("items.chasing.title"), text: t("items.chasing.text") },
+    { icon: Compass, title: t("items.direction.title"), text: t("items.direction.text") },
   ];
   return (
-    <Section eyebrow="Le constat" title="L'argent ne devrait pas être une source de stress permanent.">
+    <Section eyebrow={t("eyebrow")} title={t("title")}>
       <div className="grid gap-4 md:grid-cols-3">
         {items.map((item) => (
           <FeatureCard
@@ -55,62 +45,36 @@ export function ProblemSection() {
 }
 
 export function SolutionSection() {
+  const t = useTranslations("marketing.solution");
   return (
     <Section
-      eyebrow="La solution"
-      title="Une boussole financière, calme, lisible, faite pour les humains."
-      description="LIBERIA assemble ton argent, tes dépenses et tes objectifs dans une seule interface premium. Tu vois où tu en es, ce qui pèse, et la prochaine étape concrète."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
     >
       <div className="grid gap-4 md:grid-cols-2">
-        <BigFeature
-          icon={BarChart3}
-          title="Score de stabilité financière"
-          text="Une note sur 100 transparente qui résume ton équilibre : revenus, dépenses, épargne, fonds d'urgence."
-        />
-        <BigFeature
-          icon={Target}
-          title="Objectifs qui ont du sens"
-          text="Fonds d'urgence, remboursement de dette, premier projet. Suivis simplement, sans gamification toxique."
-        />
-        <BigFeature
-          icon={Wallet}
-          title="Budget mensuel clair"
-          text="Tes revenus et dépenses classés automatiquement par catégorie, sans connexion bancaire intrusive."
-        />
-        <BigFeature
-          icon={PiggyBank}
-          title="Reste à vivre réel"
-          text="Tu sais immédiatement ce qu'il te reste après l'essentiel — et combien tu peux mettre de côté."
-        />
+        <BigFeature icon={BarChart3} title={t("items.score.title")} text={t("items.score.text")} />
+        <BigFeature icon={Target} title={t("items.goals.title")} text={t("items.goals.text")} />
+        <BigFeature icon={Wallet} title={t("items.budget.title")} text={t("items.budget.text")} />
+        <BigFeature icon={PiggyBank} title={t("items.leftover.title")} text={t("items.leftover.text")} />
       </div>
     </Section>
   );
 }
 
 export function HowItWorks() {
+  const t = useTranslations("marketing.howItWorks");
   const steps = [
-    {
-      n: "01",
-      title: "Tu dresses le tableau",
-      text: "5 minutes pour décrire ta situation, tes revenus et tes dépenses principales.",
-    },
-    {
-      n: "02",
-      title: "On calcule ta stabilité",
-      text: "Score, reste à vivre, niveau de stress, fonds d'urgence — tout devient lisible.",
-    },
-    {
-      n: "03",
-      title: "Tu avances par paliers",
-      text: "Des objectifs concrets, mois après mois, sans pression. Tu reprends ton souffle.",
-    },
+    { n: "01", title: t("steps.one.title"), text: t("steps.one.text") },
+    { n: "02", title: t("steps.two.title"), text: t("steps.two.text") },
+    { n: "03", title: t("steps.three.title"), text: t("steps.three.text") },
   ];
 
   return (
     <Section
       id="how-it-works"
-      eyebrow="Comment ça marche"
-      title="Trois étapes calmes pour reprendre la main."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
     >
       <div className="grid gap-4 md:grid-cols-3">
         {steps.map((s) => (
@@ -135,43 +99,20 @@ export function HowItWorks() {
 }
 
 export function FeaturesSection() {
+  const t = useTranslations("marketing.features");
   const items = [
-    {
-      icon: BarChart3,
-      title: "Dashboard premium",
-      text: "Une vue d'ensemble lisible, en quelques secondes.",
-    },
-    {
-      icon: Wallet,
-      title: "Suivi budget complet",
-      text: "Revenus, dépenses, catégories essentielles ou plaisir.",
-    },
-    {
-      icon: Target,
-      title: "Objectifs financiers",
-      text: "Crée et suis tes priorités en quelques tap.",
-    },
-    {
-      icon: PiggyBank,
-      title: "Épargne pilotée",
-      text: "Le reste à vivre devient une vraie variable de décision.",
-    },
-    {
-      icon: Layers,
-      title: "Mode démo riche",
-      text: "Teste tout, sans créer de compte, avec des données réalistes.",
-    },
-    {
-      icon: Sparkles,
-      title: "Coach IA inclus",
-      text: "Un assistant qui comprend tes chiffres et te répond sans jargon.",
-    },
+    { icon: BarChart3, title: t("items.dashboard.title"), text: t("items.dashboard.text") },
+    { icon: Wallet, title: t("items.budget.title"), text: t("items.budget.text") },
+    { icon: Target, title: t("items.goals.title"), text: t("items.goals.text") },
+    { icon: PiggyBank, title: t("items.savings.title"), text: t("items.savings.text") },
+    { icon: Layers, title: t("items.demo.title"), text: t("items.demo.text") },
+    { icon: Sparkles, title: t("items.coach.title"), text: t("items.coach.text") },
   ];
   return (
     <Section
       id="features"
-      eyebrow="Fonctionnalités"
-      title="Tout ce qu'il faut. Rien qu'il ne faut."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
@@ -188,18 +129,19 @@ export function FeaturesSection() {
 }
 
 export function SecuritySection() {
+  const t = useTranslations("marketing.security");
   return (
     <Section
       id="security"
-      eyebrow="Sécurité"
-      title="Tes données t'appartiennent. Point."
-      description="Stockage chiffré, accès strict par utilisateur via Row-Level Security Supabase, aucune revente, aucune publicité. LIBERIA n'a pas besoin de tes mots de passe bancaires."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
     >
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          { icon: Lock, t: "Chiffrement", d: "Connexion TLS et stockage chiffré au repos." },
-          { icon: ShieldCheck, t: "RLS Supabase", d: "Chaque utilisateur ne voit que ses propres données." },
-          { icon: Sparkles, t: "Pas d'agrégation bancaire", d: "Tu restes maître de ce que tu saisis, sans intermédiaire intrusif." },
+          { icon: Lock, t: t("items.encryption.title"), d: t("items.encryption.text") },
+          { icon: ShieldCheck, t: t("items.rls.title"), d: t("items.rls.text") },
+          { icon: Sparkles, t: t("items.noAggregation.title"), d: t("items.noAggregation.text") },
         ].map((item) => (
           <FeatureCard
             key={item.t}
@@ -214,34 +156,17 @@ export function SecuritySection() {
 }
 
 export function FaqSection() {
+  const t = useTranslations("marketing.faq");
   const faqs = [
-    {
-      q: "C'est vraiment gratuit ?",
-      a: "Tu démarres avec 14 jours d'essai gratuit (carte requise pour activer). Après l'essai, ton abonnement choisi se déclenche automatiquement : 14.99 CHF/mois ou 119.99 CHF/an. Tu peux annuler à tout moment depuis ton espace, sans question.",
-    },
-    {
-      q: "Que se passe-t-il si j'annule pendant l'essai ?",
-      a: "Aucun prélèvement. Ton accès continue jusqu'à la fin des 14 jours, puis ton compte passe en pause — tes données restent en sécurité et tu peux réactiver quand tu veux.",
-    },
-    {
-      q: "Quels moyens de paiement sont acceptés ?",
-      a: "Cartes Visa, Mastercard et American Express, Apple Pay, Google Pay, ainsi que TWINT (Suisse, selon activation Stripe Dashboard). Tout est géré par Stripe — chiffré et conforme PCI.",
-    },
-    {
-      q: "Mes données sont-elles connectées à ma banque ?",
-      a: "Non. LIBERIA fonctionne par saisie volontaire pour rester 100 % sous ton contrôle. C'est plus sain mentalement et nettement plus sûr.",
-    },
-    {
-      q: "Pour qui est LIBERIA ?",
-      a: "Pour toute personne qui veut reprendre pied financièrement — du salarié serré au freelance qui veut clarifier son année, en passant par les profils en reconstruction.",
-    },
-    {
-      q: "Et l'IA dans tout ça ?",
-      a: "Le coach IA est déjà inclus : tu peux discuter de ta situation, demander un plan financier sur 30, 60 ou 90 jours, et obtenir des recommandations adaptées à tes vrais chiffres. Aucune donnée bancaire requise — tu lui parles comme à quelqu'un qui connaît ton dossier.",
-    },
+    { q: t("items.free.q"), a: t("items.free.a") },
+    { q: t("items.cancelTrial.q"), a: t("items.cancelTrial.a") },
+    { q: t("items.payment.q"), a: t("items.payment.a") },
+    { q: t("items.bank.q"), a: t("items.bank.a") },
+    { q: t("items.audience.q"), a: t("items.audience.a") },
+    { q: t("items.ai.q"), a: t("items.ai.a") },
   ];
   return (
-    <Section id="faq" eyebrow="FAQ" title="Questions fréquentes.">
+    <Section id="faq" eyebrow={t("eyebrow")} title={t("title")}>
       <div className="mx-auto max-w-3xl divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
         {faqs.map((f) => (
           <details key={f.q} className="group p-5 [&_summary::-webkit-details-marker]:hidden">
@@ -258,6 +183,7 @@ export function FaqSection() {
 }
 
 export function CtaSection() {
+  const t = useTranslations("marketing.cta");
   return (
     <section className="relative overflow-hidden border-t border-border/60 bg-background">
       <div
@@ -266,19 +192,20 @@ export function CtaSection() {
       />
       <div className="container relative py-20 text-center">
         <h2 className="mx-auto max-w-2xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-          Donne à ton argent une direction <span className="gold-text">claire</span>.
+          {t("titleBefore")} <span className="gold-text">{t("titleAccent")}</span>
+          {t("titleAfter")}
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-pretty text-muted-foreground">
-          Crée ton compte en 30 secondes — ou explore le mode démo sans inscription.
+          {t("subtitle")}
         </p>
         <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild size="xl" variant="gold">
             <Link href={ROUTES.register}>
-              Commencer gratuitement <ArrowRight className="h-4 w-4" />
+              {t("ctaStart")} <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild size="xl" variant="outline">
-            <Link href={ROUTES.demo}>Essayer la démo</Link>
+            <Link href={ROUTES.demo}>{t("ctaDemo")}</Link>
           </Button>
         </div>
       </div>

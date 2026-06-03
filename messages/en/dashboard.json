@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "title": "Dashboard"
+  },
+  "header": {
+    "eyebrow": "Overview",
+    "title": "Hi, {firstName}",
+    "description": "Here's your current financial snapshot. You can adjust your income, expenses and goals any time.",
+    "demoBadge": "Demo mode",
+    "addExpense": "Add an expense",
+    "addIncome": "Add income"
+  },
+  "stats": {
+    "stressLabel": "Financial stress",
+    "stressHintHigh": "Focus on the essentials this month.",
+    "stressHintLow": "Manageable level, keep the course.",
+    "income": "Monthly income",
+    "expenses": "Monthly expenses",
+    "leftover": "Take-home money",
+    "leftoverHint": "Savings rate {rate}",
+    "emergency": "Emergency fund",
+    "monthsSuffix": "{months} months"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "emptyTitle": "Enter your data to get going",
+    "emptyText": "Add your income and expenses to see your first alerts — a few minutes is enough.",
+    "cashflowNegativeTitle": "You're spending more than you earn",
+    "cashflowNegativeText": "Identify 1 or 2 non-essential expenses to cut.",
+    "cashflowPositiveTitle": "Your monthly flow is positive",
+    "cashflowPositiveText": "Consider automating a monthly savings transfer.",
+    "runwayLowTitle": "Emergency fund very low",
+    "runwayLowText": "Short-term goal: 1 month of expenses set aside.",
+    "runwaySolidTitle": "Emergency fund solid",
+    "runwaySolidText": "Keep it intact, that's your peace of mind.",
+    "runwayBuildingTitle": "Emergency fund growing",
+    "runwayBuildingText": "Aim progressively for 3 months of expenses."
+  }
+}

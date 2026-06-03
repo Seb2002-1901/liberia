@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { RegisterForm } from "@/components/auth/register-form";
 
-export const metadata: Metadata = {
-  title: "Inscription",
-  description: "Crée ton compte LIBERIA et reprends le contrôle de ton argent.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth.register.metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default function RegisterPage() {
   return <RegisterForm />;

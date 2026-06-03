@@ -1,8 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { resolveAppLocale } from "@/i18n/config";
 import { COUNTRIES } from "@/lib/locale/countries";
 import { CURRENCIES } from "@/lib/locale/currencies";
 import { LANGUAGES } from "@/lib/locale/languages";
@@ -54,6 +56,16 @@ export async function updateProfileLocale(input: {
     })
     .eq("id", user.id);
   if (error) return { ok: false, error: error.message };
+
+  // Sync NEXT_LOCALE so next-intl picks up the new language on the
+  // very next render. Without this the user keeps seeing the previous
+  // language until the middleware-side cookie expires.
+  const cookieStore = await cookies();
+  cookieStore.set("NEXT_LOCALE", resolveAppLocale(parsed.data.locale), {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+  });
 
   // Currency / locale drive every personal amount across the app —
   // invalidate the surfaces that render finance data so the new

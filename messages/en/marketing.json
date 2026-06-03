@@ -1,0 +1,196 @@
+{
+  "header": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ"
+    },
+    "login": "Sign in",
+    "start": "Get started",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
+  },
+  "footer": {
+    "tagline": "Take back control of your money. LIBERIA helps you rebuild your financial stability, one step at a time.",
+    "columns": {
+      "product": "Product",
+      "resources": "Resources",
+      "legal": "Legal"
+    },
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "demo": "Demo mode",
+      "faq": "FAQ",
+      "security": "Security & trust",
+      "aiPolicy": "Responsible AI policy",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "disclaimer": "Disclaimer"
+    },
+    "copyright": "© {year} LIBERIA — All rights reserved.",
+    "disclaimer": "LIBERIA is a personal piloting tool. Nothing shown here constitutes financial, tax or investment advice."
+  },
+  "hero": {
+    "badge": "A new generation of financial piloting",
+    "titlePart1": "Take back control of",
+    "titleAccent": "your money.",
+    "subtitle": "LIBERIA helps you understand your finances, lower your stress and build durable stability — without jargon, without shame.",
+    "ctaStart": "Get started for free",
+    "ctaHow": "See how it works",
+    "trustSignal": "14 days free · Encrypted data · No ads"
+  },
+  "problem": {
+    "eyebrow": "The reality",
+    "title": "Money shouldn't be a constant source of stress.",
+    "items": {
+      "overwhelmed": {
+        "title": "You feel overwhelmed by your finances",
+        "text": "Scattered accounts, fuzzy spending, tight month-ends — it's mentally exhausting."
+      },
+      "chasing": {
+        "title": "You feel like you're chasing money",
+        "text": "You work hard but you can't tell where it actually goes."
+      },
+      "direction": {
+        "title": "You have no clear direction",
+        "text": "You want to move forward, but without a tangible plan every month looks like the last."
+      }
+    }
+  },
+  "solution": {
+    "eyebrow": "The solution",
+    "title": "A calm, readable financial compass, built for humans.",
+    "description": "LIBERIA brings together your money, your spending and your goals in a single premium interface. You see where you stand, what's weighing you down, and the next concrete step.",
+    "items": {
+      "score": {
+        "title": "Financial stability score",
+        "text": "A transparent score out of 100 that sums up your balance: income, expenses, savings, emergency fund."
+      },
+      "goals": {
+        "title": "Goals that actually matter",
+        "text": "Emergency fund, debt repayment, first project. Tracked simply, without toxic gamification."
+      },
+      "budget": {
+        "title": "Clear monthly budget",
+        "text": "Your income and expenses sorted automatically by category, with no intrusive bank connection."
+      },
+      "leftover": {
+        "title": "Real take-home money",
+        "text": "You instantly know what's left after the essentials — and how much you can put aside."
+      }
+    }
+  },
+  "howItWorks": {
+    "eyebrow": "How it works",
+    "title": "Three calm steps to take charge again.",
+    "steps": {
+      "one": {
+        "title": "You map it out",
+        "text": "5 minutes to describe your situation, your income and your main expenses."
+      },
+      "two": {
+        "title": "We compute your stability",
+        "text": "Score, take-home money, stress level, emergency fund — everything becomes legible."
+      },
+      "three": {
+        "title": "You move forward step by step",
+        "text": "Concrete goals, month after month, without pressure. You catch your breath."
+      }
+    }
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "Everything you need. Nothing you don't.",
+    "items": {
+      "dashboard": {
+        "title": "Premium dashboard",
+        "text": "A readable overview, in seconds."
+      },
+      "budget": {
+        "title": "Full budget tracking",
+        "text": "Income, expenses, essential or pleasure categories."
+      },
+      "goals": {
+        "title": "Financial goals",
+        "text": "Create and track your priorities in a few taps."
+      },
+      "savings": {
+        "title": "Piloted savings",
+        "text": "Your take-home money becomes a real decision variable."
+      },
+      "demo": {
+        "title": "Rich demo mode",
+        "text": "Try everything, without signing up, with realistic data."
+      },
+      "coach": {
+        "title": "AI coach included",
+        "text": "An assistant who understands your numbers and answers without jargon."
+      }
+    }
+  },
+  "security": {
+    "eyebrow": "Security",
+    "title": "Your data is yours. Period.",
+    "description": "Encrypted storage, strict per-user access via Supabase Row-Level Security, no resale, no ads. LIBERIA doesn't need your bank passwords.",
+    "items": {
+      "encryption": {
+        "title": "Encryption",
+        "text": "TLS connection and encrypted storage at rest."
+      },
+      "rls": {
+        "title": "Supabase RLS",
+        "text": "Each user only sees their own data."
+      },
+      "noAggregation": {
+        "title": "No bank aggregation",
+        "text": "You stay in control of what you enter, with no intrusive middleman."
+      }
+    }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Frequently asked questions.",
+    "items": {
+      "free": {
+        "q": "Is it really free?",
+        "a": "You start with a 14-day free trial (card required to activate). After the trial, your chosen subscription kicks in automatically: 14.99 CHF/month or 119.99 CHF/year. You can cancel any time from your account, no questions asked."
+      },
+      "cancelTrial": {
+        "q": "What happens if I cancel during the trial?",
+        "a": "No charge. Your access continues until the end of the 14 days, then your account goes on pause — your data stays safe and you can reactivate whenever you want."
+      },
+      "payment": {
+        "q": "Which payment methods are accepted?",
+        "a": "Visa, Mastercard and American Express cards, Apple Pay, Google Pay, plus TWINT (Switzerland, depending on Stripe Dashboard activation). Everything is handled by Stripe — encrypted and PCI-compliant."
+      },
+      "bank": {
+        "q": "Is my data connected to my bank?",
+        "a": "No. LIBERIA works with manual entry to keep you 100% in control. It's mentally healthier and substantially safer."
+      },
+      "audience": {
+        "q": "Who is LIBERIA for?",
+        "a": "Anyone who wants to get back on their feet financially — from a tight salary to a freelancer who wants to clarify the year, including people in financial recovery."
+      },
+      "ai": {
+        "q": "What about the AI?",
+        "a": "The AI coach is already included: you can discuss your situation, ask for a 30, 60 or 90-day financial plan, and get recommendations matched to your real numbers. No banking data required — you talk to it like to someone who knows your file."
+      }
+    }
+  },
+  "pricingPreview": {
+    "eyebrow": "Pricing",
+    "title": "{days} days free. Then the plan of your choice.",
+    "subtitle": "Card required to start. Automatic renewal after the trial. Cancel any time.",
+    "seeAll": "See all features →"
+  },
+  "cta": {
+    "titleBefore": "Give your money a",
+    "titleAccent": "clear",
+    "titleAfter": " direction.",
+    "subtitle": "Create your account in 30 seconds — or explore demo mode without signing up.",
+    "ctaStart": "Get started for free",
+    "ctaDemo": "Try the demo"
+  }
+}

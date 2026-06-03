@@ -1,0 +1,14 @@
+{
+  "validation": {
+    "emailRequired": "Email requis",
+    "emailInvalid": "Email invalide",
+    "passwordRequired": "Mot de passe requis",
+    "passwordMin": "8 caractères minimum",
+    "passwordMax": "72 caractères maximum",
+    "nameMin": "2 caractères minimum",
+    "nameMax": "60 caractères maximum",
+    "confirmRequired": "Confirmation requise",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "acceptTerms": "Merci d'accepter les conditions pour continuer."
+  }
+}

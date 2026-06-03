@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "sonner";
 import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import "./globals.css";
@@ -72,31 +74,35 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
   return (
     <html
-      lang="fr"
+      lang={locale}
       className={`${inter.variable} ${outfit.variable} dark`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans antialiased">
-        {children}
-        <Toaster
-          position="top-right"
-          theme="dark"
-          richColors
-          closeButton
-          toastOptions={{
-            classNames: {
-              toast:
-                "rounded-xl border border-border/60 bg-card/95 backdrop-blur-md",
-            },
-          }}
-        />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+          <Toaster
+            position="top-right"
+            theme="dark"
+            richColors
+            closeButton
+            toastOptions={{
+              classNames: {
+                toast:
+                  "rounded-xl border border-border/60 bg-card/95 backdrop-blur-md",
+              },
+            }}
+          />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

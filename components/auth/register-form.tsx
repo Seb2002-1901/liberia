@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { TRIAL_DAYS } from "@/lib/stripe/config";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -18,6 +19,8 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
 
 export function RegisterForm() {
+  const tForm = useTranslations("auth.register");
+  const tErr = useTranslations();
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -39,8 +42,8 @@ export function RegisterForm() {
 
   const onSubmit = async (values: RegisterInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("L'inscription est en cours d'activation", {
-        description: "Réessaie dans quelques instants.",
+      toast.error(tForm("configuringTitle"), {
+        description: tForm("configuringBody"),
       });
       return;
     }
@@ -58,7 +61,7 @@ export function RegisterForm() {
         },
       });
       if (error) {
-        toast.error("Inscription impossible", { description: error.message });
+        toast.error(tForm("failedTitle"), { description: error.message });
         return;
       }
 
@@ -66,12 +69,12 @@ export function RegisterForm() {
       //  - "Confirm email" ON: signUp returns user but no session.
       //  - "Confirm email" OFF: signUp returns user + session, user is signed in.
       if (!data.session) {
-        toast.success("Compte créé.", {
-          description: "Vérifie ta boîte mail pour confirmer ton adresse.",
+        toast.success(tForm("createdTitle"), {
+          description: tForm("createdBody"),
         });
         router.push(ROUTES.login);
       } else {
-        toast.success("Bienvenue dans LIBERIA.");
+        toast.success(tForm("welcome"));
         router.push(ROUTES.onboarding);
       }
       router.refresh();
@@ -84,65 +87,74 @@ export function RegisterForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          Commence ta reconstruction.
+          {tForm("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Création de compte en 30 secondes.
-        </p>
+        <p className="text-sm text-muted-foreground">{tForm("subtitle")}</p>
         <div className="rounded-xl border border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.06)] px-3 py-2.5 text-xs text-muted-foreground">
           <span className="font-medium text-foreground">
-            {TRIAL_DAYS} jours gratuits
+            {tForm("trialBadgeStrong", { days: TRIAL_DAYS })}
           </span>
-          , puis abonnement automatique selon le plan choisi. Annulable à tout
-          moment.
+          {tForm("trialBadgeRest")}
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <Field label="Prénom / Nom" htmlFor="name" error={errors.name?.message}>
+        <Field
+          label={tForm("labels.name")}
+          htmlFor="name"
+          error={errors.name?.message ? tErr(errors.name.message) : undefined}
+        >
           <Input
             id="name"
             type="text"
             autoComplete="name"
-            placeholder="Comment souhaites-tu être appelé·e ?"
+            placeholder={tForm("placeholders.name")}
             {...register("name")}
           />
         </Field>
 
-        <Field label="Email" htmlFor="email" error={errors.email?.message}>
+        <Field
+          label={tForm("labels.email")}
+          htmlFor="email"
+          error={errors.email?.message ? tErr(errors.email.message) : undefined}
+        >
           <Input
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="toi@email.com"
+            placeholder={tForm("placeholders.email")}
             {...register("email")}
           />
         </Field>
 
         <Field
-          label="Mot de passe"
+          label={tForm("labels.password")}
           htmlFor="password"
-          error={errors.password?.message}
+          error={errors.password?.message ? tErr(errors.password.message) : undefined}
         >
           <Input
             id="password"
             type="password"
             autoComplete="new-password"
-            placeholder="8 caractères minimum"
+            placeholder={tForm("placeholders.password")}
             {...register("password")}
           />
         </Field>
 
         <Field
-          label="Confirmation"
+          label={tForm("labels.confirmPassword")}
           htmlFor="confirmPassword"
-          error={errors.confirmPassword?.message}
+          error={
+            errors.confirmPassword?.message
+              ? tErr(errors.confirmPassword.message)
+              : undefined
+          }
         >
           <Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
-            placeholder="Confirme ton mot de passe"
+            placeholder={tForm("placeholders.confirmPassword")}
             {...register("confirmPassword")}
           />
         </Field>
@@ -177,28 +189,28 @@ export function RegisterForm() {
                     )}
                   />
                   <span className="text-xs leading-relaxed text-muted-foreground">
-                    J&apos;accepte les{" "}
+                    {tForm("acceptBefore")}{" "}
                     <Link
                       href={ROUTES.terms}
                       className="font-medium text-foreground underline-offset-2 hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      conditions d&apos;utilisation
+                      {tForm("termsLink")}
                     </Link>{" "}
-                    et la{" "}
+                    {tForm("and")}{" "}
                     <Link
                       href={ROUTES.privacy}
                       className="font-medium text-foreground underline-offset-2 hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      politique de confidentialité
+                      {tForm("privacyLink")}
                     </Link>
                     .
                   </span>
                 </Label>
-                {hasError && (
+                {hasError && errors.acceptTerms?.message && (
                   <p className="mt-1.5 text-xs text-[hsl(var(--destructive))]">
-                    {errors.acceptTerms?.message}
+                    {tErr(errors.acceptTerms.message)}
                   </p>
                 )}
               </div>
@@ -208,14 +220,14 @@ export function RegisterForm() {
 
         <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          Créer mon compte
+          {tForm("submit")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Déjà inscrit·e ?{" "}
+        {tForm("alreadyRegistered")}{" "}
         <Link href={ROUTES.login} className="font-medium text-foreground hover:underline">
-          Se connecter
+          {tForm("loginLink")}
         </Link>
       </p>
     </div>

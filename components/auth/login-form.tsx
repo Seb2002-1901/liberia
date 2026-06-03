@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,8 @@ import { ROUTES } from "@/lib/constants";
 import { safeRedirectPath } from "@/lib/utils/redirect";
 
 export function LoginForm() {
+  const tForm = useTranslations("auth.login");
+  const tErr = useTranslations();
   const router = useRouter();
   const params = useSearchParams();
   const next = safeRedirectPath(params.get("next"), ROUTES.dashboard);
@@ -25,11 +28,11 @@ export function LoginForm() {
   const errorParam = params.get("error");
   React.useEffect(() => {
     if (errorParam === "auth_callback") {
-      toast.error("Lien invalide ou expiré", {
-        description: "Reconnecte-toi ou demande un nouveau lien.",
+      toast.error(tForm("expiredLinkTitle"), {
+        description: tForm("expiredLinkBody"),
       });
     }
-  }, [errorParam]);
+  }, [errorParam, tForm]);
 
   const {
     register,
@@ -42,8 +45,8 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginInput) => {
     if (!isSupabaseConfigured()) {
-      toast.error("L'authentification est en cours d'activation", {
-        description: "Réessaie dans quelques instants.",
+      toast.error(tForm("configuringTitle"), {
+        description: tForm("configuringBody"),
       });
       return;
     }
@@ -52,10 +55,10 @@ export function LoginForm() {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword(values);
       if (error) {
-        toast.error("Connexion impossible", { description: error.message });
+        toast.error(tForm("failedTitle"), { description: error.message });
         return;
       }
-      toast.success("Bon retour parmi nous.");
+      toast.success(tForm("successWelcome"));
       router.push(next);
       router.refresh();
     } finally {
@@ -67,38 +70,36 @@ export function LoginForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          Content de te revoir.
+          {tForm("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Connecte-toi pour reprendre ton pilotage.
-        </p>
+        <p className="text-sm text-muted-foreground">{tForm("subtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <Field
-          label="Email"
+          label={tForm("labels.email")}
           htmlFor="email"
-          error={errors.email?.message}
+          error={errors.email?.message ? tErr(errors.email.message) : undefined}
         >
           <Input
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="toi@email.com"
+            placeholder={tForm("placeholders.email")}
             {...register("email")}
           />
         </Field>
 
         <Field
-          label="Mot de passe"
+          label={tForm("labels.password")}
           htmlFor="password"
-          error={errors.password?.message}
+          error={errors.password?.message ? tErr(errors.password.message) : undefined}
           hint={
             <Link
               href={ROUTES.forgotPassword}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
-              Oublié ?
+              {tForm("forgot")}
             </Link>
           }
         >
@@ -106,21 +107,21 @@ export function LoginForm() {
             id="password"
             type="password"
             autoComplete="current-password"
-            placeholder="••••••••"
+            placeholder={tForm("placeholders.password")}
             {...register("password")}
           />
         </Field>
 
         <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          Se connecter
+          {tForm("submit")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        Pas encore de compte ?{" "}
+        {tForm("noAccount")}{" "}
         <Link href={ROUTES.register} className="font-medium text-foreground hover:underline">
-          Crée le tien
+          {tForm("createAccount")}
         </Link>
       </p>
     </div>

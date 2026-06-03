@@ -3,21 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-const NAV_LINKS = [
-  { href: "/#features", label: "Fonctionnalités" },
-  { href: "/#how-it-works", label: "Comment ça marche" },
-  { href: ROUTES.pricing, label: "Tarifs" },
-  { href: "/#faq", label: "FAQ" },
-];
-
 export function SiteHeader() {
+  const t = useTranslations("marketing.header");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const navLinks = [
+    { href: "/#features", label: t("nav.features") },
+    { href: "/#how-it-works", label: t("nav.howItWorks") },
+    { href: ROUTES.pricing, label: t("nav.pricing") },
+    { href: "/#faq", label: t("nav.faq") },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -38,7 +40,7 @@ export function SiteHeader() {
       <div className="container flex h-16 items-center justify-between">
         <BrandMark />
         <nav className="hidden items-center gap-7 md:flex">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -50,17 +52,17 @@ export function SiteHeader() {
         </nav>
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost" size="sm">
-            <Link href={ROUTES.login}>Se connecter</Link>
+            <Link href={ROUTES.login}>{t("login")}</Link>
           </Button>
           <Button asChild variant="gold" size="sm">
-            <Link href={ROUTES.register}>Commencer</Link>
+            <Link href={ROUTES.register}>{t("start")}</Link>
           </Button>
         </div>
         <button
           type="button"
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-label={open ? t("menuClose") : t("menuOpen")}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -68,7 +70,7 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
           <div className="container flex flex-col gap-2 py-4">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -80,10 +82,10 @@ export function SiteHeader() {
             ))}
             <div className="mt-2 flex gap-2 px-1">
               <Button asChild variant="outline" size="sm" className="flex-1">
-                <Link href={ROUTES.login}>Se connecter</Link>
+                <Link href={ROUTES.login}>{t("login")}</Link>
               </Button>
               <Button asChild variant="gold" size="sm" className="flex-1">
-                <Link href={ROUTES.register}>Commencer</Link>
+                <Link href={ROUTES.register}>{t("start")}</Link>
               </Button>
             </div>
           </div>

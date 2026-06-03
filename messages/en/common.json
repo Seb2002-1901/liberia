@@ -1,0 +1,16 @@
+{
+  "appName": "LIBERIA",
+  "tagline": "Take back control of your money.",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "loading": "Loading…",
+    "submit": "Submit"
+  },
+  "smoke": "i18n active"
+}

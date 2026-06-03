@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "title": "Tableau de bord"
+  },
+  "header": {
+    "eyebrow": "Vue d'ensemble",
+    "title": "Salut, {firstName}",
+    "description": "Voici ta photo financière du moment. Tu peux ajuster tes revenus, dépenses et objectifs à tout moment.",
+    "demoBadge": "Mode démo",
+    "addExpense": "Ajouter une dépense",
+    "addIncome": "Ajouter un revenu"
+  },
+  "stats": {
+    "stressLabel": "Stress financier",
+    "stressHintHigh": "Concentre-toi sur l'essentiel ce mois-ci.",
+    "stressHintLow": "Niveau gérable, garde le cap.",
+    "income": "Revenus mensuels",
+    "expenses": "Dépenses mensuelles",
+    "leftover": "Reste à vivre",
+    "leftoverHint": "Taux d'épargne {rate}",
+    "emergency": "Fonds d'urgence",
+    "monthsSuffix": "{months} mois"
+  },
+  "alerts": {
+    "title": "Alertes",
+    "emptyTitle": "Renseigne tes données pour démarrer",
+    "emptyText": "Ajoute tes revenus et dépenses pour voir tes premières alertes — quelques minutes suffisent.",
+    "cashflowNegativeTitle": "Tu dépenses plus que tu ne gagnes",
+    "cashflowNegativeText": "Identifie 1 ou 2 dépenses non essentielles à réduire.",
+    "cashflowPositiveTitle": "Ton flux mensuel est positif",
+    "cashflowPositiveText": "Pense à automatiser une épargne mensuelle.",
+    "runwayLowTitle": "Fonds d'urgence très faible",
+    "runwayLowText": "Objectif court terme : 1 mois de dépenses de côté.",
+    "runwaySolidTitle": "Fonds d'urgence solide",
+    "runwaySolidText": "Continue à le préserver, c'est ta tranquillité.",
+    "runwayBuildingTitle": "Fonds d'urgence en construction",
+    "runwayBuildingText": "Vise progressivement 3 mois de dépenses."
+  }
+}

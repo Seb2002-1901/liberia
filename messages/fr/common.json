@@ -1,0 +1,16 @@
+{
+  "appName": "LIBERIA",
+  "tagline": "Reprends le contrôle de ton argent.",
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "continue": "Continuer",
+    "loading": "Chargement…",
+    "submit": "Valider"
+  },
+  "smoke": "i18n actif"
+}

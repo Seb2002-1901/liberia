@@ -1,0 +1,196 @@
+{
+  "header": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "faq": "FAQ"
+    },
+    "login": "Se connecter",
+    "start": "Commencer",
+    "menuOpen": "Ouvrir le menu",
+    "menuClose": "Fermer le menu"
+  },
+  "footer": {
+    "tagline": "Reprends le contrôle de ton argent. LIBERIA t'aide à reconstruire ta stabilité financière, étape par étape.",
+    "columns": {
+      "product": "Produit",
+      "resources": "Ressources",
+      "legal": "Légal"
+    },
+    "links": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "demo": "Mode démo",
+      "faq": "FAQ",
+      "security": "Sécurité & confiance",
+      "aiPolicy": "Politique IA responsable",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "disclaimer": "Disclaimer"
+    },
+    "copyright": "© {year} LIBERIA — Tous droits réservés.",
+    "disclaimer": "LIBERIA est un outil de pilotage personnel. Aucune des informations affichées ne constitue un conseil financier, fiscal ou d'investissement."
+  },
+  "hero": {
+    "badge": "Nouvelle génération de pilotage financier",
+    "titlePart1": "Reprends le contrôle de",
+    "titleAccent": "ton argent.",
+    "subtitle": "LIBERIA t'aide à comprendre ta situation financière, réduire ton stress et construire une stabilité durable — sans jargon, sans culpabilisation.",
+    "ctaStart": "Commencer gratuitement",
+    "ctaHow": "Voir comment ça marche",
+    "trustSignal": "14 jours gratuits · Données chiffrées · Sans pub"
+  },
+  "problem": {
+    "eyebrow": "Le constat",
+    "title": "L'argent ne devrait pas être une source de stress permanent.",
+    "items": {
+      "overwhelmed": {
+        "title": "Tu te sens dépassé·e par tes finances",
+        "text": "Comptes éparpillés, dépenses floues, fin de mois tendue — c'est épuisant mentalement."
+      },
+      "chasing": {
+        "title": "Tu as l'impression de courir après l'argent",
+        "text": "Tu travailles dur mais tu n'arrives pas à savoir où il part vraiment."
+      },
+      "direction": {
+        "title": "Tu n'as pas de direction claire",
+        "text": "Tu veux avancer, mais sans plan tangible chaque mois ressemble au précédent."
+      }
+    }
+  },
+  "solution": {
+    "eyebrow": "La solution",
+    "title": "Une boussole financière, calme, lisible, faite pour les humains.",
+    "description": "LIBERIA assemble ton argent, tes dépenses et tes objectifs dans une seule interface premium. Tu vois où tu en es, ce qui pèse, et la prochaine étape concrète.",
+    "items": {
+      "score": {
+        "title": "Score de stabilité financière",
+        "text": "Une note sur 100 transparente qui résume ton équilibre : revenus, dépenses, épargne, fonds d'urgence."
+      },
+      "goals": {
+        "title": "Objectifs qui ont du sens",
+        "text": "Fonds d'urgence, remboursement de dette, premier projet. Suivis simplement, sans gamification toxique."
+      },
+      "budget": {
+        "title": "Budget mensuel clair",
+        "text": "Tes revenus et dépenses classés automatiquement par catégorie, sans connexion bancaire intrusive."
+      },
+      "leftover": {
+        "title": "Reste à vivre réel",
+        "text": "Tu sais immédiatement ce qu'il te reste après l'essentiel — et combien tu peux mettre de côté."
+      }
+    }
+  },
+  "howItWorks": {
+    "eyebrow": "Comment ça marche",
+    "title": "Trois étapes calmes pour reprendre la main.",
+    "steps": {
+      "one": {
+        "title": "Tu dresses le tableau",
+        "text": "5 minutes pour décrire ta situation, tes revenus et tes dépenses principales."
+      },
+      "two": {
+        "title": "On calcule ta stabilité",
+        "text": "Score, reste à vivre, niveau de stress, fonds d'urgence — tout devient lisible."
+      },
+      "three": {
+        "title": "Tu avances par paliers",
+        "text": "Des objectifs concrets, mois après mois, sans pression. Tu reprends ton souffle."
+      }
+    }
+  },
+  "features": {
+    "eyebrow": "Fonctionnalités",
+    "title": "Tout ce qu'il faut. Rien qu'il ne faut.",
+    "items": {
+      "dashboard": {
+        "title": "Dashboard premium",
+        "text": "Une vue d'ensemble lisible, en quelques secondes."
+      },
+      "budget": {
+        "title": "Suivi budget complet",
+        "text": "Revenus, dépenses, catégories essentielles ou plaisir."
+      },
+      "goals": {
+        "title": "Objectifs financiers",
+        "text": "Crée et suis tes priorités en quelques tap."
+      },
+      "savings": {
+        "title": "Épargne pilotée",
+        "text": "Le reste à vivre devient une vraie variable de décision."
+      },
+      "demo": {
+        "title": "Mode démo riche",
+        "text": "Teste tout, sans créer de compte, avec des données réalistes."
+      },
+      "coach": {
+        "title": "Coach IA inclus",
+        "text": "Un assistant qui comprend tes chiffres et te répond sans jargon."
+      }
+    }
+  },
+  "security": {
+    "eyebrow": "Sécurité",
+    "title": "Tes données t'appartiennent. Point.",
+    "description": "Stockage chiffré, accès strict par utilisateur via Row-Level Security Supabase, aucune revente, aucune publicité. LIBERIA n'a pas besoin de tes mots de passe bancaires.",
+    "items": {
+      "encryption": {
+        "title": "Chiffrement",
+        "text": "Connexion TLS et stockage chiffré au repos."
+      },
+      "rls": {
+        "title": "RLS Supabase",
+        "text": "Chaque utilisateur ne voit que ses propres données."
+      },
+      "noAggregation": {
+        "title": "Pas d'agrégation bancaire",
+        "text": "Tu restes maître de ce que tu saisis, sans intermédiaire intrusif."
+      }
+    }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions fréquentes.",
+    "items": {
+      "free": {
+        "q": "C'est vraiment gratuit ?",
+        "a": "Tu démarres avec 14 jours d'essai gratuit (carte requise pour activer). Après l'essai, ton abonnement choisi se déclenche automatiquement : 14.99 CHF/mois ou 119.99 CHF/an. Tu peux annuler à tout moment depuis ton espace, sans question."
+      },
+      "cancelTrial": {
+        "q": "Que se passe-t-il si j'annule pendant l'essai ?",
+        "a": "Aucun prélèvement. Ton accès continue jusqu'à la fin des 14 jours, puis ton compte passe en pause — tes données restent en sécurité et tu peux réactiver quand tu veux."
+      },
+      "payment": {
+        "q": "Quels moyens de paiement sont acceptés ?",
+        "a": "Cartes Visa, Mastercard et American Express, Apple Pay, Google Pay, ainsi que TWINT (Suisse, selon activation Stripe Dashboard). Tout est géré par Stripe — chiffré et conforme PCI."
+      },
+      "bank": {
+        "q": "Mes données sont-elles connectées à ma banque ?",
+        "a": "Non. LIBERIA fonctionne par saisie volontaire pour rester 100 % sous ton contrôle. C'est plus sain mentalement et nettement plus sûr."
+      },
+      "audience": {
+        "q": "Pour qui est LIBERIA ?",
+        "a": "Pour toute personne qui veut reprendre pied financièrement — du salarié serré au freelance qui veut clarifier son année, en passant par les profils en reconstruction."
+      },
+      "ai": {
+        "q": "Et l'IA dans tout ça ?",
+        "a": "Le coach IA est déjà inclus : tu peux discuter de ta situation, demander un plan financier sur 30, 60 ou 90 jours, et obtenir des recommandations adaptées à tes vrais chiffres. Aucune donnée bancaire requise — tu lui parles comme à quelqu'un qui connaît ton dossier."
+      }
+    }
+  },
+  "pricingPreview": {
+    "eyebrow": "Tarifs",
+    "title": "{days} jours gratuits. Puis l'abonnement de ton choix.",
+    "subtitle": "Carte requise pour démarrer. Renouvellement automatique après l'essai. Annulable à tout moment.",
+    "seeAll": "Voir toutes les fonctionnalités →"
+  },
+  "cta": {
+    "titleBefore": "Donne à ton argent une direction",
+    "titleAccent": "claire",
+    "titleAfter": ".",
+    "subtitle": "Crée ton compte en 30 secondes — ou explore le mode démo sans inscription.",
+    "ctaStart": "Commencer gratuitement",
+    "ctaDemo": "Essayer la démo"
+  }
+}

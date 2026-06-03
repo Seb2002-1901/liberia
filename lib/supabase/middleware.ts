@@ -1,9 +1,13 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveAppLocale } from "@/i18n/config";
 
 // NB: /reset-password is intentionally NOT here — the password-recovery
 // flow lands authenticated and would otherwise be bounced to /dashboard.
 const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
+
+const LOCALE_COOKIE = "NEXT_LOCALE";
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/budget",
@@ -77,6 +81,32 @@ export async function updateSession(request: NextRequest) {
     redirect.pathname = "/dashboard";
     redirect.searchParams.delete("next");
     return NextResponse.redirect(redirect);
+  }
+
+  // Cheap locale-cookie sync: only when the user is authenticated AND
+  // no NEXT_LOCALE cookie is set yet. We hit profiles for a single
+  // column once (after login or cookie expiry) — every subsequent
+  // request reads the cookie next-intl already trusts. The locale
+  // form on /profile also writes the cookie directly so a change is
+  // visible without waiting for this branch.
+  if (user && !request.cookies.get(LOCALE_COOKIE)) {
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("locale")
+        .eq("id", user.id)
+        .maybeSingle();
+      const resolved = resolveAppLocale(profile?.locale ?? null);
+      response.cookies.set(LOCALE_COOKIE, resolved, {
+        path: "/",
+        maxAge: LOCALE_COOKIE_MAX_AGE,
+        sameSite: "lax",
+      });
+    } catch {
+      // Schema drift / network blip — let next-intl fall back to
+      // Accept-Language for this request. Cookie stays unset so we
+      // retry on the next navigation.
+    }
   }
 
   return response;

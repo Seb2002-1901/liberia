@@ -1,0 +1,130 @@
+{
+  "eyebrowOnboarding": "Onboarding",
+  "eyebrowFirstInsight": "First insight",
+  "skip": "Skip for now",
+  "stepCounter": "Step {current} / {total}",
+  "actions": {
+    "back": "Back",
+    "continue": "Continue",
+    "finish": "Start LIBERIA"
+  },
+  "submit": {
+    "successTitle": "Financial profile created.",
+    "successBody": "We have everything we need to get going.",
+    "invalidPayload": "Invalid data"
+  },
+  "steps": {
+    "situation": {
+      "title": "How are you doing financially?",
+      "subtitle": "No judgement, just to calibrate."
+    },
+    "income": {
+      "title": "Your monthly income.",
+      "subtitle": "What actually comes in, after tax.",
+      "label": "Net monthly income",
+      "placeholder": "2 400",
+      "helper": "Enter what comes in each month, from every source combined."
+    },
+    "expenses": {
+      "title": "Your monthly expenses.",
+      "subtitle": "An honest estimate is more than enough.",
+      "expensesLabel": "Estimated monthly expenses",
+      "expensesPlaceholder": "1 900",
+      "debtLabel": "Monthly debt / credit repayments",
+      "debtPlaceholder": "0"
+    },
+    "savings": {
+      "title": "Your available savings.",
+      "subtitle": "Accessible cash, excluding real estate.",
+      "label": "Available savings",
+      "placeholder": "1 200",
+      "emergencyFundTitle": "I have a dedicated emergency fund",
+      "emergencyFundHelper": "A separate amount, untouchable except for emergencies (ideally 3-6 months of expenses)."
+    },
+    "goal": {
+      "title": "Which goal are you aiming for?",
+      "subtitle": "One at a time is more effective."
+    },
+    "behavior": {
+      "title": "How would you describe your relationship with money?",
+      "subtitle": "Pick what fits (as many as you want)."
+    },
+    "stress": {
+      "title": "Your stress level.",
+      "subtitle": "To track your peace of mind over time."
+    },
+    "insight": {
+      "title": "Here's what we'll keep in mind.",
+      "subtitle": "A first glimpse of your situation — we'll dig deeper together.",
+      "nextAction": "Concrete next action",
+      "footnote": "These first numbers are computed from your answers. As you log your real data, the coach will refine its recommendations."
+    }
+  },
+  "situations": {
+    "struggling": {
+      "label": "I'm struggling",
+      "description": "My expenses are higher than my income."
+    },
+    "tight": {
+      "label": "I'm just getting by",
+      "description": "I finish the month with no margin."
+    },
+    "stable": {
+      "label": "I'm stable",
+      "description": "I manage to put a little aside."
+    },
+    "comfortable": {
+      "label": "I'm comfortable",
+      "description": "I save and want to optimise."
+    }
+  },
+  "stressLevels": {
+    "1": "No stress",
+    "2": "Mild",
+    "3": "Moderate",
+    "4": "High",
+    "5": "Very high"
+  },
+  "goals": {
+    "emergency_fund": "Emergency fund",
+    "debt_payoff": "Pay off debt",
+    "savings": "Savings",
+    "purchase": "Big purchase",
+    "travel": "Travel",
+    "other": "Other"
+  },
+  "traits": {
+    "impulsive": {
+      "label": "Impulse buying",
+      "description": "Sometimes I splurge without planning."
+    },
+    "avoidant": {
+      "label": "I avoid looking",
+      "description": "My finances stress me out, I'd rather not think about them."
+    },
+    "organized": {
+      "label": "Rather organised",
+      "description": "I track things, I like to know where money goes."
+    },
+    "anxious": {
+      "label": "Anxious about money",
+      "description": "Thinking about money makes me tense."
+    },
+    "motivated": {
+      "label": "Very motivated",
+      "description": "I want to act, now."
+    },
+    "lost": {
+      "label": "A bit lost",
+      "description": "I don't know where to start anymore."
+    },
+    "disciplined": {
+      "label": "Disciplined",
+      "description": "I keep my commitments when I make them."
+    },
+    "rebuilding": {
+      "label": "Rebuilding",
+      "description": "I'm coming out of a rough patch, climbing back up."
+    }
+  }
+}

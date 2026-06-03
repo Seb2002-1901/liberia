@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
 export function Hero() {
+  const t = useTranslations("marketing.hero");
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 grid-bg opacity-60" aria-hidden />
@@ -24,30 +26,29 @@ export function Hero() {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.06)] px-3 py-1 text-xs font-medium text-[hsl(var(--gold))]">
             <Sparkles className="h-3.5 w-3.5" />
-            Nouvelle génération de pilotage financier
+            {t("badge")}
           </div>
           <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl">
-            Reprends le contrôle de
-            <span className="gold-text"> ton argent.</span>
+            {t("titlePart1")}
+            <span className="gold-text"> {t("titleAccent")}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-            LIBERIA t'aide à comprendre ta situation financière, réduire ton stress
-            et construire une stabilité durable — sans jargon, sans culpabilisation.
+            {t("subtitle")}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="xl" variant="gold">
               <Link href={ROUTES.register}>
-                Commencer gratuitement
+                {t("ctaStart")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="xl" variant="outline">
-              <Link href="/#how-it-works">Voir comment ça marche</Link>
+              <Link href="/#how-it-works">{t("ctaHow")}</Link>
             </Button>
           </div>
           <p className="mt-5 inline-flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" />
-            14 jours gratuits · Données chiffrées · Sans pub
+            {t("trustSignal")}
           </p>
         </motion.div>
 
