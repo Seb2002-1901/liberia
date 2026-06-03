@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -32,16 +33,12 @@ export function LocaleForm({
   initialCurrency,
   initialLocale,
 }: Props) {
+  const t = useTranslations("app.profile.locale");
   const [country, setCountry] = React.useState(initialCountry);
   const [currency, setCurrency] = React.useState(initialCurrency);
   const [language, setLanguage] = React.useState(initialLocale);
   const [pending, startTransition] = React.useTransition();
 
-  // Picking a country only *suggests* currency + language. Whatever
-  // value the user currently has in those two selectors is overwritten
-  // with the country's defaults, but they can then change either back
-  // to anything — a Swiss user who wants the interface in Italian and
-  // amounts in CHF is the explicit V1 target.
   const onCountryChange = (next: string) => {
     setCountry(next);
     setCurrency(getDefaultCurrencyForCountry(next));
@@ -57,7 +54,7 @@ export function LocaleForm({
         locale: language,
       });
       if (res.ok) {
-        toast.success("Préférences enregistrées.");
+        toast.success(t("saved"));
       } else {
         toast.error(res.error);
       }
@@ -73,7 +70,7 @@ export function LocaleForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <Label htmlFor="country">Pays</Label>
+          <Label htmlFor="country">{t("country")}</Label>
           <Select value={country} onValueChange={onCountryChange}>
             <SelectTrigger id="country">
               <SelectValue />
@@ -88,7 +85,7 @@ export function LocaleForm({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="currency">Devise</Label>
+          <Label htmlFor="currency">{t("currency")}</Label>
           <Select value={currency} onValueChange={setCurrency}>
             <SelectTrigger id="currency">
               <SelectValue />
@@ -103,7 +100,7 @@ export function LocaleForm({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="language">Langue</Label>
+          <Label htmlFor="language">{t("language")}</Label>
           <Select value={language} onValueChange={setLanguage}>
             <SelectTrigger id="language">
               <SelectValue />
@@ -119,14 +116,10 @@ export function LocaleForm({
         </div>
       </div>
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          Tes montants personnels suivent ta devise. L&apos;interface reste en
-          français au lancement ; le choix de langue prépare la traduction
-          complète. L&apos;abonnement LIBERIA est facturé en CHF.
-        </p>
+        <p className="text-xs text-muted-foreground">{t("footnote")}</p>
         <Button type="submit" disabled={!changed || pending}>
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-          Enregistrer
+          {t("save")}
         </Button>
       </div>
     </form>

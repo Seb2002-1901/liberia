@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
@@ -18,11 +19,13 @@ import {
   frequencyMultiplier,
 } from "@/lib/calculations/aggregate";
 
-export const metadata: Metadata = {
-  title: "Budget",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.finance.budget.metadata");
+  return { title: t("title") };
+}
 
 export default async function BudgetPage() {
+  const t = await getTranslations("app.finance.budget");
   const data = await getFinanceData();
 
   const monthlyIncome = totalMonthly(data.incomes);
@@ -47,58 +50,58 @@ export default async function BudgetPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Pilotage"
-        title="Ton budget mensuel"
-        description="Vue d'ensemble : ce qui rentre, ce qui sort, ce qu'il reste pour avancer."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Revenus"
+          label={t("stats.income")}
           value={formatCurrency(monthlyIncome, data.profile.currency)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
         />
         <StatCard
-          label="Dépenses"
+          label={t("stats.expenses")}
           value={formatCurrency(monthlyExpenses, data.profile.currency)}
           icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
-          label="Reste à vivre"
+          label={t("stats.leftover")}
           value={formatCurrency(cashflow, data.profile.currency)}
           tone={cashflow >= 0 ? "positive" : "negative"}
           icon={<Scale className="h-4 w-4" />}
-          hint={`Taux d'épargne ${formatPercent(savingsRate)}`}
+          hint={t("stats.leftoverHint", { rate: formatPercent(savingsRate) })}
         />
         <StatCard
-          label="Ratio dépenses / revenus"
+          label={t("stats.ratio")}
           value={formatPercent(expenseRatio)}
-          hint={expenseRatio > 100 ? "Tu vis au-dessus de tes moyens." : "Marge encore disponible."}
+          hint={expenseRatio > 100 ? t("stats.ratioOver") : t("stats.ratioOk")}
         />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Essentiel vs. plaisir</CardTitle>
+            <CardTitle>{t("essentialVsPleasure")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <BudgetBar
-              label="Dépenses essentielles"
+              label={t("barEssential")}
               value={essentialTotal}
               max={monthlyExpenses || 1}
               currency={data.profile.currency}
             />
             <BudgetBar
-              label="Dépenses non essentielles"
+              label={t("barNonEssential")}
               value={nonEssentialTotal}
               max={monthlyExpenses || 1}
               tone="muted"
               currency={data.profile.currency}
             />
             <BudgetBar
-              label="Reste à vivre / Épargne"
+              label={t("barLeftover")}
               value={Math.max(0, cashflow)}
               max={monthlyIncome || 1}
               tone="gold"
@@ -146,4 +149,3 @@ function BudgetBar({
     </div>
   );
 }
-

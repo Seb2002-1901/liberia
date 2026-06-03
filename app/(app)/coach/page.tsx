@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, MessageSquarePlus, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { listConversations } from "@/lib/services/coach";
 import { getFinanceData } from "@/lib/services/finance";
 
-export const metadata: Metadata = {
-  title: "Coach IA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.coach.metadata");
+  return { title: t("title") };
+}
 
 export default async function CoachIndexPage() {
+  const t = await getTranslations("app.coach");
   const data = await getFinanceData();
 
   // If user has existing conversations, jump to the most recent.
@@ -31,30 +34,26 @@ export default async function CoachIndexPage() {
       </span>
       <div className="max-w-md space-y-2">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-          Bienvenue dans ton coach financier
+          {t("welcomeTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Discute en français de tes finances. Le coach LIBERIA s&apos;appuie
-          sur tes revenus, dépenses et objectifs pour te proposer des actions
-          concrètes — calmement, sans jargon, sans promesse.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("welcomeBody")}</p>
       </div>
 
       {data.isDemo ? (
         <Button asChild variant="gold" size="lg">
           <Link href="/register">
-            Créer mon compte
+            {t("createAccount")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       ) : (
-        <NewConversationCta />
+        <NewConversationCta label={t("newConversation")} />
       )}
     </div>
   );
 }
 
-function NewConversationCta() {
+function NewConversationCta({ label }: { label: string }) {
   return (
     <form
       action={async () => {
@@ -69,7 +68,7 @@ function NewConversationCta() {
     >
       <Button type="submit" variant="gold" size="lg">
         <MessageSquarePlus className="h-4 w-4" />
-        Démarrer une conversation
+        {label}
       </Button>
     </form>
   );

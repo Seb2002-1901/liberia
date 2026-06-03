@@ -16,6 +16,7 @@ import {
   User,
   Wallet,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -29,32 +30,6 @@ import {
 import { BrandMark } from "@/components/layout/brand-mark";
 import { ROUTES } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
-
-const NAV = [
-  { href: ROUTES.dashboard, label: "Tableau de bord", icon: LayoutDashboard },
-  { href: ROUTES.coach, label: "Coach IA", icon: MessageSquare },
-  { href: ROUTES.plan, label: "Plan", icon: Map },
-  { href: ROUTES.budget, label: "Budget", icon: Wallet },
-  { href: ROUTES.incomes, label: "Revenus", icon: ArrowUpCircle },
-  { href: ROUTES.expenses, label: "Dépenses", icon: ArrowDownCircle },
-  { href: ROUTES.goals, label: "Objectifs", icon: Target },
-];
-
-// On mobile the bottom-nav keeps the 5 most-used entries so each tap
-// target stays comfortable on small screens. Less-used items remain in
-// the sidebar dropdown / direct URL.
-const MOBILE_NAV = [
-  { href: ROUTES.dashboard, label: "Accueil", icon: LayoutDashboard },
-  { href: ROUTES.coach, label: "Coach", icon: MessageSquare },
-  { href: ROUTES.plan, label: "Plan", icon: Map },
-  { href: ROUTES.budget, label: "Budget", icon: Wallet },
-  { href: ROUTES.goals, label: "Objectifs", icon: Target },
-];
-
-const SECONDARY = [
-  { href: ROUTES.profile, label: "Profil", icon: User },
-  { href: ROUTES.settings, label: "Paramètres", icon: Settings },
-];
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -76,8 +51,33 @@ export function AppShell({
   isDemo,
   onSignOut,
 }: AppShellProps) {
+  const t = useTranslations("common.shell");
   const pathname = usePathname();
   const displayName = user?.fullName || user?.email?.split("@")[0] || "Membre";
+
+  // Built per-render so labels follow the active locale.
+  const NAV = [
+    { href: ROUTES.dashboard, label: t("nav.dashboard"), icon: LayoutDashboard },
+    { href: ROUTES.coach, label: t("nav.coach"), icon: MessageSquare },
+    { href: ROUTES.plan, label: t("nav.plan"), icon: Map },
+    { href: ROUTES.budget, label: t("nav.budget"), icon: Wallet },
+    { href: ROUTES.incomes, label: t("nav.incomes"), icon: ArrowUpCircle },
+    { href: ROUTES.expenses, label: t("nav.expenses"), icon: ArrowDownCircle },
+    { href: ROUTES.goals, label: t("nav.goals"), icon: Target },
+  ];
+
+  const MOBILE_NAV = [
+    { href: ROUTES.dashboard, label: t("mobileNav.dashboard"), icon: LayoutDashboard },
+    { href: ROUTES.coach, label: t("mobileNav.coach"), icon: MessageSquare },
+    { href: ROUTES.plan, label: t("mobileNav.plan"), icon: Map },
+    { href: ROUTES.budget, label: t("mobileNav.budget"), icon: Wallet },
+    { href: ROUTES.goals, label: t("mobileNav.goals"), icon: Target },
+  ];
+
+  const SECONDARY = [
+    { href: ROUTES.profile, label: t("nav.profile"), icon: User },
+    { href: ROUTES.settings, label: t("nav.settings"), icon: Settings },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +87,7 @@ export function AppShell({
           <BrandMark />
         </div>
         <nav className="flex-1 space-y-1 px-3">
-          <SidebarSection title="Pilotage">
+          <SidebarSection title={t("sectionPilotage")}>
             {NAV.map((item) => (
               <SidebarLink
                 key={item.href}
@@ -99,11 +99,12 @@ export function AppShell({
                   (isDemo === true && pathname === "/demo" && item.href === ROUTES.dashboard)
                 }
                 disabled={isDemo === true && item.href !== ROUTES.dashboard}
+                disabledTooltip={t("menu.disabledTooltip")}
               />
             ))}
           </SidebarSection>
           {!isDemo && (
-            <SidebarSection title="Compte">
+            <SidebarSection title={t("sectionAccount")}>
               {SECONDARY.map((item) => (
                 <SidebarLink
                   key={item.href}
@@ -117,11 +118,7 @@ export function AppShell({
           )}
         </nav>
         <div className="p-3">
-          {isDemo ? (
-            <DemoUpsellCard />
-          ) : (
-            <UpgradeCard plan={plan} trialUsed={trialUsed} />
-          )}
+          {isDemo ? <DemoUpsellCard /> : <UpgradeCard plan={plan} trialUsed={trialUsed} />}
         </div>
       </aside>
 
@@ -134,7 +131,7 @@ export function AppShell({
           <div className="ml-auto flex items-center gap-3">
             {isDemo && (
               <span className="hidden rounded-full border border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.08)] px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-[hsl(var(--gold))] sm:inline-flex">
-                Mode démo
+                {t("demoBadge")}
               </span>
             )}
             <DropdownMenu>
@@ -142,7 +139,7 @@ export function AppShell({
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-1.5 py-1.5 transition-colors hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  aria-label="Menu compte"
+                  aria-label={t("menu.ariaLabel")}
                 >
                   <Avatar className="h-7 w-7">
                     <AvatarFallback className="bg-secondary text-xs">
@@ -170,12 +167,12 @@ export function AppShell({
                   <>
                     <DropdownMenuItem asChild>
                       <Link href={ROUTES.register}>
-                        <Sparkles className="h-4 w-4" /> Créer mon compte
+                        <Sparkles className="h-4 w-4" /> {t("menu.createAccount")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={ROUTES.login}>
-                        <User className="h-4 w-4" /> Se connecter
+                        <User className="h-4 w-4" /> {t("menu.login")}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -183,17 +180,17 @@ export function AppShell({
                   <>
                     <DropdownMenuItem asChild>
                       <Link href={ROUTES.profile}>
-                        <User className="h-4 w-4" /> Profil
+                        <User className="h-4 w-4" /> {t("menu.profile")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={ROUTES.settings}>
-                        <Settings className="h-4 w-4" /> Paramètres
+                        <Settings className="h-4 w-4" /> {t("menu.settings")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={ROUTES.subscription}>
-                        <Sparkles className="h-4 w-4" /> Abonnement
+                        <Sparkles className="h-4 w-4" /> {t("menu.subscription")}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -207,7 +204,7 @@ export function AppShell({
                         void onSignOut();
                       }}
                     >
-                      <LogOut className="h-4 w-4" /> Se déconnecter
+                      <LogOut className="h-4 w-4" /> {t("menu.signOut")}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -232,9 +229,9 @@ export function AppShell({
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="container flex items-center justify-between py-3">
-            <p className="text-xs text-muted-foreground">Mode démo · lecture seule</p>
+            <p className="text-xs text-muted-foreground">{t("demoBottomNote")}</p>
             <Button asChild size="sm" variant="gold">
-              <Link href={ROUTES.register}>Créer mon compte</Link>
+              <Link href={ROUTES.register}>{t("menu.createAccount")}</Link>
             </Button>
           </div>
         </nav>
@@ -258,7 +255,7 @@ export function AppShell({
                   aria-current={active ? "page" : undefined}
                 >
                   <Icon className="h-5 w-5" />
-                  <span>{shortLabel(item.label)}</span>
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
@@ -292,18 +289,20 @@ function SidebarLink({
   icon: Icon,
   active,
   disabled,
+  disabledTooltip,
 }: {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   active: boolean;
   disabled?: boolean;
+  disabledTooltip?: string;
 }) {
   if (disabled) {
     return (
       <span
         aria-disabled
-        title="Disponible avec un compte"
+        title={disabledTooltip}
         className="group flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground/50"
       >
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/30 text-muted-foreground/60">
@@ -340,17 +339,16 @@ function SidebarLink({
 }
 
 function DemoUpsellCard() {
+  const t = useTranslations("common.shell.upgradeCard");
   return (
     <div className="relative overflow-hidden rounded-xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.08)] to-transparent p-4">
       <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
         <Sparkles className="h-4 w-4" />
-        <p className="text-xs font-semibold uppercase tracking-wider">Démo</p>
+        <p className="text-xs font-semibold uppercase tracking-wider">{t("eyebrowDemo")}</p>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Crée ton compte pour piloter tes vraies données.
-      </p>
+      <p className="mt-2 text-xs text-muted-foreground">{t("demoBody")}</p>
       <Button asChild size="sm" variant="gold" className="mt-3 w-full">
-        <Link href={ROUTES.register}>Créer mon compte</Link>
+        <Link href={ROUTES.register}>{t("demoCta")}</Link>
       </Button>
     </div>
   );
@@ -363,25 +361,22 @@ function UpgradeCard({
   plan: "free" | "premium";
   trialUsed: boolean;
 }) {
+  const t = useTranslations("common.shell.upgradeCard");
   if (plan === "premium") {
     return (
       <div className="rounded-xl border border-border/60 bg-card/40 p-3 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Plan Premium actif</p>
-        <p className="mt-1">Merci pour ton soutien.</p>
+        <p className="font-medium text-foreground">{t("premiumActive")}</p>
+        <p className="mt-1">{t("premiumThanks")}</p>
       </div>
     );
   }
-  const cta = trialUsed
-    ? "Reprendre mon abonnement"
-    : "Démarrer mon essai 14 jours";
-  const body = trialUsed
-    ? "Ton accès est en pause. Reprends ton abonnement à 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment."
-    : "14 jours gratuits, puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment.";
+  const cta = trialUsed ? t("resumeCta") : t("trialCta");
+  const body = trialUsed ? t("resumeBody") : t("trialBody");
   return (
     <div className="relative overflow-hidden rounded-xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.08)] to-transparent p-4">
       <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
         <Sparkles className="h-4 w-4" />
-        <p className="text-xs font-semibold uppercase tracking-wider">Premium</p>
+        <p className="text-xs font-semibold uppercase tracking-wider">{t("eyebrowPremium")}</p>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">{body}</p>
       <Button asChild size="sm" variant="gold" className="mt-3 w-full">
@@ -395,19 +390,4 @@ function isActive(pathname: string | null, href: string) {
   if (!pathname) return false;
   if (href === "/dashboard") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function shortLabel(label: string) {
-  const map: Record<string, string> = {
-    "Tableau de bord": "Accueil",
-    Accueil: "Accueil",
-    Coach: "Coach",
-    "Coach IA": "Coach",
-    Plan: "Plan",
-    Revenus: "Revenus",
-    Dépenses: "Dépenses",
-    Objectifs: "Objectifs",
-    Budget: "Budget",
-  };
-  return map[label] ?? label;
 }

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,6 +31,8 @@ export function CoachingMemoryCard({
   initialTriggers,
   initialNotes,
 }: CoachingMemoryCardProps) {
+  const t = useTranslations("app.settings.memory");
+  const tConst = useTranslations("app.memoryConstants");
   const [tone, setTone] = React.useState<CoachingToneId | null>(initialTone);
   const [challenges, setChallenges] =
     React.useState<RecurringChallengeId[]>(initialChallenges);
@@ -61,7 +64,7 @@ export function CoachingMemoryCard({
         toast.error(res.error);
         return;
       }
-      toast.success("Mémoire de coaching mise à jour.");
+      toast.success(t("savedTitle"));
     } finally {
       setPending(false);
     }
@@ -69,9 +72,7 @@ export function CoachingMemoryCard({
 
   const reset = async () => {
     if (typeof window !== "undefined") {
-      const ok = window.confirm(
-        "Réinitialiser ta mémoire de coaching ? Tes données financières restent intactes — seules les préférences de personnalisation sont effacées.",
-      );
+      const ok = window.confirm(t("resetConfirm"));
       if (!ok) return;
     }
     setClearing(true);
@@ -85,7 +86,7 @@ export function CoachingMemoryCard({
       setChallenges([]);
       setTriggers([]);
       setNotes("");
-      toast.success("Mémoire réinitialisée.");
+      toast.success(t("resetDone"));
     } finally {
       setClearing(false);
     }
@@ -94,31 +95,24 @@ export function CoachingMemoryCard({
   return (
     <div className="space-y-7">
       <div className="rounded-xl border border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.04)] px-4 py-3 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">
-          LIBERIA apprend ton profil pour mieux t&apos;accompagner.
-        </p>
-        <p className="mt-1">
-          Ces préférences restent privées et ne sortent jamais de ton
-          compte. Tu peux les modifier ou les effacer à tout moment.
-        </p>
+        <p className="font-medium text-foreground">{t("intro")}</p>
+        <p className="mt-1">{t("introSub")}</p>
       </div>
 
       {/* Coaching tone */}
       <div className="space-y-3">
         <div>
-          <Label className="text-sm font-medium">Style de coaching</Label>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Le ton que LIBERIA utilise quand il te parle.
-          </p>
+          <Label className="text-sm font-medium">{t("toneLabel")}</Label>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t("toneHelp")}</p>
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {COACHING_TONES.map((t) => {
-            const active = tone === t.id;
+          {COACHING_TONES.map((tn) => {
+            const active = tone === tn.id;
             return (
               <button
-                key={t.id}
+                key={tn.id}
                 type="button"
-                onClick={() => setTone(active ? null : t.id)}
+                onClick={() => setTone(active ? null : tn.id)}
                 aria-pressed={active}
                 className={cn(
                   "rounded-2xl border p-3.5 text-left transition-colors",
@@ -127,9 +121,9 @@ export function CoachingMemoryCard({
                     : "border-border/60 hover:border-border hover:bg-card/60",
                 )}
               >
-                <p className="text-sm font-medium">{t.label}</p>
+                <p className="text-sm font-medium">{tConst(`tones.${tn.id}.label`)}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {t.description}
+                  {tConst(`tones.${tn.id}.description`)}
                 </p>
               </button>
             );
@@ -140,12 +134,8 @@ export function CoachingMemoryCard({
       {/* Recurring challenges */}
       <div className="space-y-3">
         <div>
-          <Label className="text-sm font-medium">
-            Difficultés que tu rencontres
-          </Label>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Sélectionne ce qui te parle. Aide LIBERIA à mieux te guider.
-          </p>
+          <Label className="text-sm font-medium">{t("challengesLabel")}</Label>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t("challengesHelp")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {RECURRING_CHALLENGES.map((c) => {
@@ -165,7 +155,7 @@ export function CoachingMemoryCard({
                     : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground",
                 )}
               >
-                {c.label}
+                {tConst(`challenges.${c.id}`)}
               </button>
             );
           })}
@@ -175,22 +165,18 @@ export function CoachingMemoryCard({
       {/* Spending triggers */}
       <div className="space-y-3">
         <div>
-          <Label className="text-sm font-medium">
-            Tes déclencheurs de dépense
-          </Label>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Les moments où tu dépenses plus que prévu.
-          </p>
+          <Label className="text-sm font-medium">{t("triggersLabel")}</Label>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t("triggersHelp")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {SPENDING_TRIGGERS.map((t) => {
-            const active = triggers.includes(t.id);
+          {SPENDING_TRIGGERS.map((tr) => {
+            const active = triggers.includes(tr.id);
             return (
               <button
-                key={t.id}
+                key={tr.id}
                 type="button"
                 onClick={() =>
-                  setTriggers((prev) => toggle(prev, t.id as SpendingTriggerId))
+                  setTriggers((prev) => toggle(prev, tr.id as SpendingTriggerId))
                 }
                 aria-pressed={active}
                 className={cn(
@@ -200,7 +186,7 @@ export function CoachingMemoryCard({
                     : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground",
                 )}
               >
-                {t.label}
+                {tConst(`triggers.${tr.id}`)}
               </button>
             );
           })}
@@ -211,23 +197,20 @@ export function CoachingMemoryCard({
       <div className="space-y-2">
         <div>
           <Label htmlFor="memory-notes" className="text-sm font-medium">
-            Notes personnelles
+            {t("notesLabel")}
           </Label>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Ce que tu veux que LIBERIA garde en tête sur ta trajectoire.
-            Visible uniquement par toi.
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t("notesHelp")}</p>
         </div>
         <Textarea
           id="memory-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
           rows={4}
-          placeholder="Ex. « En ce moment je sors d'une période difficile, j'ai besoin d'avancer doucement. »"
+          placeholder={t("notesPlaceholder")}
           className="resize-none"
         />
         <p className="text-[10px] text-muted-foreground">
-          {notes.length} / 1000 caractères
+          {t("charCount", { count: notes.length })}
         </p>
       </div>
 
@@ -244,7 +227,7 @@ export function CoachingMemoryCard({
           ) : (
             <RotateCcw className="h-3.5 w-3.5" />
           )}
-          Réinitialiser
+          {t("reset")}
         </Button>
         <Button
           variant="gold"
@@ -257,7 +240,7 @@ export function CoachingMemoryCard({
           ) : (
             <Sparkles className="h-3.5 w-3.5" />
           )}
-          Enregistrer
+          {t("save")}
         </Button>
       </div>
     </div>

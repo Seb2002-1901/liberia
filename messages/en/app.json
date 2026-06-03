@@ -1,0 +1,274 @@
+{
+  "profile": {
+    "metadata": { "title": "Profile" },
+    "header": {
+      "eyebrow": "Account",
+      "title": "Profile",
+      "description": "Your personal information. Editable any time."
+    },
+    "fallbackName": "Member",
+    "infoCard": "Information",
+    "planActive": "Premium plan",
+    "planInactive": "No active subscription",
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email"
+    },
+    "regionCard": "Country, currency and language",
+    "locale": {
+      "country": "Country",
+      "currency": "Currency",
+      "language": "Language",
+      "footnote": "Your personal amounts follow your currency. The interface is translated into the language you pick; languages without a complete translation fall back to English. The LIBERIA subscription is billed in CHF.",
+      "save": "Save",
+      "saved": "Preferences saved.",
+      "unsupported": "Country / currency / language combination not supported yet."
+    }
+  },
+  "settings": {
+    "metadata": { "title": "Settings" },
+    "header": {
+      "eyebrow": "Account",
+      "title": "Settings",
+      "description": "Tune your preferences and manage your data."
+    },
+    "sections": {
+      "memory": "Coaching memory",
+      "notifications": "Notifications",
+      "subscription": "Subscription",
+      "data": "Data & privacy",
+      "security": "Security"
+    },
+    "memory": {
+      "intro": "LIBERIA learns your profile to support you better.",
+      "introSub": "These preferences stay private and never leave your account. You can edit or wipe them any time.",
+      "toneLabel": "Coaching style",
+      "toneHelp": "The tone LIBERIA uses when speaking to you.",
+      "challengesLabel": "Challenges you run into",
+      "challengesHelp": "Pick what resonates. Helps LIBERIA guide you better.",
+      "triggersLabel": "Your spending triggers",
+      "triggersHelp": "The moments when you spend more than planned.",
+      "notesLabel": "Personal notes",
+      "notesHelp": "What you want LIBERIA to keep in mind about your trajectory. Only visible to you.",
+      "notesPlaceholder": "e.g. \"I'm coming out of a rough patch, I need to move slowly.\"",
+      "charCount": "{count} / 1000 characters",
+      "reset": "Reset",
+      "save": "Save",
+      "savedTitle": "Coaching memory updated.",
+      "resetConfirm": "Reset your coaching memory? Your financial data stays intact — only personalisation preferences are cleared.",
+      "resetDone": "Memory reset."
+    },
+    "prefs": {
+      "weekly": {
+        "title": "Weekly summary email",
+        "description": "Every Sunday, a short recap of your financial week."
+      },
+      "alerts": {
+        "title": "Important alerts",
+        "description": "Negative take-home, goals running late."
+      },
+      "encouragement": {
+        "title": "Progress encouragement",
+        "description": "A short email when the coach detects notable progress."
+      },
+      "milestones": {
+        "title": "Goal milestones",
+        "description": "When a goal hits a tier (50 / 80 / 100%)."
+      },
+      "inactivity": {
+        "title": "Coach follow-up",
+        "description": "A gentle email after several inactive days."
+      },
+      "trial": {
+        "title": "Trial and payment reminders",
+        "description": "Before the trial ends and on payment issues. Recommended."
+      },
+      "analytics": {
+        "title": "Anonymous product analytics",
+        "description": "Aggregated counters (never personal) to improve LIBERIA. No resale, no ad tracking."
+      }
+    },
+    "subscription": {
+      "intro": "Manage your plan, billing and Premium access.",
+      "cta": "Manage my subscription"
+    },
+    "data": {
+      "intro": "Per GDPR, you can export or permanently delete all your data.",
+      "exportInfo": "The export contains profile, income, expenses, goals, AI plans and conversation history.",
+      "exportCta": "Download my data (JSON)",
+      "exportDone": "Export downloaded.",
+      "deleteCta": "Delete my account",
+      "deleteConfirm": "Permanently delete your LIBERIA account? This action is irreversible and wipes all your data (income, expenses, goals, AI plans, conversations).",
+      "deletePrompt": "To confirm, type \"delete\" exactly.",
+      "deleteKeyword": "delete",
+      "deleteCancelled": "Deletion cancelled."
+    },
+    "security": {
+      "intro": "Your data is encrypted at rest and in transit. Each user only accesses their own data — strict isolation enforced at the database layer.",
+      "linksBefore": "See also our",
+      "privacyLink": "privacy policy",
+      "linksAnd": "and the",
+      "legalLink": "legal disclaimer"
+    }
+  },
+  "subscription": {
+    "metadata": { "title": "Subscription" },
+    "header": {
+      "eyebrow": "Account",
+      "title": "Subscription",
+      "description": "Manage your trial, plan and payment method."
+    },
+    "banners": {
+      "trialTitle": "Free trial in progress",
+      "trialTitleWithDays": "Free trial in progress — {days, plural, one {# day left} other {# days left}}",
+      "trialBillingFrom": "Automatic billing starts on {date}. ",
+      "trialBillingSoon": "Automatic billing will start when the trial ends. ",
+      "trialCancelled": "You've cancelled: no invoice will be charged.",
+      "trialCanCancel": "You can cancel any time via the portal.",
+      "activeTitle": "Subscription active",
+      "activeTitleCancelling": "Subscription active — cancellation scheduled",
+      "activeKeptUntil": "Your access continues until {date}.",
+      "activeKeptUntilFallback": "Your access continues until the end of the period.",
+      "activeRenews": "Next renewal: {date}.",
+      "activeManaged": "You can manage your subscription any time.",
+      "pastDueTitle": "Payment pending",
+      "pastDueBody": "The last payment didn't go through. Update your payment method via the portal to reactivate access — your data stays safe.",
+      "lapsedPausedTitle": "Your access is paused",
+      "lapsedNewTitle": "You can activate your access",
+      "lapsedPausedBody": "Pick a plan to reactivate full LIBERIA access. Your data stays intact.",
+      "lapsedNewBody": "Activate your {days}-day free trial. Cancel any time."
+    },
+    "status": {
+      "label": "Current plan",
+      "trialing": "Trial",
+      "active": "Premium",
+      "pastDue": "Payment pending",
+      "paused": "Trial paused",
+      "canceled": "Cancelled",
+      "incomplete": "Incomplete payment",
+      "none": "No subscription",
+      "trialUsedNote": "You've already used your free trial. Future plans start at the standard rate.",
+      "freshNote": "Start with {days} free days. Card required to activate.",
+      "manageNote": "You can change plan or cancel any time via the portal."
+    },
+    "timeline": {
+      "title": "Account activity",
+      "trialUsedLabel": "Free trial used",
+      "trialUsedDetail": "One trial per account — anti-abuse.",
+      "trialEndsLabel": "Trial ends: {date}",
+      "trialEndedLabel": "Trial ended on {date}",
+      "accessKeptLabel": "Access maintained until {date}",
+      "renewsLabel": "Next renewal: {date}",
+      "cancelScheduledLabel": "Cancellation scheduled",
+      "cancelScheduledDetail": "You can revoke it via the portal while the period is running.",
+      "paymentMethodLabel": "Payment method stored with Stripe",
+      "paymentMethodDetail": "Manageable from the customer portal."
+    },
+    "footnote": "Billing in CHF for launch, whatever your country. Payment handled by Stripe (encrypted, PCI-compliant). Accepted methods: Visa / Mastercard / American Express cards, Apple Pay, Google Pay, and TWINT (Switzerland, depending on Stripe Dashboard activation)."
+  },
+  "coach": {
+    "metadata": { "title": "AI coach" },
+    "welcomeTitle": "Welcome to your financial coach",
+    "welcomeBody": "Talk about your finances. The LIBERIA coach uses your income, expenses and goals to suggest concrete actions — calmly, without jargon, without promise.",
+    "newConversation": "Start a conversation",
+    "createAccount": "Create my account"
+  },
+  "plan": {
+    "metadata": { "title": "Financial plan" },
+    "header": {
+      "eyebrow": "Plan",
+      "title": "Your financial plan",
+      "description": "A concrete action plan to move forward week after week."
+    },
+    "aiNotReady": "The AI plan is coming shortly.",
+    "demoReason": "Demo mode: create an account to generate a plan.",
+    "demoEmptyTitle": "The AI plan is reserved for accounts",
+    "demoEmptyBody": "Create your account to generate a personalised 30, 60 or 90-day plan based on your real data.",
+    "createAccount": "Create my account"
+  },
+  "finance": {
+    "budget": {
+      "metadata": { "title": "Budget" },
+      "header": {
+        "eyebrow": "Piloting",
+        "title": "Your monthly budget",
+        "description": "The overview: what comes in, what goes out, what's left to move forward."
+      },
+      "stats": {
+        "income": "Income",
+        "expenses": "Expenses",
+        "leftover": "Take-home",
+        "leftoverHint": "Savings rate {rate}",
+        "ratio": "Expenses / income ratio",
+        "ratioOver": "You're living above your means.",
+        "ratioOk": "Margin still available."
+      },
+      "essentialVsPleasure": "Essential vs. pleasure",
+      "barEssential": "Essential expenses",
+      "barNonEssential": "Non-essential expenses",
+      "barLeftover": "Take-home / Savings"
+    },
+    "incomes": {
+      "metadata": { "title": "Income" },
+      "header": {
+        "eyebrow": "Piloting",
+        "title": "Your income",
+        "description": "Salary, freelance, allowances, side income — everything that comes in, sorted cleanly."
+      },
+      "stats": {
+        "monthly": "Monthly income",
+        "sources": "Active sources",
+        "sourcesHint": "Add every source for a faithful calculation."
+      }
+    },
+    "expenses": {
+      "metadata": { "title": "Expenses" },
+      "header": {
+        "eyebrow": "Piloting",
+        "title": "Your expenses",
+        "description": "List your essential and non-essential expenses. No judgement, just for clarity."
+      },
+      "stats": {
+        "monthly": "Monthly expenses",
+        "lines": "Recorded lines",
+        "linesHint": "You can edit or delete them any time."
+      }
+    },
+    "goals": {
+      "metadata": { "title": "Goals" },
+      "header": {
+        "eyebrow": "Piloting",
+        "title": "Your financial goals",
+        "description": "One clear goal beats ten good intentions. Move forward step by step."
+      }
+    }
+  },
+  "memoryConstants": {
+    "tones": {
+      "calm": { "label": "Calm and reassuring", "description": "Soft, no pressure. Pace beats performance." },
+      "direct": { "label": "Direct and motivating", "description": "Clear, energetic, factual. No detours." },
+      "structured": { "label": "Very structured", "description": "Crisp steps, checklists, measurable milestones." },
+      "gentle": { "label": "Gentle and gradual", "description": "Small steps, lots of kindness." }
+    },
+    "challenges": {
+      "irregular_income": "Irregular income",
+      "subscriptions": "Subscriptions piling up",
+      "impulse_shopping": "Impulse buying",
+      "social_pressure": "Social pressure",
+      "emergencies": "Frequent unexpected events",
+      "debt_load": "High debt load",
+      "tracking_fatigue": "Hard to track everything",
+      "no_savings_habit": "No savings habit"
+    },
+    "triggers": {
+      "stress": "Stress",
+      "boredom": "Boredom",
+      "social": "Going out / social",
+      "online": "Online shopping",
+      "food": "Restaurants / delivery",
+      "gifts": "Gifts for others",
+      "fomo": "Fear of missing out",
+      "rewards": "Reward after effort"
+    }
+  }
+}

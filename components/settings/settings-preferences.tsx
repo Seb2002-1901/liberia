@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function SettingsPreferences({
   inactivityFollowupEnabled,
   analyticsEnabled,
 }: SettingsPreferencesProps) {
+  const t = useTranslations("app.settings.prefs");
   const [weekly, setWeekly] = React.useState(weeklyEnabled);
   const [alerts, setAlerts] = React.useState(alertsEnabled);
   const [encouragement, setEncouragement] = React.useState(encouragementEnabled);
@@ -85,30 +87,22 @@ export function SettingsPreferences({
   return (
     <div className="space-y-5">
       <Row
-        title="Résumé hebdomadaire par email"
-        description="Chaque dimanche, un récap court de ta semaine financière."
+        title={t("weekly.title")}
+        description={t("weekly.description")}
         control={
-          <Switch
-            checked={weekly}
-            onCheckedChange={onWeeklyChange}
-            disabled={pending}
-          />
+          <Switch checked={weekly} onCheckedChange={onWeeklyChange} disabled={pending} />
         }
       />
       <Row
-        title="Alertes importantes"
-        description="Reste à vivre négatif, objectifs en retard."
+        title={t("alerts.title")}
+        description={t("alerts.description")}
         control={
-          <Switch
-            checked={alerts}
-            onCheckedChange={onAlertsChange}
-            disabled={pending}
-          />
+          <Switch checked={alerts} onCheckedChange={onAlertsChange} disabled={pending} />
         }
       />
       <Row
-        title="Encouragements de progression"
-        description="Un email court quand le coach détecte une avancée notable."
+        title={t("encouragement.title")}
+        description={t("encouragement.description")}
         control={
           <Switch
             checked={encouragement}
@@ -118,8 +112,8 @@ export function SettingsPreferences({
         }
       />
       <Row
-        title="Rappels d'objectifs"
-        description="Quand un objectif franchit un palier (50 / 80 / 100%)."
+        title={t("milestones.title")}
+        description={t("milestones.description")}
         control={
           <Switch
             checked={milestones}
@@ -129,8 +123,8 @@ export function SettingsPreferences({
         }
       />
       <Row
-        title="Suivi du coach"
-        description="Un email doux après plusieurs jours d'inactivité."
+        title={t("inactivity.title")}
+        description={t("inactivity.description")}
         control={
           <Switch
             checked={inactivity}
@@ -140,8 +134,8 @@ export function SettingsPreferences({
         }
       />
       <Row
-        title="Rappels d'essai et de paiement"
-        description="Avant la fin de l'essai et en cas de problème de paiement. Recommandé."
+        title={t("trial.title")}
+        description={t("trial.description")}
         control={
           <Switch
             checked={trial}
@@ -151,8 +145,8 @@ export function SettingsPreferences({
         }
       />
       <Row
-        title="Analytique produit anonyme"
-        description="Compteurs agrégés (jamais nominatifs) pour améliorer LIBERIA. Aucune revente, aucun tracking publicitaire."
+        title={t("analytics.title")}
+        description={t("analytics.description")}
         control={
           <Switch
             checked={analytics}
@@ -195,6 +189,7 @@ function Row({
 }
 
 export function DataExportButton() {
+  const t = useTranslations("app.settings.data");
   const [pending, setPending] = React.useState(false);
 
   const onClick = async () => {
@@ -214,7 +209,7 @@ export function DataExportButton() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      toast.success("Export téléchargé.");
+      toast.success(t("exportDone"));
     } finally {
       setPending(false);
     }
@@ -223,25 +218,22 @@ export function DataExportButton() {
   return (
     <Button variant="outline" onClick={onClick} disabled={pending}>
       {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-      Télécharger mes données (JSON)
+      {t("exportCta")}
     </Button>
   );
 }
 
 export function DeleteAccountButton() {
+  const t = useTranslations("app.settings.data");
   const [pending, setPending] = React.useState(false);
 
   const onClick = async () => {
     if (typeof window === "undefined") return;
-    const confirmed = window.confirm(
-      "Supprimer définitivement ton compte LIBERIA ? Cette action est irréversible et efface toutes tes données (revenus, dépenses, objectifs, plans IA, conversations).",
-    );
+    const confirmed = window.confirm(t("deleteConfirm"));
     if (!confirmed) return;
-    const phrase = window.prompt(
-      'Pour confirmer, tape "supprimer" exactement.',
-    );
-    if (phrase?.trim().toLowerCase() !== "supprimer") {
-      toast.info("Suppression annulée.");
+    const phrase = window.prompt(t("deletePrompt"));
+    if (phrase?.trim().toLowerCase() !== t("deleteKeyword").toLowerCase()) {
+      toast.info(t("deleteCancelled"));
       return;
     }
     setPending(true);
@@ -269,7 +261,7 @@ export function DeleteAccountButton() {
       className="text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/0.08)]"
     >
       {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-      Supprimer mon compte
+      {t("deleteCta")}
     </Button>
   );
 }

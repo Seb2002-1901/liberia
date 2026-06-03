@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,25 +11,27 @@ import { LocaleForm } from "@/components/profile/locale-form";
 import { getFinanceData } from "@/lib/services/finance";
 import { getInitials } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Profil",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.profile.metadata");
+  return { title: t("title") };
+}
 
 export default async function ProfilePage() {
+  const t = await getTranslations("app.profile");
   const data = await getFinanceData();
-  const name = data.profile.full_name ?? "Membre";
+  const name = data.profile.full_name ?? t("fallbackName");
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Compte"
-        title="Profil"
-        description="Tes informations personnelles. Modifiables à tout moment."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Informations</CardTitle>
+          <CardTitle>{t("infoCard")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
@@ -41,7 +44,7 @@ export default async function ProfilePage() {
               <p className="font-medium">{name}</p>
               <p className="text-sm text-muted-foreground">{data.profile.email}</p>
               <Badge variant={data.subscription.plan === "premium" ? "gold" : "secondary"} className="mt-1">
-                {data.subscription.plan === "premium" ? "Plan Premium" : "Sans abonnement actif"}
+                {data.subscription.plan === "premium" ? t("planActive") : t("planInactive")}
               </Badge>
             </div>
           </div>
@@ -49,15 +52,15 @@ export default async function ProfilePage() {
           <Separator />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormRow label="Nom complet" value={name} />
-            <FormRow label="Email" value={data.profile.email} />
+            <FormRow label={t("fields.fullName")} value={name} />
+            <FormRow label={t("fields.email")} value={data.profile.email} />
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Pays, devise et langue</CardTitle>
+          <CardTitle>{t("regionCard")}</CardTitle>
         </CardHeader>
         <CardContent>
           <LocaleForm

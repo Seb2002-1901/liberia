@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowDownCircle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { TransactionList } from "@/components/finance/transaction-list";
@@ -11,32 +12,34 @@ import {
 } from "@/app/actions/expenses";
 import { formatCurrency } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Dépenses",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.finance.expenses.metadata");
+  return { title: t("title") };
+}
 
 export default async function ExpensesPage() {
+  const t = await getTranslations("app.finance.expenses");
   const data = await getFinanceData();
   const monthly = totalMonthly(data.expenses);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Pilotage"
-        title="Tes dépenses"
-        description="Liste tes dépenses essentielles et non essentielles. Sans jugement, juste pour voir clair."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
-          label="Dépenses mensuelles"
+          label={t("stats.monthly")}
           value={formatCurrency(monthly, data.profile.currency)}
           icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
-          label="Lignes enregistrées"
+          label={t("stats.lines")}
           value={`${data.expenses.length}`}
-          hint="Tu peux les modifier ou supprimer à tout moment."
+          hint={t("stats.linesHint")}
         />
       </div>
 

@@ -1,0 +1,274 @@
+{
+  "profile": {
+    "metadata": { "title": "Profil" },
+    "header": {
+      "eyebrow": "Compte",
+      "title": "Profil",
+      "description": "Tes informations personnelles. Modifiables à tout moment."
+    },
+    "fallbackName": "Membre",
+    "infoCard": "Informations",
+    "planActive": "Plan Premium",
+    "planInactive": "Sans abonnement actif",
+    "fields": {
+      "fullName": "Nom complet",
+      "email": "Email"
+    },
+    "regionCard": "Pays, devise et langue",
+    "locale": {
+      "country": "Pays",
+      "currency": "Devise",
+      "language": "Langue",
+      "footnote": "Tes montants personnels suivent ta devise. L'interface est traduite dans la langue choisie ; les langues sans traduction complète tombent sur l'anglais. L'abonnement LIBERIA est facturé en CHF.",
+      "save": "Enregistrer",
+      "saved": "Préférences enregistrées.",
+      "unsupported": "Combinaison pays / devise / langue non supportée pour le moment."
+    }
+  },
+  "settings": {
+    "metadata": { "title": "Paramètres" },
+    "header": {
+      "eyebrow": "Compte",
+      "title": "Paramètres",
+      "description": "Ajuste tes préférences et gère tes données."
+    },
+    "sections": {
+      "memory": "Mémoire de coaching",
+      "notifications": "Notifications",
+      "subscription": "Abonnement",
+      "data": "Données & confidentialité",
+      "security": "Sécurité"
+    },
+    "memory": {
+      "intro": "LIBERIA apprend ton profil pour mieux t'accompagner.",
+      "introSub": "Ces préférences restent privées et ne sortent jamais de ton compte. Tu peux les modifier ou les effacer à tout moment.",
+      "toneLabel": "Style de coaching",
+      "toneHelp": "Le ton que LIBERIA utilise quand il te parle.",
+      "challengesLabel": "Difficultés que tu rencontres",
+      "challengesHelp": "Sélectionne ce qui te parle. Aide LIBERIA à mieux te guider.",
+      "triggersLabel": "Tes déclencheurs de dépense",
+      "triggersHelp": "Les moments où tu dépenses plus que prévu.",
+      "notesLabel": "Notes personnelles",
+      "notesHelp": "Ce que tu veux que LIBERIA garde en tête sur ta trajectoire. Visible uniquement par toi.",
+      "notesPlaceholder": "Ex. « En ce moment je sors d'une période difficile, j'ai besoin d'avancer doucement. »",
+      "charCount": "{count} / 1000 caractères",
+      "reset": "Réinitialiser",
+      "save": "Enregistrer",
+      "savedTitle": "Mémoire de coaching mise à jour.",
+      "resetConfirm": "Réinitialiser ta mémoire de coaching ? Tes données financières restent intactes — seules les préférences de personnalisation sont effacées.",
+      "resetDone": "Mémoire réinitialisée."
+    },
+    "prefs": {
+      "weekly": {
+        "title": "Résumé hebdomadaire par email",
+        "description": "Chaque dimanche, un récap court de ta semaine financière."
+      },
+      "alerts": {
+        "title": "Alertes importantes",
+        "description": "Reste à vivre négatif, objectifs en retard."
+      },
+      "encouragement": {
+        "title": "Encouragements de progression",
+        "description": "Un email court quand le coach détecte une avancée notable."
+      },
+      "milestones": {
+        "title": "Rappels d'objectifs",
+        "description": "Quand un objectif franchit un palier (50 / 80 / 100%)."
+      },
+      "inactivity": {
+        "title": "Suivi du coach",
+        "description": "Un email doux après plusieurs jours d'inactivité."
+      },
+      "trial": {
+        "title": "Rappels d'essai et de paiement",
+        "description": "Avant la fin de l'essai et en cas de problème de paiement. Recommandé."
+      },
+      "analytics": {
+        "title": "Analytique produit anonyme",
+        "description": "Compteurs agrégés (jamais nominatifs) pour améliorer LIBERIA. Aucune revente, aucun tracking publicitaire."
+      }
+    },
+    "subscription": {
+      "intro": "Gère ton plan, ta facturation et ton accès Premium.",
+      "cta": "Gérer mon abonnement"
+    },
+    "data": {
+      "intro": "Conformément au RGPD, tu peux exporter ou supprimer définitivement l'ensemble de tes données.",
+      "exportInfo": "L'export contient profil, revenus, dépenses, objectifs, plans IA et historique des conversations.",
+      "exportCta": "Télécharger mes données (JSON)",
+      "exportDone": "Export téléchargé.",
+      "deleteCta": "Supprimer mon compte",
+      "deleteConfirm": "Supprimer définitivement ton compte LIBERIA ? Cette action est irréversible et efface toutes tes données (revenus, dépenses, objectifs, plans IA, conversations).",
+      "deletePrompt": "Pour confirmer, tape \"supprimer\" exactement.",
+      "deleteKeyword": "supprimer",
+      "deleteCancelled": "Suppression annulée."
+    },
+    "security": {
+      "intro": "Tes données sont chiffrées au repos et en transit. Chaque utilisateur n'accède qu'à ses propres données — isolation stricte appliquée côté base.",
+      "linksBefore": "Consulte aussi notre",
+      "privacyLink": "politique de confidentialité",
+      "linksAnd": "et le",
+      "legalLink": "disclaimer légal"
+    }
+  },
+  "subscription": {
+    "metadata": { "title": "Abonnement" },
+    "header": {
+      "eyebrow": "Compte",
+      "title": "Abonnement",
+      "description": "Gère ton essai, ton plan et ton moyen de paiement."
+    },
+    "banners": {
+      "trialTitle": "Essai gratuit en cours",
+      "trialTitleWithDays": "Essai gratuit en cours — {days, plural, one {# jour restant} other {# jours restants}}",
+      "trialBillingFrom": "Le prélèvement automatique commence le {date}. ",
+      "trialBillingSoon": "Le prélèvement automatique se déclenchera en fin d'essai. ",
+      "trialCancelled": "Tu as annulé : aucune facture ne sera prélevée.",
+      "trialCanCancel": "Tu peux annuler à tout moment via le portail.",
+      "activeTitle": "Abonnement actif",
+      "activeTitleCancelling": "Abonnement actif — annulation programmée",
+      "activeKeptUntil": "Ton accès continue jusqu'au {date}.",
+      "activeKeptUntilFallback": "Ton accès continue jusqu'au terme de la période.",
+      "activeRenews": "Prochain renouvellement : {date}.",
+      "activeManaged": "Tu peux gérer ton abonnement à tout moment.",
+      "pastDueTitle": "Paiement en attente",
+      "pastDueBody": "Le dernier prélèvement n'a pas abouti. Mets à jour ton moyen de paiement via le portail pour réactiver ton accès — tes données restent en sécurité.",
+      "lapsedPausedTitle": "Ton accès est en pause",
+      "lapsedNewTitle": "Tu peux activer ton accès",
+      "lapsedPausedBody": "Choisis un plan pour réactiver ton accès complet à LIBERIA. Tes données restent intactes.",
+      "lapsedNewBody": "Active ton essai gratuit de {days} jours. Annulable à tout moment."
+    },
+    "status": {
+      "label": "Plan actuel",
+      "trialing": "Essai",
+      "active": "Premium",
+      "pastDue": "Paiement en attente",
+      "paused": "Essai en pause",
+      "canceled": "Annulé",
+      "incomplete": "Paiement incomplet",
+      "none": "Aucun abonnement",
+      "trialUsedNote": "Tu as déjà utilisé ton essai gratuit. Les prochains plans démarrent au tarif normal.",
+      "freshNote": "Démarre par {days} jours gratuits. Carte requise pour activer.",
+      "manageNote": "Tu peux changer de plan ou annuler à tout moment via le portail."
+    },
+    "timeline": {
+      "title": "Activité du compte",
+      "trialUsedLabel": "Essai gratuit utilisé",
+      "trialUsedDetail": "Un seul essai par compte — anti-abus.",
+      "trialEndsLabel": "Fin de l'essai : {date}",
+      "trialEndedLabel": "Essai terminé le {date}",
+      "accessKeptLabel": "Accès maintenu jusqu'au {date}",
+      "renewsLabel": "Prochain renouvellement : {date}",
+      "cancelScheduledLabel": "Annulation programmée",
+      "cancelScheduledDetail": "Tu peux la révoquer via le portail tant que la période n'est pas écoulée.",
+      "paymentMethodLabel": "Moyen de paiement enregistré chez Stripe",
+      "paymentMethodDetail": "Gérable depuis le portail client."
+    },
+    "footnote": "Facturation en CHF pour le lancement, quel que soit ton pays. Paiement géré par Stripe (chiffré, conforme PCI). Moyens acceptés : cartes Visa / Mastercard / American Express, Apple Pay, Google Pay et TWINT (Suisse, selon activation Stripe Dashboard)."
+  },
+  "coach": {
+    "metadata": { "title": "Coach IA" },
+    "welcomeTitle": "Bienvenue dans ton coach financier",
+    "welcomeBody": "Discute de tes finances. Le coach LIBERIA s'appuie sur tes revenus, dépenses et objectifs pour te proposer des actions concrètes — calmement, sans jargon, sans promesse.",
+    "newConversation": "Démarrer une conversation",
+    "createAccount": "Créer mon compte"
+  },
+  "plan": {
+    "metadata": { "title": "Plan financier" },
+    "header": {
+      "eyebrow": "Plan",
+      "title": "Ton plan financier",
+      "description": "Un plan d'actions concrètes pour avancer semaine après semaine."
+    },
+    "aiNotReady": "Le plan IA arrive bientôt.",
+    "demoReason": "Mode démo : crée un compte pour générer un plan.",
+    "demoEmptyTitle": "Le plan IA est réservé aux comptes",
+    "demoEmptyBody": "Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles.",
+    "createAccount": "Créer mon compte"
+  },
+  "finance": {
+    "budget": {
+      "metadata": { "title": "Budget" },
+      "header": {
+        "eyebrow": "Pilotage",
+        "title": "Ton budget mensuel",
+        "description": "Vue d'ensemble : ce qui rentre, ce qui sort, ce qu'il reste pour avancer."
+      },
+      "stats": {
+        "income": "Revenus",
+        "expenses": "Dépenses",
+        "leftover": "Reste à vivre",
+        "leftoverHint": "Taux d'épargne {rate}",
+        "ratio": "Ratio dépenses / revenus",
+        "ratioOver": "Tu vis au-dessus de tes moyens.",
+        "ratioOk": "Marge encore disponible."
+      },
+      "essentialVsPleasure": "Essentiel vs. plaisir",
+      "barEssential": "Dépenses essentielles",
+      "barNonEssential": "Dépenses non essentielles",
+      "barLeftover": "Reste à vivre / Épargne"
+    },
+    "incomes": {
+      "metadata": { "title": "Revenus" },
+      "header": {
+        "eyebrow": "Pilotage",
+        "title": "Tes revenus",
+        "description": "Salaire, freelance, allocations, revenus annexes — tout ce qui rentre, classé proprement."
+      },
+      "stats": {
+        "monthly": "Revenus mensuels",
+        "sources": "Sources actives",
+        "sourcesHint": "Ajoute toutes tes sources pour un calcul fidèle."
+      }
+    },
+    "expenses": {
+      "metadata": { "title": "Dépenses" },
+      "header": {
+        "eyebrow": "Pilotage",
+        "title": "Tes dépenses",
+        "description": "Liste tes dépenses essentielles et non essentielles. Sans jugement, juste pour voir clair."
+      },
+      "stats": {
+        "monthly": "Dépenses mensuelles",
+        "lines": "Lignes enregistrées",
+        "linesHint": "Tu peux les modifier ou supprimer à tout moment."
+      }
+    },
+    "goals": {
+      "metadata": { "title": "Objectifs" },
+      "header": {
+        "eyebrow": "Pilotage",
+        "title": "Tes objectifs financiers",
+        "description": "Un objectif clair vaut mieux que dix bonnes intentions. Avance par paliers."
+      }
+    }
+  },
+  "memoryConstants": {
+    "tones": {
+      "calm": { "label": "Calme et rassurant", "description": "Doux, sans pression. Le rythme prime sur la performance." },
+      "direct": { "label": "Direct et motivant", "description": "Clair, énergique, factuel. Pas de détour." },
+      "structured": { "label": "Très structuré", "description": "Étapes nettes, checklists, jalons mesurables." },
+      "gentle": { "label": "Doux et progressif", "description": "Petits pas, beaucoup de bienveillance." }
+    },
+    "challenges": {
+      "irregular_income": "Revenus irréguliers",
+      "subscriptions": "Abonnements qui s'accumulent",
+      "impulse_shopping": "Achats impulsifs",
+      "social_pressure": "Pression sociale",
+      "emergencies": "Imprévus fréquents",
+      "debt_load": "Charge de dette élevée",
+      "tracking_fatigue": "Difficile de tout suivre",
+      "no_savings_habit": "Pas d'habitude d'épargne"
+    },
+    "triggers": {
+      "stress": "Stress",
+      "boredom": "Ennui",
+      "social": "Sorties et social",
+      "online": "Shopping en ligne",
+      "food": "Restaurants / livraisons",
+      "gifts": "Cadeaux pour les autres",
+      "fomo": "Peur de rater",
+      "rewards": "Récompense après effort"
+    }
+  }
+}

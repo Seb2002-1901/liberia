@@ -12,5 +12,52 @@
     "loading": "Chargement…",
     "submit": "Valider"
   },
+  "shell": {
+    "sectionPilotage": "Pilotage",
+    "sectionAccount": "Compte",
+    "demoBadge": "Mode démo",
+    "demoBottomNote": "Mode démo · lecture seule",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "coach": "Coach IA",
+      "plan": "Plan",
+      "budget": "Budget",
+      "incomes": "Revenus",
+      "expenses": "Dépenses",
+      "goals": "Objectifs",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "subscription": "Abonnement"
+    },
+    "mobileNav": {
+      "dashboard": "Accueil",
+      "coach": "Coach",
+      "plan": "Plan",
+      "budget": "Budget",
+      "goals": "Objectifs"
+    },
+    "menu": {
+      "ariaLabel": "Menu compte",
+      "createAccount": "Créer mon compte",
+      "login": "Se connecter",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "subscription": "Abonnement",
+      "signOut": "Se déconnecter",
+      "disabledTooltip": "Disponible avec un compte"
+    },
+    "upgradeCard": {
+      "eyebrowDemo": "Démo",
+      "demoBody": "Crée ton compte pour piloter tes vraies données.",
+      "demoCta": "Créer mon compte",
+      "eyebrowPremium": "Premium",
+      "premiumActive": "Plan Premium actif",
+      "premiumThanks": "Merci pour ton soutien.",
+      "trialCta": "Démarrer mon essai 14 jours",
+      "trialBody": "14 jours gratuits, puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment.",
+      "resumeCta": "Reprendre mon abonnement",
+      "resumeBody": "Ton accès est en pause. Reprends ton abonnement à 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment."
+    }
+  },
   "smoke": "i18n actif"
 }

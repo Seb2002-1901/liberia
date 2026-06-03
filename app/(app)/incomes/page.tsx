@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { TransactionList } from "@/components/finance/transaction-list";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
@@ -11,33 +12,35 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { ArrowUpCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Revenus",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.finance.incomes.metadata");
+  return { title: t("title") };
+}
 
 export default async function IncomesPage() {
+  const t = await getTranslations("app.finance.incomes");
   const data = await getFinanceData();
   const monthly = totalMonthly(data.incomes);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Pilotage"
-        title="Tes revenus"
-        description="Salaire, freelance, allocations, revenus annexes — tout ce qui rentre, classé proprement."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
-          label="Revenus mensuels"
+          label={t("stats.monthly")}
           value={formatCurrency(monthly, data.profile.currency)}
           tone="gold"
           icon={<ArrowUpCircle className="h-4 w-4" />}
         />
         <StatCard
-          label="Sources actives"
+          label={t("stats.sources")}
           value={`${data.incomes.length}`}
-          hint="Ajoute toutes tes sources pour un calcul fidèle."
+          hint={t("stats.sourcesHint")}
         />
       </div>
 

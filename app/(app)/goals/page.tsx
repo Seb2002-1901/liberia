@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { GoalsList } from "@/components/finance/goals-list";
 import { getFinanceData } from "@/lib/services/finance";
 import { createGoal, deleteGoal, updateGoal } from "@/app/actions/goals";
 
-export const metadata: Metadata = {
-  title: "Objectifs",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.finance.goals.metadata");
+  return { title: t("title") };
+}
 
 export default async function GoalsPage() {
+  const t = await getTranslations("app.finance.goals");
   const data = await getFinanceData();
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Pilotage"
-        title="Tes objectifs financiers"
-        description="Un objectif clair vaut mieux que dix bonnes intentions. Avance par paliers."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
       <GoalsList
         goals={data.goals}

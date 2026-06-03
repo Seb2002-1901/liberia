@@ -7,6 +7,7 @@ import {
   Clock,
   Sparkles,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,15 +19,17 @@ import { formatDate } from "@/lib/utils";
 import { getFinanceData } from "@/lib/services/finance";
 import { inferBillingState } from "@/lib/billing/state";
 
-export const metadata: Metadata = {
-  title: "Abonnement",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.subscription.metadata");
+  return { title: t("title") };
+}
 
 export default async function SubscriptionPage() {
+  const t = await getTranslations("app.subscription");
   const data = await getFinanceData();
   const sub = data.subscription;
   const billing = inferBillingState(sub);
-  const timeline = buildAccountTimeline(sub);
+  const timeline = buildAccountTimeline(sub, t);
 
   return (
     <div className="space-y-6">
@@ -34,9 +37,9 @@ export default async function SubscriptionPage() {
         <CheckoutFeedback />
       </Suspense>
       <PageHeader
-        eyebrow="Compte"
-        title="Abonnement"
-        description="Gère ton essai, ton plan et ton moyen de paiement."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       {/* Billing state banner */}
@@ -48,16 +51,16 @@ export default async function SubscriptionPage() {
               <div>
                 <p className="font-medium">
                   {billing.daysLeft === null
-                    ? "Essai gratuit en cours"
-                    : `Essai gratuit en cours — ${billing.daysLeft} ${billing.daysLeft > 1 ? "jours" : "jour"} restants`}
+                    ? t("banners.trialTitle")
+                    : t("banners.trialTitleWithDays", { days: billing.daysLeft })}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {billing.trialEndsAt
-                    ? `Le prélèvement automatique commence le ${formatDate(billing.trialEndsAt)}. `
-                    : "Le prélèvement automatique se déclenchera en fin d'essai. "}
+                    ? t("banners.trialBillingFrom", { date: formatDate(billing.trialEndsAt) })
+                    : t("banners.trialBillingSoon")}
                   {billing.cancelAtPeriodEnd
-                    ? "Tu as annulé : aucune facture ne sera prélevée."
-                    : "Tu peux annuler à tout moment via le portail."}
+                    ? t("banners.trialCancelled")
+                    : t("banners.trialCanCancel")}
                 </p>
               </div>
             </div>
@@ -73,15 +76,18 @@ export default async function SubscriptionPage() {
               <CheckCircle2 className="mt-0.5 h-5 w-5 text-[hsl(var(--success))]" />
               <div>
                 <p className="font-medium">
-                  Abonnement actif
-                  {billing.cancelAtPeriodEnd && " — annulation programmée"}
+                  {billing.cancelAtPeriodEnd
+                    ? t("banners.activeTitleCancelling")
+                    : t("banners.activeTitle")}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {billing.cancelAtPeriodEnd
-                    ? `Ton accès continue jusqu'au ${billing.currentPeriodEnd ? formatDate(billing.currentPeriodEnd) : "terme de la période"}.`
+                    ? billing.currentPeriodEnd
+                      ? t("banners.activeKeptUntil", { date: formatDate(billing.currentPeriodEnd) })
+                      : t("banners.activeKeptUntilFallback")
                     : billing.currentPeriodEnd
-                      ? `Prochain renouvellement : ${formatDate(billing.currentPeriodEnd)}.`
-                      : "Tu peux gérer ton abonnement à tout moment."}
+                      ? t("banners.activeRenews", { date: formatDate(billing.currentPeriodEnd) })
+                      : t("banners.activeManaged")}
                 </p>
               </div>
             </div>
@@ -97,13 +103,9 @@ export default async function SubscriptionPage() {
               <AlertTriangle className="mt-0.5 h-5 w-5 text-[hsl(var(--warning))]" />
               <div>
                 <p className="font-medium text-[hsl(var(--warning))]">
-                  Paiement en attente
+                  {t("banners.pastDueTitle")}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Le dernier prélèvement n'a pas abouti. Mets à jour ton moyen
-                  de paiement via le portail pour réactiver ton accès — tes
-                  données restent en sécurité.
-                </p>
+                <p className="text-sm text-muted-foreground">{t("banners.pastDueBody")}</p>
               </div>
             </div>
             {sub.has_customer && <PortalButton />}
@@ -119,13 +121,13 @@ export default async function SubscriptionPage() {
               <div>
                 <p className="font-medium">
                   {sub.trial_used
-                    ? "Ton accès est en pause"
-                    : "Tu peux activer ton accès"}
+                    ? t("banners.lapsedPausedTitle")
+                    : t("banners.lapsedNewTitle")}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {sub.trial_used
-                    ? "Choisis un plan pour réactiver ton accès complet à LIBERIA. Tes données restent intactes."
-                    : `Active ton essai gratuit de ${TRIAL_DAYS} jours. Annulable à tout moment.`}
+                    ? t("banners.lapsedPausedBody")
+                    : t("banners.lapsedNewBody", { days: TRIAL_DAYS })}
                 </p>
               </div>
             </div>
@@ -137,7 +139,7 @@ export default async function SubscriptionPage() {
       {/* Status chip */}
       <Card>
         <CardHeader>
-          <CardTitle>Plan actuel</CardTitle>
+          <CardTitle>{t("status.label")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
           <Badge
@@ -152,26 +154,26 @@ export default async function SubscriptionPage() {
             }
           >
             {sub.status === "trialing"
-              ? "Essai"
+              ? t("status.trialing")
               : sub.status === "active"
-                ? "Premium"
+                ? t("status.active")
                 : sub.status === "past_due" || sub.status === "unpaid"
-                  ? "Paiement en attente"
+                  ? t("status.pastDue")
                   : sub.status === "paused"
-                    ? "Essai en pause"
+                    ? t("status.paused")
                     : sub.status === "canceled"
-                      ? "Annulé"
+                      ? t("status.canceled")
                       : sub.status === "incomplete" ||
                           sub.status === "incomplete_expired"
-                        ? "Paiement incomplet"
-                        : "Aucun abonnement"}
+                        ? t("status.incomplete")
+                        : t("status.none")}
           </Badge>
           <p className="text-sm text-muted-foreground">
             {sub.trial_used && billing.kind === "lapsed"
-              ? "Tu as déjà utilisé ton essai gratuit. Les prochains plans démarrent au tarif normal."
+              ? t("status.trialUsedNote")
               : !sub.status
-                ? `Démarre par ${TRIAL_DAYS} jours gratuits. Carte requise pour activer.`
-                : "Tu peux changer de plan ou annuler à tout moment via le portail."}
+                ? t("status.freshNote", { days: TRIAL_DAYS })
+                : t("status.manageNote")}
           </p>
         </CardContent>
       </Card>
@@ -181,7 +183,7 @@ export default async function SubscriptionPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <CalendarClock className="h-4 w-4 text-[hsl(var(--gold))]" />
-              Activité du compte
+              {t("timeline.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -218,12 +220,7 @@ export default async function SubscriptionPage() {
         currentPriceId={sub.price_id}
       />
 
-      <p className="text-xs text-muted-foreground">
-        Facturation en CHF pour le lancement, quel que soit ton pays. Paiement
-        géré par Stripe (chiffré, conforme PCI). Moyens acceptés : cartes Visa /
-        Mastercard / American Express, Apple Pay, Google Pay et TWINT (Suisse,
-        selon activation Stripe Dashboard).
-      </p>
+      <p className="text-xs text-muted-foreground">{t("footnote")}</p>
     </div>
   );
 }
@@ -236,43 +233,44 @@ export default async function SubscriptionPage() {
  */
 function buildAccountTimeline(
   sub: Awaited<ReturnType<typeof getFinanceData>>["subscription"],
+  t: Awaited<ReturnType<typeof getTranslations<"app.subscription">>>,
 ): Array<{ label: string; detail?: string }> {
   const events: Array<{ label: string; detail?: string }> = [];
 
   if (sub.trial_used) {
     events.push({
-      label: "Essai gratuit utilisé",
-      detail: "Un seul essai par compte — anti-abus.",
+      label: t("timeline.trialUsedLabel"),
+      detail: t("timeline.trialUsedDetail"),
     });
   }
 
   if (sub.trial_ends_at) {
     const label =
       sub.status === "trialing"
-        ? `Fin de l'essai : ${formatDate(sub.trial_ends_at)}`
-        : `Essai terminé le ${formatDate(sub.trial_ends_at)}`;
+        ? t("timeline.trialEndsLabel", { date: formatDate(sub.trial_ends_at) })
+        : t("timeline.trialEndedLabel", { date: formatDate(sub.trial_ends_at) });
     events.push({ label });
   }
 
   if (sub.current_period_end && sub.status === "active") {
     events.push({
       label: sub.cancel_at_period_end
-        ? `Accès maintenu jusqu'au ${formatDate(sub.current_period_end)}`
-        : `Prochain renouvellement : ${formatDate(sub.current_period_end)}`,
+        ? t("timeline.accessKeptLabel", { date: formatDate(sub.current_period_end) })
+        : t("timeline.renewsLabel", { date: formatDate(sub.current_period_end) }),
     });
   }
 
   if (sub.cancel_at_period_end && sub.status !== "active") {
     events.push({
-      label: "Annulation programmée",
-      detail: "Tu peux la révoquer via le portail tant que la période n'est pas écoulée.",
+      label: t("timeline.cancelScheduledLabel"),
+      detail: t("timeline.cancelScheduledDetail"),
     });
   }
 
   if (sub.has_customer) {
     events.push({
-      label: "Moyen de paiement enregistré chez Stripe",
-      detail: "Gérable depuis le portail client.",
+      label: t("timeline.paymentMethodLabel"),
+      detail: t("timeline.paymentMethodDetail"),
     });
   }
 

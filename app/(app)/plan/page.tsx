@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
@@ -14,20 +15,22 @@ import { isAnthropicConfigured } from "@/lib/env";
 import { isAdminConfigured } from "@/lib/supabase/admin";
 import { ROUTES } from "@/lib/constants";
 
-export const metadata: Metadata = {
-  title: "Plan financier",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.plan.metadata");
+  return { title: t("title") };
+}
 
 export default async function PlanPage() {
+  const t = await getTranslations("app.plan");
   const [active, data] = await Promise.all([getActivePlan(), getFinanceData()]);
   const aiReady = isAnthropicConfigured() && isAdminConfigured();
   const isDemo = data.isDemo;
 
   const generationDisabled = !aiReady || isDemo;
   const disabledReason = !aiReady
-    ? "Le plan IA arrive bientôt."
+    ? t("aiNotReady")
     : isDemo
-      ? "Mode démo : crée un compte pour générer un plan."
+      ? t("demoReason")
       : undefined;
 
   const situation = data.financialProfile?.situation ?? "tight";
@@ -35,9 +38,9 @@ export default async function PlanPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Plan"
-        title="Ton plan financier"
-        description="Un plan d'actions concrètes pour avancer semaine après semaine."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
         actions={
           <PlanGenerateButton
             hasPlan={Boolean(active)}
@@ -55,12 +58,12 @@ export default async function PlanPage() {
       ) : isDemo ? (
         <EmptyState
           icon={<Sparkles className="h-5 w-5" />}
-          title="Le plan IA est réservé aux comptes"
-          description="Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles."
+          title={t("demoEmptyTitle")}
+          description={t("demoEmptyBody")}
           action={
             <Button asChild variant="gold">
               <Link href={ROUTES.register}>
-                Créer mon compte
+                {t("createAccount")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

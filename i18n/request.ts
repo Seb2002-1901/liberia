@@ -72,6 +72,7 @@ async function loadMessages(
     "auth",
     "onboarding",
     "dashboard",
+    "app",
     "errors",
     "email",
   ] as const;

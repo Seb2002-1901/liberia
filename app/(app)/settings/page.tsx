@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Bell, BrainCircuit, CreditCard, Database, Shield, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,11 +18,13 @@ import { ROUTES, type CoachingToneId, type RecurringChallengeId, type SpendingTr
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Paramètres",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.settings.metadata");
+  return { title: t("title") };
+}
 
 export default async function SettingsPage() {
+  const t = await getTranslations("app.settings");
   const [prefs, memory] = await Promise.all([
     loadPreferences(),
     getMyUserMemory(),
@@ -30,16 +33,16 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Compte"
-        title="Paramètres"
-        description="Ajuste tes préférences et gère tes données."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
       />
 
       <Card className="border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.04)] via-card/40 to-card/40">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BrainCircuit className="h-4 w-4 text-[hsl(var(--gold))]" />
-            Mémoire de coaching
+            {t("sections.memory")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -59,7 +62,7 @@ export default async function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-[hsl(var(--gold))]" /> Notifications
+            <Bell className="h-4 w-4 text-[hsl(var(--gold))]" /> {t("sections.notifications")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -78,16 +81,14 @@ export default async function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-[hsl(var(--gold))]" /> Abonnement
+            <CreditCard className="h-4 w-4 text-[hsl(var(--gold))]" /> {t("sections.subscription")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Gère ton plan, ta facturation et ton accès Premium.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("subscription.intro")}</p>
           <Button asChild variant="gold" size="sm">
             <Link href={ROUTES.subscription}>
-              <Sparkles className="h-4 w-4" /> Gérer mon abonnement
+              <Sparkles className="h-4 w-4" /> {t("subscription.cta")}
             </Link>
           </Button>
         </CardContent>
@@ -96,47 +97,36 @@ export default async function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Database className="h-4 w-4 text-[hsl(var(--gold))]" /> Données &
-            confidentialité
+            <Database className="h-4 w-4 text-[hsl(var(--gold))]" /> {t("sections.data")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Conformément au RGPD, tu peux exporter ou supprimer définitivement
-            l'ensemble de tes données.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("data.intro")}</p>
           <div className="flex flex-wrap gap-2">
             <DataExportButton />
             <DeleteAccountButton />
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            L'export contient profil, revenus, dépenses, objectifs, plans IA et
-            historique des conversations.
-          </p>
+          <p className="text-[11px] text-muted-foreground">{t("data.exportInfo")}</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-[hsl(var(--gold))]" /> Sécurité
+            <Shield className="h-4 w-4 text-[hsl(var(--gold))]" /> {t("sections.security")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>
-            Tes données sont chiffrées au repos et en transit. Chaque
-            utilisateur n&apos;accède qu&apos;à ses propres données — isolation
-            stricte appliquée côté base.
-          </p>
+          <p>{t("security.intro")}</p>
           <Separator />
           <p>
-            Consulte aussi notre{" "}
+            {t("security.linksBefore")}{" "}
             <Link href={ROUTES.privacy} className="text-foreground hover:underline">
-              politique de confidentialité
+              {t("security.privacyLink")}
             </Link>{" "}
-            et le{" "}
+            {t("security.linksAnd")}{" "}
             <Link href={ROUTES.legal} className="text-foreground hover:underline">
-              disclaimer légal
+              {t("security.legalLink")}
             </Link>
             .
           </p>
