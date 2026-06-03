@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Menu } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ export function CoachMobileTrigger({
   conversations,
   isDemo,
 }: CoachMobileTriggerProps) {
+  const t = useTranslations("app.coach.mobile");
   const [open, setOpen] = React.useState(false);
 
   // Auto-close when navigation happens (sidebar Link clicked).
@@ -43,15 +45,15 @@ export function CoachMobileTrigger({
           <button
             type="button"
             className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label="Ouvrir la liste des conversations"
+            aria-label={t("openListLabel")}
           >
             <Menu className="h-3.5 w-3.5" />
-            Conversations
+            {t("buttonLabel")}
           </button>
         </DialogTrigger>
         <DialogContent className="flex h-[80vh] max-w-md flex-col p-0">
           <DialogHeader className="border-b border-border/60 px-5 py-3">
-            <DialogTitle>Mes conversations</DialogTitle>
+            <DialogTitle>{t("dialogTitle")}</DialogTitle>
           </DialogHeader>
           {/*
             Close the dialog only when the user actually navigates to a

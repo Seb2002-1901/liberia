@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Send, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,17 +18,10 @@ interface CoachChatProps {
   /**
    * Persona-aware prompt suggestions surfaced on the empty state.
    * Computed server-side from the user's memory + financial snapshot.
-   * Falls back to `DEFAULT_SUGGESTIONS` when absent.
+   * Falls back to the localised default list when absent.
    */
   suggestions?: readonly string[];
 }
-
-const DEFAULT_SUGGESTIONS = [
-  "Que dois-je faire cette semaine ?",
-  "Comment réduire mon stress financier ?",
-  "Quelle dépense dois-je surveiller ?",
-  "Aide-moi à tenir mon plan.",
-];
 
 export function CoachChat({
   conversationId,
@@ -35,8 +29,11 @@ export function CoachChat({
   isDemo,
   suggestions,
 }: CoachChatProps) {
+  const t = useTranslations("app.coach.chat");
   const router = useRouter();
-  const promptList = suggestions && suggestions.length > 0 ? suggestions : DEFAULT_SUGGESTIONS;
+  const defaultSuggestions = (t.raw("defaultSuggestions") as string[]) ?? [];
+  const promptList =
+    suggestions && suggestions.length > 0 ? suggestions : defaultSuggestions;
   const [messages, setMessages] = React.useState<CoachMessage[]>(initialMessages);
   const [input, setInput] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
@@ -171,7 +168,7 @@ export function CoachChat({
       } catch (err) {
         if ((err as { name?: string } | null)?.name === "AbortError") return;
         const message =
-          err instanceof Error ? err.message : "Le coach n'a pas pu répondre.";
+          err instanceof Error ? err.message : t("fallbackError");
         toast.error(message);
         setMessages((prev) => prev.filter((m) => m.id !== optimisticUser.id));
         setStreamedText("");
@@ -180,7 +177,7 @@ export function CoachChat({
         abortRef.current = null;
       }
     },
-    [conversationId, disabled, router],
+    [conversationId, disabled, router, t],
   );
 
   const onSubmit = (e: React.FormEvent) => {
@@ -222,7 +219,7 @@ export function CoachChat({
           {streaming && !streamedText && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Le coach réfléchit…
+              {t("thinking")}
             </div>
           )}
         </div>
@@ -237,9 +234,7 @@ export function CoachChat({
               onKeyDown={onKeyDown}
               rows={1}
               placeholder={
-                isDemo
-                  ? "Mode démo : crée un compte pour discuter avec le coach."
-                  : "Pose une question à ton coach…"
+                isDemo ? t("placeholderDemo") : t("placeholder")
               }
               disabled={disabled}
               className="min-h-[44px] max-h-40 flex-1 resize-none"
@@ -249,7 +244,7 @@ export function CoachChat({
               variant="gold"
               size="icon"
               disabled={disabled || !input.trim()}
-              aria-label="Envoyer"
+              aria-label={t("sendAriaLabel")}
             >
               {streaming ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -259,7 +254,7 @@ export function CoachChat({
             </Button>
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Le coach LIBERIA est informatif. Aucune information n'est un conseil financier réglementé.
+            {t("disclaimer")}
           </p>
         </form>
       </div>
@@ -314,6 +309,7 @@ function EmptyCoachState({
   isDemo: boolean;
   suggestions: readonly string[];
 }) {
+  const t = useTranslations("app.coach.chat");
   return (
     <div className="space-y-6 py-8">
       <div className="space-y-2 text-center">
@@ -324,17 +320,16 @@ function EmptyCoachState({
           <Sparkles className="h-5 w-5" />
         </span>
         <h2 className="font-display text-2xl font-semibold tracking-tight">
-          Ton coach financier
+          {t("emptyTitle")}
         </h2>
         <p className="mx-auto max-w-md text-sm text-muted-foreground">
-          Pose-lui une question concrète sur ta situation, tes dépenses ou tes objectifs.
-          Il s&apos;appuie sur tes données réelles et propose des actions étape par étape.
+          {t("emptyBody")}
         </p>
       </div>
 
       {isDemo && (
         <div className="mx-auto max-w-md rounded-xl border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.06)] p-4 text-xs text-[hsl(var(--gold))]">
-          Mode démo : la conversation s&apos;active après création d&apos;un compte.
+          {t("demoBanner")}
         </div>
       )}
 

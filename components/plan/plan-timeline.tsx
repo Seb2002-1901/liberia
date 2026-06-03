@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PlanStepItem } from "@/components/plan/plan-step-item";
 import type { FinancialPlanStep } from "@/types/database";
 
@@ -5,12 +6,12 @@ interface PlanTimelineProps {
   steps: FinancialPlanStep[];
 }
 
-export function PlanTimeline({ steps }: PlanTimelineProps) {
+export async function PlanTimeline({ steps }: PlanTimelineProps) {
+  const t = await getTranslations("app.plan.timeline");
+
   if (steps.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        Pas encore d'étapes dans ce plan.
-      </p>
+      <p className="text-sm text-muted-foreground">{t("empty")}</p>
     );
   }
 
@@ -34,12 +35,12 @@ export function PlanTimeline({ steps }: PlanTimelineProps) {
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="flex items-baseline gap-3">
                 <span className="font-display text-xl font-semibold gold-text">
-                  S{weekNumber}
+                  {t("weekShort", { n: weekNumber })}
                 </span>
                 <h3 className="font-medium text-foreground">{weekFocus}</h3>
               </div>
               <span className="text-xs text-muted-foreground">
-                {done} / {weekSteps.length} faits
+                {t("doneSummary", { done, total: weekSteps.length })}
               </span>
             </div>
             <ul className="space-y-2.5">

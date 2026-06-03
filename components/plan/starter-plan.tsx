@@ -1,4 +1,5 @@
 import { Sparkles, BookOpen, Hourglass } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlanGenerateButton } from "@/components/plan/plan-generate-button";
@@ -14,15 +15,15 @@ interface StarterPlanProps {
 /**
  * Curated 90-day plan rendered when the user has no AI-generated plan yet.
  *
- * Stays static / deterministic — no LLM call. When ANTHROPIC_API_KEY is
- * wired up, the "Générer mon plan personnalisé" CTA produces a fully
- * tailored alternative via /app/actions/plans.generateFinancialPlan.
+ * Stays static / deterministic — no LLM call. The localised AI variant
+ * is reachable via the PlanGenerateButton inside.
  */
-export function StarterPlanView({
+export async function StarterPlanView({
   situation,
   aiReady,
   isDemo = false,
 }: StarterPlanProps) {
+  const t = await getTranslations("app.plan.starter");
   const plan: StarterPlan = getStarterPlan(situation);
   const weeks = groupByWeek(plan.steps);
 
@@ -32,11 +33,11 @@ export function StarterPlanView({
         <CardContent className="space-y-3 p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Badge variant="gold" className="gap-1">
-              <Sparkles className="h-3 w-3" /> Plan de démarrage
+              <Sparkles className="h-3 w-3" /> {t("badge")}
             </Badge>
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
               <Hourglass className="h-3.5 w-3.5" />
-              90 jours · 12 semaines
+              {t("duration")}
             </span>
           </div>
           <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
@@ -49,15 +50,14 @@ export function StarterPlanView({
               disabled={!aiReady || isDemo}
               disabledReason={
                 isDemo
-                  ? "Mode démo : crée un compte pour générer un plan."
+                  ? t("demoReason")
                   : !aiReady
-                    ? "La génération personnalisée arrive bientôt."
+                    ? t("aiNotReadyReason")
                     : undefined
               }
             />
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Ce plan est un cadre. Tu pourras le remplacer par une version
-              personnalisée IA dès que le coach sera prêt.
+              {t("fineprint")}
             </p>
           </div>
         </CardContent>
@@ -77,7 +77,7 @@ export function StarterPlanView({
                   </span>
                   <div>
                     <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                      Semaine {week.week_number}
+                      {t("weekLabel", { n: week.week_number })}
                     </p>
                     <p className="text-sm font-medium">{week.focus}</p>
                   </div>

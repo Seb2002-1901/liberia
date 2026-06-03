@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   Banknote,
@@ -18,19 +19,21 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { toggleStep } from "@/app/actions/plans";
 import type { FinancialPlanStep } from "@/types/database";
 
-const CATEGORY_META: Record<
+const CATEGORY_ICONS: Record<
   string,
-  { label: string; icon: React.ComponentType<{ className?: string }> }
+  React.ComponentType<{ className?: string }>
 > = {
-  reduce_expense: { label: "Réduire dépense", icon: TrendingDown },
-  build_emergency: { label: "Fonds d'urgence", icon: ShieldCheck },
-  debt_payoff: { label: "Dette", icon: Banknote },
-  automate_saving: { label: "Automatiser", icon: Repeat },
-  habit: { label: "Habitude", icon: Lightbulb },
-  income_boost: { label: "Revenu", icon: Coins },
-  review: { label: "Revue", icon: Sparkles },
-  other: { label: "Action", icon: PiggyBank },
+  reduce_expense: TrendingDown,
+  build_emergency: ShieldCheck,
+  debt_payoff: Banknote,
+  automate_saving: Repeat,
+  habit: Lightbulb,
+  income_boost: Coins,
+  review: Sparkles,
+  other: PiggyBank,
 };
+
+const CATEGORY_KEYS = new Set(Object.keys(CATEGORY_ICONS));
 
 interface PlanStepItemProps {
   step: FinancialPlanStep;
@@ -38,10 +41,12 @@ interface PlanStepItemProps {
 }
 
 export function PlanStepItem({ step, disabled }: PlanStepItemProps) {
+  const t = useTranslations("app.plan.step");
   const [pending, startTransition] = React.useTransition();
   const [optimisticDone, setOptimisticDone] = React.useState(step.is_completed);
-  const meta = CATEGORY_META[step.category ?? "other"] ?? CATEGORY_META.other;
-  const Icon = meta.icon;
+  const rawCategory = step.category ?? "other";
+  const categoryKey = CATEGORY_KEYS.has(rawCategory) ? rawCategory : "other";
+  const Icon = CATEGORY_ICONS[categoryKey];
 
   React.useEffect(() => {
     setOptimisticDone(step.is_completed);
@@ -72,7 +77,7 @@ export function PlanStepItem({ step, disabled }: PlanStepItemProps) {
         onClick={onToggle}
         disabled={disabled || pending}
         aria-pressed={optimisticDone}
-        aria-label={optimisticDone ? "Marquer non fait" : "Marquer fait"}
+        aria-label={optimisticDone ? t("ariaMarkUndone") : t("ariaMarkDone")}
         className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         {optimisticDone ? (
@@ -86,12 +91,14 @@ export function PlanStepItem({ step, disabled }: PlanStepItemProps) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex h-6 items-center gap-1 rounded-md bg-secondary/60 px-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
             <Icon className="h-3 w-3" />
-            {meta.label}
+            {t(`categories.${categoryKey}`)}
           </span>
           {typeof step.expected_impact_eur === "number" &&
             step.expected_impact_eur > 0 && (
               <span className="inline-flex h-6 items-center rounded-md bg-[hsl(var(--gold)/0.12)] px-2 text-[11px] font-medium text-[hsl(var(--gold))]">
-                ~{formatCurrency(step.expected_impact_eur)}/mois
+                {t("perMonth", {
+                  amount: formatCurrency(step.expected_impact_eur),
+                })}
               </span>
             )}
         </div>

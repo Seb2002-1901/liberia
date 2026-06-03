@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, type ButtonProps } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ export function CheckoutButton({
   variant = "gold",
   className,
 }: CheckoutButtonProps) {
+  const t = useTranslations("app.billing");
   const [loading, setLoading] = React.useState(false);
 
   const onClick = async () => {
@@ -30,16 +32,21 @@ export function CheckoutButton({
       });
       const data: { url?: string; error?: string } = await res.json();
       if (!res.ok || !data.url) {
-        toast.error(data.error ?? "Impossible de démarrer le paiement.");
+        toast.error(data.error ?? t("errors.checkoutFallback"));
         return;
       }
       window.location.href = data.url;
     } catch {
-      toast.error("Une erreur est survenue.");
+      toast.error(t("errors.generic"));
     } finally {
       setLoading(false);
     }
   };
+
+  const defaultLabel =
+    planId === "premium_yearly"
+      ? t("ctaCheckoutYearly")
+      : t("ctaCheckoutMonthly");
 
   return (
     <Button
@@ -49,10 +56,7 @@ export function CheckoutButton({
       disabled={loading}
     >
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-      {label ??
-        (planId === "premium_yearly"
-          ? "Commencer l'essai annuel"
-          : "Commencer l'essai mensuel")}
+      {label ?? defaultLabel}
     </Button>
   );
 }

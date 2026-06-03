@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { MessageSquarePlus, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,7 @@ export function CoachSidebar({
   conversations,
   isDemo,
 }: CoachSidebarProps) {
+  const t = useTranslations("app.coach.sidebar");
   const router = useRouter();
   const pathname = usePathname();
   const activeId = React.useMemo(() => {
@@ -39,7 +41,7 @@ export function CoachSidebar({
 
   const handleCreate = async () => {
     if (isDemo) {
-      toast.error("Mode démo : crée un compte pour ouvrir une conversation.");
+      toast.error(t("demoToast"));
       return;
     }
     setCreating(true);
@@ -58,7 +60,7 @@ export function CoachSidebar({
 
   const handleRename = async (id: string, currentTitle: string) => {
     if (typeof window === "undefined") return;
-    const next = window.prompt("Nouveau titre", currentTitle);
+    const next = window.prompt(t("renamePrompt"), currentTitle);
     if (!next || next.trim() === currentTitle.trim()) return;
     const res = await renameConversation(id, next.trim());
     if (!res.ok) toast.error(res.error);
@@ -67,7 +69,7 @@ export function CoachSidebar({
 
   const handleDelete = async (id: string, title: string) => {
     if (typeof window === "undefined") return;
-    if (!window.confirm(`Supprimer « ${title} » ? Cette action est définitive.`)) {
+    if (!window.confirm(t("deleteConfirm", { title }))) {
       return;
     }
     const res = await deleteConversation(id);
@@ -75,7 +77,7 @@ export function CoachSidebar({
       toast.error(res.error);
       return;
     }
-    toast.success("Conversation supprimée.");
+    toast.success(t("deletedToast"));
     if (pathname?.endsWith(`/${id}`)) {
       router.push("/coach");
     } else {
@@ -94,13 +96,13 @@ export function CoachSidebar({
           disabled={creating || isDemo}
         >
           <MessageSquarePlus className="h-4 w-4" />
-          Nouvelle conversation
+          {t("newConversation")}
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto p-2">
         {conversations.length === 0 ? (
           <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-            Aucune conversation pour l'instant.
+            {t("empty")}
           </p>
         ) : (
           <ul className="space-y-0.5">
@@ -125,7 +127,7 @@ export function CoachSidebar({
                         <Button
                           variant="ghost"
                           size="icon"
-                          aria-label="Actions"
+                          aria-label={t("actionsLabel")}
                           className="h-7 w-7"
                         >
                           <MoreVertical className="h-3.5 w-3.5" />
@@ -138,7 +140,7 @@ export function CoachSidebar({
                             void handleRename(c.id, c.title);
                           }}
                         >
-                          <Pencil className="h-4 w-4" /> Renommer
+                          <Pencil className="h-4 w-4" /> {t("rename")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={(e) => {
@@ -147,7 +149,7 @@ export function CoachSidebar({
                           }}
                           className="text-[hsl(var(--destructive))]"
                         >
-                          <Trash2 className="h-4 w-4" /> Supprimer
+                          <Trash2 className="h-4 w-4" /> {t("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

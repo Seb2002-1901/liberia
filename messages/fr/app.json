@@ -171,7 +171,40 @@
     "welcomeTitle": "Bienvenue dans ton coach financier",
     "welcomeBody": "Discute de tes finances. Le coach LIBERIA s'appuie sur tes revenus, dépenses et objectifs pour te proposer des actions concrètes — calmement, sans jargon, sans promesse.",
     "newConversation": "Démarrer une conversation",
-    "createAccount": "Créer mon compte"
+    "createAccount": "Créer mon compte",
+    "chat": {
+      "thinking": "Le coach réfléchit…",
+      "placeholder": "Pose une question à ton coach…",
+      "placeholderDemo": "Mode démo : crée un compte pour discuter avec le coach.",
+      "sendAriaLabel": "Envoyer",
+      "disclaimer": "Le coach LIBERIA est informatif. Aucune information n'est un conseil financier réglementé.",
+      "emptyTitle": "Ton coach financier",
+      "emptyBody": "Pose-lui une question concrète sur ta situation, tes dépenses ou tes objectifs. Il s'appuie sur tes données réelles et propose des actions étape par étape.",
+      "demoBanner": "Mode démo : la conversation s'active après création d'un compte.",
+      "fallbackError": "Le coach n'a pas pu répondre.",
+      "defaultSuggestions": [
+        "Que dois-je faire cette semaine ?",
+        "Comment réduire mon stress financier ?",
+        "Quelle dépense dois-je surveiller ?",
+        "Aide-moi à tenir mon plan."
+      ]
+    },
+    "sidebar": {
+      "newConversation": "Nouvelle conversation",
+      "demoToast": "Mode démo : crée un compte pour ouvrir une conversation.",
+      "empty": "Aucune conversation pour l'instant.",
+      "actionsLabel": "Actions",
+      "rename": "Renommer",
+      "delete": "Supprimer",
+      "renamePrompt": "Nouveau titre",
+      "deleteConfirm": "Supprimer « {title} » ? Cette action est définitive.",
+      "deletedToast": "Conversation supprimée."
+    },
+    "mobile": {
+      "openListLabel": "Ouvrir la liste des conversations",
+      "buttonLabel": "Conversations",
+      "dialogTitle": "Mes conversations"
+    }
   },
   "plan": {
     "metadata": { "title": "Plan financier" },
@@ -184,7 +217,62 @@
     "demoReason": "Mode démo : crée un compte pour générer un plan.",
     "demoEmptyTitle": "Le plan IA est réservé aux comptes",
     "demoEmptyBody": "Crée ton compte pour générer un plan personnalisé sur 30, 60 ou 90 jours basé sur tes données réelles.",
-    "createAccount": "Créer mon compte"
+    "createAccount": "Créer mon compte",
+    "generate": {
+      "generateCta": "Générer mon plan",
+      "regenerateCta": "Régénérer le plan",
+      "regenerateCtaShort": "Régénérer",
+      "dialogTitleNew": "Générer ton plan financier",
+      "dialogTitleRegen": "Régénérer ton plan",
+      "description": "Le coach LIBERIA s'appuie sur tes vrais chiffres (revenus, dépenses, objectifs) pour construire un plan d'actions concrètes.",
+      "archiveNotice": " Le plan actuel sera archivé.",
+      "cancel": "Annuler",
+      "submit": "Lancer la génération",
+      "submitting": "Génération…",
+      "footnote": "La génération prend généralement 10 à 30 secondes. Tu peux fermer cette fenêtre — le plan apparaîtra dès qu'il sera prêt.",
+      "successNew": "Ton plan est prêt.",
+      "successRegen": "Nouveau plan généré.",
+      "horizons": {
+        "30": { "label": "30 jours", "description": "Sprint court : un objectif clair et mesurable." },
+        "60": { "label": "60 jours", "description": "Deux mois pour installer durablement de nouvelles habitudes." },
+        "90": { "label": "90 jours", "description": "Trimestre complet — la transformation la plus solide." }
+      }
+    },
+    "progress": {
+      "eyebrow": "Plan {days} jours",
+      "stepsLabel": "{done} / {total} étapes",
+      "progression": "Progression",
+      "generatedOn": "Généré le {date} · {model}",
+      "fallbackModel": "modèle IA"
+    },
+    "step": {
+      "ariaMarkDone": "Marquer fait",
+      "ariaMarkUndone": "Marquer non fait",
+      "perMonth": "~{amount}/mois",
+      "categories": {
+        "reduce_expense": "Réduire dépense",
+        "build_emergency": "Fonds d'urgence",
+        "debt_payoff": "Dette",
+        "automate_saving": "Automatiser",
+        "habit": "Habitude",
+        "income_boost": "Revenu",
+        "review": "Revue",
+        "other": "Action"
+      }
+    },
+    "timeline": {
+      "empty": "Pas encore d'étapes dans ce plan.",
+      "weekShort": "S{n}",
+      "doneSummary": "{done} / {total} faits"
+    },
+    "starter": {
+      "badge": "Plan de démarrage",
+      "duration": "90 jours · 12 semaines",
+      "fineprint": "Ce plan est un cadre. Tu pourras le remplacer par une version personnalisée IA dès que le coach sera prêt.",
+      "demoReason": "Mode démo : crée un compte pour générer un plan.",
+      "aiNotReadyReason": "La génération personnalisée arrive bientôt.",
+      "weekLabel": "Semaine {n}"
+    }
   },
   "finance": {
     "budget": {
@@ -240,6 +328,56 @@
         "eyebrow": "Pilotage",
         "title": "Tes objectifs financiers",
         "description": "Un objectif clair vaut mieux que dix bonnes intentions. Avance par paliers."
+      }
+    }
+  },
+  "billing": {
+    "currentBadge": "Ton plan actuel",
+    "activeButton": "Plan actif",
+    "perYear": "an",
+    "perMonth": "mois",
+    "yearlySavings": "Soit {monthly}/mois — économise environ {savings}/an",
+    "ctaStartYearly": "Démarrer l'essai annuel",
+    "ctaStartMonthly": "Démarrer l'essai mensuel",
+    "ctaCheckoutYearly": "Commencer l'essai annuel",
+    "ctaCheckoutMonthly": "Commencer l'essai mensuel",
+    "ctaStartTrial": "Commencer {days} jours gratuits",
+    "fineprint": "Carte requise pour démarrer. Prélèvement automatique à la fin des {days} jours. Annulable à tout moment.",
+    "portal": "Gérer mon abonnement",
+    "errors": {
+      "checkoutFallback": "Impossible de démarrer le paiement.",
+      "portalFallback": "Impossible d'ouvrir le portail.",
+      "generic": "Une erreur est survenue."
+    },
+    "feedback": {
+      "successTitle": "Paiement reçu. Bienvenue dans Premium.",
+      "successBody": "Ton accès est en cours d'activation, ça peut prendre quelques secondes.",
+      "cancelled": "Paiement annulé. Tu peux réessayer à tout moment."
+    },
+    "plans": {
+      "monthly": {
+        "name": "Mensuel",
+        "description": "Accès complet à LIBERIA. Annule à tout moment depuis ton espace.",
+        "features": [
+          "14 jours gratuits, sans engagement",
+          "Coach IA conversationnel",
+          "Plan financier IA personnalisé 30 / 60 / 90 jours",
+          "Suivi budget complet (revenus, dépenses, objectifs)",
+          "Récap hebdo par email",
+          "Annulable à tout moment"
+        ]
+      },
+      "yearly": {
+        "name": "Annuel",
+        "description": "Soit ~9.99 CHF/mois — environ 60 CHF d'économie sur l'année.",
+        "badge": "Recommandé",
+        "features": [
+          "14 jours gratuits, sans engagement",
+          "Tout ce qu'il y a dans le Mensuel",
+          "Économise environ 60 CHF par an",
+          "Facturation une seule fois par an",
+          "Annulable à tout moment"
+        ]
       }
     }
   },

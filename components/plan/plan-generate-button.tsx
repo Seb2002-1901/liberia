@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,17 +29,14 @@ interface PlanGenerateButtonProps {
   disabledReason?: string;
 }
 
-const HORIZONS = [
-  { value: 30, label: "30 jours", description: "Sprint court : un objectif clair et mesurable." },
-  { value: 60, label: "60 jours", description: "Deux mois pour installer durablement de nouvelles habitudes." },
-  { value: 90, label: "90 jours", description: "Trimestre complet — la transformation la plus solide." },
-] as const;
+const HORIZON_VALUES = [30, 60, 90] as const;
 
 export function PlanGenerateButton({
   hasPlan,
   disabled,
   disabledReason,
 }: PlanGenerateButtonProps) {
+  const t = useTranslations("app.plan.generate");
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [horizon, setHorizon] = React.useState<30 | 60 | 90>(90);
@@ -52,7 +50,7 @@ export function PlanGenerateButton({
         toast.error(res.error);
         return;
       }
-      toast.success(hasPlan ? "Nouveau plan généré." : "Ton plan est prêt.");
+      toast.success(hasPlan ? t("successRegen") : t("successNew"));
       setOpen(false);
       router.refresh();
     } finally {
@@ -64,7 +62,7 @@ export function PlanGenerateButton({
     return (
       <Button variant="outline" disabled title={disabledReason}>
         <Sparkles className="h-4 w-4" />
-        {hasPlan ? "Régénérer" : "Générer mon plan"}
+        {hasPlan ? t("regenerateCtaShort") : t("generateCta")}
       </Button>
     );
   }
@@ -74,18 +72,17 @@ export function PlanGenerateButton({
       <DialogTrigger asChild>
         <Button variant="gold">
           <Sparkles className="h-4 w-4" />
-          {hasPlan ? "Régénérer le plan" : "Générer mon plan"}
+          {hasPlan ? t("regenerateCta") : t("generateCta")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {hasPlan ? "Régénérer ton plan" : "Générer ton plan financier"}
+            {hasPlan ? t("dialogTitleRegen") : t("dialogTitleNew")}
           </DialogTitle>
           <DialogDescription>
-            Le coach LIBERIA s'appuie sur tes vrais chiffres (revenus, dépenses,
-            objectifs) pour construire un plan d'actions concrètes.
-            {hasPlan && " Le plan actuel sera archivé."}
+            {t("description")}
+            {hasPlan && t("archiveNotice")}
           </DialogDescription>
         </DialogHeader>
 
@@ -94,27 +91,29 @@ export function PlanGenerateButton({
           onValueChange={(v) => setHorizon(Number(v) as 30 | 60 | 90)}
           className="space-y-2"
         >
-          {HORIZONS.map((h) => (
+          {HORIZON_VALUES.map((value) => (
             <label
-              key={h.value}
-              htmlFor={`h-${h.value}`}
+              key={value}
+              htmlFor={`h-${value}`}
               className={cn(
                 "flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors",
-                horizon === h.value
+                horizon === value
                   ? "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.05)]"
                   : "border-border/60 hover:bg-card/60",
               )}
             >
               <RadioGroupItem
-                id={`h-${h.value}`}
-                value={String(h.value)}
+                id={`h-${value}`}
+                value={String(value)}
                 className="mt-0.5"
               />
               <div>
-                <Label htmlFor={`h-${h.value}`} className="text-sm font-medium">
-                  {h.label}
+                <Label htmlFor={`h-${value}`} className="text-sm font-medium">
+                  {t(`horizons.${value}.label`)}
                 </Label>
-                <p className="text-xs text-muted-foreground">{h.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t(`horizons.${value}.description`)}
+                </p>
               </div>
             </label>
           ))}
@@ -127,7 +126,7 @@ export function PlanGenerateButton({
             onClick={() => setOpen(false)}
             disabled={submitting}
           >
-            Annuler
+            {t("cancel")}
           </Button>
           <Button
             type="button"
@@ -136,13 +135,11 @@ export function PlanGenerateButton({
             disabled={submitting}
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {submitting ? "Génération…" : "Lancer la génération"}
+            {submitting ? t("submitting") : t("submit")}
           </Button>
         </DialogFooter>
 
-        <p className="text-[11px] text-muted-foreground">
-          La génération prend généralement 10 à 30 secondes. Tu peux fermer cette fenêtre — le plan apparaîtra dès qu'il sera prêt.
-        </p>
+        <p className="text-[11px] text-muted-foreground">{t("footnote")}</p>
       </DialogContent>
     </Dialog>
   );
