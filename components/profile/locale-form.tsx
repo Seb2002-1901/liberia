@@ -13,28 +13,48 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateProfileLocale } from "@/app/actions/profile";
-import { REGIONS, type RegionId } from "@/lib/locale/regions";
+import {
+  COUNTRIES,
+  getDefaultCurrencyForCountry,
+  getDefaultLanguageForCountry,
+} from "@/lib/locale/countries";
+import { CURRENCIES } from "@/lib/locale/currencies";
+import { LANGUAGES } from "@/lib/locale/languages";
+
+type Props = {
+  initialCountry: string;
+  initialCurrency: string;
+  initialLocale: string;
+};
 
 export function LocaleForm({
   initialCountry,
-}: {
-  initialCountry: string;
-}) {
-  const fallback: RegionId =
-    (REGIONS.find((r) => r.id === initialCountry)?.id as RegionId | undefined) ??
-    "CH";
-  const [selected, setSelected] = React.useState<RegionId>(fallback);
+  initialCurrency,
+  initialLocale,
+}: Props) {
+  const [country, setCountry] = React.useState(initialCountry);
+  const [currency, setCurrency] = React.useState(initialCurrency);
+  const [language, setLanguage] = React.useState(initialLocale);
   const [pending, startTransition] = React.useTransition();
 
-  const region = REGIONS.find((r) => r.id === selected) ?? REGIONS[0];
+  // Picking a country only *suggests* currency + language. Whatever
+  // value the user currently has in those two selectors is overwritten
+  // with the country's defaults, but they can then change either back
+  // to anything — a Swiss user who wants the interface in Italian and
+  // amounts in CHF is the explicit V1 target.
+  const onCountryChange = (next: string) => {
+    setCountry(next);
+    setCurrency(getDefaultCurrencyForCountry(next));
+    setLanguage(getDefaultLanguageForCountry(next));
+  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
       const res = await updateProfileLocale({
-        country: region.country,
-        currency: region.currency,
-        locale: region.locale,
+        country,
+        currency,
+        locale: language,
       });
       if (res.ok) {
         toast.success("Préférences enregistrées.");
@@ -44,46 +64,65 @@ export function LocaleForm({
     });
   };
 
-  const changed = selected !== initialCountry;
+  const changed =
+    country !== initialCountry ||
+    currency !== initialCurrency ||
+    language !== initialLocale;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
           <Label htmlFor="country">Pays</Label>
-          <Select
-            value={selected}
-            onValueChange={(v) => setSelected(v as RegionId)}
-          >
+          <Select value={country} onValueChange={onCountryChange}>
             <SelectTrigger id="country">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {REGIONS.map((r) => (
-                <SelectItem key={r.id} value={r.id}>
-                  {r.countryLabel}
+              {COUNTRIES.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Devise</Label>
-          <p className="rounded-md border border-border/60 bg-card/40 px-3 py-2 text-sm">
-            {region.currency}
-          </p>
+          <Label htmlFor="currency">Devise</Label>
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger id="currency">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Langue</Label>
-          <p className="rounded-md border border-border/60 bg-card/40 px-3 py-2 text-sm">
-            {region.languageLabel}
-          </p>
+          <Label htmlFor="language">Langue</Label>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger id="language">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map((l) => (
+                <SelectItem key={l.id} value={l.id}>
+                  {l.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          Tes montants personnels seront affichés dans la devise et le format
-          choisis. L'abonnement LIBERIA reste facturé en CHF au lancement.
+          Tes montants personnels suivent ta devise. L&apos;interface reste en
+          français au lancement ; le choix de langue prépare la traduction
+          complète. L&apos;abonnement LIBERIA est facturé en CHF.
         </p>
         <Button type="submit" disabled={!changed || pending}>
           {pending && <Loader2 className="h-4 w-4 animate-spin" />}

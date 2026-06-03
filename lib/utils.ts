@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { getLocaleForLanguage } from "./locale/languages";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,18 +31,27 @@ export function formatCurrencyPrecise(
 
 /**
  * Renders an amount using the user's profile preferences. Single entry
- * point for every personal amount in the app — extends cleanly when a
- * user picks a different (country, currency, locale) combo.
+ * point for every personal amount in the app. Country qualifies a
+ * bare language tag so "fr" with country "CH" formats as "1'234 CHF"
+ * while "fr" with country "FR" formats as "1 234,00 CHF". Region-
+ * qualified tags ("fr-CH", "en-GB") are passed through unchanged.
  */
 export function formatUserCurrency(
   amount: number,
-  profile: { currency?: string | null; locale?: string | null } | null | undefined,
+  profile:
+    | {
+        currency?: string | null;
+        locale?: string | null;
+        country?: string | null;
+      }
+    | null
+    | undefined,
 ): string {
-  return formatCurrency(
-    amount,
-    profile?.currency ?? "CHF",
+  const intlLocale = getLocaleForLanguage(
     profile?.locale ?? "fr-CH",
+    profile?.country,
   );
+  return formatCurrency(amount, profile?.currency ?? "CHF", intlLocale);
 }
 
 export function formatPercent(value: number, locale = "fr-CH"): string {

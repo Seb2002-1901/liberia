@@ -55,38 +55,34 @@ update public.profiles
 
 -- Whitelists soft (NOT VALID) — les écritures futures sont validées
 -- mais on ne bloque pas un éventuel profil existant avec une valeur
--- hors liste, pour ne casser personne. Le formulaire profil limite
--- l'utilisateur aux mêmes valeurs côté client.
-do $$
-begin
-  if not exists (
-    select 1 from pg_constraint
-    where conrelid = 'public.profiles'::regclass
-      and conname = 'profiles_currency_chk'
-  ) then
-    alter table public.profiles
-      add constraint profiles_currency_chk
-      check (currency in ('CHF','EUR','USD','GBP')) not valid;
-  end if;
-  if not exists (
-    select 1 from pg_constraint
-    where conrelid = 'public.profiles'::regclass
-      and conname = 'profiles_locale_chk'
-  ) then
-    alter table public.profiles
-      add constraint profiles_locale_chk
-      check (locale in ('fr-CH','fr-FR','en-US','en-GB','de-DE','it-IT')) not valid;
-  end if;
-  if not exists (
-    select 1 from pg_constraint
-    where conrelid = 'public.profiles'::regclass
-      and conname = 'profiles_country_chk'
-  ) then
-    alter table public.profiles
-      add constraint profiles_country_chk
-      check (country in ('CH','FR','BE','DE','IT','GB','US')) not valid;
-  end if;
-end$$;
+-- hors liste, pour ne casser personne. Les listes sont volontairement
+-- larges : country / currency / locale sont indépendants côté code
+-- (un Suisse peut payer en CHF et utiliser l'app en italien). On droppe
+-- les anciennes versions plus étroites avant de réinstaller la version
+-- élargie ; rejouer le script reste idempotent.
+alter table public.profiles drop constraint if exists profiles_currency_chk;
+alter table public.profiles drop constraint if exists profiles_locale_chk;
+alter table public.profiles drop constraint if exists profiles_country_chk;
+
+alter table public.profiles
+  add constraint profiles_currency_chk
+  check (currency in ('CHF','EUR','USD','GBP','CAD','TRY')) not valid;
+
+alter table public.profiles
+  add constraint profiles_locale_chk
+  check (locale in (
+    'fr','fr-CH','fr-FR',
+    'en','en-US','en-GB',
+    'de','it','es','pt',
+    'hr','sr','bs','sq','tr','ar'
+  )) not valid;
+
+alter table public.profiles
+  add constraint profiles_country_chk
+  check (country in (
+    'CH','FR','BE','DE','IT','GB','US',
+    'CA','PT','ES','HR','RS','BA','AL','TR'
+  )) not valid;
 
 -- Force PostgREST to refresh its schema cache so the newly-added
 -- `country` column (and the new CHECK constraints above) become

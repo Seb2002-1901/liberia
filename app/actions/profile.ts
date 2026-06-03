@@ -3,13 +3,24 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { COUNTRIES } from "@/lib/locale/countries";
+import { CURRENCIES } from "@/lib/locale/currencies";
+import { LANGUAGES } from "@/lib/locale/languages";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
+// Zod whitelists mirror the DB CHECK constraints in
+// supabase/migrations/20240603_profiles_expand_locale.sql so a user
+// can never POST a tuple the database would reject (saves a roundtrip
+// and a confusing error message).
+const COUNTRY_IDS = COUNTRIES.map((c) => c.id) as [string, ...string[]];
+const CURRENCY_IDS = CURRENCIES.map((c) => c.id) as [string, ...string[]];
+const LANGUAGE_IDS = LANGUAGES.map((l) => l.id) as [string, ...string[]];
+
 const localeSchema = z.object({
-  country: z.enum(["CH", "FR", "BE", "DE", "IT", "GB", "US"]),
-  currency: z.enum(["CHF", "EUR", "USD", "GBP"]),
-  locale: z.enum(["fr-CH", "fr-FR", "en-US", "en-GB", "de-DE", "it-IT"]),
+  country: z.enum(COUNTRY_IDS),
+  currency: z.enum(CURRENCY_IDS),
+  locale: z.enum(LANGUAGE_IDS),
 });
 
 export async function updateProfileLocale(input: {
@@ -44,9 +55,10 @@ export async function updateProfileLocale(input: {
     .eq("id", user.id);
   if (error) return { ok: false, error: error.message };
 
-  // Currency drives every personal amount across the app — invalidate
-  // the surfaces that render finance data so the new symbol appears
-  // immediately instead of waiting for a hard refresh.
+  // Currency / locale drive every personal amount across the app —
+  // invalidate the surfaces that render finance data so the new
+  // symbol / formatting appears immediately instead of waiting for
+  // a hard refresh.
   revalidatePath("/profile");
   revalidatePath("/dashboard");
   revalidatePath("/budget");

@@ -60,7 +60,11 @@ export default async function ProfilePage() {
           <CardTitle>Pays, devise et langue</CardTitle>
         </CardHeader>
         <CardContent>
-          <LocaleForm initialCountry={data.profile.country ?? "CH"} />
+          <LocaleForm
+            initialCountry={data.profile.country ?? "CH"}
+            initialCurrency={data.profile.currency ?? "CHF"}
+            initialLocale={data.profile.locale ?? "fr-CH"}
+          />
         </CardContent>
       </Card>
     </div>
