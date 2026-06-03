@@ -6,33 +6,26 @@ import {
   memoryUpdateSchema,
   type MemoryUpdateInput,
 } from "@/lib/validations/memory";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
-/**
- * Persist (upsert) the current user's coaching memory. Every field is
- * optional — only those present in `input` are written. RLS guarantees
- * the row belongs to the caller. DB CHECK constraints + zod schema cap
- * free-text lengths so a direct SDK call can't bloat the column.
- */
 export async function updateMemory(
   input: MemoryUpdateInput,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = memoryUpdateSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues[0]?.message ?? "Données invalides.",
-    };
+    return { ok: false, error: tErr("invalidData") };
   }
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   const v = parsed.data;
   const payload: Record<string, unknown> = { user_id: user.id };
@@ -54,19 +47,16 @@ export async function updateMemory(
   return { ok: true };
 }
 
-/**
- * Erase the user's coaching memory row. The user keeps full control —
- * they can reset everything at any time. Idempotent.
- */
 export async function clearMyMemory(): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
   const { error } = await supabase
     .from("user_memory")
     .delete()

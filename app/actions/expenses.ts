@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { expenseSchema, type ExpenseInput } from "@/lib/validations/finance";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -16,12 +17,13 @@ async function requireUserId(): Promise<string | null> {
 }
 
 export async function createExpense(input: ExpenseInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = expenseSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise (ou mode démo)." };
+  if (!userId) return { ok: false, error: tErr("authRequiredDemo") };
 
   const supabase = await createClient();
   const { error } = await supabase.from("expenses").insert({
@@ -41,12 +43,13 @@ export async function createExpense(input: ExpenseInput): Promise<ActionResult> 
 }
 
 export async function updateExpense(id: string, input: ExpenseInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = expenseSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -69,8 +72,9 @@ export async function updateExpense(id: string, input: ExpenseInput): Promise<Ac
 }
 
 export async function deleteExpense(id: string): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase

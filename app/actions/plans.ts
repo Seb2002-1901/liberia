@@ -13,6 +13,7 @@ import { requirePremiumAccess } from "@/lib/services/access";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { track } from "@/lib/analytics/tracker";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -21,28 +22,26 @@ type ActionResult<T = void> =
 export async function generateFinancialPlan(input: {
   horizonDays: 30 | 60 | 90;
 }): Promise<ActionResult<{ planId: string }>> {
+  const tErr = await getActionErrors();
   if (!isAnthropicConfigured() || !isAdminConfigured()) {
-    return {
-      ok: false,
-      error: "Le plan IA arrive bientôt — il est en cours d'activation.",
-    };
+    return { ok: false, error: tErr("planSoon") };
   }
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
 
   const parsed = generatePlanRequestSchema.safeParse({
     horizon_days: input.horizonDays,
   });
   if (!parsed.success) {
-    return { ok: false, error: "Horizon invalide (30, 60 ou 90)." };
+    return { ok: false, error: tErr("invalidHorizon") };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   // Premium gate — plan generation costs LIBERIA real money. Block free
   // / lapsed accounts before hitting Anthropic. Existing plans remain
@@ -57,20 +56,13 @@ export async function generateFinancialPlan(input: {
   // its sliding window — plan generation goes through the same budget).
   const rate = await checkRateLimit("ai", user.id);
   if (!rate.success) {
-    return {
-      ok: false,
-      error: "Trop de générations récentes. Réessaye dans quelques minutes.",
-    };
+    return { ok: false, error: tErr("tooManyPlans") };
   }
 
   // Build the snapshot the model sees + we audit.
   const financeData = await getFinanceData();
   if (financeData.isDemo) {
-    return {
-      ok: false,
-      error:
-        "Le plan IA est réservé aux comptes connectés avec des données réelles.",
-    };
+    return { ok: false, error: tErr("planForReal") };
   }
   const financeContext = buildFinanceContext(financeData);
 
@@ -88,8 +80,7 @@ export async function generateFinancialPlan(input: {
     tokensIn = result.tokensIn;
     tokensOut = result.tokensOut;
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Erreur de génération du plan.";
+    const message = err instanceof Error ? err.message : tErr("planGenerationError");
     return { ok: false, error: message };
   }
 
@@ -171,14 +162,15 @@ export async function toggleStep(
   stepId: string,
   isCompleted: boolean,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   const { error } = await supabase
     .from("financial_plan_steps")

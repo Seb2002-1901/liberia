@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { incomeSchema, type IncomeInput } from "@/lib/validations/finance";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -16,14 +17,15 @@ async function requireUserId(): Promise<string | null> {
 }
 
 export async function createIncome(input: IncomeInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = incomeSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
 
   const userId = await requireUserId();
   if (!userId) {
-    return { ok: false, error: "Authentification requise (ou mode démo)." };
+    return { ok: false, error: tErr("authRequiredDemo") };
   }
 
   const supabase = await createClient();
@@ -44,12 +46,13 @@ export async function createIncome(input: IncomeInput): Promise<ActionResult> {
 }
 
 export async function updateIncome(id: string, input: IncomeInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = incomeSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -72,8 +75,9 @@ export async function updateIncome(id: string, input: IncomeInput): Promise<Acti
 }
 
 export async function deleteIncome(id: string): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase

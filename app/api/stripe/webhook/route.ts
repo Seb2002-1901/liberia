@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 /**
  * Stripe webhook (Phase 2).
@@ -26,7 +27,8 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     event = stripe.webhooks.constructEvent(rawBody, signature, secret);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Signature invalide";
+    const tErr = await getActionErrors();
+    const message = err instanceof Error ? err.message : tErr("invalidSignature");
     return NextResponse.json({ error: message }, { status: 400 });
   }
 

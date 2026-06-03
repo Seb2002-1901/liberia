@@ -535,6 +535,22 @@
       }
     }
   },
+  "unsubscribe": {
+    "metadata": { "title": "Unsubscribe" },
+    "serviceUnavailableTitle": "Service unavailable",
+    "serviceUnavailableBody": "Link-based unsubscribe isn't configured on this environment. Open your settings directly to manage your email preferences.",
+    "invalidLinkTitle": "Invalid link",
+    "invalidLinkBody": "This unsubscribe link is incomplete. Open your settings in LIBERIA to manage your email preferences.",
+    "backToApp": "Back to LIBERIA",
+    "eyebrowDone": "Unsubscribe",
+    "doneTitle": "Done.",
+    "doneBody": "You'll no longer receive the LIBERIA weekly recap. You can reactivate it any time from your settings.",
+    "errorTitle": "Invalid link",
+    "errorBody": "This unsubscribe link isn't recognised. Open your settings in LIBERIA to manage your email preferences.",
+    "confirmTitle": "Unsubscribe from emails?",
+    "confirmBody": "You'll no longer receive the LIBERIA weekly recap. You can reactivate it any time from your settings.",
+    "confirmCta": "Confirm unsubscribe"
+  },
   "memoryConstants": {
     "tones": {
       "calm": { "label": "Calm and reassuring", "description": "Soft, no pressure. Pace beats performance." },

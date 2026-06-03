@@ -6,6 +6,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
 import { isStripeConfigured } from "@/lib/stripe/config";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -23,8 +24,9 @@ async function requireUserId(): Promise<string | null> {
 export async function setEmailWeeklySummary(
   enabled: boolean,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
   const supabase = await createClient();
   const { error } = await supabase
     .from("user_settings")
@@ -38,8 +40,9 @@ export async function setEmailWeeklySummary(
 export async function setNotificationAlerts(
   enabled: boolean,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
   const supabase = await createClient();
   const { error } = await supabase
     .from("user_settings")
@@ -53,8 +56,7 @@ export async function setNotificationAlerts(
 /**
  * Allowlist of email-preference columns the user can flip from the UI.
  * Stays in code (vs. taking the column name from the client) so a
- * malicious SDK call can't toggle billing-critical flags. Each entry
- * must be a real boolean column on `public.user_settings`.
+ * malicious SDK call can't toggle billing-critical flags.
  */
 const EMAIL_PREF_KEYS = [
   "email_encouragement",
@@ -68,11 +70,12 @@ export async function setEmailPreference(
   key: EmailPreferenceKey,
   enabled: boolean,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   if (!EMAIL_PREF_KEYS.includes(key)) {
-    return { ok: false, error: "Préférence inconnue." };
+    return { ok: false, error: tErr("prefUnknown") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
   const supabase = await createClient();
   const { error } = await supabase
     .from("user_settings")
@@ -83,17 +86,12 @@ export async function setEmailPreference(
   return { ok: true };
 }
 
-/**
- * Privacy-friendly product analytics opt-out toggle. Default false at
- * the DB level (opted in) but the tracker itself is no-op until a
- * provider is wired — this flag is forward-compatible plumbing so the
- * user already controls their data the day analytics ship.
- */
 export async function setAnalyticsOptOut(
   optedOut: boolean,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
   const supabase = await createClient();
   const { error } = await supabase
     .from("user_settings")
@@ -104,22 +102,18 @@ export async function setAnalyticsOptOut(
   return { ok: true };
 }
 
-/**
- * RGPD-friendly export. Builds a JSON snapshot of everything the user
- * can see in the app and returns the bytes for the client to download.
- * Uses the user-session client (RLS already scopes to self).
- */
 export async function exportUserData(): Promise<
   ActionResult<{ filename: string; json: string }>
 > {
+  const tErr = await getActionErrors();
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   const [
     profile,
@@ -161,7 +155,7 @@ export async function exportUserData(): Promise<
     financial_plan_steps: planSteps.data ?? [],
     ai_conversations: conversations.data ?? [],
     ai_messages: messages.data ?? [],
-    note: "Données utilisateur exportées par LIBERIA. Conforme au principe RGPD de portabilité (Art. 20).",
+    note: tErr("exportNote"),
   };
 
   return {
@@ -173,35 +167,16 @@ export async function exportUserData(): Promise<
   };
 }
 
-/**
- * Hard delete the user's auth account. Supabase cascades to all owned
- * tables via the FK ON DELETE CASCADE chain (profiles, subscriptions,
- * financial_profiles, incomes, expenses, goals, financial_plans,
- * financial_plan_steps, ai_conversations, ai_messages, user_settings).
- * Before deleting, cancel any active Stripe subscription so the card
- * on file is never charged again after the user has rage-quit. The
- * Stripe Customer record is left in place for accounting / refund
- * history — hard delete of the Customer is reserved for an admin
- * script (not exposed here).
- */
 export async function deleteAccount(): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   if (!isAdminConfigured()) {
-    return {
-      ok: false,
-      error:
-        "La suppression de compte sera disponible très bientôt. Contacte le support pour une demande immédiate.",
-    };
+    return { ok: false, error: tErr("accountDeletionUnavailable") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const admin = getAdminClient();
 
-  // Cancel the live Stripe subscription before we drop the local row.
-  // Without this, a deleted user would keep getting charged at every
-  // renewal until support manually intervenes in the Stripe Dashboard.
-  // We immediate-cancel (no proration) — the user explicitly chose to
-  // burn the account, so granting access until period_end is moot.
   const { data: sub } = await admin
     .from("subscriptions")
     .select("stripe_subscription_id")
@@ -217,12 +192,10 @@ export async function deleteAccount(): Promise<ActionResult> {
       await stripe.subscriptions.cancel(sub.stripe_subscription_id);
     } catch {
       // Stripe outage / already-canceled subscription — proceed with the
-      // local delete anyway. Better to honour the user's deletion request
-      // than to hold their data hostage to Stripe's availability.
+      // local delete anyway.
     }
   }
 
-  // Mark the subscription as locally-deleted so we keep an audit trail.
   await admin
     .from("subscriptions")
     .update({ plan: "free", status: "canceled", cancel_at_period_end: true })

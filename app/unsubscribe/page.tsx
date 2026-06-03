@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { UnsubscribeForm } from "@/components/unsubscribe/unsubscribe-form";
@@ -7,22 +8,21 @@ import { isAdminConfigured } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Désinscription",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.unsubscribe.metadata");
+  return {
+    title: t("title"),
+    robots: { index: false, follow: false },
+  };
+}
 
 interface PageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
 export default async function UnsubscribePage({ searchParams }: PageProps) {
+  const t = await getTranslations("app.unsubscribe");
   const { token } = await searchParams;
-
-  // GET requests don't unsubscribe by themselves — email link previewers
-  // (Gmail, Slack, Twitter, antivirus link checkers) crawl every URL and
-  // would auto-trigger the action. The actual unsubscribe happens via a
-  // server action invoked by a form submit (POST) inside UnsubscribeForm.
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -33,29 +33,24 @@ export default async function UnsubscribePage({ searchParams }: PageProps) {
         {!isAdminConfigured() ? (
           <>
             <h1 className="font-display text-2xl font-semibold tracking-tight">
-              Service indisponible
+              {t("serviceUnavailableTitle")}
             </h1>
             <p className="mt-3 text-muted-foreground">
-              La désinscription par lien n'est pas configurée sur cet
-              environnement. Ouvre directement tes paramètres pour gérer tes
-              préférences emails.
+              {t("serviceUnavailableBody")}
             </p>
           </>
         ) : !token ? (
           <>
             <h1 className="font-display text-2xl font-semibold tracking-tight">
-              Lien invalide
+              {t("invalidLinkTitle")}
             </h1>
-            <p className="mt-3 text-muted-foreground">
-              Ce lien de désinscription est incomplet. Ouvre tes paramètres
-              dans LIBERIA pour gérer tes préférences emails.
-            </p>
+            <p className="mt-3 text-muted-foreground">{t("invalidLinkBody")}</p>
           </>
         ) : (
           <UnsubscribeForm token={token} />
         )}
         <Button asChild variant="gold" size="lg" className="mt-7">
-          <Link href="/">Retour à LIBERIA</Link>
+          <Link href="/">{t("backToApp")}</Link>
         </Button>
       </div>
     </div>

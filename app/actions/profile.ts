@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { resolveAppLocale } from "@/i18n/config";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 import { COUNTRIES } from "@/lib/locale/countries";
 import { CURRENCIES } from "@/lib/locale/currencies";
 import { LANGUAGES } from "@/lib/locale/languages";
@@ -30,22 +31,19 @@ export async function updateProfileLocale(input: {
   currency: string;
   locale: string;
 }): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   if (!isSupabaseConfigured()) {
-    return { ok: false, error: "Authentification requise." };
+    return { ok: false, error: tErr("authRequired") };
   }
   const parsed = localeSchema.safeParse(input);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error:
-        "Combinaison pays / devise / langue non supportée pour le moment.",
-    };
+    return { ok: false, error: tErr("regionUnsupported") };
   }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   const { error } = await supabase
     .from("profiles")

@@ -15,28 +15,26 @@ import {
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
 import { track } from "@/lib/analytics/tracker";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
 export async function completeOnboarding(input: OnboardingInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = onboardingSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
 
   if (!isSupabaseConfigured()) {
-    return {
-      ok: false,
-      error:
-        "L'enregistrement de ton profil sera disponible dans un instant. Réessaie.",
-    };
+    return { ok: false, error: tErr("profileUnavailable") };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Authentification requise." };
+  if (!user) return { ok: false, error: tErr("authRequired") };
 
   const v = parsed.data;
   const dti = v.monthlyIncome > 0 ? (v.monthlyDebt / v.monthlyIncome) * 100 : 0;

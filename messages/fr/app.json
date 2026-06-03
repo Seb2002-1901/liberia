@@ -535,6 +535,22 @@
       }
     }
   },
+  "unsubscribe": {
+    "metadata": { "title": "Désinscription" },
+    "serviceUnavailableTitle": "Service indisponible",
+    "serviceUnavailableBody": "La désinscription par lien n'est pas configurée sur cet environnement. Ouvre directement tes paramètres pour gérer tes préférences emails.",
+    "invalidLinkTitle": "Lien invalide",
+    "invalidLinkBody": "Ce lien de désinscription est incomplet. Ouvre tes paramètres dans LIBERIA pour gérer tes préférences emails.",
+    "backToApp": "Retour à LIBERIA",
+    "eyebrowDone": "Désinscription",
+    "doneTitle": "C'est fait.",
+    "doneBody": "Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le réactiver à tout moment depuis tes paramètres.",
+    "errorTitle": "Lien invalide",
+    "errorBody": "Ce lien de désinscription n'est pas reconnu. Ouvre tes paramètres dans LIBERIA pour gérer tes préférences emails.",
+    "confirmTitle": "Se désinscrire des emails ?",
+    "confirmBody": "Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le réactiver depuis tes paramètres à tout moment.",
+    "confirmCta": "Confirmer la désinscription"
+  },
   "memoryConstants": {
     "tones": {
       "calm": { "label": "Calme et rassurant", "description": "Doux, sans pression. Le rythme prime sur la performance." },

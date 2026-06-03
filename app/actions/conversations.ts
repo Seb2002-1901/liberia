@@ -6,6 +6,7 @@ import {
   conversationIdSchema,
   conversationTitleSchema,
 } from "@/lib/ai/safety";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -23,8 +24,9 @@ async function requireUserId(): Promise<string | null> {
 export async function createConversation(): Promise<
   ActionResult<{ id: string }>
 > {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -42,16 +44,17 @@ export async function renameConversation(
   id: string,
   title: string,
 ): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const idParsed = conversationIdSchema.safeParse({ id });
-  if (!idParsed.success) return { ok: false, error: "Conversation invalide." };
+  if (!idParsed.success) return { ok: false, error: tErr("conversationInvalid") };
 
   const titleParsed = conversationTitleSchema.safeParse({ title });
   if (!titleParsed.success) {
-    return { ok: false, error: "Titre invalide." };
+    return { ok: false, error: tErr("titleInvalid") };
   }
 
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -66,11 +69,12 @@ export async function renameConversation(
 }
 
 export async function deleteConversation(id: string): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const idParsed = conversationIdSchema.safeParse({ id });
-  if (!idParsed.success) return { ok: false, error: "Conversation invalide." };
+  if (!idParsed.success) return { ok: false, error: tErr("conversationInvalid") };
 
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase

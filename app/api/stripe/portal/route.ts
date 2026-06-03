@@ -4,29 +4,19 @@ import { isStripeConfigured } from "@/lib/stripe/config";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getAppBaseUrl } from "@/lib/url";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
-/**
- * Customer Portal — opens Stripe's hosted portal for the user's
- * subscription (cancel / update payment method / view invoices).
- *
- * Requires the user to already have a stripe_customer_id, which is set
- * by the webhook after their first Checkout completion. If they have
- * not paid yet, return 400 with a clear message — the UI should not
- * show the Portal button in that case anyway.
- */
 export async function POST(_request: Request) {
+  const tErr = await getActionErrors();
   if (!isStripeConfigured()) {
     return NextResponse.json(
-      {
-        error:
-          "Le portail d'abonnement arrive bientôt — il est en cours d'activation.",
-      },
+      { error: tErr("subUnavailable") },
       { status: 501 },
     );
   }
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
-      { error: "Authentification requise." },
+      { error: tErr("authRequired") },
       { status: 401 },
     );
   }
@@ -36,13 +26,13 @@ export async function POST(_request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+    return NextResponse.json({ error: tErr("authRequired") }, { status: 401 });
   }
 
   const rate = await checkRateLimit("stripe", user.id);
   if (!rate.success) {
     return NextResponse.json(
-      { error: "Trop de tentatives. Réessaye dans quelques instants." },
+      { error: tErr("tooManyAttempts") },
       { status: 429 },
     );
   }
@@ -55,10 +45,7 @@ export async function POST(_request: Request) {
 
   if (!sub?.stripe_customer_id) {
     return NextResponse.json(
-      {
-        error:
-          "Aucun abonnement actif à gérer. Souscris d'abord à Premium pour accéder au portail.",
-      },
+      { error: tErr("noActiveSubscription") },
       { status: 400 },
     );
   }
@@ -75,8 +62,7 @@ export async function POST(_request: Request) {
     });
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erreur Stripe";
+    const message = err instanceof Error ? err.message : tErr("stripeError");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

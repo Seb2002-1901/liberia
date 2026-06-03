@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { goalSchema, type GoalInput } from "@/lib/validations/finance";
 import { LAPSED_ACCOUNT_GOAL_LIMIT } from "@/lib/constants";
+import { getActionErrors } from "@/lib/i18n/action-errors";
+import { getTranslations } from "next-intl/server";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -17,12 +19,13 @@ async function requireUserId(): Promise<string | null> {
 }
 
 export async function createGoal(input: GoalInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = goalSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise (ou mode démo)." };
+  if (!userId) return { ok: false, error: tErr("authRequiredDemo") };
 
   const supabase = await createClient();
 
@@ -43,9 +46,12 @@ export async function createGoal(input: GoalInput): Promise<ActionResult> {
       .eq("user_id", userId)
       .eq("is_completed", false);
     if ((count ?? 0) >= LAPSED_ACCOUNT_GOAL_LIMIT) {
+      const tErrParam = await getTranslations("errors.actions");
       return {
         ok: false,
-        error: `Limite de ${LAPSED_ACCOUNT_GOAL_LIMIT} objectif actif atteinte. Démarre ton essai 14 jours (ou reprends ton abonnement) pour des objectifs illimités.`,
+        error: tErrParam("goalLimitReached", {
+          limit: LAPSED_ACCOUNT_GOAL_LIMIT,
+        }),
       };
     }
   }
@@ -68,12 +74,13 @@ export async function createGoal(input: GoalInput): Promise<ActionResult> {
 }
 
 export async function updateGoal(id: string, input: GoalInput): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const parsed = goalSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { ok: false, error: tErr("invalidData") };
   }
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -97,8 +104,9 @@ export async function updateGoal(id: string, input: GoalInput): Promise<ActionRe
 }
 
 export async function deleteGoal(id: string): Promise<ActionResult> {
+  const tErr = await getActionErrors();
   const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "Authentification requise." };
+  if (!userId) return { ok: false, error: tErr("authRequired") };
 
   const supabase = await createClient();
   const { error } = await supabase

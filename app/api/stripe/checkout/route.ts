@@ -10,18 +10,17 @@ import { getStripe } from "@/lib/stripe/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getAppBaseUrl } from "@/lib/url";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 const bodySchema = z.object({
   planId: z.enum(["premium_monthly", "premium_yearly"]),
 });
 
 export async function POST(request: Request) {
+  const tErr = await getActionErrors();
   if (!isStripeConfigured()) {
     return NextResponse.json(
-      {
-        error:
-          "Les abonnements arrivent bientôt — le paiement est en cours d'activation.",
-      },
+      { error: tErr("subscriptionsActivating") },
       { status: 501 },
     );
   }
@@ -30,29 +29,26 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: tErr("invalidRequest") }, { status: 400 });
   }
 
   const parsed = bodySchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Plan invalide" }, { status: 400 });
+    return NextResponse.json({ error: tErr("planInvalid") }, { status: 400 });
   }
 
   const planId: StripePlanId = parsed.data.planId;
   const plan = STRIPE_PLANS[planId];
   if (!plan?.priceId) {
     return NextResponse.json(
-      {
-        error:
-          "Ce plan sera disponible très bientôt. Réessaie dans quelques instants.",
-      },
+      { error: tErr("planNotYet") },
       { status: 501 },
     );
   }
 
   if (!isSupabaseConfigured()) {
     return NextResponse.json(
-      { error: "Authentification requise." },
+      { error: tErr("authRequired") },
       { status: 401 },
     );
   }
@@ -62,13 +58,13 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+    return NextResponse.json({ error: tErr("authRequired") }, { status: 401 });
   }
 
   const rate = await checkRateLimit("stripe", user.id);
   if (!rate.success) {
     return NextResponse.json(
-      { error: "Trop de tentatives. Réessaye dans quelques instants." },
+      { error: tErr("tooManyAttempts") },
       { status: 429 },
     );
   }
@@ -150,7 +146,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erreur Stripe";
+    const message = err instanceof Error ? err.message : tErr("stripeError");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

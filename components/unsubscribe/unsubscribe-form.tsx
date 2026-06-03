@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { confirmUnsubscribe } from "@/app/actions/unsubscribe";
 
@@ -10,6 +11,7 @@ interface UnsubscribeFormProps {
 }
 
 export function UnsubscribeForm({ token }: UnsubscribeFormProps) {
+  const t = useTranslations("app.unsubscribe");
   const [pending, setPending] = React.useState(false);
   const [state, setState] = React.useState<"idle" | "ok" | "error">("idle");
   const [error, setError] = React.useState<string | null>(null);
@@ -34,15 +36,12 @@ export function UnsubscribeForm({ token }: UnsubscribeFormProps) {
     return (
       <>
         <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-          Désinscription
+          {t("eyebrowDone")}
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-          C'est fait.
+          {t("doneTitle")}
         </h1>
-        <p className="mt-3 text-muted-foreground">
-          Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le
-          réactiver à tout moment depuis tes paramètres.
-        </p>
+        <p className="mt-3 text-muted-foreground">{t("doneBody")}</p>
       </>
     );
   }
@@ -51,11 +50,9 @@ export function UnsubscribeForm({ token }: UnsubscribeFormProps) {
     return (
       <>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Lien invalide
+          {t("errorTitle")}
         </h1>
-        <p className="mt-3 text-muted-foreground">
-          {error ?? "Ce lien de désinscription n'est pas reconnu. Ouvre tes paramètres dans LIBERIA pour gérer tes préférences emails."}
-        </p>
+        <p className="mt-3 text-muted-foreground">{error ?? t("errorBody")}</p>
       </>
     );
   }
@@ -63,15 +60,12 @@ export function UnsubscribeForm({ token }: UnsubscribeFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-        Se désinscrire des emails ?
+        {t("confirmTitle")}
       </h1>
-      <p className="text-muted-foreground">
-        Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le
-        réactiver depuis tes paramètres à tout moment.
-      </p>
+      <p className="text-muted-foreground">{t("confirmBody")}</p>
       <Button type="submit" variant="gold" size="lg" disabled={pending}>
         {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-        Confirmer la désinscription
+        {t("confirmCta")}
       </Button>
     </form>
   );

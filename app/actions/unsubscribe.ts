@@ -1,15 +1,17 @@
 "use server";
 
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 export async function confirmUnsubscribe(
   token: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  const tErr = await getActionErrors();
   if (!isAdminConfigured()) {
-    return { ok: false, error: "Service indisponible." };
+    return { ok: false, error: tErr("serviceUnavailable") };
   }
   if (!token || typeof token !== "string" || token.length < 8) {
-    return { ok: false, error: "Lien invalide." };
+    return { ok: false, error: tErr("invalidLink") };
   }
   const admin = getAdminClient();
   const { data, error } = await admin
@@ -19,7 +21,7 @@ export async function confirmUnsubscribe(
     .select("user_id")
     .maybeSingle();
   if (error || !data) {
-    return { ok: false, error: "Lien invalide ou expiré." };
+    return { ok: false, error: tErr("invalidOrExpiredLink") };
   }
   return { ok: true };
 }

@@ -19,6 +19,7 @@ import { requirePremiumAccess } from "@/lib/services/access";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getLanguageEnglishName } from "@/lib/locale/languages";
+import { getActionErrors } from "@/lib/i18n/action-errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,14 +30,13 @@ export const maxDuration = 60;
 const HISTORY_LIMIT = MAX_CONVERSATION_TURNS; // last N turns kept in context
 
 export async function POST(request: Request) {
+  const tErr = await getActionErrors();
   // Admin client is required either path — assistant messages can only
   // be written via service_role (the ai_messages RLS policy restricts
   // user-side INSERTs to role='user').
   if (!isAdminConfigured() || !isSupabaseConfigured()) {
     return NextResponse.json(
-      {
-        error: "Le coach IA arrive bientôt — il est en cours d'activation.",
-      },
+      { error: tErr("coachUnavailable") },
       { status: 501 },
     );
   }
@@ -45,23 +45,17 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: tErr("invalidRequest") }, { status: 400 });
   }
 
   const parsed = chatMessageSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: tErr("invalidData") }, { status: 400 });
   }
 
   if (looksLikeAbuse(parsed.data.content)) {
     return NextResponse.json(
-      {
-        error:
-          "Cette demande n'entre pas dans le cadre du coach LIBERIA. Reformule en parlant de ta situation financière.",
-      },
+      { error: tErr("outOfScope") },
       { status: 400 },
     );
   }
@@ -71,7 +65,7 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+    return NextResponse.json({ error: tErr("authRequired") }, { status: 401 });
   }
 
   // Premium gate — calls to Anthropic cost real money. Free / lapsed
@@ -87,10 +81,7 @@ export async function POST(request: Request) {
   const rate = await checkRateLimit("ai", user.id);
   if (!rate.success) {
     return NextResponse.json(
-      {
-        error:
-          "Tu envoies trop de messages d'affilée. Attends quelques secondes et réessaye.",
-      },
+      { error: tErr("tooManyMessages") },
       { status: 429 },
     );
   }
@@ -107,7 +98,7 @@ export async function POST(request: Request) {
   }
   if (!conversation) {
     return NextResponse.json(
-      { error: "Conversation introuvable." },
+      { error: tErr("conversationNotFound") },
       { status: 404 },
     );
   }
@@ -156,7 +147,7 @@ export async function POST(request: Request) {
   if (history.filter((m) => m.role === "user").length === 1) {
     const derivedTitle =
       parsed.data.content.slice(0, 60).replace(/\s+/g, " ").trim() ||
-      "Nouvelle conversation";
+      tErr("newConversationDefaultTitle");
     await supabase
       .from("ai_conversations")
       .update({ title: derivedTitle })
