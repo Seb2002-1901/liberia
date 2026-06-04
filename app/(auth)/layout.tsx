@@ -1,12 +1,17 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BrandMark } from "@/components/layout/brand-mark";
-import { APP_TAGLINE } from "@/lib/constants";
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [t, tCommon] = await Promise.all([
+    getTranslations("auth.layout"),
+    getTranslations("common"),
+  ]);
+  const tagline = tCommon("tagline");
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
       {/* Left: form */}
@@ -18,11 +23,11 @@ export default function AuthLayout({
         <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} LIBERIA ·{" "}
           <Link href="/terms" className="hover:text-foreground">
-            Conditions
+            {t("footerTerms")}
           </Link>{" "}
           ·{" "}
           <Link href="/privacy" className="hover:text-foreground">
-            Confidentialité
+            {t("footerPrivacy")}
           </Link>
         </p>
       </div>
@@ -45,14 +50,12 @@ export default function AuthLayout({
           <div />
           <div className="max-w-md">
             <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-              {APP_TAGLINE}
+              {tagline}
             </p>
             <p className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight">
-              Construis ta stabilité financière, calmement.
+              {t("panelTitle")}
             </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Aucune publicité, aucune revente de données. Juste un outil clair, pour toi.
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground">{t("panelBody")}</p>
           </div>
         </div>
       </div>

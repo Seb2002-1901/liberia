@@ -39,7 +39,18 @@
     "subtitle": "LIBERIA helps you understand your finances, lower your stress and build durable stability — without jargon, without shame.",
     "ctaStart": "Get started for free",
     "ctaHow": "See how it works",
-    "trustSignal": "14 days free · Encrypted data · No ads"
+    "trustSignal": "14 days free · Encrypted data · No ads",
+    "preview": {
+      "stabilityLabel": "Financial stability",
+      "pillCashflow": "Net cash flow · 540 CHF",
+      "pillSavings": "Savings · +210 CHF",
+      "income": "Income",
+      "incomeValue": "2,450 CHF",
+      "expenses": "Expenses",
+      "expensesValue": "1,910 CHF",
+      "goals": "Goals",
+      "goalsValue": "2 active"
+    }
   },
   "problem": {
     "eyebrow": "The reality",
@@ -282,6 +293,15 @@
     "title": "{days} days free. Then the plan of your choice.",
     "subtitle": "Card required to start. Automatic renewal after the trial. Cancel any time.",
     "seeAll": "See all features →"
+  },
+  "pricingPage": {
+    "metadata": {
+      "title": "Pricing",
+      "description": "LIBERIA — {days} days free then 14.99 CHF/month or 119.99 CHF/year. Cancel any time."
+    },
+    "eyebrow": "Pricing",
+    "title": "A clear price. No traps.",
+    "subtitle": "{days} days free to explore LIBERIA. Then the plan you choose (monthly or yearly) starts automatically. You can cancel any time from your account, no questions asked."
   },
   "cta": {
     "titleBefore": "Give your money a",

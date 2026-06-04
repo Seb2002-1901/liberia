@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import {
   type EmailRender,
   escape,
@@ -21,7 +21,12 @@ export async function renderInactivityEmail(
   input: InactivityEmailInput,
 ): Promise<EmailRender> {
   const { firstName, appUrl, unsubscribeUrl, daysSinceLast, locale } = input;
-  const { t } = await createEmailTranslator(locale);
+  const { t, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject = t("inactivity.subject");
   const sinceLine =
@@ -55,6 +60,7 @@ export async function renderInactivityEmail(
     inner,
     appUrl,
     unsubscribeUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("inactivity.footer"),
   });
 

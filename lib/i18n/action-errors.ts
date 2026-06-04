@@ -43,6 +43,9 @@ export type ActionErrorKey =
   | "noActiveSubscription"
   | "subscriptionsActivating"
   | "outOfScope"
+  | "coachStreamError"
+  | "premiumRequired"
+  | "premiumLapsed"
   | "newConversationDefaultTitle";
 
 export async function getActionErrors(): Promise<

@@ -32,6 +32,9 @@
     "noActiveSubscription": "No active subscription to manage. Subscribe to Premium first to access the portal.",
     "subscriptionsActivating": "Subscriptions are coming soon — payment is being activated.",
     "outOfScope": "This request is outside the scope of the LIBERIA coach. Reframe it around your financial situation.",
+    "coachStreamError": "A temporary error occurred. Try again in a moment.",
+    "premiumRequired": "This feature is for Premium accounts. Start your 14-day trial to activate it.",
+    "premiumLapsed": "Your subscription is no longer active. Resume your subscription to use this feature — your data remains accessible.",
     "newConversationDefaultTitle": "New conversation"
   },
   "validation": {
@@ -54,6 +57,7 @@
     "amountGteZero": "Amount >= 0",
     "amountTooHighShort": "Too high",
     "dateInvalid": "Invalid date",
-    "currentExceedsTarget": "The current amount cannot exceed the target"
+    "currentExceedsTarget": "The current amount cannot exceed the target",
+    "notesTooLong": "Notes too long (max 1000 characters)."
   }
 }

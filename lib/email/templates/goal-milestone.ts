@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import { formatCurrency } from "@/lib/utils";
 import {
   type EmailRender,
@@ -36,7 +36,12 @@ export async function renderGoalMilestoneEmail(
     locale,
   } = input;
 
-  const { t, intlLocale } = await createEmailTranslator(locale);
+  const { t, intlLocale, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
   const remaining = Math.max(0, targetAmount - currentAmount);
 
   const subjectKey =
@@ -83,6 +88,7 @@ export async function renderGoalMilestoneEmail(
     inner,
     appUrl,
     unsubscribeUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("goalMilestone.footer"),
   });
 

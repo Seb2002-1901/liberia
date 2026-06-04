@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import { formatCurrency } from "@/lib/utils";
 import {
   type EmailRender,
@@ -23,7 +23,12 @@ export async function renderEncouragementEmail(
   input: EncouragementEmailInput,
 ): Promise<EmailRender> {
   const { firstName, appUrl, unsubscribeUrl, headline, metric, locale } = input;
-  const { t, intlLocale } = await createEmailTranslator(locale);
+  const { t, intlLocale, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject = t("encouragement.subject");
 
@@ -48,6 +53,7 @@ export async function renderEncouragementEmail(
     inner,
     appUrl,
     unsubscribeUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("encouragement.footer"),
   });
 

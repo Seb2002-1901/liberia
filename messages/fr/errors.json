@@ -32,6 +32,9 @@
     "noActiveSubscription": "Aucun abonnement actif à gérer. Souscris d'abord à Premium pour accéder au portail.",
     "subscriptionsActivating": "Les abonnements arrivent bientôt — le paiement est en cours d'activation.",
     "outOfScope": "Cette demande n'entre pas dans le cadre du coach LIBERIA. Reformule en parlant de ta situation financière.",
+    "coachStreamError": "Une erreur temporaire est survenue. Réessaie dans quelques instants.",
+    "premiumRequired": "Cette fonction est réservée aux comptes Premium. Démarre ton essai 14 jours pour l'activer.",
+    "premiumLapsed": "Ton abonnement n'est plus actif. Reprends ton abonnement pour utiliser cette fonction — tes données restent accessibles.",
     "newConversationDefaultTitle": "Nouvelle conversation"
   },
   "validation": {
@@ -54,6 +57,7 @@
     "amountGteZero": "Montant >= 0",
     "amountTooHighShort": "Trop élevé",
     "dateInvalid": "Date invalide",
-    "currentExceedsTarget": "Le montant actuel ne peut dépasser l'objectif"
+    "currentExceedsTarget": "Le montant actuel ne peut dépasser l'objectif",
+    "notesTooLong": "Notes trop longues (max 1000 caractères)."
   }
 }

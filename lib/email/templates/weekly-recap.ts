@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import {
   type EmailRender,
@@ -43,7 +43,12 @@ export async function renderWeeklyEmail(
     currency = "CHF",
   } = input;
 
-  const { t, intlLocale } = await createEmailTranslator(locale);
+  const { t, intlLocale, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject = t("weekly.subject", { score: stabilityScore });
   const toneText =
@@ -106,6 +111,7 @@ export async function renderWeeklyEmail(
     inner,
     appUrl,
     unsubscribeUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("weekly.footer"),
   });
 

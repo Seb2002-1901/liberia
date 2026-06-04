@@ -23,8 +23,11 @@ export async function StarterPlanView({
   aiReady,
   isDemo = false,
 }: StarterPlanProps) {
-  const t = await getTranslations("app.plan.starter");
-  const plan: StarterPlan = getStarterPlan(situation);
+  const [t, tContent] = await Promise.all([
+    getTranslations("app.plan.starter"),
+    getTranslations("app.plan.starter.content"),
+  ]);
+  const plan: StarterPlan = getStarterPlan(situation, tContent);
   const weeks = groupByWeek(plan.steps);
 
   return (

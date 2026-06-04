@@ -71,5 +71,20 @@
       "resumeBody": "Your access is paused. Resume your subscription at 14.99 CHF/month or 119.99 CHF/year. Cancel any time."
     }
   },
+  "errorPages": {
+    "global": {
+      "eyebrow": "An error occurred",
+      "title": "Something broke.",
+      "body": "We logged the incident. You can retry or head back home — your data is intact.",
+      "retry": "Retry",
+      "home": "Home"
+    },
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "This page wandered off.",
+      "body": "The link may be incorrect or the page may have moved. Head back home calmly.",
+      "cta": "Back to home"
+    }
+  },
   "smoke": "i18n active"
 }

@@ -1,14 +1,15 @@
 import "server-only";
 import { cache } from "react";
+import { getTranslations } from "next-intl/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { normalizeToMonthly } from "@/lib/calculations/finance";
 import { frequencyMultiplier } from "@/lib/calculations/aggregate";
 import {
-  demoExpenses,
   demoFinancialProfile,
-  demoGoals,
-  demoIncomes,
-  demoProfile,
+  getDemoExpenses,
+  getDemoGoals,
+  getDemoIncomes,
+  getDemoProfile,
 } from "@/lib/demo/data";
 import type {
   Expense,
@@ -54,7 +55,7 @@ export function totalMonthly(entries: Array<{ amount: number; frequency: string 
 
 export const getFinanceData = cache(async (): Promise<FinanceData> => {
   if (!isSupabaseConfigured()) {
-    return buildDemoData();
+    return await buildDemoData();
   }
 
   try {
@@ -62,7 +63,7 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return buildDemoData();
+      return await buildDemoData();
     }
 
     const [profileRes, subRes, fpRes, incRes, expRes, goalsRes] = await Promise.all([
@@ -165,11 +166,14 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
       isDemo: false,
     };
   } catch {
-    return buildDemoData();
+    return await buildDemoData();
   }
 });
 
-function buildDemoData(): FinanceData {
+async function buildDemoData(): Promise<FinanceData> {
+  const t = await getTranslations("app.demo.data");
+  const tString = (key: string) => t(key);
+  const demoProfile = getDemoProfile(tString);
   return {
     profile: {
       full_name: demoProfile.full_name,
@@ -191,9 +195,9 @@ function buildDemoData(): FinanceData {
       has_customer: false,
     },
     financialProfile: demoFinancialProfile,
-    incomes: demoIncomes,
-    expenses: demoExpenses,
-    goals: demoGoals,
+    incomes: getDemoIncomes(tString),
+    expenses: getDemoExpenses(tString),
+    goals: getDemoGoals(tString),
     isDemo: true,
   };
 }

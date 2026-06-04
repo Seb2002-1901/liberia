@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import {
   EMAIL_THEME,
   type EmailRender,
@@ -19,7 +19,12 @@ export async function renderPaymentFailedEmail(
   input: PaymentFailedEmailInput,
 ): Promise<EmailRender> {
   const { firstName, appUrl, portalUrl, locale } = input;
-  const { t } = await createEmailTranslator(locale);
+  const { t, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject = t("paymentFailed.subject");
 
@@ -43,6 +48,7 @@ export async function renderPaymentFailedEmail(
     eyebrow: t("paymentFailed.eyebrow"),
     inner,
     appUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("paymentFailed.footer"),
   });
 

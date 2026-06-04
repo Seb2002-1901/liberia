@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2, Circle, Sparkles, XCircle } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { isAdminUser } from "@/lib/admin";
@@ -9,10 +10,13 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getReadinessSummary } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Admin · LIBERIA",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.admin.metadata");
+  return {
+    title: t("title"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -31,22 +35,24 @@ export default async function AdminPage() {
   } = await supabase.auth.getUser();
   if (!isAdminUser(user?.id)) notFound();
 
-  const stats = await loadStats();
+  const [stats, t, locale] = await Promise.all([
+    loadStats(),
+    getTranslations("app.admin"),
+    getLocale(),
+  ]);
   const readiness = getReadinessSummary();
+  const numberFormatter = new Intl.NumberFormat(locale);
 
   return (
     <div className="container mx-auto max-w-5xl space-y-6 px-6 py-10">
       <div className="space-y-2">
         <Badge variant="gold" className="gap-1">
-          <Sparkles className="h-3 w-3" /> Admin
+          <Sparkles className="h-3 w-3" /> {t("eyebrow")}
         </Badge>
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Aperçu produit
+          {t("pageTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Compteurs internes — uniquement les agrégats, jamais de données
-          individuelles. Aucune donnée n&apos;est exposée à un tiers.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("intro")}</p>
       </div>
 
       <Card
@@ -61,14 +67,16 @@ export default async function AdminPage() {
           <CardTitle className="flex items-center justify-between gap-2 text-sm">
             <span className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[hsl(var(--gold))]" />
-              Préparation production
+              {t("readiness.title")}
             </span>
             <Badge
               variant={readiness.productionReady ? "success" : "warning"}
             >
               {readiness.productionReady
-                ? "Prêt"
-                : `${readiness.counts.missingRequired} requis manquant${readiness.counts.missingRequired > 1 ? "s" : ""}`}
+                ? t("readiness.ready")
+                : t("readiness.missing", {
+                    count: readiness.counts.missingRequired,
+                  })}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -105,63 +113,100 @@ export default async function AdminPage() {
             ))}
           </ul>
           <p className="mt-3 text-[10px] text-muted-foreground">
-            Aucune valeur d&apos;env n&apos;est jamais affichée — uniquement la
-            présence (oui/non) de chaque variable.
+            {t("readiness.envNote")}
           </p>
         </CardContent>
       </Card>
 
-      <Section title="Acquisition">
-        <Stat label="Comptes créés" value={stats.totalUsers} />
+      <Section title={t("sections.acquisition")}>
         <Stat
-          label="Onboarding complété"
+          label={t("stats.totalUsers")}
+          value={stats.totalUsers}
+          formatter={numberFormatter}
+        />
+        <Stat
+          label={t("stats.onboardedUsers")}
           value={stats.onboardedUsers}
-          hint={pctHint(stats.onboardedUsers, stats.totalUsers)}
+          formatter={numberFormatter}
+          hint={pctHint(stats.onboardedUsers, stats.totalUsers, t)}
         />
       </Section>
 
-      <Section title="Abonnement">
-        <Stat label="En essai" value={stats.trialingSubs} tone="gold" />
-        <Stat label="Premium actif" value={stats.activeSubs} tone="success" />
-        <Stat label="En attente / pause" value={stats.warningSubs} tone="warning" />
-        <Stat label="Annulés" value={stats.canceledSubs} />
+      <Section title={t("sections.subscription")}>
+        <Stat
+          label={t("stats.trialingSubs")}
+          value={stats.trialingSubs}
+          formatter={numberFormatter}
+          tone="gold"
+        />
+        <Stat
+          label={t("stats.activeSubs")}
+          value={stats.activeSubs}
+          formatter={numberFormatter}
+          tone="success"
+        />
+        <Stat
+          label={t("stats.warningSubs")}
+          value={stats.warningSubs}
+          formatter={numberFormatter}
+          tone="warning"
+        />
+        <Stat
+          label={t("stats.canceledSubs")}
+          value={stats.canceledSubs}
+          formatter={numberFormatter}
+        />
       </Section>
 
-      <Section title="Engagement coach">
-        <Stat label="Conversations IA" value={stats.aiConversations} />
+      <Section title={t("sections.coach")}>
         <Stat
-          label="Messages 7 derniers jours"
+          label={t("stats.aiConversations")}
+          value={stats.aiConversations}
+          formatter={numberFormatter}
+        />
+        <Stat
+          label={t("stats.aiMessagesLast7d")}
           value={stats.aiMessagesLast7d}
-          hint="user + assistant confondus"
+          formatter={numberFormatter}
+          hint={t("stats.aiMessagesLast7dHint")}
         />
-        <Stat label="Plans générés" value={stats.financialPlans} />
         <Stat
-          label="Étapes plan validées"
+          label={t("stats.financialPlans")}
+          value={stats.financialPlans}
+          formatter={numberFormatter}
+        />
+        <Stat
+          label={t("stats.planStepsCompleted")}
           value={stats.planStepsCompleted}
+          formatter={numberFormatter}
         />
       </Section>
 
-      <Section title="Objectifs">
-        <Stat label="Objectifs créés" value={stats.totalGoals} />
-        <Stat label="Objectifs atteints" value={stats.completedGoals} />
+      <Section title={t("sections.goals")}>
+        <Stat
+          label={t("stats.totalGoals")}
+          value={stats.totalGoals}
+          formatter={numberFormatter}
+        />
+        <Stat
+          label={t("stats.completedGoals")}
+          value={stats.completedGoals}
+          formatter={numberFormatter}
+        />
       </Section>
 
       <Card className="border-border/60">
         <CardHeader>
-          <CardTitle className="text-sm">Notes</CardTitle>
+          <CardTitle className="text-sm">{t("notesTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-xs text-muted-foreground">
           <p>
             <ArrowRight className="mr-1 inline h-3 w-3 text-[hsl(var(--gold))]" />
-            Les compteurs reflètent l&apos;état présent (pas d&apos;historique
-            time-series). Pour des séries dans le temps, brancher un
-            provider analytics dédié (voir <code>lib/analytics/</code>).
+            <span dangerouslySetInnerHTML={{ __html: t.raw("note1") as string }} />
           </p>
           <p>
             <ArrowRight className="mr-1 inline h-3 w-3 text-[hsl(var(--gold))]" />
-            Aucun e-mail, nom complet, montant ou contenu utilisateur
-            n&apos;apparaît sur cette page. Si tu en vois — c&apos;est un bug,
-            signale-le.
+            {t("note2")}
           </p>
         </CardContent>
       </Card>
@@ -191,11 +236,13 @@ function Stat({
   value,
   hint,
   tone = "neutral",
+  formatter,
 }: {
   label: string;
   value: number;
   hint?: string;
   tone?: "neutral" | "gold" | "success" | "warning";
+  formatter: Intl.NumberFormat;
 }) {
   const valueColor =
     tone === "gold"
@@ -211,7 +258,7 @@ function Stat({
         {label}
       </p>
       <p className={`mt-1 font-display text-2xl font-semibold tabular-nums ${valueColor}`}>
-        {value.toLocaleString("fr-CH")}
+        {formatter.format(value)}
       </p>
       {hint && (
         <p className="mt-1 text-[10px] text-muted-foreground">{hint}</p>
@@ -220,9 +267,13 @@ function Stat({
   );
 }
 
-function pctHint(n: number, d: number): string | undefined {
+function pctHint(
+  n: number,
+  d: number,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string | undefined {
   if (d === 0) return undefined;
-  return `${Math.round((n / d) * 100)} % du total`;
+  return t("pctHint", { pct: Math.round((n / d) * 100) });
 }
 
 type Stats = {

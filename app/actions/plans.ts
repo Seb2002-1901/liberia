@@ -48,7 +48,7 @@ export async function generateFinancialPlan(input: {
   // readable via /plan (lib/services/plan is RLS-bound, not gated).
   const access = await requirePremiumAccess(supabase, user.id);
   if (!access.ok) {
-    return { ok: false, error: access.reason };
+    return { ok: false, error: tErr(access.reasonKey) };
   }
 
   // Plan generation is expensive (Sonnet 4.6 tool-use, ~$0.05-0.10/req).

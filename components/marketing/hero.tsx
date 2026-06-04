@@ -66,13 +66,14 @@ export function Hero() {
 }
 
 function DashboardPreview() {
+  const t = useTranslations("marketing.hero.preview");
   return (
     <div className="relative rounded-3xl border border-border/60 bg-card/40 p-2 shadow-[0_30px_120px_-30px_hsl(var(--gold)/0.25)] backdrop-blur-md">
       <div className="rounded-2xl border border-border/40 bg-background/80 p-6 sm:p-8">
         <div className="flex items-center justify-between border-b border-border/40 pb-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Stabilité financière
+              {t("stabilityLabel")}
             </p>
             <p className="mt-1 font-display text-3xl font-semibold">
               <span className="gold-text">68</span>
@@ -82,14 +83,24 @@ function DashboardPreview() {
             </p>
           </div>
           <div className="hidden gap-2 sm:flex">
-            <Pill label="Reste à vivre · 540 CHF" />
-            <Pill label="Épargne · +210 CHF" highlight />
+            <Pill label={t("pillCashflow")} />
+            <Pill label={t("pillSavings")} highlight />
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <MiniCard label="Revenus" value="2 450 CHF" trend="+0%" />
-          <MiniCard label="Dépenses" value="1 910 CHF" trend="-4%" tone="success" />
-          <MiniCard label="Objectifs" value="2 actifs" trend="48%" tone="gold" />
+          <MiniCard label={t("income")} value={t("incomeValue")} trend="+0%" />
+          <MiniCard
+            label={t("expenses")}
+            value={t("expensesValue")}
+            trend="-4%"
+            tone="success"
+          />
+          <MiniCard
+            label={t("goals")}
+            value={t("goalsValue")}
+            trend="48%"
+            tone="gold"
+          />
         </div>
         <div className="mt-6 h-32 rounded-xl border border-border/40 bg-gradient-to-br from-[hsl(var(--gold)/0.08)] via-transparent to-transparent" />
       </div>

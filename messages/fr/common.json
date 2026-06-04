@@ -71,5 +71,20 @@
       "resumeBody": "Ton accès est en pause. Reprends ton abonnement à 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment."
     }
   },
+  "errorPages": {
+    "global": {
+      "eyebrow": "Une erreur est survenue",
+      "title": "Quelque chose s'est cassé.",
+      "body": "On a noté l'incident. Tu peux réessayer ou revenir à l'accueil — tes données restent intactes.",
+      "retry": "Réessayer",
+      "home": "Accueil"
+    },
+    "notFound": {
+      "eyebrow": "Erreur 404",
+      "title": "Cette page s'est égarée.",
+      "body": "Le lien est peut-être incorrect ou la page a été déplacée. Reviens sereinement à l'accueil.",
+      "cta": "Retour à l'accueil"
+    }
+  },
   "smoke": "i18n actif"
 }

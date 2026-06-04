@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import { formatCurrency } from "@/lib/utils";
 import {
   type EmailRender,
@@ -35,7 +35,12 @@ export async function renderTrialEndingEmail(
     locale,
   } = input;
 
-  const { t, intlLocale } = await createEmailTranslator(locale);
+  const { t, intlLocale, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject =
     daysLeft === 1 ? t("trialEnding.subject1") : t("trialEnding.subject3");
@@ -83,6 +88,7 @@ export async function renderTrialEndingEmail(
     eyebrow: t("trialEnding.eyebrow"),
     inner,
     appUrl,
+    locale: layoutLocale,
     footerDisclaimer: t("trialEnding.footer"),
   });
 

@@ -42,29 +42,40 @@ export function escape(s: string | number): string {
  * is the body HTML (you compose it with the card helpers below);
  * `appUrl` + `unsubscribeUrl` populate the footer.
  */
+export type LayoutLocaleStrings = {
+  /** BCP-47 language code for the <html lang> attribute (e.g. "fr", "en"). */
+  htmlLang: string;
+  /** The "LIBERIA is a personal piloting tool…" disclaimer line. */
+  appDisclaimer: string;
+  /** Default footer disclaimer (when no override is provided). */
+  defaultFooterDisclaimer: string;
+  /** Unsubscribe link label (only used when `unsubscribeUrl` is set). */
+  unsubscribeNonEssential: string;
+};
+
 export function renderLayout(opts: {
   subject: string;
   eyebrow: string;
   inner: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  /** Locale-resolved strings — every caller must pass them. */
+  locale: LayoutLocaleStrings;
   /**
    * Footer disclaimer line. Override per-template when needed (e.g.
-   * payment emails: "Tu reçois cet email car ton abonnement requiert
-   * ton attention"). Default mentions weekly recap opt-in.
+   * payment emails: "your subscription requires your attention").
+   * When omitted, `locale.defaultFooterDisclaimer` is used.
    */
   footerDisclaimer?: string;
 }): string {
   const t = EMAIL_THEME;
-  const disclaimer =
-    opts.footerDisclaimer ??
-    `Tu reçois cet email parce qu'il concerne ton compte LIBERIA. Tu peux ajuster tes préférences depuis <a href="${escape(opts.appUrl)}/settings" style="color:${t.MUTED};">tes paramètres</a>.`;
+  const disclaimer = opts.footerDisclaimer ?? opts.locale.defaultFooterDisclaimer;
   const unsubLine = opts.unsubscribeUrl
-    ? `<br><a href="${escape(opts.unsubscribeUrl)}" style="color:${t.MUTED};">Se désinscrire des emails non essentiels</a>`
+    ? `<br><a href="${escape(opts.unsubscribeUrl)}" style="color:${t.MUTED};">${escape(opts.locale.unsubscribeNonEssential)}</a>`
     : "";
 
   return `<!doctype html>
-<html lang="fr">
+<html lang="${escape(opts.locale.htmlLang)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -79,7 +90,7 @@ export function renderLayout(opts: {
           <p style="color:${t.MUTED};font-size:12px;margin:0 0 24px 0;text-transform:uppercase;letter-spacing:0.18em;">${escape(opts.eyebrow)}</p>
           ${opts.inner}
           <p style="color:${t.MUTED};font-size:11px;line-height:1.6;text-align:center;margin:24px 0 0 0;">
-            LIBERIA est un outil de pilotage personnel. Aucune information ici n'est un conseil financier réglementé.<br>
+            ${escape(opts.locale.appDisclaimer)}<br>
             ${disclaimer}${unsubLine}
           </p>
         </td></tr>

@@ -182,12 +182,50 @@
       "emptyBody": "Ask a concrete question about your situation, your expenses or your goals. It uses your real data and proposes actions step by step.",
       "demoBanner": "Demo mode: the conversation activates after creating an account.",
       "fallbackError": "The coach couldn't answer.",
-      "defaultSuggestions": [
-        "What should I do this week?",
-        "How do I lower my financial stress?",
-        "Which expense should I watch?",
-        "Help me stick to my plan."
-      ]
+      "suggestions": {
+        "default": [
+          "What should I do this week?",
+          "How do I lower my financial stress?",
+          "Which expense should I watch?",
+          "Help me stick to my plan."
+        ],
+        "cashflowNegative": [
+          "How do I close my monthly gap?",
+          "Which expense is the easiest to cut?",
+          "Where do I start to ease the pressure?",
+          "How do I get back some margin this month?"
+        ],
+        "noEmergencyFund": [
+          "How do I build an emergency fund at my pace?",
+          "What amount should I aim for to start?",
+          "How do I automate my savings?",
+          "Where do I start to feel safer?"
+        ],
+        "debtHeavy": [
+          "Which debt should I pay off first?",
+          "How do I lighten my debt load?",
+          "How do I prioritise between paying off and saving?",
+          "How do I renegotiate a loan?"
+        ],
+        "anxious": [
+          "How do I lower my financial stress?",
+          "Just one action to take today?",
+          "How do I find peace of mind around money?",
+          "Help me move forward without pressure."
+        ],
+        "impulsive": [
+          "How do I curb impulse purchases?",
+          "How do I cap my variable spending?",
+          "How do I spot my spending triggers?",
+          "How do I build a habit that sticks?"
+        ],
+        "solidBase": [
+          "How do I accelerate my savings?",
+          "What goals should I aim for over 12 months?",
+          "How do I put my savings to work?",
+          "How do I optimise my insurance and contracts?"
+        ]
+      }
     },
     "sidebar": {
       "newConversation": "New conversation",
@@ -356,7 +394,208 @@
       "fineprint": "This plan is a frame. You'll be able to replace it with a personalised AI version once the coach is ready.",
       "demoReason": "Demo mode: create an account to generate a plan.",
       "aiNotReadyReason": "Personalised generation is coming shortly.",
-      "weekLabel": "Week {n}"
+      "weekLabel": "Week {n}",
+      "content": {
+        "titles": {
+          "struggling": "90-day plan — Catch your breath",
+          "tight": "90-day plan — Stabilise the month",
+          "stable": "90-day plan — Consolidate the base",
+          "comfortable": "90-day plan — Optimise and accelerate"
+        },
+        "summaries": {
+          "struggling": "Three months to ease the pressure, free up some breathing room and rebuild a first financial cushion. One step at a time, no rush.",
+          "tight": "Three months to put an end to tight month-ends, build a first emergency fund and ease the costliest debts.",
+          "stable": "Three months to consolidate your foundations, secure your savings and prepare a portion that works for you.",
+          "comfortable": "Three months to refine your allocation, put your savings to work and concretely prepare a significant project."
+        },
+        "steps": {
+          "common.w1.s1": {
+            "focus": "Take stock",
+            "title": "List your 5 largest fixed expenses",
+            "description": "Rent, insurance, subscriptions, transport. Record the exact amounts in LIBERIA — no judgement, just clarity."
+          },
+          "common.w1.s2": {
+            "focus": "Take stock",
+            "title": "Spot 1 subscription to cancel or renegotiate",
+            "description": "Just one — the most obvious. Unused streaming, paused gym, duplicate insurance. Start small."
+          },
+          "common.w2.s1": {
+            "focus": "Stabilise the basics",
+            "title": "Log 7 days of daily expenses",
+            "description": "Coffee, transport, groceries, outings. Nothing to change this week — just observe your real pattern."
+          },
+          "common.w3.s1": {
+            "focus": "First lock",
+            "title": "Schedule an automatic transfer to a savings account",
+            "description": "Even symbolic (20–50 CHF). The point is to build the reflex — the amount can grow later."
+          },
+          "common.w4.s1": {
+            "focus": "First lock",
+            "title": "Set 1 concrete 90-day goal",
+            "description": "Concrete and realistic: \"500 CHF emergency fund\", \"pay off X of credit card\". Activate it in the Goals section."
+          },
+          "struggling.w5.s1": {
+            "focus": "Ease the pressure",
+            "title": "Contact your landlord or bank for a payment schedule",
+            "description": "If a charge is squeezing you, propose a phased plan. Most agree — the worst answer is no."
+          },
+          "struggling.w6.s1": {
+            "focus": "Ease the pressure",
+            "title": "Ask a social service or association for help",
+            "description": "Caritas, regional social centre, Pro Senectute — many forms of help exist and remain confidential. There's nothing to lose by asking."
+          },
+          "struggling.w7.s1": {
+            "focus": "Cut 1 category",
+            "title": "Pick 1 non-essential category to halve this month",
+            "description": "Delivery, outings, clothing. Not from guilt — just to gain breathing room."
+          },
+          "struggling.w8.s1": {
+            "focus": "Cut 1 category",
+            "title": "Cancel 1 additional subscription",
+            "description": "By now you have better visibility — target the ones you pay out of habit without real value."
+          },
+          "struggling.w9.s1": {
+            "focus": "Boost income",
+            "title": "List 3 realistic side-income ideas",
+            "description": "Extra hours, one-off mission, selling unused items. Activating just one is enough."
+          },
+          "struggling.w10.s1": {
+            "focus": "Boost income",
+            "title": "Activate 1 lead this week",
+            "description": "Sign-up, message, listing. The hardest part is the first step — after that it flows."
+          },
+          "struggling.w11.s1": {
+            "focus": "Build the emergency fund",
+            "title": "Aim for 100 CHF emergency fund this week",
+            "description": "Small milestone but symbolic. Your first cushion already lifts mental load."
+          },
+          "struggling.w12.s1": {
+            "focus": "Build the emergency fund",
+            "title": "Review: where are you vs. 90 days ago?",
+            "description": "Calm review. Note 3 things that changed for the better. Set the next 90-day milestone."
+          },
+          "tight.w5.s1": {
+            "focus": "Optimise the month",
+            "title": "Renegotiate 1 contract (mobile, insurance, internet)",
+            "description": "Call your provider, ask for the latest loyalty offer. 15 minutes can free 20–80 CHF/month."
+          },
+          "tight.w6.s1": {
+            "focus": "Optimise the month",
+            "title": "Cap 1 variable category (leisure, shopping)",
+            "description": "Set a weekly budget. If you go over, it resets the following week — no guilt."
+          },
+          "tight.w7.s1": {
+            "focus": "First emergency fund",
+            "title": "Increase your automatic transfer by 10–20%",
+            "description": "If you saved 50 CHF, move to 60 CHF. Barely noticeable adjustment, important compounding effect."
+          },
+          "tight.w8.s1": {
+            "focus": "First emergency fund",
+            "title": "Physically separate your savings",
+            "description": "Different account, even a different bank. The further the money is from your current account, the less you touch it."
+          },
+          "tight.w9.s1": {
+            "focus": "Cut costly debt",
+            "title": "List your debts by interest rate (most expensive first)",
+            "description": "Credit card or consumer loan often sits at the top. Target that one first."
+          },
+          "tight.w10.s1": {
+            "focus": "Cut costly debt",
+            "title": "Shift one minimum payment toward faster repayment",
+            "description": "Even 50 CHF more on the costliest debt saves hundreds long term."
+          },
+          "tight.w11.s1": {
+            "focus": "Make the habit last",
+            "title": "Build 1 weekly review routine (10 min)",
+            "description": "Same day, same time. Open LIBERIA, look at your cash flow, adjust if needed."
+          },
+          "tight.w12.s1": {
+            "focus": "Make the habit last",
+            "title": "Set the next 90-day goal",
+            "description": "Reach 1 month of emergency fund? Pay off a loan? Choose 1 clear, quantified target."
+          },
+          "stable.w5.s1": {
+            "focus": "Secure",
+            "title": "Aim for 3 months of emergency fund",
+            "description": "You have a base — the next step is long-term safety. Compute the target amount and set a deadline."
+          },
+          "stable.w6.s1": {
+            "focus": "Secure",
+            "title": "Insurance audit: remove duplicates",
+            "description": "Home, private liability, travel. Many coverages overlap. A free consultation with an independent broker often suffices."
+          },
+          "stable.w7.s1": {
+            "focus": "Optimise savings",
+            "title": "Compare your savings account to the best offers",
+            "description": "If your rate is below 1%, look at what online banks offer. The difference is hundreds of CHF / year."
+          },
+          "stable.w8.s1": {
+            "focus": "Optimise savings",
+            "title": "Increase your automatic transfer by 10%",
+            "description": "You won't feel the difference in your cash flow, but over 12 months it's already a sizable extra cushion."
+          },
+          "stable.w9.s1": {
+            "focus": "Put a portion to work",
+            "title": "Look into the 3rd pillar (Switzerland) or a long-term investment",
+            "description": "Inform yourself before investing. No rush. This week = reading only."
+          },
+          "stable.w10.s1": {
+            "focus": "Put a portion to work",
+            "title": "Define your target allocation (short / medium / long term)",
+            "description": "How much do you keep liquid? How much can you lock for 5+ years? Set the ratios before acting."
+          },
+          "stable.w11.s1": {
+            "focus": "Long-term horizon",
+            "title": "Set 1 quantified 12-month goal",
+            "description": "\"6-month emergency fund\", \"3rd pillar opened and funded\", \"X CHF invested\". Set it in Goals."
+          },
+          "stable.w12.s1": {
+            "focus": "Long-term horizon",
+            "title": "90-day review + next quarter plan",
+            "description": "Calm review. What worked, what you keep, what you change. You have the landmarks now."
+          },
+          "comfortable.w5.s1": {
+            "focus": "Refine the allocation",
+            "title": "Compute your real savings capacity (vs. stated)",
+            "description": "You may save more than you think. Compare what leaves your account each month vs. what you believe you set aside."
+          },
+          "comfortable.w6.s1": {
+            "focus": "Refine the allocation",
+            "title": "Define your target allocation (cash / invested / long term)",
+            "description": "What % for emergencies? For retirement? For 3–5-year projects? State it clearly."
+          },
+          "comfortable.w7.s1": {
+            "focus": "Put to work",
+            "title": "Open or fund a 3rd pillar (Switzerland)",
+            "description": "Tax optimisation + retirement. Check the annual cap based on your status."
+          },
+          "comfortable.w8.s1": {
+            "focus": "Put to work",
+            "title": "Compare the fees on your current investments",
+            "description": "1% in excess fees over 20 years = tens of thousands of CHF less. Audit first."
+          },
+          "comfortable.w9.s1": {
+            "focus": "Prepare a concrete project",
+            "title": "Define 1 quantified 1–3-year project",
+            "description": "Real estate purchase, sabbatical, business launch. Set the target amount and the deadline."
+          },
+          "comfortable.w10.s1": {
+            "focus": "Prepare a concrete project",
+            "title": "Separate this project from the rest of your savings",
+            "description": "Dedicated account or fund. You see real progress and don't dip into it by mistake."
+          },
+          "comfortable.w11.s1": {
+            "focus": "Anti-fragile",
+            "title": "Income audit: how dependent is your flow on a single source?",
+            "description": "Diversifying income matters as much as diversifying savings. Identify 1 realistic lever."
+          },
+          "comfortable.w12.s1": {
+            "focus": "Anti-fragile",
+            "title": "90-day review + annual horizon",
+            "description": "You have the base and the margin — set measurable annual goals and pick 2 priorities."
+          }
+        }
+      }
     }
   },
   "finance": {
@@ -550,6 +789,111 @@
     "confirmTitle": "Unsubscribe from emails?",
     "confirmBody": "You'll no longer receive the LIBERIA weekly recap. You can reactivate it any time from your settings.",
     "confirmCta": "Confirm unsubscribe"
+  },
+  "admin": {
+    "metadata": { "title": "Admin · LIBERIA" },
+    "eyebrow": "Admin",
+    "pageTitle": "Product overview",
+    "intro": "Internal counters — aggregates only, never individual data. No data is exposed to any third party.",
+    "readiness": {
+      "title": "Production readiness",
+      "ready": "Ready",
+      "missing": "{count, plural, one {# required item missing} other {# required items missing}}",
+      "envNote": "No env value is ever displayed — only the presence (yes/no) of each variable."
+    },
+    "sections": {
+      "acquisition": "Acquisition",
+      "subscription": "Subscription",
+      "coach": "Coach engagement",
+      "goals": "Goals"
+    },
+    "stats": {
+      "totalUsers": "Accounts created",
+      "onboardedUsers": "Onboarding completed",
+      "trialingSubs": "Trialing",
+      "activeSubs": "Premium active",
+      "warningSubs": "Pending / paused",
+      "canceledSubs": "Canceled",
+      "aiConversations": "AI conversations",
+      "aiMessagesLast7d": "Messages last 7 days",
+      "aiMessagesLast7dHint": "user + assistant combined",
+      "financialPlans": "Plans generated",
+      "planStepsCompleted": "Plan steps completed",
+      "totalGoals": "Goals created",
+      "completedGoals": "Goals achieved"
+    },
+    "pctHint": "{pct}% of total",
+    "notesTitle": "Notes",
+    "note1": "Counters reflect the current state (no time-series history). For series over time, plug in a dedicated analytics provider (see <code>lib/analytics/</code>).",
+    "note2": "No email, full name, amount or user content appears on this page. If you see any — it's a bug, please report it."
+  },
+  "demo": {
+    "metadata": {
+      "title": "Demo mode",
+      "description": "Explore LIBERIA with realistic data — no sign-up required."
+    },
+    "banner": {
+      "title": "You're exploring LIBERIA in demo mode.",
+      "body": "The data shown is fictional. Create your account to pilot your real data (14-day free trial).",
+      "createCta": "Create my account",
+      "loginCta": "Sign in"
+    },
+    "header": {
+      "eyebrow": "Overview",
+      "title": "Demo dashboard",
+      "description": "A representative view of someone rebuilding their finances.",
+      "badge": "Demo"
+    },
+    "stress": {
+      "label": "Financial stress",
+      "high": "High mental load.",
+      "ok": "Manageable level."
+    },
+    "stats": {
+      "monthlyIncome": "Monthly income",
+      "monthlyExpenses": "Monthly expenses",
+      "netCashflow": "Net cash flow",
+      "savingsRateHint": "Savings rate {rate}",
+      "emergencyFund": "Emergency fund",
+      "runwayMonths": "{months} months"
+    },
+    "recommendations": {
+      "title": "Recommendations",
+      "shortTerm": {
+        "label": "Short term",
+        "body": "Aim for 1 month of expenses in your emergency fund within 6 months."
+      },
+      "lighter": {
+        "label": "Lighten up",
+        "body": "Cut 1 non-essential subscription this month."
+      },
+      "automation": {
+        "label": "Automation",
+        "body": "Set up a recurring monthly transfer to savings, even a symbolic one."
+      }
+    },
+    "data": {
+      "profileName": "Demo mode",
+      "incomes": {
+        "salary": "Net salary",
+        "freelance": "Freelance mission"
+      },
+      "expenses": {
+        "housing": "Rent + charges",
+        "food": "Groceries",
+        "transport": "Transport",
+        "utilities": "Energy",
+        "insurance": "Insurance",
+        "debt": "Consumer loan",
+        "subscriptions": "Subscriptions",
+        "leisure": "Leisure",
+        "shopping": "Shopping"
+      },
+      "goals": {
+        "emergencyFund": "Emergency fund (1 month)",
+        "debtPayoff": "Pay off consumer loan"
+      }
+    }
   },
   "memoryConstants": {
     "tones": {

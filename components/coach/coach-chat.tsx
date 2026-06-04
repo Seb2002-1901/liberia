@@ -31,7 +31,8 @@ export function CoachChat({
 }: CoachChatProps) {
   const t = useTranslations("app.coach.chat");
   const router = useRouter();
-  const defaultSuggestions = (t.raw("defaultSuggestions") as string[]) ?? [];
+  const defaultSuggestions =
+    (t.raw("suggestions.default") as string[]) ?? [];
   const promptList =
     suggestions && suggestions.length > 0 ? suggestions : defaultSuggestions;
   const [messages, setMessages] = React.useState<CoachMessage[]>(initialMessages);
@@ -113,7 +114,7 @@ export function CoachChat({
           const data = (await res.json().catch(() => null)) as
             | { error?: string }
             | null;
-          throw new Error(data?.error ?? "Le coach n'a pas pu répondre.");
+          throw new Error(data?.error ?? t("fallbackError"));
         }
 
         const reader = res.body.getReader();

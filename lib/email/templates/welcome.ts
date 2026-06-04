@@ -1,4 +1,4 @@
-import { createEmailTranslator } from "@/lib/email/i18n";
+import { createEmailTranslator, getLayoutLocaleStrings } from "@/lib/email/i18n";
 import {
   type EmailRender,
   escape,
@@ -23,7 +23,12 @@ export async function renderWelcomeEmail(
   input: WelcomeEmailInput,
 ): Promise<EmailRender> {
   const { firstName, appUrl, locale } = input;
-  const { t } = await createEmailTranslator(locale);
+  const { t, locale: resolvedLocale } = await createEmailTranslator(locale);
+  const layoutLocale = getLayoutLocaleStrings(
+    t,
+    resolvedLocale,
+    `${appUrl}/settings`,
+  );
 
   const subject = t("welcome.subject");
 
@@ -46,6 +51,7 @@ export async function renderWelcomeEmail(
     eyebrow: t("welcome.eyebrow"),
     inner,
     appUrl,
+    locale: layoutLocale,
     footerDisclaimer: `${t("welcome.footer")} <a href="${escape(appUrl)}/settings" style="color:#9999a3;">→</a>`,
   });
 

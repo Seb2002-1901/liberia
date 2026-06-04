@@ -74,7 +74,10 @@ export async function POST(request: Request) {
   // new messages. 402 Payment Required is the right semantic.
   const access = await requirePremiumAccess(supabase, user.id);
   if (!access.ok) {
-    return NextResponse.json({ error: access.reason }, { status: 402 });
+    return NextResponse.json(
+      { error: tErr(access.reasonKey) },
+      { status: 402 },
+    );
   }
 
   // Rate limit per-user across all coach traffic.
@@ -335,9 +338,7 @@ export async function POST(request: Request) {
         }
       } catch (err) {
         const message =
-          err instanceof Error
-            ? err.message
-            : "Une erreur temporaire est survenue. Réessaie dans quelques instants.";
+          err instanceof Error ? err.message : tErr("coachStreamError");
         send("error", { message });
         try {
           controller.close();

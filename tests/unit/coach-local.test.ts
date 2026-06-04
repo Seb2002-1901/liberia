@@ -4,7 +4,10 @@ import {
   generateLocalCoachReply,
   type CoachTranslator,
 } from "@/lib/coach/local";
-import { deriveQuickPrompts } from "@/lib/coach/quick-prompts";
+import {
+  deriveQuickPrompts,
+  pickQuickPromptCategory,
+} from "@/lib/coach/quick-prompts";
 import type { FinancialProfile, UserMemory } from "@/types/database";
 import frApp from "@/messages/fr/app.json";
 import enApp from "@/messages/en/app.json";
@@ -211,31 +214,31 @@ describe("generateLocalCoachReply — intent detection", () => {
   });
 });
 
-describe("deriveQuickPrompts — persona-aware suggestions", () => {
-  it("returns cashflow-focused prompts when cashflow is negative", () => {
-    const prompts = deriveQuickPrompts({
+describe("pickQuickPromptCategory — persona-aware suggestions", () => {
+  it("returns cashflowNegative when cashflow is negative", () => {
+    const category = pickQuickPromptCategory({
       financialProfile: makeProfile({ behavior_traits: [] }),
       memory: makeMemory(),
       monthlyIncome: 2000,
       monthlyExpenses: 2400,
       hasEmergencyFund: true,
     });
-    expect(prompts.join(" ").toLowerCase()).toMatch(/écart|marge|souffler|réduire/);
+    expect(category).toBe("cashflowNegative");
   });
 
-  it("returns debt-focused prompts when DTI is high", () => {
-    const prompts = deriveQuickPrompts({
+  it("returns debtHeavy when DTI is high", () => {
+    const category = pickQuickPromptCategory({
       financialProfile: makeProfile({ monthly_debt: 1200 }),
       memory: makeMemory(),
       monthlyIncome: 3000,
       monthlyExpenses: 2000,
       hasEmergencyFund: true,
     });
-    expect(prompts.join(" ").toLowerCase()).toMatch(/crédit|dette|rembours/);
+    expect(category).toBe("debtHeavy");
   });
 
-  it("returns anxious-friendly prompts when trait is anxious", () => {
-    const prompts = deriveQuickPrompts({
+  it("returns anxious when trait is anxious", () => {
+    const category = pickQuickPromptCategory({
       financialProfile: makeProfile({
         behavior_traits: ["anxious"],
       }),
@@ -244,17 +247,37 @@ describe("deriveQuickPrompts — persona-aware suggestions", () => {
       monthlyExpenses: 2500,
       hasEmergencyFund: true,
     });
-    expect(prompts.join(" ").toLowerCase()).toMatch(/stress|sereinité|sérénit|pression|sans pression/);
+    expect(category).toBe("anxious");
   });
 
-  it("returns 4 prompts in every branch", () => {
-    const empty = deriveQuickPrompts({
+  it("falls back to default with empty input", () => {
+    const category = pickQuickPromptCategory({
       financialProfile: null,
       memory: null,
       monthlyIncome: 0,
       monthlyExpenses: 0,
       hasEmergencyFund: false,
     });
-    expect(empty).toHaveLength(4);
+    expect(category).toBe("default");
+  });
+});
+
+describe("deriveQuickPrompts — translator integration", () => {
+  it("resolves 4 prompts via the translator for every category", () => {
+    const tFr = (category: string) =>
+      (frApp.coach.chat.suggestions as Record<string, readonly string[]>)[
+        category
+      ] ?? [];
+    const prompts = deriveQuickPrompts(
+      {
+        financialProfile: null,
+        memory: null,
+        monthlyIncome: 0,
+        monthlyExpenses: 0,
+        hasEmergencyFund: false,
+      },
+      tFr as (c: string) => readonly string[],
+    );
+    expect(prompts).toHaveLength(4);
   });
 });

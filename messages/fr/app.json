@@ -182,12 +182,50 @@
       "emptyBody": "Pose-lui une question concrète sur ta situation, tes dépenses ou tes objectifs. Il s'appuie sur tes données réelles et propose des actions étape par étape.",
       "demoBanner": "Mode démo : la conversation s'active après création d'un compte.",
       "fallbackError": "Le coach n'a pas pu répondre.",
-      "defaultSuggestions": [
-        "Que dois-je faire cette semaine ?",
-        "Comment réduire mon stress financier ?",
-        "Quelle dépense dois-je surveiller ?",
-        "Aide-moi à tenir mon plan."
-      ]
+      "suggestions": {
+        "default": [
+          "Que dois-je faire cette semaine ?",
+          "Comment réduire mon stress financier ?",
+          "Quelle dépense dois-je surveiller ?",
+          "Aide-moi à tenir mon plan."
+        ],
+        "cashflowNegative": [
+          "Comment réduire mon écart mensuel ?",
+          "Quelle est la dépense la plus simple à couper ?",
+          "Par où commencer pour souffler un peu ?",
+          "Comment retrouver de la marge ce mois-ci ?"
+        ],
+        "noEmergencyFund": [
+          "Comment construire un fonds d'urgence à mon rythme ?",
+          "Quel montant viser pour commencer ?",
+          "Comment automatiser mon épargne ?",
+          "Par où commencer pour me sécuriser ?"
+        ],
+        "debtHeavy": [
+          "Par quel crédit dois-je commencer à rembourser ?",
+          "Comment alléger ma charge de dette ?",
+          "Comment prioriser entre rembourser et épargner ?",
+          "Comment renégocier un crédit ?"
+        ],
+        "anxious": [
+          "Comment baisser mon stress financier ?",
+          "Une seule action à faire aujourd'hui ?",
+          "Comment retrouver de la sérénité côté argent ?",
+          "Aide-moi à avancer sans pression."
+        ],
+        "impulsive": [
+          "Comment limiter les achats impulsifs ?",
+          "Comment plafonner mes dépenses variables ?",
+          "Comment identifier mes déclencheurs de dépense ?",
+          "Comment construire une habitude qui tient ?"
+        ],
+        "solidBase": [
+          "Comment accélérer mon épargne ?",
+          "Quels objectifs viser sur 12 mois ?",
+          "Comment faire travailler mon épargne ?",
+          "Comment optimiser mes assurances et contrats ?"
+        ]
+      }
     },
     "sidebar": {
       "newConversation": "Nouvelle conversation",
@@ -356,7 +394,208 @@
       "fineprint": "Ce plan est un cadre. Tu pourras le remplacer par une version personnalisée IA dès que le coach sera prêt.",
       "demoReason": "Mode démo : crée un compte pour générer un plan.",
       "aiNotReadyReason": "La génération personnalisée arrive bientôt.",
-      "weekLabel": "Semaine {n}"
+      "weekLabel": "Semaine {n}",
+      "content": {
+        "titles": {
+          "struggling": "Plan 90 jours — Reprendre le souffle",
+          "tight": "Plan 90 jours — Stabiliser le mois",
+          "stable": "Plan 90 jours — Consolider la base",
+          "comfortable": "Plan 90 jours — Optimiser et accélérer"
+        },
+        "summaries": {
+          "struggling": "Trois mois pour réduire la pression, libérer du souffle et reconstruire un premier coussin financier. Une étape à la fois, sans précipitation.",
+          "tight": "Trois mois pour mettre fin aux fins de mois tendues, créer un premier fonds d'urgence et alléger les dettes les plus coûteuses.",
+          "stable": "Trois mois pour consolider tes fondations, sécuriser ton épargne et préparer une part qui travaille pour toi.",
+          "comfortable": "Trois mois pour affiner ton allocation, faire travailler ton épargne et préparer concrètement un projet d'envergure."
+        },
+        "steps": {
+          "common.w1.s1": {
+            "focus": "Faire l'état des lieux",
+            "title": "Liste tes 5 dépenses fixes les plus importantes",
+            "description": "Loyer, assurances, abonnements, transport. Note les montants exacts dans LIBERIA — sans jugement, juste pour voir clair."
+          },
+          "common.w1.s2": {
+            "focus": "Faire l'état des lieux",
+            "title": "Identifie 1 abonnement à supprimer ou renégocier",
+            "description": "Un seul, le plus évident. Streaming non utilisé, salle de sport en pause, assurance doublonnée — on commence petit."
+          },
+          "common.w2.s1": {
+            "focus": "Stabiliser les bases",
+            "title": "Note 7 jours de dépenses quotidiennes",
+            "description": "Café, transport, courses, sorties. Tu n'as rien à changer cette semaine, juste à observer ton schéma réel."
+          },
+          "common.w3.s1": {
+            "focus": "Premier verrou",
+            "title": "Programme un virement automatique vers un compte épargne",
+            "description": "Même symbolique (20–50 CHF). L'idée est de créer le réflexe — le montant grandira ensuite."
+          },
+          "common.w4.s1": {
+            "focus": "Premier verrou",
+            "title": "Définis 1 objectif chiffré sur 90 jours",
+            "description": "Concret et réaliste : « 500 CHF de fonds d'urgence », « rembourser X de carte de crédit ». Active-le dans la section Objectifs."
+          },
+          "struggling.w5.s1": {
+            "focus": "Libérer du souffle",
+            "title": "Contacte ton bailleur ou ton banquier pour un rééchelonnement",
+            "description": "Si une charge te met sous tension, propose un étalement. La plupart acceptent — la pire réponse est non."
+          },
+          "struggling.w6.s1": {
+            "focus": "Libérer du souffle",
+            "title": "Demande de l'aide à un service social ou une association",
+            "description": "Caritas, Centre social régional, Pro Senectute — beaucoup d'aides existent et restent confidentielles. Tu ne perds rien à demander."
+          },
+          "struggling.w7.s1": {
+            "focus": "Réduire 1 poste",
+            "title": "Choisis 1 poste non essentiel à diviser par 2 ce mois-ci",
+            "description": "Livraison, sorties, vêtements. Pas par culpabilité — juste pour gagner du reste à vivre."
+          },
+          "struggling.w8.s1": {
+            "focus": "Réduire 1 poste",
+            "title": "Annule 1 abonnement supplémentaire",
+            "description": "À ce stade tu as une meilleure visibilité — vise ceux que tu paies par habitude sans en tirer vraiment de valeur."
+          },
+          "struggling.w9.s1": {
+            "focus": "Augmenter les rentrées",
+            "title": "Liste 3 pistes de revenus complémentaires réalistes",
+            "description": "Heures supplémentaires, mission ponctuelle, vente d'objets inutilisés. Une seule piste activée suffit."
+          },
+          "struggling.w10.s1": {
+            "focus": "Augmenter les rentrées",
+            "title": "Active 1 piste cette semaine",
+            "description": "Inscription, message, annonce. Le plus dur c'est le premier pas — ensuite ça déroule."
+          },
+          "struggling.w11.s1": {
+            "focus": "Construire le fonds d'urgence",
+            "title": "Vise 100 CHF de fonds d'urgence cette semaine",
+            "description": "Petit palier mais symbolique. Ton premier coussin t'enlève déjà de la charge mentale."
+          },
+          "struggling.w12.s1": {
+            "focus": "Construire le fonds d'urgence",
+            "title": "Bilan : où en es-tu vs. il y a 90 jours ?",
+            "description": "Revue calme. Note 3 choses qui ont changé positivement. Pose le prochain palier de 90 jours."
+          },
+          "tight.w5.s1": {
+            "focus": "Optimiser le mois",
+            "title": "Renégocie 1 contrat (mobile, assurance, internet)",
+            "description": "Appelle ton fournisseur, demande la dernière offre fidélisation. 15 minutes peuvent libérer 20–80 CHF/mois."
+          },
+          "tight.w6.s1": {
+            "focus": "Optimiser le mois",
+            "title": "Plafonne 1 catégorie variable (loisirs, shopping)",
+            "description": "Fixe-toi un budget hebdomadaire. Si tu dépasses, ça repart à zéro la semaine suivante — pas de culpabilité."
+          },
+          "tight.w7.s1": {
+            "focus": "Premier fonds d'urgence",
+            "title": "Augmente ton virement automatique de 10–20%",
+            "description": "Si tu épargnais 50 CHF, passe à 60 CHF. Ajustement à peine perceptible, effet composé important."
+          },
+          "tight.w8.s1": {
+            "focus": "Premier fonds d'urgence",
+            "title": "Sépare physiquement ton épargne",
+            "description": "Compte différent, voire banque différente. Plus l'argent est éloigné de ton compte courant, moins tu y touches."
+          },
+          "tight.w9.s1": {
+            "focus": "Réduire les dettes coûteuses",
+            "title": "Liste tes crédits par taux d'intérêt (du plus cher au moins cher)",
+            "description": "La carte de crédit ou le crédit conso ressort souvent en tête. Vise celui-là en priorité."
+          },
+          "tight.w10.s1": {
+            "focus": "Réduire les dettes coûteuses",
+            "title": "Bascule un mois de paiement minimum vers un remboursement plus rapide",
+            "description": "Même 50 CHF de plus sur le crédit le plus cher économise des centaines à long terme."
+          },
+          "tight.w11.s1": {
+            "focus": "Pérenniser l'habitude",
+            "title": "Crée 1 routine de revue hebdo (10 min)",
+            "description": "Même jour, même heure. Tu ouvres LIBERIA, tu regardes ton reste à vivre, tu ajustes si besoin."
+          },
+          "tight.w12.s1": {
+            "focus": "Pérenniser l'habitude",
+            "title": "Pose le prochain objectif 90 jours",
+            "description": "Atteindre 1 mois de fonds d'urgence ? Rembourser un crédit ? Choisis 1 cap clair et chiffré."
+          },
+          "stable.w5.s1": {
+            "focus": "Sécuriser",
+            "title": "Vise 3 mois de fonds d'urgence",
+            "description": "Tu as une base — la prochaine étape c'est la sécurité long terme. Calcule le montant cible et fixe l'échéance."
+          },
+          "stable.w6.s1": {
+            "focus": "Sécuriser",
+            "title": "Audit assurances : retire les doublons",
+            "description": "Ménage, RC privée, voyage. Beaucoup de couvertures se chevauchent. Une consultation gratuite avec un courtier indépendant suffit souvent."
+          },
+          "stable.w7.s1": {
+            "focus": "Optimiser l'épargne",
+            "title": "Compare ton compte épargne actuel aux meilleures offres",
+            "description": "Si ton taux est < à 1%, regarde ce que proposent les banques en ligne. La différence se compte en centaines de CHF / an."
+          },
+          "stable.w8.s1": {
+            "focus": "Optimiser l'épargne",
+            "title": "Augmente ton virement automatique de 10%",
+            "description": "Tu ne sens pas la différence sur ton reste à vivre, mais sur 12 mois ça représente déjà un beau coussin supplémentaire."
+          },
+          "stable.w9.s1": {
+            "focus": "Faire travailler une partie",
+            "title": "Informe-toi sur le 3e pilier (Suisse) ou un placement long terme",
+            "description": "Renseigne-toi avant d'investir. Pas de précipitation. Cette semaine = lecture seulement."
+          },
+          "stable.w10.s1": {
+            "focus": "Faire travailler une partie",
+            "title": "Définis ton allocation cible (court / moyen / long terme)",
+            "description": "Combien gardes-tu liquide ? Combien tu peux bloquer 5+ ans ? Pose les ratios avant d'agir."
+          },
+          "stable.w11.s1": {
+            "focus": "Cap long terme",
+            "title": "Définis 1 objectif chiffré à 12 mois",
+            "description": "« Fonds d'urgence à 6 mois », « 3e pilier ouvert et alimenté », « X CHF investis ». Pose-le dans Objectifs."
+          },
+          "stable.w12.s1": {
+            "focus": "Cap long terme",
+            "title": "Bilan 90 jours + plan trimestre suivant",
+            "description": "Revue posée. Ce qui a marché, ce que tu reconduis, ce que tu fais évoluer. Tu as les repères maintenant."
+          },
+          "comfortable.w5.s1": {
+            "focus": "Affiner l'allocation",
+            "title": "Calcule ta capacité d'épargne réelle (vs. déclarative)",
+            "description": "Tu épargnes peut-être plus que tu ne crois. Compare ce qui sort de ton compte chaque mois vs. ce que tu penses mettre de côté."
+          },
+          "comfortable.w6.s1": {
+            "focus": "Affiner l'allocation",
+            "title": "Définis ton allocation cible (liquidités / investi / long terme)",
+            "description": "Quel % pour les imprévus ? Pour la retraite ? Pour les projets 3–5 ans ? Pose-le clairement."
+          },
+          "comfortable.w7.s1": {
+            "focus": "Faire travailler",
+            "title": "Ouvre ou alimente un 3e pilier (Suisse)",
+            "description": "Optimisation fiscale + retraite. Plafond annuel à vérifier selon ton statut."
+          },
+          "comfortable.w8.s1": {
+            "focus": "Faire travailler",
+            "title": "Compare les frais de tes placements actuels",
+            "description": "1% de frais en trop sur 20 ans = des dizaines de milliers de CHF en moins. Audit avant tout."
+          },
+          "comfortable.w9.s1": {
+            "focus": "Préparer un projet concret",
+            "title": "Définis 1 projet chiffré à horizon 1–3 ans",
+            "description": "Achat immobilier, sabbatique, lancement d'activité. Pose le montant cible et l'échéance."
+          },
+          "comfortable.w10.s1": {
+            "focus": "Préparer un projet concret",
+            "title": "Sépare ce projet du reste de ton épargne",
+            "description": "Compte ou fonds dédié. Tu vois la progression réelle, tu ne ponctionnes pas par erreur."
+          },
+          "comfortable.w11.s1": {
+            "focus": "Anti-fragiliser",
+            "title": "Audit revenus : à quel point ton flux dépend d'une seule source ?",
+            "description": "Diversifier les revenus est aussi important que diversifier l'épargne. Identifie 1 levier réaliste."
+          },
+          "comfortable.w12.s1": {
+            "focus": "Anti-fragiliser",
+            "title": "Bilan 90 jours + cap annuel",
+            "description": "Tu as la base et la marge — pose des objectifs annuels mesurables et choisis-en 2 prioritaires."
+          }
+        }
+      }
     }
   },
   "finance": {
@@ -550,6 +789,111 @@
     "confirmTitle": "Se désinscrire des emails ?",
     "confirmBody": "Tu ne recevras plus le récap hebdomadaire de LIBERIA. Tu peux le réactiver depuis tes paramètres à tout moment.",
     "confirmCta": "Confirmer la désinscription"
+  },
+  "admin": {
+    "metadata": { "title": "Admin · LIBERIA" },
+    "eyebrow": "Admin",
+    "pageTitle": "Aperçu produit",
+    "intro": "Compteurs internes — uniquement les agrégats, jamais de données individuelles. Aucune donnée n'est exposée à un tiers.",
+    "readiness": {
+      "title": "Préparation production",
+      "ready": "Prêt",
+      "missing": "{count, plural, one {# requis manquant} other {# requis manquants}}",
+      "envNote": "Aucune valeur d'env n'est jamais affichée — uniquement la présence (oui/non) de chaque variable."
+    },
+    "sections": {
+      "acquisition": "Acquisition",
+      "subscription": "Abonnement",
+      "coach": "Engagement coach",
+      "goals": "Objectifs"
+    },
+    "stats": {
+      "totalUsers": "Comptes créés",
+      "onboardedUsers": "Onboarding complété",
+      "trialingSubs": "En essai",
+      "activeSubs": "Premium actif",
+      "warningSubs": "En attente / pause",
+      "canceledSubs": "Annulés",
+      "aiConversations": "Conversations IA",
+      "aiMessagesLast7d": "Messages 7 derniers jours",
+      "aiMessagesLast7dHint": "user + assistant confondus",
+      "financialPlans": "Plans générés",
+      "planStepsCompleted": "Étapes plan validées",
+      "totalGoals": "Objectifs créés",
+      "completedGoals": "Objectifs atteints"
+    },
+    "pctHint": "{pct} % du total",
+    "notesTitle": "Notes",
+    "note1": "Les compteurs reflètent l'état présent (pas d'historique time-series). Pour des séries dans le temps, brancher un provider analytics dédié (voir <code>lib/analytics/</code>).",
+    "note2": "Aucun e-mail, nom complet, montant ou contenu utilisateur n'apparaît sur cette page. Si tu en vois — c'est un bug, signale-le."
+  },
+  "demo": {
+    "metadata": {
+      "title": "Mode démo",
+      "description": "Découvre LIBERIA avec des données réalistes — sans inscription."
+    },
+    "banner": {
+      "title": "Tu explores LIBERIA en mode démo.",
+      "body": "Les données affichées sont fictives. Crée ton compte pour piloter tes vraies données (14 jours d'essai gratuit).",
+      "createCta": "Créer mon compte",
+      "loginCta": "Se connecter"
+    },
+    "header": {
+      "eyebrow": "Aperçu",
+      "title": "Tableau de bord démo",
+      "description": "Une vue représentative d'un utilisateur en reconstruction financière.",
+      "badge": "Démo"
+    },
+    "stress": {
+      "label": "Stress financier",
+      "high": "Charge mentale élevée.",
+      "ok": "Niveau gérable."
+    },
+    "stats": {
+      "monthlyIncome": "Revenus mensuels",
+      "monthlyExpenses": "Dépenses mensuelles",
+      "netCashflow": "Reste à vivre",
+      "savingsRateHint": "Taux d'épargne {rate}",
+      "emergencyFund": "Fonds d'urgence",
+      "runwayMonths": "{months} mois"
+    },
+    "recommendations": {
+      "title": "Recommandations",
+      "shortTerm": {
+        "label": "Court terme",
+        "body": "Vise 1 mois de dépenses en fonds d'urgence d'ici 6 mois."
+      },
+      "lighter": {
+        "label": "Allègement",
+        "body": "Réduis 1 abonnement non essentiel ce mois-ci."
+      },
+      "automation": {
+        "label": "Automatisation",
+        "body": "Bloque un virement automatique mensuel vers l'épargne, même symbolique."
+      }
+    },
+    "data": {
+      "profileName": "Mode démo",
+      "incomes": {
+        "salary": "Salaire net",
+        "freelance": "Mission freelance"
+      },
+      "expenses": {
+        "housing": "Loyer + charges",
+        "food": "Courses",
+        "transport": "Transport",
+        "utilities": "Énergie",
+        "insurance": "Mutuelle",
+        "debt": "Crédit conso",
+        "subscriptions": "Abonnements",
+        "leisure": "Loisirs",
+        "shopping": "Shopping"
+      },
+      "goals": {
+        "emergencyFund": "Fonds d'urgence (1 mois)",
+        "debtPayoff": "Solder crédit conso"
+      }
+    }
   },
   "memoryConstants": {
     "tones": {

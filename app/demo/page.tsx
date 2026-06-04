@@ -8,6 +8,7 @@ import {
   Sparkles,
   Wallet,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,10 +19,10 @@ import { CashflowChart } from "@/components/dashboard/cashflow-chart";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { GoalsSummary } from "@/components/dashboard/goals-summary";
 import {
-  demoExpenses,
   demoFinancialProfile,
-  demoGoals,
-  demoIncomes,
+  getDemoExpenses,
+  getDemoGoals,
+  getDemoIncomes,
 } from "@/lib/demo/data";
 import { totalMonthly } from "@/lib/services/finance";
 import {
@@ -36,12 +37,24 @@ import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 
-export const metadata: Metadata = {
-  title: "Mode démo",
-  description: "Découvre LIBERIA avec des données réalistes — sans inscription.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.demo.metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
-export default function DemoDashboardPage() {
+export default async function DemoDashboardPage() {
+  const [t, tData] = await Promise.all([
+    getTranslations("app.demo"),
+    getTranslations("app.demo.data"),
+  ]);
+  const tDataString = (key: string) => tData(key);
+  const demoIncomes = getDemoIncomes(tDataString);
+  const demoExpenses = getDemoExpenses(tDataString);
+  const demoGoals = getDemoGoals(tDataString);
+
   const monthlyIncome = totalMonthly(demoIncomes);
   const monthlyExpenses = totalMonthly(demoExpenses);
   const currentSavings = demoFinancialProfile.current_savings;
@@ -73,28 +86,26 @@ export default function DemoDashboardPage() {
     <div className="space-y-6">
       <div className="rounded-2xl border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.06)] p-4 text-sm">
         <p className="font-medium text-[hsl(var(--gold))]">
-          Tu explores LIBERIA en mode démo.
+          {t("banner.title")}
         </p>
-        <p className="text-muted-foreground">
-          Les données affichées sont fictives. Crée ton compte pour piloter tes vraies données (14 jours d&apos;essai gratuit).
-        </p>
+        <p className="text-muted-foreground">{t("banner.body")}</p>
         <div className="mt-3 flex gap-2">
           <Button asChild variant="gold" size="sm">
-            <Link href={ROUTES.register}>Créer mon compte</Link>
+            <Link href={ROUTES.register}>{t("banner.createCta")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link href={ROUTES.login}>Se connecter</Link>
+            <Link href={ROUTES.login}>{t("banner.loginCta")}</Link>
           </Button>
         </div>
       </div>
 
       <PageHeader
-        eyebrow="Aperçu"
-        title="Tableau de bord démo"
-        description="Une vue représentative d'un utilisateur en reconstruction financière."
+        eyebrow={t("header.eyebrow")}
+        title={t("header.title")}
+        description={t("header.description")}
         actions={
           <Badge variant="gold" className="gap-1">
-            <Sparkles className="h-3 w-3" /> Démo
+            <Sparkles className="h-3 w-3" /> {t("header.badge")}
           </Badge>
         }
       />
@@ -102,21 +113,40 @@ export default function DemoDashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <StabilityCard score={stability} className="lg:col-span-2" />
         <StatCard
-          label="Stress financier"
+          label={t("stress.label")}
           value={`${stress}/100`}
           icon={<HeartPulse className="h-4 w-4" />}
           tone={stress >= 60 ? "negative" : "neutral"}
-          hint={stress >= 60 ? "Charge mentale élevée." : "Niveau gérable."}
+          hint={stress >= 60 ? t("stress.high") : t("stress.ok")}
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Revenus mensuels" value={formatCurrency(monthlyIncome)} icon={<ArrowUpCircle className="h-4 w-4" />} tone="gold" />
-        <StatCard label="Dépenses mensuelles" value={formatCurrency(monthlyExpenses)} icon={<ArrowDownCircle className="h-4 w-4" />} />
-        <StatCard label="Reste à vivre" value={formatCurrency(cashflow)} tone={cashflow >= 0 ? "positive" : "negative"} icon={<Wallet className="h-4 w-4" />} hint={`Taux d'épargne ${formatPercent(savingsRate)}`} />
         <StatCard
-          label="Fonds d'urgence"
-          value={Number.isFinite(runway) ? `${runway.toFixed(1)} mois` : "∞"}
+          label={t("stats.monthlyIncome")}
+          value={formatCurrency(monthlyIncome)}
+          icon={<ArrowUpCircle className="h-4 w-4" />}
+          tone="gold"
+        />
+        <StatCard
+          label={t("stats.monthlyExpenses")}
+          value={formatCurrency(monthlyExpenses)}
+          icon={<ArrowDownCircle className="h-4 w-4" />}
+        />
+        <StatCard
+          label={t("stats.netCashflow")}
+          value={formatCurrency(cashflow)}
+          tone={cashflow >= 0 ? "positive" : "negative"}
+          icon={<Wallet className="h-4 w-4" />}
+          hint={t("stats.savingsRateHint", { rate: formatPercent(savingsRate) })}
+        />
+        <StatCard
+          label={t("stats.emergencyFund")}
+          value={
+            Number.isFinite(runway)
+              ? t("stats.runwayMonths", { months: runway.toFixed(1) })
+              : "∞"
+          }
           icon={<PiggyBank className="h-4 w-4" />}
           hint={formatCurrency(currentSavings)}
         />
@@ -128,20 +158,20 @@ export default function DemoDashboardPage() {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Recommandations</CardTitle>
+            <CardTitle>{t("recommendations.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <RecoTip
-              label="Court terme"
-              text="Vise 1 mois de dépenses en fonds d'urgence d'ici 6 mois."
+              label={t("recommendations.shortTerm.label")}
+              text={t("recommendations.shortTerm.body")}
             />
             <RecoTip
-              label="Allègement"
-              text="Réduis 1 abonnement non essentiel ce mois-ci."
+              label={t("recommendations.lighter.label")}
+              text={t("recommendations.lighter.body")}
             />
             <RecoTip
-              label="Automatisation"
-              text="Bloque un virement automatique mensuel vers l'épargne, même symbolique."
+              label={t("recommendations.automation.label")}
+              text={t("recommendations.automation.body")}
             />
           </CardContent>
         </Card>
@@ -165,4 +195,3 @@ function RecoTip({ label, text }: { label: string; text: string }) {
     </div>
   );
 }
-

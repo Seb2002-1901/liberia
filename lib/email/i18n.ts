@@ -4,6 +4,7 @@ import {
   loadLocaleFor,
   resolveAppLocale,
 } from "@/i18n/config";
+import type { LayoutLocaleStrings } from "@/lib/email/layout";
 
 /**
  * Builds a translator scoped to `email.*` for use inside email
@@ -43,4 +44,23 @@ export async function createEmailTranslator(
   // separators and date order.
   const intlLocale = rawLocale && rawLocale.length >= 2 ? rawLocale : requested;
   return { t, locale: requested, intlLocale };
+}
+
+/**
+ * Returns the locale strings required by `renderLayout`. The
+ * `settingsUrl` is interpolated into the default footer disclaimer so
+ * the link is clickable without HTML escaping the markup we want to
+ * keep (the surrounding template still escapes user-supplied values).
+ */
+export function getLayoutLocaleStrings(
+  t: ReturnType<typeof createTranslator>,
+  locale: AppLocale,
+  settingsUrl: string,
+): LayoutLocaleStrings {
+  return {
+    htmlLang: locale,
+    appDisclaimer: t("common.appDisclaimer"),
+    defaultFooterDisclaimer: t("common.defaultFooterDisclaimer", { settingsUrl }),
+    unsubscribeNonEssential: t("common.unsubscribeNonEssential"),
+  };
 }

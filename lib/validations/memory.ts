@@ -34,7 +34,7 @@ export const memoryUpdateSchema = z.object({
   spendingTriggers: z.array(z.enum(spendingTriggerIds)).max(8).optional(),
   progressNotes: z
     .string()
-    .max(1000, "Notes trop longues (max 1000 caractères).")
+    .max(1000, "errors.validation.notesTooLong")
     .nullable()
     .optional(),
 });
