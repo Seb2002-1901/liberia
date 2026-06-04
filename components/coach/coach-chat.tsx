@@ -57,43 +57,61 @@ export function CoachChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
+  // Single source of truth for scrolling the message log to the bottom.
+  //
+  // We target scrollRef DIRECTLY (scrollTo on the known container)
+  // instead of bottomRef.scrollIntoView. scrollIntoView walks every
+  // scrollable ancestor — including <body> when the app shell's outer
+  // padding makes the document a few rems taller than the viewport —
+  // and the browser ends up adjusting body scroll instead of (or in
+  // addition to) the chat container, which left the textarea below
+  // the fold and the first message pinned at the top of the visible
+  // area. scrollTo on scrollRef.current is unambiguous: it scrolls
+  // exactly the element we mean.
+  //
+  // `force=true` (mount / conversation switch): always go to the
+  // bottom regardless of current scroll position.
+  // `force=false` (during streaming / new message): only follow if
+  // the user is already near the bottom — never yank them back down
+  // mid-reread of an earlier message.
+  const scrollToBottom = React.useCallback((force: boolean) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (!force) {
+      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      if (distanceFromBottom > 120) return;
+    }
+    el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+  }, []);
+
   // First-paint scroll-to-bottom + focus the input on desktop.
   //
-  // Why double rAF + a 50ms fallback:
-  //   - On mount, React commits the message list synchronously but the
-  //     browser hasn't laid out / painted yet. Calling scrollIntoView
-  //     in the same tick measures the OLD scrollHeight (often 0) and
-  //     no-ops.
-  //   - Double requestAnimationFrame is the canonical pattern — first
-  //     rAF runs before the browser paints, second rAF runs AFTER the
-  //     paint when scrollHeight is settled.
-  //   - The 50ms setTimeout fallback handles slow fonts: when the
-  //     coach prompt suggestions or markdown renders pull a webfont,
-  //     the second rAF can still fire before the font swap repaints,
-  //     leaving us a few pixels short. The timeout catches the
-  //     trailing layout shift without ever yanking the user (since
-  //     this only runs once per conversationId).
+  // Why a multi-stage retry (rAF, double rAF, 100ms, 300ms):
+  //   - On mount, React commits the message list synchronously but
+  //     the browser hasn't laid out / painted yet. Measuring
+  //     scrollHeight in the same tick returns the OLD value (often 0).
+  //   - Double requestAnimationFrame catches the first post-paint
+  //     frame when scrollHeight is settled.
+  //   - 100ms covers the webfont swap repaint (Inter/system fallback
+  //     swap pushes message heights by a few pixels).
+  //   - 300ms covers slow markdown reflow on very long conversations
+  //     and the iOS Safari case where dvh recomputes after the URL
+  //     bar collapses.
+  //
+  // We always pass force=true here so the bottom is reached even if
+  // the browser restored an old scroll position on this container.
   //
   // Skip focus on touch devices so iOS / Android don't pop the IME
   // and obscure the conversation behind the keyboard.
   React.useEffect(() => {
-    const scrollToBottom = () => {
-      const bottom = bottomRef.current;
-      if (bottom) bottom.scrollIntoView({ block: "end" });
-      else if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    };
+    const go = () => scrollToBottom(true);
 
+    let raf2: number | null = null;
     const raf1 = window.requestAnimationFrame(() => {
-      const raf2 = window.requestAnimationFrame(() => {
-        scrollToBottom();
-      });
-      // Stash the inner id on the outer one so the cleanup cancels both
-      // without an extra ref.
-      (raf1 as unknown as { __inner?: number }).__inner = raf2;
+      raf2 = window.requestAnimationFrame(go);
     });
-    const fallback = window.setTimeout(scrollToBottom, 50);
+    const t100 = window.setTimeout(go, 100);
+    const t300 = window.setTimeout(go, 300);
 
     if (typeof window !== "undefined") {
       const isTouch =
@@ -104,26 +122,18 @@ export function CoachChat({
 
     return () => {
       window.cancelAnimationFrame(raf1);
-      const inner = (raf1 as unknown as { __inner?: number }).__inner;
-      if (inner !== undefined) window.cancelAnimationFrame(inner);
-      window.clearTimeout(fallback);
+      if (raf2 !== null) window.cancelAnimationFrame(raf2);
+      window.clearTimeout(t100);
+      window.clearTimeout(t300);
     };
-  }, [conversationId]);
+  }, [conversationId, scrollToBottom]);
 
-  // Auto-scroll the chat to the bottom, but ONLY when the user is
-  // already near the bottom — otherwise yanking them back down would
-  // interrupt them mid-reread of an earlier message. 120px slack handles
-  // small over-scroll and minor layout shift from the streaming cursor.
+  // Follow the conversation as new chunks arrive, but only if the user
+  // is already near the bottom. force=false preserves the user's
+  // scroll position when they've scrolled up to re-read history.
   React.useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    if (distanceFromBottom < 120) {
-      const bottom = bottomRef.current;
-      if (bottom) bottom.scrollIntoView({ block: "end" });
-      else el.scrollTop = el.scrollHeight;
-    }
-  }, [messages, streamedText]);
+    scrollToBottom(false);
+  }, [messages, streamedText, scrollToBottom]);
 
   // Abort in-flight stream if the component unmounts or the user switches
   // conversation. Otherwise the SSE fetch keeps Anthropic tokens running
@@ -251,10 +261,21 @@ export function CoachChat({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
+      {/*
+        min-h-0 on the outer flex column AND on the scrollRef child is
+        a defensive guard against the classic flexbox "auto min-size"
+        trap. Per spec, a flex item with overflow other than `visible`
+        gets `min-height: 0` automatically — but in deeply nested flex
+        chains (we have 4 levels here: section > slot > chat > scroll),
+        the auto rule can fail in older Chromium / iOS Safari builds,
+        letting the scroll container grow to its content height and
+        pushing the textarea below the visible viewport. Explicit
+        min-h-0 forces the constraint in every browser.
+      */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto pb-6"
+        className="min-h-0 flex-1 overflow-y-auto pb-6"
       >
         <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
           {messages.length === 0 && !streamedText && (

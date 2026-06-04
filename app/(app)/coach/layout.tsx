@@ -26,9 +26,15 @@ export default async function CoachLayout({
         <aside className="hidden border-r border-border/60 bg-card/30 backdrop-blur-md md:flex md:flex-col">
           <CoachSidebar conversations={conversations} isDemo={data.isDemo} />
         </aside>
-        <section className="flex h-full min-w-0 flex-col">
+        <section className="flex h-full min-h-0 min-w-0 flex-col">
           <CoachMobileTrigger conversations={conversations} isDemo={data.isDemo} />
-          <div className="flex-1 overflow-hidden">{children}</div>
+          {/*
+            min-h-0 on this flex child is required so the children
+            slot can be shorter than its content — without it, a tall
+            chat conversation pushes the slot past the viewport and
+            the textarea ends up below the fold on first paint.
+          */}
+          <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
         </section>
       </div>
     </div>
