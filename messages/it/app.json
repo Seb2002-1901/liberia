@@ -60,7 +60,46 @@
       "save": "Salva",
       "savedTitle": "Memoria di coaching aggiornata.",
       "resetConfirm": "Reimpostare la tua memoria di coaching? I tuoi dati finanziari restano intatti — vengono cancellate solo le preferenze di personalizzazione.",
-      "resetDone": "Memoria reimpostata."
+      "resetDone": "Memoria reimpostata.",
+      "premiumTitle": "Memoria IA premium",
+      "premiumIntro": "Conversando con il tuo coach, lui ricorda ciò che conta (obiettivi, preferenze, eventi importanti). Resti tu al comando.",
+      "premiumCta": "Gestisci la memoria IA"
+    },
+    "memoryPage": {
+      "metaTitle": "Memoria IA — LIBERIA",
+      "eyebrow": "Coach IA",
+      "title": "Memoria IA premium",
+      "description": "Tutto ciò che il tuo coach ha memorizzato dalle vostre conversazioni. Puoi eliminare un singolo ricordo, disattivare la memoria o cancellare tutto in qualsiasi momento.",
+      "backToSettings": "Torna alle impostazioni",
+      "howItWorksTitle": "Come funziona",
+      "howItWorksBody": "Dopo ogni scambio, il coach estrae al massimo 3 ricordi duraturi e li raggruppa in 4 categorie:",
+      "howItWorksGoal": "Obiettivi: ciò che vuoi raggiungere finanziariamente.",
+      "howItWorksPreference": "Preferenze: come vuoi essere accompagnato.",
+      "howItWorksEvent": "Eventi: cambiamenti di vita che influiscono sul tuo budget.",
+      "howItWorksBlocker": "Blocchi: ostacoli ricorrenti al tuo percorso.",
+      "toggleTitle": "Attiva la memoria",
+      "toggleDescription": "Quando è disattivata, il coach smette di imparare e di usare i tuoi ricordi esistenti.",
+      "toggleOn": "Memoria attiva",
+      "toggleOff": "Memoria disattivata",
+      "toggleOnHelp": "Il coach impara dalle conversazioni e personalizza le risposte.",
+      "toggleOffHelp": "I tuoi ricordi esistenti restano memorizzati ma non vengono più utilizzati.",
+      "entriesTitle": "{count, plural, =0 {Nessun ricordo} one {# ricordo} other {# ricordi}}",
+      "entriesDescription": "Clicca sulla croce per eliminare un singolo ricordo senza toccare gli altri.",
+      "empty": "Ancora nessun ricordo. Continua a parlare con il coach — imparerà naturalmente.",
+      "archiveEntryLabel": "Elimina questo ricordo",
+      "clearAll": "Cancella tutto",
+      "clearAllConfirm": "Eliminare definitivamente tutti i tuoi ricordi? Questa azione è irreversibile.",
+      "entryMeta": "Importanza {importance}/5 · aggiornato il {date}",
+      "toastArchived": "Ricordo eliminato.",
+      "toastCleared": "Tutti i ricordi sono stati cancellati.",
+      "toastEnabled": "Memoria IA attivata.",
+      "toastDisabled": "Memoria IA disattivata.",
+      "kinds": {
+        "goal": "Obiettivi",
+        "preference": "Preferenze",
+        "event": "Eventi",
+        "blocker": "Blocchi"
+      }
     },
     "prefs": {
       "weekly": {

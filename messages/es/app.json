@@ -60,7 +60,46 @@
       "save": "Guardar",
       "savedTitle": "Memoria de coaching actualizada.",
       "resetConfirm": "¿Reiniciar tu memoria de coaching? Tus datos financieros quedan intactos — solo se borran las preferencias de personalización.",
-      "resetDone": "Memoria reiniciada."
+      "resetDone": "Memoria reiniciada.",
+      "premiumTitle": "Memoria IA premium",
+      "premiumIntro": "A medida que hablas con tu coach, recuerda lo que importa (objetivos, preferencias, eventos importantes). Mantienes el control total.",
+      "premiumCta": "Gestionar memoria IA"
+    },
+    "memoryPage": {
+      "metaTitle": "Memoria IA — LIBERIA",
+      "eyebrow": "Coach IA",
+      "title": "Memoria IA premium",
+      "description": "Todo lo que tu coach ha recordado de vuestras conversaciones. Puedes eliminar un recuerdo, desactivar la memoria o borrar todo en cualquier momento.",
+      "backToSettings": "Volver a ajustes",
+      "howItWorksTitle": "Cómo funciona",
+      "howItWorksBody": "Después de cada intercambio, el coach extrae como máximo 3 recuerdos duraderos y los agrupa en 4 categorías:",
+      "howItWorksGoal": "Objetivos: lo que quieres lograr financieramente.",
+      "howItWorksPreference": "Preferencias: cómo quieres que te acompañen.",
+      "howItWorksEvent": "Eventos: cambios de vida que afectan a tu presupuesto.",
+      "howItWorksBlocker": "Bloqueos: obstáculos recurrentes en tu camino.",
+      "toggleTitle": "Activar la memoria",
+      "toggleDescription": "Cuando está desactivada, el coach deja de aprender y deja de usar tus recuerdos existentes.",
+      "toggleOn": "Memoria activa",
+      "toggleOff": "Memoria desactivada",
+      "toggleOnHelp": "El coach aprende de las conversaciones y personaliza sus respuestas.",
+      "toggleOffHelp": "Tus recuerdos existentes siguen almacenados pero ya no se utilizan.",
+      "entriesTitle": "{count, plural, =0 {Ningún recuerdo} one {# recuerdo} other {# recuerdos}}",
+      "entriesDescription": "Haz clic en la cruz para eliminar un recuerdo individual sin tocar los demás.",
+      "empty": "Aún no hay recuerdos. Sigue hablando con el coach — aprenderá de forma natural.",
+      "archiveEntryLabel": "Eliminar este recuerdo",
+      "clearAll": "Borrar todo",
+      "clearAllConfirm": "¿Eliminar definitivamente todos tus recuerdos? Esta acción no se puede deshacer.",
+      "entryMeta": "Importancia {importance}/5 · actualizado el {date}",
+      "toastArchived": "Recuerdo eliminado.",
+      "toastCleared": "Todos los recuerdos borrados.",
+      "toastEnabled": "Memoria IA activada.",
+      "toastDisabled": "Memoria IA desactivada.",
+      "kinds": {
+        "goal": "Objetivos",
+        "preference": "Preferencias",
+        "event": "Eventos",
+        "blocker": "Bloqueos"
+      }
     },
     "prefs": {
       "weekly": {

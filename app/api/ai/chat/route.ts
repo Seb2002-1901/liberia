@@ -15,6 +15,13 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import { getMyUserMemory } from "@/lib/services/memory";
+import {
+  selectEntriesForPrompt,
+  touchMemoryEntries,
+  upsertMemoryEntry,
+} from "@/lib/services/memory-entries";
+import { buildMemoryEntriesBlock } from "@/lib/ai/memory-context";
+import { extractMemoryEntries } from "@/lib/ai/memory-extractor";
 import { requirePremiumAccess } from "@/lib/services/access";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -138,10 +145,23 @@ export async function POST(request: Request) {
   const history = (historyDesc ?? []).slice().reverse();
 
   // Build finance + memory context (read-only per-request snapshot).
-  const [financeData, memory] = await Promise.all([
+  // Premium memory: load the user's opt-out flag + top-N typed entries
+  // in the same parallel block. selectEntriesForPrompt returns [] when
+  // the user has no entries OR when admin client isn't configured.
+  const [financeData, memory, memoryFlagRow, memoryEntries] = await Promise.all([
     getFinanceData(),
     getMyUserMemory(),
+    supabase
+      .from("profiles")
+      .select("coach_memory_enabled")
+      .eq("id", user.id)
+      .maybeSingle(),
+    selectEntriesForPrompt(user.id),
   ]);
+  const memoryEnabled = memoryFlagRow.data?.coach_memory_enabled ?? true;
+  const memoryBlock = memoryEnabled
+    ? buildMemoryEntriesBlock(memoryEntries)
+    : null;
   const financeContext = buildFinanceContext(financeData);
   const useLLM = isAnthropicConfigured();
 
@@ -210,28 +230,47 @@ export async function POST(request: Request) {
               financeData.profile.locale,
             );
 
+            // Assemble system blocks. The memory block is OPTIONAL:
+            // we only include it when the user has entries AND has
+            // not disabled the feature. Skipping it keeps the cached
+            // prefix stable for users without any memory yet.
+            const systemBlocks: Array<{
+              type: "text";
+              text: string;
+              cache_control?: { type: "ephemeral" };
+            }> = [
+              { type: "text", text: COACH_SYSTEM_PROMPT },
+              {
+                type: "text",
+                text: financeContext,
+                // Cache the system + finance context together. The whole
+                // block typically lands above the 2048-token Sonnet 4.6
+                // minimum once the user has any data; below that, the
+                // cache silently no-ops.
+                cache_control: { type: "ephemeral" },
+              },
+            ];
+            if (memoryBlock) {
+              systemBlocks.push({
+                type: "text",
+                text: memoryBlock,
+                // Cache memory separately from finance — finance refreshes
+                // when the user logs a new tx; memory refreshes when the
+                // extractor stores a new entry. Different invalidation
+                // cadences, so they share the prefix but live in their
+                // own cache breakpoint.
+                cache_control: { type: "ephemeral" },
+              });
+            }
+            systemBlocks.push({
+              type: "text",
+              text: `Always respond exclusively in ${userLanguageName}. Match the user's tone in that language. Never switch to a different language even if the finance context above is in French — that is internal data, not a hint about the user's preferred language.`,
+            });
+
             const claudeStream = claude.messages.stream({
               model: COACH_MODEL,
               max_tokens: COACH_MAX_TOKENS,
-              system: [
-                {
-                  type: "text",
-                  text: COACH_SYSTEM_PROMPT,
-                },
-                {
-                  type: "text",
-                  text: financeContext,
-                  // Cache the system + finance context together. The whole
-                  // block typically lands above the 2048-token Sonnet 4.6
-                  // minimum once the user has any data; below that, the
-                  // cache silently no-ops.
-                  cache_control: { type: "ephemeral" },
-                },
-                {
-                  type: "text",
-                  text: `Always respond exclusively in ${userLanguageName}. Match the user's tone in that language. Never switch to a different language even if the finance context above is in French — that is internal data, not a hint about the user's preferred language.`,
-                },
-              ],
+              system: systemBlocks,
               messages: apiMessages,
               thinking: { type: "adaptive" },
             });
@@ -378,6 +417,36 @@ export async function POST(request: Request) {
           .eq("id", conversation.id)
           .eq("user_id", user.id);
 
+        // Premium memory: touch the entries we just injected so the
+        // recency ranking keeps active ones near the top, AND fire the
+        // extractor in the background. We never await it — a slow
+        // Haiku call must not delay the user's next prompt.
+        if (memoryEnabled) {
+          const injectedIds = memoryEntries.map((e) => e.id);
+          if (injectedIds.length > 0) {
+            void touchMemoryEntries(user.id, injectedIds).catch((err) => {
+              console.error(
+                "[ai/chat] touchMemoryEntries failed:",
+                err instanceof Error ? err.message : String(err),
+              );
+            });
+          }
+
+          // Only run extraction when the LLM actually answered. The
+          // local fallback is deterministic and recycles existing
+          // context — no new memory to learn from it.
+          if (useLLM && assistantBuffer) {
+            void runExtractionInBackground({
+              userId: user.id,
+              conversationId: conversation.id,
+              userMessage: parsed.data.content,
+              assistantReply: assistantBuffer,
+              locale: financeData.profile.locale ?? "fr",
+              fullName: financeData.profile.full_name,
+            });
+          }
+        }
+
         send("done", {
           tokens_in: tokensIn,
           tokens_out: tokensOut,
@@ -421,4 +490,61 @@ export async function POST(request: Request) {
       "X-Accel-Buffering": "no",
     },
   });
+}
+
+interface RunExtractionInput {
+  userId: string;
+  conversationId: string;
+  userMessage: string;
+  assistantReply: string;
+  locale: string;
+  fullName: string | null;
+}
+
+/**
+ * Fire-and-forget memory extraction. Runs the Haiku extractor on the
+ * finished exchange and upserts any returned entries. All failures
+ * are swallowed (logged to stderr) — this MUST NOT throw back into
+ * the SSE stream or the user's reply silently fails to ship.
+ *
+ * Kept out of the request lifecycle: we don't await it from the route
+ * handler, the Node runtime keeps the Function warm long enough for
+ * the call to finish before the worker is recycled.
+ */
+async function runExtractionInBackground(
+  input: RunExtractionInput,
+): Promise<void> {
+  try {
+    const extracted = await extractMemoryEntries({
+      userMessage: input.userMessage,
+      assistantReply: input.assistantReply,
+      locale: input.locale,
+      fullName: input.fullName,
+    });
+    if (extracted.length === 0) return;
+
+    const now = Date.now();
+    for (const entry of extracted) {
+      const expiresAt = entry.expiresInDays
+        ? new Date(now + entry.expiresInDays * 86400000).toISOString()
+        : null;
+      await upsertMemoryEntry({
+        userId: input.userId,
+        kind: entry.kind,
+        key: entry.key,
+        summary: entry.summary,
+        detail: entry.detail,
+        importance: entry.importance,
+        confidence: entry.confidence,
+        source: "coach",
+        conversationId: input.conversationId,
+        expiresAt,
+      });
+    }
+  } catch (err) {
+    console.error(
+      "[ai/chat] memory extraction failed:",
+      err instanceof Error ? `${err.name}: ${err.message}` : String(err),
+    );
+  }
 }

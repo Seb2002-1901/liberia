@@ -45,7 +45,7 @@ export default async function SettingsPage() {
             {t("sections.memory")}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <CoachingMemoryCard
             initialTone={(memory?.coaching_tone as CoachingToneId | null) ?? null}
             initialChallenges={
@@ -56,6 +56,17 @@ export default async function SettingsPage() {
             }
             initialNotes={memory?.progress_notes ?? null}
           />
+          <div className="rounded-xl border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.04)] p-4">
+            <p className="text-sm font-medium">{t("memory.premiumTitle")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("memory.premiumIntro")}
+            </p>
+            <Button asChild size="sm" variant="gold" className="mt-3">
+              <Link href={ROUTES.memory}>
+                <Sparkles className="h-4 w-4" /> {t("memory.premiumCta")}
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

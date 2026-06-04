@@ -135,6 +135,31 @@ export interface UserMemory {
   updated_at: string;
 }
 
+export type MemoryEntryKind = "goal" | "preference" | "event" | "blocker";
+export type MemoryEntrySource =
+  | "user"
+  | "coach"
+  | "onboarding"
+  | "inferred";
+
+export interface UserMemoryEntry {
+  id: string;
+  user_id: string;
+  kind: MemoryEntryKind;
+  key: string;
+  summary: string;
+  detail: string | null;
+  importance: number;
+  confidence: number;
+  source: MemoryEntrySource;
+  conversation_id: string | null;
+  expires_at: string | null;
+  last_referenced_at: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface FinancialPlan {
   id: string;
   user_id: string;

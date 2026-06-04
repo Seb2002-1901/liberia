@@ -34,6 +34,7 @@ export const ROUTES = {
   profile: "/profile",
   settings: "/settings",
   subscription: "/settings/subscription",
+  memory: "/settings/memory",
   demo: "/demo",
 } as const;
 

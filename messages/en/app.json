@@ -60,7 +60,46 @@
       "save": "Save",
       "savedTitle": "Coaching memory updated.",
       "resetConfirm": "Reset your coaching memory? Your financial data stays intact — only personalisation preferences are cleared.",
-      "resetDone": "Memory reset."
+      "resetDone": "Memory reset.",
+      "premiumTitle": "Premium AI memory",
+      "premiumIntro": "As you talk to your coach, it remembers the things that matter (goals, preferences, life events). You stay in full control.",
+      "premiumCta": "Manage AI memory"
+    },
+    "memoryPage": {
+      "metaTitle": "AI Memory — LIBERIA",
+      "eyebrow": "AI Coach",
+      "title": "Premium AI memory",
+      "description": "Everything your coach has remembered from your conversations. You can delete a single memory, turn memory off, or clear everything at any time.",
+      "backToSettings": "Back to settings",
+      "howItWorksTitle": "How it works",
+      "howItWorksBody": "After each exchange, the coach extracts up to 3 long-lasting memories and groups them into 4 categories:",
+      "howItWorksGoal": "Goals: what you're trying to achieve financially.",
+      "howItWorksPreference": "Preferences: how you want to be coached.",
+      "howItWorksEvent": "Events: life changes that affect your budget.",
+      "howItWorksBlocker": "Blockers: recurring obstacles to your progress.",
+      "toggleTitle": "Enable memory",
+      "toggleDescription": "When disabled, the coach stops learning and stops using your existing memories.",
+      "toggleOn": "Memory on",
+      "toggleOff": "Memory off",
+      "toggleOnHelp": "The coach learns from conversations and personalises its replies.",
+      "toggleOffHelp": "Your existing memories stay stored but are no longer used.",
+      "entriesTitle": "{count, plural, =0 {No memories} one {# memory} other {# memories}}",
+      "entriesDescription": "Click the cross to delete a single memory without touching the rest.",
+      "empty": "No memories yet. Keep talking to the coach — it will learn naturally.",
+      "archiveEntryLabel": "Delete this memory",
+      "clearAll": "Clear all",
+      "clearAllConfirm": "Permanently delete all your memories? This cannot be undone.",
+      "entryMeta": "Importance {importance}/5 · updated {date}",
+      "toastArchived": "Memory deleted.",
+      "toastCleared": "All memories cleared.",
+      "toastEnabled": "AI memory enabled.",
+      "toastDisabled": "AI memory disabled.",
+      "kinds": {
+        "goal": "Goals",
+        "preference": "Preferences",
+        "event": "Events",
+        "blocker": "Blockers"
+      }
     },
     "prefs": {
       "weekly": {

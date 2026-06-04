@@ -688,16 +688,106 @@ begin
 end$$;
 
 -- =====================================================
+-- user_memory_entries (Phase 2 IA Premium) — typed long-term memory
+-- =====================================================
+-- The coach learns from conversations and stores structured "memories"
+-- (goals, preferences, life events, persistent blockers) here. These
+-- are injected into the system prompt of every future conversation so
+-- the coach behaves as a personal companion across sessions.
+--
+-- Why a separate table from user_memory:
+--   - user_memory          = STABLE personality config (tone, traits)
+--                            edited manually from settings. 1 row/user.
+--   - user_memory_entries  = DYNAMIC facts extracted from conversations
+--                            with time decay, individually archivable.
+--                            N rows/user.
+create table if not exists public.user_memory_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  kind text not null check (kind in ('goal','preference','event','blocker')),
+  key text not null,
+  summary text not null,
+  detail text,
+  importance smallint not null default 3 check (importance between 1 and 5),
+  confidence smallint not null default 3 check (confidence between 1 and 5),
+  source text not null default 'coach' check (source in ('user','coach','onboarding','inferred')),
+  conversation_id uuid references public.ai_conversations(id) on delete set null,
+  expires_at timestamptz,
+  last_referenced_at timestamptz,
+  archived_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (user_id, kind, key)
+);
+
+do $$
+declare
+  spec record;
+begin
+  for spec in
+    select * from (values
+      ('user_memory_entries', 'summary', 'user_memory_entries_summary_length',  280),
+      ('user_memory_entries', 'detail',  'user_memory_entries_detail_length',  1000),
+      ('user_memory_entries', 'key',     'user_memory_entries_key_length',       80)
+    ) as t(table_name, column_name, constraint_name, max_len)
+  loop
+    if not exists (
+      select 1 from pg_constraint
+      where conrelid = ('public.' || spec.table_name)::regclass
+        and conname = spec.constraint_name
+    ) then
+      execute format(
+        'alter table public.%I add constraint %I check (%I is null or char_length(%I) <= %s) not valid',
+        spec.table_name, spec.constraint_name, spec.column_name, spec.column_name, spec.max_len
+      );
+    end if;
+  end loop;
+end$$;
+
+create index if not exists idx_user_memory_entries_user
+  on public.user_memory_entries(user_id);
+create index if not exists idx_user_memory_entries_active
+  on public.user_memory_entries(user_id, importance desc, last_referenced_at desc nulls last)
+  where archived_at is null;
+
+drop trigger if exists set_updated_at_user_memory_entries on public.user_memory_entries;
+create trigger set_updated_at_user_memory_entries
+before update on public.user_memory_entries
+for each row execute function public.handle_updated_at();
+
+-- User opt-out: when false, the coach stops both reading and writing
+-- entries. Default true so the feature is on for premium users by
+-- default (they expect a personal coach), opt-out from settings.
+alter table public.profiles
+  add column if not exists coach_memory_enabled boolean not null default true;
+
+-- =====================================================
 -- Row-Level Security
 -- =====================================================
-alter table public.profiles            enable row level security;
-alter table public.subscriptions       enable row level security;
-alter table public.financial_profiles  enable row level security;
-alter table public.incomes             enable row level security;
-alter table public.expenses            enable row level security;
-alter table public.goals               enable row level security;
-alter table public.user_settings       enable row level security;
-alter table public.user_memory         enable row level security;
+alter table public.profiles              enable row level security;
+alter table public.subscriptions         enable row level security;
+alter table public.financial_profiles    enable row level security;
+alter table public.incomes               enable row level security;
+alter table public.expenses              enable row level security;
+alter table public.goals                 enable row level security;
+alter table public.user_settings         enable row level security;
+alter table public.user_memory           enable row level security;
+alter table public.user_memory_entries   enable row level security;
+
+-- user_memory_entries: self-only CRUD. Service role bypasses RLS to
+-- insert coach-extracted entries from the chat route.
+drop policy if exists "user_memory_entries_self_select" on public.user_memory_entries;
+create policy "user_memory_entries_self_select" on public.user_memory_entries
+  for select using (auth.uid() = user_id);
+drop policy if exists "user_memory_entries_self_insert" on public.user_memory_entries;
+create policy "user_memory_entries_self_insert" on public.user_memory_entries
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "user_memory_entries_self_update" on public.user_memory_entries;
+create policy "user_memory_entries_self_update" on public.user_memory_entries
+  for update using (auth.uid() = user_id);
+drop policy if exists "user_memory_entries_self_delete" on public.user_memory_entries;
+create policy "user_memory_entries_self_delete" on public.user_memory_entries
+  for delete using (auth.uid() = user_id);
 
 -- user_memory: self-only CRUD. The data is sensitive personalization
 -- input — never shared, never cross-user-readable.

@@ -60,7 +60,46 @@
       "save": "Speichern",
       "savedTitle": "Coaching-Gedächtnis aktualisiert.",
       "resetConfirm": "Dein Coaching-Gedächtnis zurücksetzen? Deine Finanzdaten bleiben unangetastet — nur die Personalisierungspräferenzen werden gelöscht.",
-      "resetDone": "Gedächtnis zurückgesetzt."
+      "resetDone": "Gedächtnis zurückgesetzt.",
+      "premiumTitle": "Premium-KI-Gedächtnis",
+      "premiumIntro": "Im Laufe der Gespräche merkt sich dein Coach das Wesentliche (Ziele, Vorlieben, wichtige Ereignisse). Du behältst die volle Kontrolle.",
+      "premiumCta": "KI-Gedächtnis verwalten"
+    },
+    "memoryPage": {
+      "metaTitle": "KI-Gedächtnis — LIBERIA",
+      "eyebrow": "KI-Coach",
+      "title": "Premium-KI-Gedächtnis",
+      "description": "Alles, was sich dein Coach aus euren Gesprächen gemerkt hat. Du kannst einzelne Einträge löschen, das Gedächtnis abschalten oder jederzeit alles entfernen.",
+      "backToSettings": "Zurück zu den Einstellungen",
+      "howItWorksTitle": "So funktioniert es",
+      "howItWorksBody": "Nach jedem Austausch extrahiert der Coach maximal 3 dauerhafte Erinnerungen und ordnet sie in 4 Kategorien:",
+      "howItWorksGoal": "Ziele: was du finanziell erreichen willst.",
+      "howItWorksPreference": "Vorlieben: wie du begleitet werden möchtest.",
+      "howItWorksEvent": "Ereignisse: Lebensveränderungen, die dein Budget betreffen.",
+      "howItWorksBlocker": "Hürden: wiederkehrende Blockaden, die dich bremsen.",
+      "toggleTitle": "Gedächtnis aktivieren",
+      "toggleDescription": "Wenn deaktiviert, lernt der Coach nichts Neues mehr und nutzt deine bestehenden Erinnerungen nicht mehr.",
+      "toggleOn": "Gedächtnis aktiv",
+      "toggleOff": "Gedächtnis deaktiviert",
+      "toggleOnHelp": "Der Coach lernt aus Gesprächen und personalisiert seine Antworten.",
+      "toggleOffHelp": "Deine vorhandenen Erinnerungen bleiben gespeichert, werden aber nicht mehr verwendet.",
+      "entriesTitle": "{count, plural, =0 {Keine Erinnerungen} one {# Erinnerung} other {# Erinnerungen}}",
+      "entriesDescription": "Klick auf das Kreuz, um eine einzelne Erinnerung zu löschen, ohne den Rest anzutasten.",
+      "empty": "Noch keine Erinnerungen. Sprich weiter mit dem Coach — er lernt von selbst.",
+      "archiveEntryLabel": "Diese Erinnerung löschen",
+      "clearAll": "Alles löschen",
+      "clearAllConfirm": "Alle Erinnerungen dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "entryMeta": "Wichtigkeit {importance}/5 · aktualisiert {date}",
+      "toastArchived": "Erinnerung gelöscht.",
+      "toastCleared": "Alle Erinnerungen gelöscht.",
+      "toastEnabled": "KI-Gedächtnis aktiviert.",
+      "toastDisabled": "KI-Gedächtnis deaktiviert.",
+      "kinds": {
+        "goal": "Ziele",
+        "preference": "Vorlieben",
+        "event": "Ereignisse",
+        "blocker": "Hürden"
+      }
     },
     "prefs": {
       "weekly": {
