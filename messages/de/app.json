@@ -1,1 +1,926 @@
-{}
+{
+  "profile": {
+    "metadata": { "title": "Profil" },
+    "header": {
+      "eyebrow": "Konto",
+      "title": "Profil",
+      "description": "Deine persönlichen Daten. Jederzeit änderbar."
+    },
+    "fallbackName": "Mitglied",
+    "infoCard": "Informationen",
+    "planActive": "Premium-Plan",
+    "planInactive": "Kein aktives Abo",
+    "fields": {
+      "fullName": "Vollständiger Name",
+      "email": "E-Mail"
+    },
+    "regionCard": "Land, Währung und Sprache",
+    "locale": {
+      "country": "Land",
+      "currency": "Währung",
+      "language": "Sprache",
+      "footnote": "Deine persönlichen Beträge folgen deiner Währung. Die Oberfläche ist in die gewählte Sprache übersetzt; Sprachen ohne vollständige Übersetzung fallen auf Englisch zurück. Das LIBERIA-Abo wird in CHF abgerechnet.",
+      "save": "Speichern",
+      "saved": "Einstellungen gespeichert.",
+      "unsupported": "Kombination aus Land/Währung/Sprache noch nicht unterstützt."
+    }
+  },
+  "settings": {
+    "metadata": { "title": "Einstellungen" },
+    "header": {
+      "eyebrow": "Konto",
+      "title": "Einstellungen",
+      "description": "Stelle deine Präferenzen ein und verwalte deine Daten."
+    },
+    "sections": {
+      "memory": "Coaching-Gedächtnis",
+      "notifications": "Benachrichtigungen",
+      "subscription": "Abo",
+      "data": "Daten & Datenschutz",
+      "security": "Sicherheit"
+    },
+    "memory": {
+      "intro": "LIBERIA lernt dein Profil, um dich besser zu unterstützen.",
+      "introSub": "Diese Präferenzen bleiben privat und verlassen dein Konto nie. Du kannst sie jederzeit bearbeiten oder löschen.",
+      "toneLabel": "Coaching-Stil",
+      "toneHelp": "Der Ton, in dem LIBERIA mit dir spricht.",
+      "challengesLabel": "Herausforderungen, denen du begegnest",
+      "challengesHelp": "Wähle, was passt. Hilft LIBERIA, dich besser zu begleiten.",
+      "triggersLabel": "Deine Ausgaben-Auslöser",
+      "triggersHelp": "Die Momente, in denen du mehr ausgibst als geplant.",
+      "notesLabel": "Persönliche Notizen",
+      "notesHelp": "Was LIBERIA über deinen Weg im Hinterkopf behalten soll. Nur für dich sichtbar.",
+      "notesPlaceholder": "z. B. „Ich komme aus einer schwierigen Phase, ich muss langsam vorangehen.\"",
+      "charCount": "{count} / 1000 Zeichen",
+      "reset": "Zurücksetzen",
+      "save": "Speichern",
+      "savedTitle": "Coaching-Gedächtnis aktualisiert.",
+      "resetConfirm": "Dein Coaching-Gedächtnis zurücksetzen? Deine Finanzdaten bleiben unangetastet — nur die Personalisierungspräferenzen werden gelöscht.",
+      "resetDone": "Gedächtnis zurückgesetzt."
+    },
+    "prefs": {
+      "weekly": {
+        "title": "Wöchentliche Zusammenfassung per E-Mail",
+        "description": "Jeden Sonntag eine kurze Übersicht deiner finanziellen Woche."
+      },
+      "alerts": {
+        "title": "Wichtige Hinweise",
+        "description": "Negatives verfügbares Einkommen, Ziele in Verzug."
+      },
+      "encouragement": {
+        "title": "Fortschritts-Ermutigungen",
+        "description": "Eine kurze E-Mail, wenn der Coach bemerkenswerten Fortschritt erkennt."
+      },
+      "milestones": {
+        "title": "Ziel-Meilensteine",
+        "description": "Wenn ein Ziel eine Stufe erreicht (50 / 80 / 100 %)."
+      },
+      "inactivity": {
+        "title": "Coach-Follow-up",
+        "description": "Eine sanfte E-Mail nach mehreren inaktiven Tagen."
+      },
+      "trial": {
+        "title": "Testphase- und Zahlungserinnerungen",
+        "description": "Vor Ablauf der Testphase und bei Zahlungsproblemen. Empfohlen."
+      },
+      "analytics": {
+        "title": "Anonyme Produkt-Analytics",
+        "description": "Aggregierte Zähler (nie persönlich), um LIBERIA zu verbessern. Kein Verkauf, kein Werbe-Tracking."
+      }
+    },
+    "subscription": {
+      "intro": "Verwalte deinen Plan, deine Abrechnung und deinen Premium-Zugang.",
+      "cta": "Mein Abo verwalten"
+    },
+    "data": {
+      "intro": "Gemäss DSGVO kannst du alle deine Daten exportieren oder dauerhaft löschen.",
+      "exportInfo": "Der Export enthält Profil, Einkommen, Ausgaben, Ziele, KI-Pläne und Konversationsverlauf.",
+      "exportCta": "Meine Daten herunterladen (JSON)",
+      "exportDone": "Export heruntergeladen.",
+      "deleteCta": "Mein Konto löschen",
+      "deleteConfirm": "Dein LIBERIA-Konto dauerhaft löschen? Diese Aktion ist unumkehrbar und entfernt alle deine Daten (Einkommen, Ausgaben, Ziele, KI-Pläne, Konversationen).",
+      "deletePrompt": "Tippe zur Bestätigung exakt „löschen\".",
+      "deleteKeyword": "löschen",
+      "deleteCancelled": "Löschung abgebrochen."
+    },
+    "security": {
+      "intro": "Deine Daten sind im Ruhezustand und während der Übertragung verschlüsselt. Jeder Nutzer greift nur auf seine eigenen Daten zu — strikte Isolation auf Datenbankebene erzwungen.",
+      "linksBefore": "Siehe auch unsere",
+      "privacyLink": "Datenschutzerklärung",
+      "linksAnd": "und den",
+      "legalLink": "rechtlichen Haftungsausschluss"
+    }
+  },
+  "subscription": {
+    "metadata": { "title": "Abo" },
+    "header": {
+      "eyebrow": "Konto",
+      "title": "Abo",
+      "description": "Verwalte deine Testphase, deinen Plan und deine Zahlungsmethode."
+    },
+    "banners": {
+      "trialTitle": "Kostenlose Testphase läuft",
+      "trialTitleWithDays": "Kostenlose Testphase läuft — {days, plural, one {# Tag verbleibend} other {# Tage verbleibend}}",
+      "trialBillingFrom": "Automatische Abrechnung startet am {date}. ",
+      "trialBillingSoon": "Die automatische Abrechnung beginnt, sobald die Testphase endet. ",
+      "trialCancelled": "Du hast gekündigt: Es wird keine Rechnung abgebucht.",
+      "trialCanCancel": "Du kannst jederzeit über das Portal kündigen.",
+      "activeTitle": "Abo aktiv",
+      "activeTitleCancelling": "Abo aktiv — Kündigung geplant",
+      "activeKeptUntil": "Dein Zugang bleibt bis {date} bestehen.",
+      "activeKeptUntilFallback": "Dein Zugang bleibt bis zum Ende der Periode bestehen.",
+      "activeRenews": "Nächste Erneuerung: {date}.",
+      "activeManaged": "Du kannst dein Abo jederzeit verwalten.",
+      "pastDueTitle": "Zahlung ausstehend",
+      "pastDueBody": "Die letzte Zahlung ist nicht durchgegangen. Aktualisiere deine Zahlungsmethode über das Portal, um den Zugang zu reaktivieren — deine Daten bleiben sicher.",
+      "lapsedPausedTitle": "Dein Zugang ist pausiert",
+      "lapsedNewTitle": "Du kannst deinen Zugang aktivieren",
+      "lapsedPausedBody": "Wähle einen Plan, um den vollständigen LIBERIA-Zugang zu reaktivieren. Deine Daten bleiben unangetastet.",
+      "lapsedNewBody": "Aktiviere deine {days}-tägige kostenlose Testphase. Jederzeit kündbar."
+    },
+    "status": {
+      "label": "Aktueller Plan",
+      "trialing": "Testphase",
+      "active": "Premium",
+      "pastDue": "Zahlung ausstehend",
+      "paused": "Testphase pausiert",
+      "canceled": "Gekündigt",
+      "incomplete": "Unvollständige Zahlung",
+      "none": "Kein Abo",
+      "trialUsedNote": "Du hast deine kostenlose Testphase bereits genutzt. Künftige Pläne starten zum Standardtarif.",
+      "freshNote": "Beginne mit {days} kostenlosen Tagen. Karte zum Aktivieren erforderlich.",
+      "manageNote": "Du kannst jederzeit über das Portal den Plan wechseln oder kündigen."
+    },
+    "timeline": {
+      "title": "Konto-Aktivität",
+      "trialUsedLabel": "Kostenlose Testphase genutzt",
+      "trialUsedDetail": "Eine Testphase pro Konto — Anti-Missbrauch.",
+      "trialEndsLabel": "Testphase endet: {date}",
+      "trialEndedLabel": "Testphase endete am {date}",
+      "accessKeptLabel": "Zugang erhalten bis {date}",
+      "renewsLabel": "Nächste Erneuerung: {date}",
+      "cancelScheduledLabel": "Kündigung geplant",
+      "cancelScheduledDetail": "Du kannst sie über das Portal widerrufen, solange die Periode läuft.",
+      "paymentMethodLabel": "Zahlungsmethode bei Stripe hinterlegt",
+      "paymentMethodDetail": "Verwaltbar aus dem Kundenportal."
+    },
+    "footnote": "Abrechnung zum Start in CHF, unabhängig von deinem Land. Zahlung über Stripe abgewickelt (verschlüsselt, PCI-konform). Akzeptierte Methoden: Visa- / Mastercard- / American-Express-Karten, Apple Pay, Google Pay sowie TWINT (Schweiz, je nach Aktivierung im Stripe-Dashboard)."
+  },
+  "coach": {
+    "metadata": { "title": "KI-Coach" },
+    "welcomeTitle": "Willkommen bei deinem Finanz-Coach",
+    "welcomeBody": "Sprich über deine Finanzen. Der LIBERIA-Coach stützt sich auf dein Einkommen, deine Ausgaben und deine Ziele, um dir konkrete Aktionen vorzuschlagen — ruhig, ohne Fachjargon, ohne Versprechen.",
+    "newConversation": "Konversation starten",
+    "createAccount": "Mein Konto erstellen",
+    "chat": {
+      "thinking": "Der Coach denkt nach…",
+      "placeholder": "Stelle deinem Coach eine Frage…",
+      "placeholderDemo": "Demo-Modus: Erstelle ein Konto, um mit dem Coach zu chatten.",
+      "sendAriaLabel": "Senden",
+      "disclaimer": "Der LIBERIA-Coach ist informativ. Nichts davon ist regulierte Finanzberatung.",
+      "emptyTitle": "Dein Finanz-Coach",
+      "emptyBody": "Stelle eine konkrete Frage zu deiner Situation, deinen Ausgaben oder deinen Zielen. Er stützt sich auf deine echten Daten und schlägt Schritt für Schritt Aktionen vor.",
+      "demoBanner": "Demo-Modus: Die Konversation aktiviert sich nach der Kontoerstellung.",
+      "fallbackError": "Der Coach konnte nicht antworten.",
+      "suggestions": {
+        "default": [
+          "Was soll ich diese Woche tun?",
+          "Wie senke ich meinen finanziellen Stress?",
+          "Welche Ausgabe sollte ich beobachten?",
+          "Hilf mir, an meinem Plan dranzubleiben."
+        ],
+        "cashflowNegative": [
+          "Wie schliesse ich meine monatliche Lücke?",
+          "Welche Ausgabe ist am einfachsten zu kürzen?",
+          "Wo fange ich an, um etwas Luft zu bekommen?",
+          "Wie hole ich mir diesen Monat etwas Spielraum zurück?"
+        ],
+        "noEmergencyFund": [
+          "Wie baue ich einen Notgroschen in meinem Tempo auf?",
+          "Welchen Betrag sollte ich anfangs anstreben?",
+          "Wie automatisiere ich mein Sparen?",
+          "Wo fange ich an, um mich sicherer zu fühlen?"
+        ],
+        "debtHeavy": [
+          "Welche Schuld sollte ich zuerst zurückzahlen?",
+          "Wie reduziere ich meine Schuldenlast?",
+          "Wie priorisiere ich zwischen Zurückzahlen und Sparen?",
+          "Wie verhandle ich einen Kredit neu?"
+        ],
+        "anxious": [
+          "Wie senke ich meinen finanziellen Stress?",
+          "Nur eine Aktion für heute?",
+          "Wie finde ich Ruhe rund ums Geld?",
+          "Hilf mir, ohne Druck voranzukommen."
+        ],
+        "impulsive": [
+          "Wie bremse ich Impulskäufe?",
+          "Wie deckle ich meine variablen Ausgaben?",
+          "Wie erkenne ich meine Ausgaben-Auslöser?",
+          "Wie baue ich eine Gewohnheit auf, die hält?"
+        ],
+        "solidBase": [
+          "Wie beschleunige ich mein Sparen?",
+          "Welche Ziele über 12 Monate anstreben?",
+          "Wie bringe ich meine Ersparnisse zum Arbeiten?",
+          "Wie optimiere ich meine Versicherungen und Verträge?"
+        ]
+      }
+    },
+    "sidebar": {
+      "newConversation": "Neue Konversation",
+      "demoToast": "Demo-Modus: Erstelle ein Konto, um eine Konversation zu öffnen.",
+      "empty": "Noch keine Konversation.",
+      "actionsLabel": "Aktionen",
+      "rename": "Umbenennen",
+      "delete": "Löschen",
+      "renamePrompt": "Neuer Titel",
+      "deleteConfirm": "« {title} » löschen? Diese Aktion ist endgültig.",
+      "deletedToast": "Konversation gelöscht."
+    },
+    "mobile": {
+      "openListLabel": "Konversationsliste öffnen",
+      "buttonLabel": "Konversationen",
+      "dialogTitle": "Meine Konversationen"
+    },
+    "local": {
+      "openLine": {
+        "direct": "{ack}",
+        "structured": "{ack} So würde ich es sehen.",
+        "gentle": "{ack} Keine Eile, wir gehen in deinem Tempo.",
+        "calm": "{ack}"
+      },
+      "closeLine": {
+        "direct": "Wo fangen wir an?",
+        "structured": "Soll ich einen Schritt im Detail erklären?",
+        "gentle": "Sag mir einfach, wie du dich damit fühlst.",
+        "calm": "Wollen wir einen Punkt vertiefen?"
+      },
+      "greeting": {
+        "hello": "Hallo {name},",
+        "helloNoName": "Hallo,",
+        "statusPositive": "dein monatlich verfügbares Einkommen beträgt **{cashflow}**.",
+        "statusNegative": "dir fehlen aktuell **{gap}** zu deinen Monatsausgaben — es ist messbar, also adressierbar.",
+        "statusEmpty": "wir können loslegen, sobald du dein Einkommen und deine Ausgaben eingetragen hast.",
+        "bridge": "schön, dich wiederzusehen.",
+        "promptDirect": "Was packen wir heute an?",
+        "promptStructured": "Wir können 1 Priorität, 1 Risiko oder 1 Aktion ansehen — deine Wahl.",
+        "promptDefault": "Wie kann ich dir heute helfen?"
+      },
+      "thanks": {
+        "direct": "Gerne. Mach weiter — Konstanz macht alles.",
+        "structured": "Gerne. Vergiss nicht, das Ergebnis in LIBERIA zu notieren, damit die Spur bleibt.",
+        "gentle": "Danke DIR. Nimm dir Zeit, ich bin da, wenn du mich brauchst.",
+        "calm": "Gerne. Wir machen weiter, wann du willst."
+      },
+      "nextAction": {
+        "ack": "Gute Frage.",
+        "cashflowNegative": "Deine aktuelle Priorität ist, **deine monatliche Lücke zu reduzieren**. Identifiziere heute **eine einzige wiederkehrende Ausgabe**, die du um ungefähr **{cut}** senken kannst — ein Abo, eine Lieferung, eine Einkaufskategorie. Du musst nicht alles ändern, setze nur **ein erstes Verriegelungspunkt**.",
+        "highDti": "Deine Rückzahlungen machen **{pct} %** deines Einkommens aus — das belastet im Moment am stärksten. Liste diese Woche deine Kredite nach Zinssatz auf und konzentriere deine nächsten Anstrengungen auf den teuersten.",
+        "noFund": "Du hast noch keinen Notgroschen. Das ist dein erster Meilenstein. Plane **eine automatische Überweisung von {target}** zu Monatsbeginn auf ein separates Konto. Anfangs symbolisch, später strukturell.",
+        "lowSavings": "Deine Sparquote ist gering. Diese Woche, **prüfe deine aktiven Abos** und kündige die, die du diesen Monat nicht genutzt hast. Das ist die Aktion mit dem besten Aufwand-/Wirkungs-Verhältnis.",
+        "habit": "Du hast eine gesunde Basis. **Wähle eine Gewohnheit zum Testen für 30 Tage**: eine automatische Überweisung, einen wöchentlichen Einkaufsdeckel oder eine sonntägliche Finanz-Review."
+      },
+      "stress": {
+        "ackDirect": "Finanzieller Stress ist messbar und reduzierbar.",
+        "ackStructured": "Verstanden. Wir nehmen auseinander, was belastet.",
+        "ackCalm": "Ich verstehe. Geld-Druck zu haben ist schwer — und sehr verbreitet.",
+        "bodyCashflow": "Der wahrscheinlichste Auslöser deines Stresses ist die Lücke zwischen Einkommen und Ausgaben: aktuell **{gap} mehr** als das, was reinkommt. Wir können das **eine Ausgabe nach der anderen** angehen, nicht alles auf einmal.",
+        "bodyNoFund": "Ohne Reserve wird jede Überraschung zur Krise. Der beste Weg, deinen Stress zu senken, ist **einen Notgroschen zu starten** — auch symbolisch. Ein Polster von ein paar Hundert verändert das tägliche Gefühl bereits deutlich.",
+        "bodyMental": "Du bist nicht in der finanziellen roten Zone, aber die mentale Last kann trotzdem wiegen. Eine kurze wöchentliche Finanz-Review (10 Minuten) reicht oft, um mental wieder die Kontrolle zu übernehmen."
+      },
+      "subscription": {
+        "ack": "Gute Spur — da verstecken sich oft die meisten kleinen Lecks.",
+        "body": "**Schnelle Methode**: öffne deine letzten 3 Kontoauszüge, markiere jede wiederkehrende Zeile und stelle dir EINE Frage pro Zeile — „Habe ich es diesen Monat genutzt?\". Kündige ohne zu zögern die, bei denen du Nein antwortest — du kannst dich jederzeit wieder anmelden. Zielwert: **1 gekündigtes Abo diese Woche**, nicht 5 — Konstanz schlägt Leistung."
+      },
+      "savings": {
+        "ack": "Sehr gut.",
+        "bodyNegative": "Um sparen zu können, musst du zuerst **verfügbares Einkommen freisetzen** — zur Seite legen zu wollen, während du negativ bist, schafft Schuld ohne Resultat. Konzentrieren wir uns zuerst aufs Kürzen einer Ausgabe, dann sprechen wir übers Sparen.",
+        "bodyPositive": "Dein verfügbares Einkommen beträgt **{cashflow}/Monat**. Wenn du bescheiden mit **{target}** automatisch zu Monatsbeginn auf ein separates Konto startest, baust du die Gewohnheit auf, ohne sie zu spüren. Diese automatische Bewegung macht in 12 Monaten den Unterschied."
+      },
+      "debt": {
+        "ack": "Wichtig, klar darüber zu sprechen.",
+        "bodyHigh": "Deine Rückzahlungen machen **{pct} %** deines Einkommens aus — über 30 % ist es schwer. Strategie: **liste deine Kredite nach Zinssatz** (vom teuersten zum günstigsten) und konzentriere zusätzliche Rückzahlungen auf den teuersten. Die anderen bleiben auf dem Minimum, bis dieser abbezahlt ist.",
+        "bodyManageable": "Deine Rückzahlungen machen **{pct} %** deines Einkommens aus — beherrschbar. Solange es unter 25 % bleibt, kannst du Rückzahlung und Sparen ausgleichen. Darüber zuerst die Rückzahlung.",
+        "bodyNone": "Du hast aktuell keine Rückzahlung in LIBERIA erfasst. Wenn du einen laufenden Kredit hast, der noch nicht erfasst ist, füge ihn auf der Ausgabenseite hinzu, damit wir ihn gemeinsam verfolgen können."
+      },
+      "budget": {
+        "ack": "Machen wir eine Bestandsaufnahme.",
+        "bodyData": "Du hast **{cashflow}** verfügbares Einkommen pro Monat ({rate} % deines Einkommens). {tail}\n\nFür ein klareres Budget schlage ich **3 mentale Umschläge** vor:\n- Fix (Miete, Rechnungen, Versicherung)\n- Variabel (Lebensmittel, Transport, Ausgehen)\n- Zur Seite gelegt (Sparen, beschleunigte Schulden)\n\nDiese Woche schau einfach, wie viel jeder Umschlag tatsächlich wiegt.",
+        "tailPositive": "Das ist dein Manövrierraum — damit bauen wir auf.",
+        "tailNegative": "Die Lücke ist negativ — wir werden zuerst daran arbeiten, sie zu reduzieren.",
+        "bodyEmpty": "Ich habe dein Einkommen und deine Ausgaben noch nicht. Trage sie in LIBERIA ein — auch eine Schätzung reicht für den Start."
+      },
+      "goal": {
+        "ack": "Eine Richtung zu haben macht den Unterschied.",
+        "emergencyWithAmount": "Dein erster vernünftiger Meilenstein: **1 Monat Ausgaben** zur Seite gelegt (das sind in deinem Fall ungefähr **{monthlyExpenses}**). Sobald erreicht, streben wir 3 Monate an, dann 6. Schritt für Schritt.",
+        "emergencyNoAmount": "Dein erster vernünftiger Meilenstein: **1 Monat Ausgaben** zur Seite gelegt. Sobald erreicht, streben wir 3 Monate an, dann 6. Schritt für Schritt.",
+        "debtPayoff": "Dein Ziel ist, Schulden zu reduzieren. Setze dir eine messbare Stufe auf 90 Tage (z. B. eine Kreditkarte abschliessen) statt eines Gesamtziels — das ist motivierender.",
+        "generic": "Definiere dein Ziel mit **3 Kriterien**: einem Zielbetrag, einer Frist und einem monatlich zur Seite zu legenden Betrag. Ohne diese 3 bleibt das Ziel vage. Setze sie in LIBERIA und wir packen es an."
+      },
+      "unclear": {
+        "ackDirect": "Also auf den Punkt, zwei Optionen.",
+        "ackStructured": "Einige mögliche Blickwinkel.",
+        "ackDefault": "Keine Sorge. Wir können von einem einfachen Blickwinkel aus starten.",
+        "summaryWithData": "Dein verfügbares Einkommen beträgt **{cashflow}/Monat**{fundNote}.",
+        "summaryEmpty": "Deine Finanzdaten sind noch nicht ausgefüllt — wir können dort anfangen.",
+        "fundNoteMissing": " und du hast noch keinen Notgroschen",
+        "options": "- Willst du **eine Ausgabe kürzen**? Sag „welche Ausgabe diese Woche beobachten\".\n- Willst du **mit dem Sparen anfangen**? Sag „wie einen Notgroschen aufbauen\".\n- Willst du **Schulden verwalten**? Sag „was zuerst zurückzahlen\".\n- Willst du **eine allgemeine Übersicht**? Sag „gib mir eine schnelle Übersicht\"."
+      }
+    }
+  },
+  "plan": {
+    "metadata": { "title": "Finanzplan" },
+    "header": {
+      "eyebrow": "Plan",
+      "title": "Dein Finanzplan",
+      "description": "Ein konkreter Aktionsplan, um Woche für Woche voranzukommen."
+    },
+    "aiNotReady": "Der KI-Plan kommt in Kürze.",
+    "demoReason": "Demo-Modus: Erstelle ein Konto, um einen Plan zu generieren.",
+    "demoEmptyTitle": "Der KI-Plan ist Konten vorbehalten",
+    "demoEmptyBody": "Erstelle dein Konto, um einen personalisierten 30-, 60- oder 90-Tage-Plan basierend auf deinen echten Daten zu generieren.",
+    "createAccount": "Mein Konto erstellen",
+    "generate": {
+      "generateCta": "Meinen Plan erstellen",
+      "regenerateCta": "Plan neu erstellen",
+      "regenerateCtaShort": "Neu erstellen",
+      "dialogTitleNew": "Deinen Finanzplan erstellen",
+      "dialogTitleRegen": "Deinen Plan neu erstellen",
+      "description": "Der LIBERIA-Coach nutzt deine echten Zahlen (Einkommen, Ausgaben, Ziele), um einen konkreten Aktionsplan zu bauen.",
+      "archiveNotice": " Der aktuelle Plan wird archiviert.",
+      "cancel": "Abbrechen",
+      "submit": "Generierung starten",
+      "submitting": "Generiere…",
+      "footnote": "Die Generierung dauert in der Regel 10 bis 30 Sekunden. Du kannst dieses Fenster schliessen — der Plan erscheint, sobald er bereit ist.",
+      "successNew": "Dein Plan ist bereit.",
+      "successRegen": "Neuer Plan erstellt.",
+      "horizons": {
+        "30": { "label": "30 Tage", "description": "Kurzer Sprint: ein klares, messbares Ziel." },
+        "60": { "label": "60 Tage", "description": "Zwei Monate, um neue Gewohnheiten langfristig zu verankern." },
+        "90": { "label": "90 Tage", "description": "Ganzes Quartal — die solideste Transformation." }
+      }
+    },
+    "progress": {
+      "eyebrow": "{days}-Tage-Plan",
+      "stepsLabel": "{done} / {total} Schritte",
+      "progression": "Fortschritt",
+      "generatedOn": "Erstellt am {date} · {model}",
+      "fallbackModel": "KI-Modell"
+    },
+    "step": {
+      "ariaMarkDone": "Als erledigt markieren",
+      "ariaMarkUndone": "Als nicht erledigt markieren",
+      "perMonth": "~{amount}/Monat",
+      "categories": {
+        "reduce_expense": "Ausgabe kürzen",
+        "build_emergency": "Notgroschen",
+        "debt_payoff": "Schulden",
+        "automate_saving": "Automatisieren",
+        "habit": "Gewohnheit",
+        "income_boost": "Einkommen",
+        "review": "Prüfung",
+        "other": "Aktion"
+      }
+    },
+    "timeline": {
+      "empty": "Noch keine Schritte in diesem Plan.",
+      "weekShort": "W{n}",
+      "doneSummary": "{done} / {total} erledigt"
+    },
+    "starter": {
+      "badge": "Starter-Plan",
+      "duration": "90 Tage · 12 Wochen",
+      "fineprint": "Dieser Plan ist ein Rahmen. Du kannst ihn durch eine personalisierte KI-Version ersetzen, sobald der Coach bereit ist.",
+      "demoReason": "Demo-Modus: Erstelle ein Konto, um einen Plan zu generieren.",
+      "aiNotReadyReason": "Personalisierte Generierung kommt in Kürze.",
+      "weekLabel": "Woche {n}",
+      "content": {
+        "titles": {
+          "struggling": "90-Tage-Plan — Wieder Luft holen",
+          "tight": "90-Tage-Plan — Den Monat stabilisieren",
+          "stable": "90-Tage-Plan — Die Basis festigen",
+          "comfortable": "90-Tage-Plan — Optimieren und beschleunigen"
+        },
+        "summaries": {
+          "struggling": "Drei Monate, um den Druck zu mindern, Luft zu schaffen und ein erstes finanzielles Polster wiederaufzubauen. Ein Schritt nach dem anderen, ohne Eile.",
+          "tight": "Drei Monate, um knappen Monatsenden ein Ende zu setzen, einen ersten Notgroschen aufzubauen und die teuersten Schulden zu erleichtern.",
+          "stable": "Drei Monate, um deine Fundamente zu festigen, deine Ersparnisse zu sichern und einen Teil vorzubereiten, der für dich arbeitet.",
+          "comfortable": "Drei Monate, um deine Allokation zu verfeinern, deine Ersparnisse arbeiten zu lassen und konkret ein bedeutendes Projekt vorzubereiten."
+        },
+        "steps": {
+          "common.w1.s1": {
+            "focus": "Bestandsaufnahme",
+            "title": "Liste deine 5 grössten Fixkosten auf",
+            "description": "Miete, Versicherung, Abos, Transport. Erfasse die genauen Beträge in LIBERIA — ohne Urteil, nur für Klarheit."
+          },
+          "common.w1.s2": {
+            "focus": "Bestandsaufnahme",
+            "title": "Finde 1 Abo zum Kündigen oder Neuverhandeln",
+            "description": "Nur eines — das offensichtlichste. Ungenutztes Streaming, pausiertes Fitnessstudio, doppelte Versicherung. Klein anfangen."
+          },
+          "common.w2.s1": {
+            "focus": "Die Basics stabilisieren",
+            "title": "Erfasse 7 Tage tägliche Ausgaben",
+            "description": "Kaffee, Transport, Lebensmittel, Ausgehen. Diese Woche nichts ändern — beobachte nur dein echtes Muster."
+          },
+          "common.w3.s1": {
+            "focus": "Erster Verriegelungspunkt",
+            "title": "Plane eine automatische Überweisung auf ein Sparkonto",
+            "description": "Auch symbolisch (20–50 CHF). Es geht darum, den Reflex aufzubauen — der Betrag kann später wachsen."
+          },
+          "common.w4.s1": {
+            "focus": "Erster Verriegelungspunkt",
+            "title": "Setze 1 konkretes 90-Tage-Ziel",
+            "description": "Konkret und realistisch: „500 CHF Notgroschen\", „X auf Kreditkarte zurückzahlen\". Aktiviere es im Bereich Ziele."
+          },
+          "struggling.w5.s1": {
+            "focus": "Druck mindern",
+            "title": "Kontaktiere deinen Vermieter oder deine Bank für einen Zahlungsplan",
+            "description": "Wenn eine Belastung dich unter Druck setzt, schlage eine Staffelung vor. Die meisten stimmen zu — die schlechteste Antwort ist Nein."
+          },
+          "struggling.w6.s1": {
+            "focus": "Druck mindern",
+            "title": "Bitte einen sozialen Dienst oder eine Organisation um Hilfe",
+            "description": "Caritas, regionales Sozialzentrum, Pro Senectute — viele Hilfen existieren und bleiben vertraulich. Du verlierst nichts, indem du fragst."
+          },
+          "struggling.w7.s1": {
+            "focus": "1 Posten kürzen",
+            "title": "Wähle diesen Monat 1 nicht-essenziellen Posten zum Halbieren",
+            "description": "Lieferung, Ausgehen, Kleidung. Nicht aus Schuld — nur um Spielraum zu gewinnen."
+          },
+          "struggling.w8.s1": {
+            "focus": "1 Posten kürzen",
+            "title": "Kündige 1 weiteres Abo",
+            "description": "Inzwischen hast du bessere Sicht — ziele auf die, die du aus Gewohnheit bezahlst, ohne echten Wert."
+          },
+          "struggling.w9.s1": {
+            "focus": "Einkommen erhöhen",
+            "title": "Liste 3 realistische Nebeneinkommens-Ideen auf",
+            "description": "Mehrstunden, einmaliger Auftrag, Verkauf ungenutzter Gegenstände. Eine einzige Spur reicht."
+          },
+          "struggling.w10.s1": {
+            "focus": "Einkommen erhöhen",
+            "title": "Aktiviere 1 Spur diese Woche",
+            "description": "Anmeldung, Nachricht, Inserat. Das Schwierigste ist der erste Schritt — danach läuft es."
+          },
+          "struggling.w11.s1": {
+            "focus": "Notgroschen aufbauen",
+            "title": "Strebe diese Woche 100 CHF Notgroschen an",
+            "description": "Kleiner Meilenstein, aber symbolisch. Dein erstes Polster nimmt schon mentale Last."
+          },
+          "struggling.w12.s1": {
+            "focus": "Notgroschen aufbauen",
+            "title": "Bilanz: Wo stehst du vs. vor 90 Tagen?",
+            "description": "Ruhige Prüfung. Notiere 3 Dinge, die sich positiv verändert haben. Setze den nächsten 90-Tage-Meilenstein."
+          },
+          "tight.w5.s1": {
+            "focus": "Den Monat optimieren",
+            "title": "Verhandle 1 Vertrag neu (Mobile, Versicherung, Internet)",
+            "description": "Rufe deinen Anbieter an, frage nach dem letzten Treueangebot. 15 Minuten können 20–80 CHF/Monat freisetzen."
+          },
+          "tight.w6.s1": {
+            "focus": "Den Monat optimieren",
+            "title": "Deckle 1 variable Kategorie (Freizeit, Shopping)",
+            "description": "Setze dir ein wöchentliches Budget. Wenn du überschreitest, startet es nächste Woche neu — keine Schuld."
+          },
+          "tight.w7.s1": {
+            "focus": "Erster Notgroschen",
+            "title": "Erhöhe deine automatische Überweisung um 10–20 %",
+            "description": "Wenn du 50 CHF gespart hast, geh auf 60 CHF. Kaum spürbare Anpassung, wichtige Zinseszinswirkung."
+          },
+          "tight.w8.s1": {
+            "focus": "Erster Notgroschen",
+            "title": "Trenne deine Ersparnisse physisch",
+            "description": "Anderes Konto, vielleicht andere Bank. Je weiter das Geld von deinem Girokonto entfernt ist, desto weniger fasst du es an."
+          },
+          "tight.w9.s1": {
+            "focus": "Teure Schulden reduzieren",
+            "title": "Liste deine Schulden nach Zinssatz (teuerste zuerst)",
+            "description": "Kreditkarte oder Konsumkredit steht oft an der Spitze. Ziele zuerst auf diese."
+          },
+          "tight.w10.s1": {
+            "focus": "Teure Schulden reduzieren",
+            "title": "Verlagere eine Mindestzahlung auf eine schnellere Rückzahlung",
+            "description": "Auch 50 CHF mehr auf der teuersten Schuld spart langfristig Hunderte."
+          },
+          "tight.w11.s1": {
+            "focus": "Die Gewohnheit halten",
+            "title": "Baue eine wöchentliche Prüfungs-Routine (10 Min.)",
+            "description": "Gleicher Tag, gleiche Zeit. Öffne LIBERIA, schau auf deinen Cash Flow, passe bei Bedarf an."
+          },
+          "tight.w12.s1": {
+            "focus": "Die Gewohnheit halten",
+            "title": "Setze das nächste 90-Tage-Ziel",
+            "description": "1 Monat Notgroschen erreichen? Einen Kredit zurückzahlen? Wähle 1 klares, beziffertes Ziel."
+          },
+          "stable.w5.s1": {
+            "focus": "Absichern",
+            "title": "Strebe 3 Monate Notgroschen an",
+            "description": "Du hast eine Basis — der nächste Schritt ist langfristige Sicherheit. Berechne den Zielbetrag und setze eine Frist."
+          },
+          "stable.w6.s1": {
+            "focus": "Absichern",
+            "title": "Versicherungs-Audit: Duplikate entfernen",
+            "description": "Hausrat, Privathaftpflicht, Reise. Viele Abdeckungen überschneiden sich. Eine kostenlose Beratung mit einem unabhängigen Makler reicht oft."
+          },
+          "stable.w7.s1": {
+            "focus": "Ersparnisse optimieren",
+            "title": "Vergleiche dein aktuelles Sparkonto mit den besten Angeboten",
+            "description": "Wenn dein Zinssatz unter 1 % liegt, schau, was Online-Banken bieten. Der Unterschied geht in Hunderte CHF / Jahr."
+          },
+          "stable.w8.s1": {
+            "focus": "Ersparnisse optimieren",
+            "title": "Erhöhe deine automatische Überweisung um 10 %",
+            "description": "Du spürst den Unterschied bei deinem verfügbaren Einkommen nicht, aber über 12 Monate ist es schon ein ansehnliches Extra-Polster."
+          },
+          "stable.w9.s1": {
+            "focus": "Einen Teil arbeiten lassen",
+            "title": "Informiere dich über die 3. Säule (Schweiz) oder eine langfristige Anlage",
+            "description": "Informiere dich vor dem Investieren. Keine Eile. Diese Woche = nur Lesen."
+          },
+          "stable.w10.s1": {
+            "focus": "Einen Teil arbeiten lassen",
+            "title": "Definiere deine Zielallokation (kurz- / mittel- / langfristig)",
+            "description": "Wie viel hältst du liquide? Wie viel kannst du 5+ Jahre binden? Lege die Quoten fest, bevor du handelst."
+          },
+          "stable.w11.s1": {
+            "focus": "Langfristhorizont",
+            "title": "Setze 1 beziffertes 12-Monats-Ziel",
+            "description": "„6-Monats-Notgroschen\", „3. Säule eröffnet und gefüllt\", „X CHF investiert\". Setze es in Zielen."
+          },
+          "stable.w12.s1": {
+            "focus": "Langfristhorizont",
+            "title": "90-Tage-Bilanz + Plan nächstes Quartal",
+            "description": "Ruhige Prüfung. Was funktioniert, was behältst du, was änderst du. Jetzt hast du die Orientierung."
+          },
+          "comfortable.w5.s1": {
+            "focus": "Allokation verfeinern",
+            "title": "Berechne deine tatsächliche Sparkapazität (vs. erklärt)",
+            "description": "Du sparst vielleicht mehr, als du denkst. Vergleiche, was jeden Monat aus deinem Konto abgeht, mit dem, was du glaubst zur Seite zu legen."
+          },
+          "comfortable.w6.s1": {
+            "focus": "Allokation verfeinern",
+            "title": "Definiere deine Zielallokation (liquide / investiert / langfristig)",
+            "description": "Welche % für Notfälle? Für die Rente? Für 3–5-Jahres-Projekte? Lege es klar fest."
+          },
+          "comfortable.w7.s1": {
+            "focus": "Arbeiten lassen",
+            "title": "Eröffne oder finanziere eine 3. Säule (Schweiz)",
+            "description": "Steueroptimierung + Rente. Prüfe den Jahreshöchstbetrag entsprechend deinem Status."
+          },
+          "comfortable.w8.s1": {
+            "focus": "Arbeiten lassen",
+            "title": "Vergleiche die Gebühren deiner aktuellen Anlagen",
+            "description": "1 % zu hohe Gebühren über 20 Jahre = Zehntausende CHF weniger. Zuerst auditieren."
+          },
+          "comfortable.w9.s1": {
+            "focus": "Ein konkretes Projekt vorbereiten",
+            "title": "Definiere 1 beziffertes 1–3-Jahres-Projekt",
+            "description": "Immobilienkauf, Sabbatical, Unternehmensgründung. Setze den Zielbetrag und die Frist."
+          },
+          "comfortable.w10.s1": {
+            "focus": "Ein konkretes Projekt vorbereiten",
+            "title": "Trenne dieses Projekt vom Rest deiner Ersparnisse",
+            "description": "Dediziertes Konto oder Fonds. Du siehst den echten Fortschritt und greifst nicht aus Versehen darauf zu."
+          },
+          "comfortable.w11.s1": {
+            "focus": "Anti-fragil",
+            "title": "Einkommens-Audit: Wie abhängig ist dein Fluss von einer einzigen Quelle?",
+            "description": "Einkommen zu diversifizieren ist genauso wichtig wie Ersparnisse zu diversifizieren. Identifiziere 1 realistischen Hebel."
+          },
+          "comfortable.w12.s1": {
+            "focus": "Anti-fragil",
+            "title": "90-Tage-Bilanz + Jahreshorizont",
+            "description": "Du hast die Basis und den Spielraum — setze messbare Jahresziele und wähle 2 Prioritäten."
+          }
+        }
+      }
+    }
+  },
+  "finance": {
+    "form": {
+      "transaction": {
+        "titleAddIncome": "Einkommen hinzufügen",
+        "titleAddExpense": "Ausgabe hinzufügen",
+        "titleEditIncome": "Einkommen bearbeiten",
+        "titleEditExpense": "Ausgabe bearbeiten",
+        "description": "Trage den Betrag und seine Häufigkeit ein. Du kannst jederzeit ändern.",
+        "label": "Bezeichnung",
+        "placeholderIncome": "z. B. Lohn",
+        "placeholderExpense": "z. B. Miete",
+        "amount": "Betrag",
+        "frequency": "Häufigkeit",
+        "category": "Kategorie",
+        "notes": "Notizen",
+        "notesPlaceholder": "Optional",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "add": "Hinzufügen",
+        "toastUpdated": "Aktualisiert.",
+        "toastAdded": "Erfolgreich hinzugefügt."
+      },
+      "goal": {
+        "titleNew": "Neues Ziel",
+        "titleEdit": "Ziel bearbeiten",
+        "description": "Wähle ein konkretes, erreichbares Ziel. Du kannst es anpassen.",
+        "title": "Titel",
+        "titlePlaceholder": "z. B. 1-Monats-Notgroschen",
+        "type": "Typ",
+        "target": "Ziel",
+        "current": "Bereits zur Seite gelegt",
+        "deadline": "Frist",
+        "notes": "Notizen",
+        "notesPlaceholder": "Optional",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "create": "Erstellen",
+        "toastUpdated": "Ziel aktualisiert.",
+        "toastCreated": "Ziel erstellt."
+      }
+    },
+    "list": {
+      "demoBanner": "Demo-Modus · nur Ansicht. Erstelle dein Konto, um deine Daten hinzuzufügen.",
+      "demoBannerGoals": "Demo-Modus · nur Ansicht. Erstelle dein Konto, um deine Ziele zu verwalten.",
+      "demoToastInfoTitle": "Demo-Modus · erstelle ein Konto zum Speichern.",
+      "demoToastAction": "Erstellen",
+      "demoSaveError": "Demo-Modus: Melde dich an, um zu speichern.",
+      "demoDeleteError": "Demo-Modus: Melde dich an, um zu löschen.",
+      "createAccountLink": "Konto erstellen",
+      "actionsLabel": "Aktionen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "addIncome": "Einkommen hinzufügen",
+      "addExpense": "Ausgabe hinzufügen",
+      "newGoal": "Neues Ziel",
+      "createGoal": "Ein Ziel erstellen",
+      "deleteConfirmIncome": "Dieses Einkommen « {label} » löschen?",
+      "deleteConfirmExpense": "Diese Ausgabe « {label} » löschen?",
+      "deleteConfirmGoal": "Das Ziel « {title} » löschen? Endgültig.",
+      "deletedToast": "Gelöscht.",
+      "deletedGoalToast": "Ziel gelöscht.",
+      "emptyIncomeTitle": "Noch kein Einkommen",
+      "emptyIncomeDescription": "Beginne mit deinem Hauptlohn oder wiederkehrendem Einkommen.",
+      "emptyExpenseTitle": "Noch keine Ausgabe",
+      "emptyExpenseDescription": "Liste deine essenziellen Ausgaben auf, dann die nicht-essenziellen.",
+      "emptyGoalsTitle": "Noch keine Ziele",
+      "emptyGoalsDescription": "Setze deinen ersten Schritt: Notgroschen, abzubauende Schuld, Projekt.",
+      "goalDone": "Erledigt",
+      "goalDeadlinePrefix": "Frist {date}"
+    },
+    "budget": {
+      "metadata": { "title": "Budget" },
+      "header": {
+        "eyebrow": "Steuerung",
+        "title": "Dein monatliches Budget",
+        "description": "Die Übersicht: was reinkommt, was rausgeht, was bleibt, um voranzukommen."
+      },
+      "stats": {
+        "income": "Einkommen",
+        "expenses": "Ausgaben",
+        "leftover": "Verfügbar",
+        "leftoverHint": "Sparquote {rate}",
+        "ratio": "Verhältnis Ausgaben / Einkommen",
+        "ratioOver": "Du lebst über deine Verhältnisse.",
+        "ratioOk": "Spielraum noch verfügbar."
+      },
+      "essentialVsPleasure": "Essenziell vs. Vergnügen",
+      "barEssential": "Essenzielle Ausgaben",
+      "barNonEssential": "Nicht-essenzielle Ausgaben",
+      "barLeftover": "Verfügbar / Sparen"
+    },
+    "incomes": {
+      "metadata": { "title": "Einkommen" },
+      "header": {
+        "eyebrow": "Steuerung",
+        "title": "Deine Einkommen",
+        "description": "Lohn, Freelance, Zulagen, Nebeneinkommen — alles, was reinkommt, sauber sortiert."
+      },
+      "stats": {
+        "monthly": "Monatliches Einkommen",
+        "sources": "Aktive Quellen",
+        "sourcesHint": "Trage jede Quelle ein für eine genaue Berechnung."
+      }
+    },
+    "expenses": {
+      "metadata": { "title": "Ausgaben" },
+      "header": {
+        "eyebrow": "Steuerung",
+        "title": "Deine Ausgaben",
+        "description": "Liste deine essenziellen und nicht-essenziellen Ausgaben auf. Kein Urteil, nur Klarheit."
+      },
+      "stats": {
+        "monthly": "Monatliche Ausgaben",
+        "lines": "Erfasste Zeilen",
+        "linesHint": "Du kannst sie jederzeit bearbeiten oder löschen."
+      }
+    },
+    "goals": {
+      "metadata": { "title": "Ziele" },
+      "header": {
+        "eyebrow": "Steuerung",
+        "title": "Deine Finanzziele",
+        "description": "Ein klares Ziel schlägt zehn gute Vorsätze. Geh Schritt für Schritt voran."
+      }
+    }
+  },
+  "billing": {
+    "currentBadge": "Dein aktueller Plan",
+    "activeButton": "Aktiver Plan",
+    "perYear": "Jahr",
+    "perMonth": "Monat",
+    "yearlySavings": "Das sind {monthly}/Monat — spare rund {savings}/Jahr",
+    "ctaStartYearly": "Jahres-Testphase starten",
+    "ctaStartMonthly": "Monats-Testphase starten",
+    "ctaCheckoutYearly": "Jahres-Testphase starten",
+    "ctaCheckoutMonthly": "Monats-Testphase starten",
+    "ctaStartTrial": "{days} kostenlose Tage starten",
+    "fineprint": "Karte zum Start erforderlich. Automatische Abrechnung am Ende der {days} Tage. Jederzeit kündbar.",
+    "portal": "Mein Abo verwalten",
+    "errors": {
+      "checkoutFallback": "Die Zahlung konnte nicht gestartet werden.",
+      "portalFallback": "Das Portal konnte nicht geöffnet werden.",
+      "generic": "Etwas ist schiefgegangen."
+    },
+    "feedback": {
+      "successTitle": "Zahlung empfangen. Willkommen bei Premium.",
+      "successBody": "Dein Zugang wird aktiviert, das kann ein paar Sekunden dauern.",
+      "cancelled": "Zahlung abgebrochen. Du kannst jederzeit erneut versuchen."
+    },
+    "plans": {
+      "monthly": {
+        "name": "Monatlich",
+        "description": "Vollständiger LIBERIA-Zugang. Jederzeit über dein Konto kündbar.",
+        "features": [
+          "14 Tage gratis, ohne Bindung",
+          "Konversations-KI-Coach",
+          "Personalisierter 30 / 60 / 90-Tage-KI-Finanzplan",
+          "Vollständiges Budget-Tracking (Einkommen, Ausgaben, Ziele)",
+          "Wöchentlicher Rückblick per E-Mail",
+          "Jederzeit kündbar"
+        ]
+      },
+      "yearly": {
+        "name": "Jährlich",
+        "description": "Das sind ~9.99 CHF/Monat — etwa 60 CHF Ersparnis pro Jahr.",
+        "badge": "Empfohlen",
+        "features": [
+          "14 Tage gratis, ohne Bindung",
+          "Alles aus Monatlich",
+          "Spare rund 60 CHF pro Jahr",
+          "Eine Abbuchung pro Jahr",
+          "Jederzeit kündbar"
+        ]
+      }
+    }
+  },
+  "unsubscribe": {
+    "metadata": { "title": "Abbestellen" },
+    "serviceUnavailableTitle": "Dienst nicht verfügbar",
+    "serviceUnavailableBody": "Das Abbestellen per Link ist auf dieser Umgebung nicht konfiguriert. Öffne deine Einstellungen direkt, um deine E-Mail-Präferenzen zu verwalten.",
+    "invalidLinkTitle": "Ungültiger Link",
+    "invalidLinkBody": "Dieser Abbestellungs-Link ist unvollständig. Öffne deine Einstellungen in LIBERIA, um deine E-Mail-Präferenzen zu verwalten.",
+    "backToApp": "Zurück zu LIBERIA",
+    "eyebrowDone": "Abbestellt",
+    "doneTitle": "Erledigt.",
+    "doneBody": "Du erhältst den LIBERIA-Wochenrückblick nicht mehr. Du kannst ihn jederzeit aus deinen Einstellungen reaktivieren.",
+    "errorTitle": "Ungültiger Link",
+    "errorBody": "Dieser Abbestellungs-Link wird nicht erkannt. Öffne deine Einstellungen in LIBERIA, um deine E-Mail-Präferenzen zu verwalten.",
+    "confirmTitle": "E-Mails abbestellen?",
+    "confirmBody": "Du erhältst den LIBERIA-Wochenrückblick nicht mehr. Du kannst ihn jederzeit aus deinen Einstellungen reaktivieren.",
+    "confirmCta": "Abbestellen bestätigen"
+  },
+  "admin": {
+    "metadata": { "title": "Admin · LIBERIA" },
+    "eyebrow": "Admin",
+    "pageTitle": "Produktübersicht",
+    "intro": "Interne Zähler — nur Aggregate, nie individuelle Daten. Keine Daten werden Dritten offengelegt.",
+    "readiness": {
+      "title": "Produktionsreife",
+      "ready": "Bereit",
+      "missing": "{count, plural, one {# fehlende Pflicht} other {# fehlende Pflichten}}",
+      "envNote": "Kein Env-Wert wird je angezeigt — nur das Vorhandensein (ja/nein) jeder Variable."
+    },
+    "sections": {
+      "acquisition": "Akquise",
+      "subscription": "Abo",
+      "coach": "Coach-Engagement",
+      "goals": "Ziele"
+    },
+    "stats": {
+      "totalUsers": "Erstellte Konten",
+      "onboardedUsers": "Onboarding abgeschlossen",
+      "trialingSubs": "In Testphase",
+      "activeSubs": "Premium aktiv",
+      "warningSubs": "Ausstehend / pausiert",
+      "canceledSubs": "Gekündigt",
+      "aiConversations": "KI-Konversationen",
+      "aiMessagesLast7d": "Nachrichten letzte 7 Tage",
+      "aiMessagesLast7dHint": "Nutzer + Assistent zusammen",
+      "financialPlans": "Erstellte Pläne",
+      "planStepsCompleted": "Plan-Schritte abgeschlossen",
+      "totalGoals": "Erstellte Ziele",
+      "completedGoals": "Erreichte Ziele"
+    },
+    "pctHint": "{pct} % des Gesamten",
+    "notesTitle": "Notizen",
+    "note1": "Zähler spiegeln den aktuellen Stand (keine Zeitreihen-Historie). Für Zeitreihen einen dedizierten Analytics-Anbieter anschliessen (siehe <code>lib/analytics/</code>).",
+    "note2": "Keine E-Mail, kein vollständiger Name, kein Betrag und kein Nutzerinhalt erscheinen auf dieser Seite. Falls doch — das ist ein Bug, bitte melden."
+  },
+  "demo": {
+    "metadata": {
+      "title": "Demo-Modus",
+      "description": "Entdecke LIBERIA mit realistischen Daten — ohne Anmeldung."
+    },
+    "banner": {
+      "title": "Du erkundest LIBERIA im Demo-Modus.",
+      "body": "Die angezeigten Daten sind fiktiv. Erstelle dein Konto, um deine echten Daten zu steuern (14-tägige kostenlose Testphase).",
+      "createCta": "Konto erstellen",
+      "loginCta": "Anmelden"
+    },
+    "header": {
+      "eyebrow": "Übersicht",
+      "title": "Demo-Dashboard",
+      "description": "Eine repräsentative Ansicht von jemandem, der seine Finanzen wieder aufbaut.",
+      "badge": "Demo"
+    },
+    "stress": {
+      "label": "Finanzieller Stress",
+      "high": "Hohe mentale Last.",
+      "ok": "Beherrschbares Niveau."
+    },
+    "stats": {
+      "monthlyIncome": "Monatliches Einkommen",
+      "monthlyExpenses": "Monatliche Ausgaben",
+      "netCashflow": "Verfügbares Einkommen",
+      "savingsRateHint": "Sparquote {rate}",
+      "emergencyFund": "Notgroschen",
+      "runwayMonths": "{months} Monate"
+    },
+    "recommendations": {
+      "title": "Empfehlungen",
+      "shortTerm": {
+        "label": "Kurzfristig",
+        "body": "Strebe innerhalb von 6 Monaten 1 Monat Ausgaben im Notgroschen an."
+      },
+      "lighter": {
+        "label": "Entlastung",
+        "body": "Kürze diesen Monat 1 nicht-essenzielles Abo."
+      },
+      "automation": {
+        "label": "Automatisierung",
+        "body": "Plane eine automatische monatliche Überweisung auf die Sparseite, auch symbolisch."
+      }
+    },
+    "data": {
+      "profileName": "Demo-Modus",
+      "incomes": {
+        "salary": "Nettolohn",
+        "freelance": "Freelance-Auftrag"
+      },
+      "expenses": {
+        "housing": "Miete + Nebenkosten",
+        "food": "Lebensmittel",
+        "transport": "Transport",
+        "utilities": "Energie",
+        "insurance": "Versicherung",
+        "debt": "Konsumkredit",
+        "subscriptions": "Abos",
+        "leisure": "Freizeit",
+        "shopping": "Shopping"
+      },
+      "goals": {
+        "emergencyFund": "Notgroschen (1 Monat)",
+        "debtPayoff": "Konsumkredit ablösen"
+      }
+    }
+  },
+  "memoryConstants": {
+    "tones": {
+      "calm": { "label": "Ruhig und beruhigend", "description": "Sanft, ohne Druck. Das Tempo schlägt die Leistung." },
+      "direct": { "label": "Direkt und motivierend", "description": "Klar, energisch, faktisch. Keine Umwege." },
+      "structured": { "label": "Sehr strukturiert", "description": "Saubere Schritte, Checklisten, messbare Meilensteine." },
+      "gentle": { "label": "Sanft und schrittweise", "description": "Kleine Schritte, viel Wohlwollen." }
+    },
+    "challenges": {
+      "irregular_income": "Unregelmässige Einkünfte",
+      "subscriptions": "Sich anhäufende Abos",
+      "impulse_shopping": "Impulskäufe",
+      "social_pressure": "Sozialer Druck",
+      "emergencies": "Häufige unvorhergesehene Ereignisse",
+      "debt_load": "Hohe Schuldenlast",
+      "tracking_fatigue": "Schwierig, alles zu verfolgen",
+      "no_savings_habit": "Keine Spargewohnheit"
+    },
+    "triggers": {
+      "stress": "Stress",
+      "boredom": "Langeweile",
+      "social": "Ausgehen / Soziales",
+      "online": "Online-Shopping",
+      "food": "Restaurants / Lieferung",
+      "gifts": "Geschenke für andere",
+      "fomo": "Angst, etwas zu verpassen",
+      "rewards": "Belohnung nach Anstrengung"
+    }
+  }
+}
