@@ -40,6 +40,7 @@ export function CoachChat({
   const [streaming, setStreaming] = React.useState(false);
   const [streamedText, setStreamedText] = React.useState("");
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const abortRef = React.useRef<AbortController | null>(null);
 
   // Reset the local message buffer ONLY when the user navigates to a
@@ -53,6 +54,23 @@ export function CoachChat({
     setMessages(initialMessages);
     setStreamedText("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
+
+  // First-paint scroll-to-bottom + focus the input on desktop. When the
+  // user opens an existing conversation with N messages, the scroll
+  // container starts at the top — they have to manually drag to see the
+  // latest exchange. Pin to the bottom once per conversation switch.
+  // Skip focus on touch devices so iOS / Android don't pop the keyboard
+  // and obscure the conversation behind the IME.
+  React.useEffect(() => {
+    const scroller = scrollRef.current;
+    if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    if (typeof window !== "undefined") {
+      const isTouch =
+        window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ??
+        false;
+      if (!isTouch) textareaRef.current?.focus({ preventScroll: true });
+    }
   }, [conversationId]);
 
   // Auto-scroll the chat to the bottom, but ONLY when the user is
@@ -226,10 +244,18 @@ export function CoachChat({
         </div>
       </div>
 
-      <div className="border-t border-border/60 bg-background/60 backdrop-blur-md">
+      <div
+        className="border-t border-border/60 bg-background/60 backdrop-blur-md"
+        // env(safe-area-inset-bottom) keeps the textarea above the iOS
+        // home indicator. The mobile bottom nav of the app shell is
+        // already cleared by the layout's height calc; this guards the
+        // final pixels on devices with a notch.
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
         <form onSubmit={onSubmit} className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6">
           <div className="flex items-end gap-2">
             <Textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
