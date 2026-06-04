@@ -5,7 +5,7 @@
     "unsubscribe": "Annulla iscrizione",
     "disclaimer": "LIBERIA non è una consulenza finanziaria regolamentata.",
     "appDisclaimer": "LIBERIA è uno strumento di pilotaggio personale. Nessuna informazione qui è consulenza finanziaria regolamentata.",
-    "defaultFooterDisclaimer": "Ricevi questa email perché riguarda il tuo account LIBERIA. Puoi regolare le tue preferenze dalle <a href=\"{settingsUrl}\" style=\"color:#9999a3;\">tue impostazioni</a>.",
+    "defaultFooterDisclaimer": "Ricevi questa email perché riguarda il tuo account LIBERIA. Puoi regolare le tue preferenze dalle tue impostazioni.",
     "unsubscribeNonEssential": "Annulla l'iscrizione alle email non essenziali"
   },
   "welcome": {

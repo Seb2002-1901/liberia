@@ -5,7 +5,7 @@
     "unsubscribe": "Unsubscribe",
     "disclaimer": "LIBERIA is not regulated financial advice.",
     "appDisclaimer": "LIBERIA is a personal piloting tool. No information here is regulated financial advice.",
-    "defaultFooterDisclaimer": "You're receiving this email because it concerns your LIBERIA account. You can adjust your preferences from <a href=\"{settingsUrl}\" style=\"color:#9999a3;\">your settings</a>.",
+    "defaultFooterDisclaimer": "You're receiving this email because it concerns your LIBERIA account. You can adjust your preferences from your settings.",
     "unsubscribeNonEssential": "Unsubscribe from non-essential emails"
   },
   "welcome": {

@@ -5,7 +5,7 @@
     "unsubscribe": "Abbestellen",
     "disclaimer": "LIBERIA ist keine regulierte Finanzberatung.",
     "appDisclaimer": "LIBERIA ist ein persönliches Steuerungswerkzeug. Keine Information hier ist eine regulierte Finanzberatung.",
-    "defaultFooterDisclaimer": "Du erhältst diese E-Mail, weil sie dein LIBERIA-Konto betrifft. Du kannst deine Einstellungen in <a href=\"{settingsUrl}\" style=\"color:#9999a3;\">deinen Einstellungen</a> anpassen.",
+    "defaultFooterDisclaimer": "Du erhältst diese E-Mail, weil sie dein LIBERIA-Konto betrifft. Du kannst deine Einstellungen in deinen Einstellungen anpassen.",
     "unsubscribeNonEssential": "Nicht-essenzielle E-Mails abbestellen"
   },
   "welcome": {

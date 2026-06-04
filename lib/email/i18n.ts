@@ -47,20 +47,21 @@ export async function createEmailTranslator(
 }
 
 /**
- * Returns the locale strings required by `renderLayout`. The
- * `settingsUrl` is interpolated into the default footer disclaimer so
- * the link is clickable without HTML escaping the markup we want to
- * keep (the surrounding template still escapes user-supplied values).
+ * Returns the locale strings required by `renderLayout`. The footer
+ * disclaimer is plain text — embedding HTML attributes inside an ICU
+ * message (e.g. `<a href="{settingsUrl}">…`) triggers INVALID_MESSAGE
+ * at parse time, so we keep the JSON ICU-pure and let the layout
+ * assemble the surrounding markup if it wants a clickable link.
  */
 export function getLayoutLocaleStrings(
   t: ReturnType<typeof createTranslator>,
   locale: AppLocale,
-  settingsUrl: string,
+  _settingsUrl: string,
 ): LayoutLocaleStrings {
   return {
     htmlLang: locale,
     appDisclaimer: t("common.appDisclaimer"),
-    defaultFooterDisclaimer: t("common.defaultFooterDisclaimer", { settingsUrl }),
+    defaultFooterDisclaimer: t("common.defaultFooterDisclaimer"),
     unsubscribeNonEssential: t("common.unsubscribeNonEssential"),
   };
 }
