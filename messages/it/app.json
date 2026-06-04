@@ -1,6 +1,8 @@
 {
   "profile": {
-    "metadata": { "title": "Profilo" },
+    "metadata": {
+      "title": "Profilo"
+    },
     "header": {
       "eyebrow": "Account",
       "title": "Profilo",
@@ -26,7 +28,9 @@
     }
   },
   "settings": {
-    "metadata": { "title": "Impostazioni" },
+    "metadata": {
+      "title": "Impostazioni"
+    },
     "header": {
       "eyebrow": "Account",
       "title": "Impostazioni",
@@ -112,7 +116,9 @@
     }
   },
   "subscription": {
-    "metadata": { "title": "Abbonamento" },
+    "metadata": {
+      "title": "Abbonamento"
+    },
     "header": {
       "eyebrow": "Account",
       "title": "Abbonamento",
@@ -167,7 +173,9 @@
     "footnote": "Fatturazione in CHF al lancio, qualunque sia il tuo paese. Pagamento gestito da Stripe (cifrato, conforme PCI). Metodi accettati: carte Visa / Mastercard / American Express, Apple Pay, Google Pay e TWINT (Svizzera, secondo l'attivazione del Dashboard Stripe)."
   },
   "coach": {
-    "metadata": { "title": "Coach IA" },
+    "metadata": {
+      "title": "Coach IA"
+    },
     "welcomeTitle": "Benvenuto nel tuo coach finanziario",
     "welcomeBody": "Parla delle tue finanze. Il coach LIBERIA si basa sulle tue entrate, spese e obiettivi per proporti azioni concrete — con calma, senza tecnicismi, senza promesse.",
     "newConversation": "Avvia una conversazione",
@@ -330,7 +338,9 @@
     }
   },
   "plan": {
-    "metadata": { "title": "Piano finanziario" },
+    "metadata": {
+      "title": "Piano finanziario"
+    },
     "header": {
       "eyebrow": "Piano",
       "title": "Il tuo piano finanziario",
@@ -356,9 +366,18 @@
       "successNew": "Il tuo piano è pronto.",
       "successRegen": "Nuovo piano generato.",
       "horizons": {
-        "30": { "label": "30 giorni", "description": "Sprint breve: un obiettivo chiaro e misurabile." },
-        "60": { "label": "60 giorni", "description": "Due mesi per installare nuove abitudini sul lungo termine." },
-        "90": { "label": "90 giorni", "description": "Trimestre intero — la trasformazione più solida." }
+        "30": {
+          "label": "30 giorni",
+          "description": "Sprint breve: un obiettivo chiaro e misurabile."
+        },
+        "60": {
+          "label": "60 giorni",
+          "description": "Due mesi per installare nuove abitudini sul lungo termine."
+        },
+        "90": {
+          "label": "90 giorni",
+          "description": "Trimestre intero — la trasformazione più solida."
+        }
       }
     },
     "progress": {
@@ -409,187 +428,187 @@
           "comfortable": "Tre mesi per affinare la tua allocazione, far lavorare i tuoi risparmi e preparare concretamente un progetto significativo."
         },
         "steps": {
-          "common.w1.s1": {
+          "common_w1_s1": {
             "focus": "Fare il punto",
             "title": "Elenca le tue 5 spese fisse più grandi",
             "description": "Affitto, assicurazioni, abbonamenti, trasporto. Annota gli importi esatti in LIBERIA — senza giudizio, solo per chiarezza."
           },
-          "common.w1.s2": {
+          "common_w1_s2": {
             "focus": "Fare il punto",
             "title": "Individua 1 abbonamento da disdire o rinegoziare",
             "description": "Uno solo — il più evidente. Streaming non usato, palestra in pausa, assicurazione duplicata. Si parte piano."
           },
-          "common.w2.s1": {
+          "common_w2_s1": {
             "focus": "Stabilizzare le basi",
             "title": "Registra 7 giorni di spese quotidiane",
             "description": "Caffè, trasporto, spesa, uscite. Nulla da cambiare questa settimana — osserva solo il tuo schema reale."
           },
-          "common.w3.s1": {
+          "common_w3_s1": {
             "focus": "Primo paletto",
             "title": "Imposta un trasferimento automatico su un conto risparmio",
             "description": "Anche simbolico (20–50 CHF). Il punto è creare il riflesso — l'importo può crescere dopo."
           },
-          "common.w4.s1": {
+          "common_w4_s1": {
             "focus": "Primo paletto",
             "title": "Definisci 1 obiettivo concreto a 90 giorni",
             "description": "Concreto e realistico: «500 CHF di fondo di emergenza», «rimborsare X di carta di credito». Attivalo nella sezione Obiettivi."
           },
-          "struggling.w5.s1": {
+          "struggling_w5_s1": {
             "focus": "Liberare respiro",
             "title": "Contatta il tuo locatore o la tua banca per una rateizzazione",
             "description": "Se un onere ti mette sotto pressione, proponi una scadenza scaglionata. La maggior parte accetta — la risposta peggiore è no."
           },
-          "struggling.w6.s1": {
+          "struggling_w6_s1": {
             "focus": "Liberare respiro",
             "title": "Chiedi aiuto a un servizio sociale o un'associazione",
             "description": "Caritas, centro sociale regionale, Pro Senectute — molti aiuti esistono e restano confidenziali. Non perdi nulla a chiedere."
           },
-          "struggling.w7.s1": {
+          "struggling_w7_s1": {
             "focus": "Tagliare 1 voce",
             "title": "Scegli 1 voce non essenziale da dimezzare questo mese",
             "description": "Consegne, uscite, vestiti. Non per senso di colpa — solo per guadagnare margine."
           },
-          "struggling.w8.s1": {
+          "struggling_w8_s1": {
             "focus": "Tagliare 1 voce",
             "title": "Disdici 1 abbonamento in più",
             "description": "A questo punto hai più visibilità — mira a quelli che paghi per abitudine senza trarne vero valore."
           },
-          "struggling.w9.s1": {
+          "struggling_w9_s1": {
             "focus": "Aumentare le entrate",
             "title": "Elenca 3 piste realistiche di reddito extra",
             "description": "Ore straordinarie, missione puntuale, vendita di oggetti inutilizzati. Una sola attivata basta."
           },
-          "struggling.w10.s1": {
+          "struggling_w10_s1": {
             "focus": "Aumentare le entrate",
             "title": "Attiva 1 pista questa settimana",
             "description": "Iscrizione, messaggio, annuncio. La parte più dura è il primo passo — dopo scorre."
           },
-          "struggling.w11.s1": {
+          "struggling_w11_s1": {
             "focus": "Costruire il fondo di emergenza",
             "title": "Punta a 100 CHF di fondo di emergenza questa settimana",
             "description": "Piccolo traguardo ma simbolico. Il tuo primo cuscinetto toglie già carico mentale."
           },
-          "struggling.w12.s1": {
+          "struggling_w12_s1": {
             "focus": "Costruire il fondo di emergenza",
             "title": "Bilancio: dove sei vs. 90 giorni fa?",
             "description": "Revisione calma. Annota 3 cose cambiate positivamente. Imposta il prossimo traguardo a 90 giorni."
           },
-          "tight.w5.s1": {
+          "tight_w5_s1": {
             "focus": "Ottimizzare il mese",
             "title": "Rinegozia 1 contratto (mobile, assicurazione, internet)",
             "description": "Chiama il tuo fornitore, chiedi l'ultima offerta fedeltà. 15 minuti possono liberare 20–80 CHF/mese."
           },
-          "tight.w6.s1": {
+          "tight_w6_s1": {
             "focus": "Ottimizzare il mese",
             "title": "Metti un tetto a 1 categoria variabile (tempo libero, shopping)",
             "description": "Datti un budget settimanale. Se sfori, riparte da zero la settimana dopo — niente sensi di colpa."
           },
-          "tight.w7.s1": {
+          "tight_w7_s1": {
             "focus": "Primo fondo di emergenza",
             "title": "Aumenta il tuo trasferimento automatico del 10–20 %",
             "description": "Se risparmiavi 50 CHF, passa a 60 CHF. Aggiustamento quasi impercettibile, effetto composto importante."
           },
-          "tight.w8.s1": {
+          "tight_w8_s1": {
             "focus": "Primo fondo di emergenza",
             "title": "Separa fisicamente i tuoi risparmi",
             "description": "Conto diverso, magari banca diversa. Più il denaro è lontano dal tuo conto corrente, meno lo tocchi."
           },
-          "tight.w9.s1": {
+          "tight_w9_s1": {
             "focus": "Ridurre i debiti costosi",
             "title": "Elenca i tuoi crediti per tasso d'interesse (dal più caro)",
             "description": "Carta di credito o credito al consumo spesso in testa. Mira a quello per primo."
           },
-          "tight.w10.s1": {
+          "tight_w10_s1": {
             "focus": "Ridurre i debiti costosi",
             "title": "Sposta un pagamento minimo verso un rimborso più rapido",
             "description": "Anche 50 CHF in più sul debito più caro risparmia centinaia a lungo termine."
           },
-          "tight.w11.s1": {
+          "tight_w11_s1": {
             "focus": "Far durare l'abitudine",
             "title": "Crea 1 routine di revisione settimanale (10 min)",
             "description": "Stesso giorno, stessa ora. Apri LIBERIA, guarda il tuo disponibile, aggiusta se serve."
           },
-          "tight.w12.s1": {
+          "tight_w12_s1": {
             "focus": "Far durare l'abitudine",
             "title": "Definisci il prossimo obiettivo a 90 giorni",
             "description": "Raggiungere 1 mese di fondo di emergenza? Estinguere un credito? Scegli 1 traguardo chiaro e quantificato."
           },
-          "stable.w5.s1": {
+          "stable_w5_s1": {
             "focus": "Mettere al sicuro",
             "title": "Punta a 3 mesi di fondo di emergenza",
             "description": "Hai una base — il prossimo passo è la sicurezza a lungo termine. Calcola l'importo target e fissa una scadenza."
           },
-          "stable.w6.s1": {
+          "stable_w6_s1": {
             "focus": "Mettere al sicuro",
             "title": "Audit assicurazioni: rimuovi i doppioni",
             "description": "Casa, responsabilità civile privata, viaggio. Molte coperture si sovrappongono. Spesso una consulenza gratuita con un broker indipendente basta."
           },
-          "stable.w7.s1": {
+          "stable_w7_s1": {
             "focus": "Ottimizzare il risparmio",
             "title": "Confronta il tuo conto risparmio attuale con le migliori offerte",
             "description": "Se il tuo tasso è sotto l'1 %, guarda cosa offrono le banche online. La differenza si misura in centinaia di CHF / anno."
           },
-          "stable.w8.s1": {
+          "stable_w8_s1": {
             "focus": "Ottimizzare il risparmio",
             "title": "Aumenta il tuo trasferimento automatico del 10 %",
             "description": "Non sentirai la differenza sul tuo disponibile, ma su 12 mesi è già un bel cuscinetto extra."
           },
-          "stable.w9.s1": {
+          "stable_w9_s1": {
             "focus": "Far lavorare una parte",
             "title": "Informati sul 3° pilastro (Svizzera) o un investimento a lungo termine",
             "description": "Informati prima di investire. Niente fretta. Questa settimana = solo lettura."
           },
-          "stable.w10.s1": {
+          "stable_w10_s1": {
             "focus": "Far lavorare una parte",
             "title": "Definisci la tua allocazione target (corto / medio / lungo termine)",
             "description": "Quanto tieni liquido? Quanto puoi bloccare 5+ anni? Stabilisci le proporzioni prima di agire."
           },
-          "stable.w11.s1": {
+          "stable_w11_s1": {
             "focus": "Cap lungo termine",
             "title": "Definisci 1 obiettivo quantificato a 12 mesi",
             "description": "«Fondo di emergenza a 6 mesi», «3° pilastro aperto e alimentato», «X CHF investiti». Mettilo negli Obiettivi."
           },
-          "stable.w12.s1": {
+          "stable_w12_s1": {
             "focus": "Cap lungo termine",
             "title": "Bilancio 90 giorni + piano trimestre successivo",
             "description": "Revisione calma. Cosa ha funzionato, cosa mantieni, cosa cambi. Ora hai i punti di riferimento."
           },
-          "comfortable.w5.s1": {
+          "comfortable_w5_s1": {
             "focus": "Affinare l'allocazione",
             "title": "Calcola la tua capacità di risparmio reale (vs. dichiarata)",
             "description": "Forse risparmi più di quanto credi. Confronta cosa esce dal tuo conto ogni mese vs. cosa pensi di mettere da parte."
           },
-          "comfortable.w6.s1": {
+          "comfortable_w6_s1": {
             "focus": "Affinare l'allocazione",
             "title": "Definisci la tua allocazione target (liquidi / investiti / lungo termine)",
             "description": "Quale % per gli imprevisti? Per la pensione? Per i progetti 3–5 anni? Stabiliscilo chiaramente."
           },
-          "comfortable.w7.s1": {
+          "comfortable_w7_s1": {
             "focus": "Far lavorare",
             "title": "Apri o alimenta un 3° pilastro (Svizzera)",
             "description": "Ottimizzazione fiscale + pensione. Verifica il tetto annuale in base al tuo status."
           },
-          "comfortable.w8.s1": {
+          "comfortable_w8_s1": {
             "focus": "Far lavorare",
             "title": "Confronta le commissioni dei tuoi investimenti attuali",
             "description": "1 % di commissioni in più su 20 anni = decine di migliaia di CHF in meno. Audit prima di tutto."
           },
-          "comfortable.w9.s1": {
+          "comfortable_w9_s1": {
             "focus": "Preparare un progetto concreto",
             "title": "Definisci 1 progetto quantificato a 1–3 anni",
             "description": "Acquisto immobiliare, sabbatico, lancio di attività. Stabilisci l'importo target e la scadenza."
           },
-          "comfortable.w10.s1": {
+          "comfortable_w10_s1": {
             "focus": "Preparare un progetto concreto",
             "title": "Separa questo progetto dal resto del tuo risparmio",
             "description": "Conto o fondo dedicato. Vedi la progressione reale e non lo intacchi per errore."
           },
-          "comfortable.w11.s1": {
+          "comfortable_w11_s1": {
             "focus": "Antifragile",
             "title": "Audit entrate: quanto dipende il tuo flusso da una sola fonte?",
             "description": "Diversificare le entrate conta tanto quanto diversificare il risparmio. Identifica 1 leva realistica."
           },
-          "comfortable.w12.s1": {
+          "comfortable_w12_s1": {
             "focus": "Antifragile",
             "title": "Bilancio 90 giorni + orizzonte annuale",
             "description": "Hai la base e il margine — fissa obiettivi annuali misurabili e scegline 2 prioritari."
@@ -669,7 +688,9 @@
       "goalDeadlinePrefix": "scadenza {date}"
     },
     "budget": {
-      "metadata": { "title": "Budget" },
+      "metadata": {
+        "title": "Budget"
+      },
       "header": {
         "eyebrow": "Pilotaggio",
         "title": "Il tuo budget mensile",
@@ -690,7 +711,9 @@
       "barLeftover": "Disponibile / Risparmio"
     },
     "incomes": {
-      "metadata": { "title": "Entrate" },
+      "metadata": {
+        "title": "Entrate"
+      },
       "header": {
         "eyebrow": "Pilotaggio",
         "title": "Le tue entrate",
@@ -703,7 +726,9 @@
       }
     },
     "expenses": {
-      "metadata": { "title": "Spese" },
+      "metadata": {
+        "title": "Spese"
+      },
       "header": {
         "eyebrow": "Pilotaggio",
         "title": "Le tue spese",
@@ -716,7 +741,9 @@
       }
     },
     "goals": {
-      "metadata": { "title": "Obiettivi" },
+      "metadata": {
+        "title": "Obiettivi"
+      },
       "header": {
         "eyebrow": "Pilotaggio",
         "title": "I tuoi obiettivi finanziari",
@@ -775,7 +802,9 @@
     }
   },
   "unsubscribe": {
-    "metadata": { "title": "Annulla iscrizione" },
+    "metadata": {
+      "title": "Annulla iscrizione"
+    },
     "serviceUnavailableTitle": "Servizio non disponibile",
     "serviceUnavailableBody": "La disdetta tramite link non è configurata su questo ambiente. Apri direttamente le tue impostazioni per gestire le preferenze email.",
     "invalidLinkTitle": "Link non valido",
@@ -791,7 +820,9 @@
     "confirmCta": "Confermare la disdetta"
   },
   "admin": {
-    "metadata": { "title": "Admin · LIBERIA" },
+    "metadata": {
+      "title": "Admin · LIBERIA"
+    },
     "eyebrow": "Admin",
     "pageTitle": "Panoramica prodotto",
     "intro": "Contatori interni — solo aggregati, mai dati individuali. Nessun dato è esposto a terzi.",
@@ -897,10 +928,22 @@
   },
   "memoryConstants": {
     "tones": {
-      "calm": { "label": "Calmo e rassicurante", "description": "Dolce, senza pressione. Il ritmo prevale sulla performance." },
-      "direct": { "label": "Diretto e motivante", "description": "Chiaro, energico, fattuale. Senza deviazioni." },
-      "structured": { "label": "Molto strutturato", "description": "Passi nitidi, checklist, traguardi misurabili." },
-      "gentle": { "label": "Dolce e progressivo", "description": "Piccoli passi, tanta benevolenza." }
+      "calm": {
+        "label": "Calmo e rassicurante",
+        "description": "Dolce, senza pressione. Il ritmo prevale sulla performance."
+      },
+      "direct": {
+        "label": "Diretto e motivante",
+        "description": "Chiaro, energico, fattuale. Senza deviazioni."
+      },
+      "structured": {
+        "label": "Molto strutturato",
+        "description": "Passi nitidi, checklist, traguardi misurabili."
+      },
+      "gentle": {
+        "label": "Dolce e progressivo",
+        "description": "Piccoli passi, tanta benevolenza."
+      }
     },
     "challenges": {
       "irregular_income": "Entrate irregolari",

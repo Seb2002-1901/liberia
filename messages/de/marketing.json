@@ -199,17 +199,50 @@
     "title": "Datenschutzerklärung",
     "lastUpdatedLabel": "Letzte Aktualisierung: {date}",
     "sections": [
-      { "heading": "1. Unser Grundsatz", "html": "<p>Wir erheben das Minimum, das nötig ist, um LIBERIA zu betreiben — nicht mehr. Deine Daten werden nie verkauft, nie vermietet, nie zu Werbezwecken geteilt.</p>" },
-      { "heading": "2. Erhobene Daten", "html": "<p><strong>Konto:</strong> E-Mail-Adresse, gehashtes Passwort (nie im Klartext gespeichert), optional Vorname.</p><p><strong>Finanzdaten:</strong> Einkommen, Ausgaben, Ziele, Notizen — nur was du freiwillig einträgst. LIBERIA verbindet sich nie mit deiner Bank.</p><p><strong>Präferenzen:</strong> Coaching-Stil, Verhaltensprofil, beim Onboarding angegebene Merkmale, persönliche Notizen.</p><p><strong>Assistent-Konversationen:</strong> Deine Nachrichten und Antworten werden gespeichert, damit du deinen Verlauf wiederfindest.</p><p><strong>Anonyme interne Zähler:</strong> Anzahl Anmeldungen, Funktionsnutzung, nie persönliche Aggregate. In deinen Einstellungen deaktivierbar.</p>" },
-      { "heading": "3. Hosting und Speicherung", "html": "<p>Die Daten werden auf der Supabase-Infrastruktur (EU-Region) gespeichert, verschlüsselt während der Übertragung (TLS) und im Ruhezustand (AES-256 von Supabase verwaltet). Die Pro-Benutzer-Isolation wird auf PostgreSQL-Ebene durch Row-Level Security erzwungen — jeder Benutzer greift nur auf seine eigenen Daten zu.</p>" },
-      { "heading": "4. Zahlungen", "html": "<p>Zahlungen laufen über Stripe (PCI Level 1 konform). LIBERIA speichert nie deine Kartennummer — nur eine Abonnement-Kennung zur Synchronisierung deines Premium-Status. Du kannst deine Zahlungsmethode über das Stripe-Kundenportal in deinen Einstellungen einsehen und aktualisieren.</p>" },
-      { "heading": "5. Künstliche Intelligenz", "html": "<p>Wenn du den KI-Assistenten nutzt oder einen Plan generierst, wird ein minimaler Ausschnitt deines finanziellen Kontexts und deiner Präferenzen an Anthropic gesendet, um eine Antwort zu erzeugen. Anthropic nutzt diese Daten nicht zum Trainieren ihrer Modelle (siehe <a href=\"/ai-policy\">unsere KI-Richtlinie</a>). Wenn die KI nicht aktiv ist, nutzt LIBERIA einen lokalen Generator — keine Daten verlassen unsere Infrastruktur.</p>" },
-      { "heading": "6. Cookies", "html": "<p>LIBERIA verwendet ausschliesslich strikt notwendige Cookies: das Supabase-Session-Cookie für deine Authentifizierung. Kein Werbecookie, kein Drittanbieter-Tracking-Cookie, kein Banner zum Akzeptieren.</p>" },
-      { "heading": "7. Deine Rechte (DSGVO)", "html": "<ul><li><strong>Zugang und Portabilität:</strong> Du kannst alle deine Daten als JSON aus <a href=\"/settings\">deinen Einstellungen</a> herunterladen.</li><li><strong>Löschung:</strong> Du kannst dein Konto in zwei Klicks dauerhaft löschen — alle deine Daten werden kaskadiert gelöscht.</li><li><strong>Berichtigung:</strong> Du änderst deine Daten selbst aus der App.</li><li><strong>Widerspruch:</strong> Du kannst die anonymen internen Zähler in deinen Einstellungen deaktivieren.</li></ul>" },
-      { "heading": "8. Aufbewahrung", "html": "<p>Deine Daten werden so lange aufbewahrt, wie dein Konto aktiv ist. Bei Kontolöschung ist das Löschen dauerhaft und unumkehrbar (mit Ausnahme bestimmter buchhalterischer Aufbewahrungspflichten auf Stripe-Seite, unabhängig von LIBERIA).</p>" },
-      { "heading": "9. Kein Verkauf, kein kommerzielles Teilen", "html": "<p>Wir verkaufen deine Daten nicht. Wir vermieten sie nicht. Wir teilen sie mit keinem Werbetreibenden, Broker, Marketingunternehmen oder Datenhändler. Das ist unsere Verpflichtung, und sie gilt auch, während LIBERIA wächst.</p>" },
-      { "heading": "10. Auftragsverarbeiter", "html": "<p>Die einzigen Dritten, die deine Daten in unserem Auftrag verarbeiten, sind: Supabase (Hosting + Datenbank, EU), Stripe (Zahlungen, EU/USA), Anthropic (KI-Modell, USA — nur Konversationsausschnitte), Resend (E-Mail-Zustellung, EU/USA), Vercel (Anwendungs-Hosting, EU/USA). Alle handeln nach unseren Anweisungen und unter den DSGVO-Standardvertragsklauseln.</p>" },
-      { "heading": "11. Kontakt", "html": "<p>Für jede Frage zu deinen Daten: <strong>privacy@liberia.app</strong>. Um ein Sicherheitsproblem zu melden: <strong>security@liberia.app</strong>.</p>" }
+      {
+        "heading": "1. Unser Grundsatz",
+        "html": "<p>Wir erheben das Minimum, das nötig ist, um LIBERIA zu betreiben — nicht mehr. Deine Daten werden nie verkauft, nie vermietet, nie zu Werbezwecken geteilt.</p>"
+      },
+      {
+        "heading": "2. Erhobene Daten",
+        "html": "<p><strong>Konto:</strong> E-Mail-Adresse, gehashtes Passwort (nie im Klartext gespeichert), optional Vorname.</p><p><strong>Finanzdaten:</strong> Einkommen, Ausgaben, Ziele, Notizen — nur was du freiwillig einträgst. LIBERIA verbindet sich nie mit deiner Bank.</p><p><strong>Präferenzen:</strong> Coaching-Stil, Verhaltensprofil, beim Onboarding angegebene Merkmale, persönliche Notizen.</p><p><strong>Assistent-Konversationen:</strong> Deine Nachrichten und Antworten werden gespeichert, damit du deinen Verlauf wiederfindest.</p><p><strong>Anonyme interne Zähler:</strong> Anzahl Anmeldungen, Funktionsnutzung, nie persönliche Aggregate. In deinen Einstellungen deaktivierbar.</p>"
+      },
+      {
+        "heading": "3. Hosting und Speicherung",
+        "html": "<p>Die Daten werden auf der Supabase-Infrastruktur (EU-Region) gespeichert, verschlüsselt während der Übertragung (TLS) und im Ruhezustand (AES-256 von Supabase verwaltet). Die Pro-Benutzer-Isolation wird auf PostgreSQL-Ebene durch Row-Level Security erzwungen — jeder Benutzer greift nur auf seine eigenen Daten zu.</p>"
+      },
+      {
+        "heading": "4. Zahlungen",
+        "html": "<p>Zahlungen laufen über Stripe (PCI Level 1 konform). LIBERIA speichert nie deine Kartennummer — nur eine Abonnement-Kennung zur Synchronisierung deines Premium-Status. Du kannst deine Zahlungsmethode über das Stripe-Kundenportal in deinen Einstellungen einsehen und aktualisieren.</p>"
+      },
+      {
+        "heading": "5. Künstliche Intelligenz",
+        "html": "<p>Wenn du den KI-Assistenten nutzt oder einen Plan generierst, wird ein minimaler Ausschnitt deines finanziellen Kontexts und deiner Präferenzen an Anthropic gesendet, um eine Antwort zu erzeugen. Anthropic nutzt diese Daten nicht zum Trainieren ihrer Modelle (siehe <a href=\"/ai-policy\">unsere KI-Richtlinie</a>). Wenn die KI nicht aktiv ist, nutzt LIBERIA einen lokalen Generator — keine Daten verlassen unsere Infrastruktur.</p>"
+      },
+      {
+        "heading": "6. Cookies",
+        "html": "<p>LIBERIA verwendet ausschliesslich strikt notwendige Cookies: das Supabase-Session-Cookie für deine Authentifizierung. Kein Werbecookie, kein Drittanbieter-Tracking-Cookie, kein Banner zum Akzeptieren.</p>"
+      },
+      {
+        "heading": "7. Deine Rechte (DSGVO)",
+        "html": "<ul><li><strong>Zugang und Portabilität:</strong> Du kannst alle deine Daten als JSON aus <a href=\"/settings\">deinen Einstellungen</a> herunterladen.</li><li><strong>Löschung:</strong> Du kannst dein Konto in zwei Klicks dauerhaft löschen — alle deine Daten werden kaskadiert gelöscht.</li><li><strong>Berichtigung:</strong> Du änderst deine Daten selbst aus der App.</li><li><strong>Widerspruch:</strong> Du kannst die anonymen internen Zähler in deinen Einstellungen deaktivieren.</li></ul>"
+      },
+      {
+        "heading": "8. Aufbewahrung",
+        "html": "<p>Deine Daten werden so lange aufbewahrt, wie dein Konto aktiv ist. Bei Kontolöschung ist das Löschen dauerhaft und unumkehrbar (mit Ausnahme bestimmter buchhalterischer Aufbewahrungspflichten auf Stripe-Seite, unabhängig von LIBERIA).</p>"
+      },
+      {
+        "heading": "9. Kein Verkauf, kein kommerzielles Teilen",
+        "html": "<p>Wir verkaufen deine Daten nicht. Wir vermieten sie nicht. Wir teilen sie mit keinem Werbetreibenden, Broker, Marketingunternehmen oder Datenhändler. Das ist unsere Verpflichtung, und sie gilt auch, während LIBERIA wächst.</p>"
+      },
+      {
+        "heading": "10. Auftragsverarbeiter",
+        "html": "<p>Die einzigen Dritten, die deine Daten in unserem Auftrag verarbeiten, sind: Supabase (Hosting + Datenbank, EU), Stripe (Zahlungen, EU/USA), Anthropic (KI-Modell, USA — nur Konversationsausschnitte), Resend (E-Mail-Zustellung, EU/USA), Vercel (Anwendungs-Hosting, EU/USA). Alle handeln nach unseren Anweisungen und unter den DSGVO-Standardvertragsklauseln.</p>"
+      },
+      {
+        "heading": "11. Kontakt",
+        "html": "<p>Für jede Frage zu deinen Daten: <strong>privacy@liberia.app</strong>. Um ein Sicherheitsproblem zu melden: <strong>security@liberia.app</strong>.</p>"
+      }
     ]
   },
   "terms": {
@@ -221,19 +254,58 @@
     "title": "Nutzungsbedingungen",
     "lastUpdatedLabel": "Letzte Aktualisierung: {date}",
     "sections": [
-      { "heading": "1. Zweck", "html": "<p>LIBERIA ist ein persönliches Finanz-Steuerungswerkzeug, das dir helfen soll, deine Situation zu verstehen, dein Budget zu strukturieren und auf deine Ziele zuzusteuern. Die App wird in Genf (Schweiz) herausgegeben und in erster Linie für den Schweizer Markt entwickelt, eine internationale Nutzung ist möglich.</p>" },
-      { "heading": "2. Keine Finanzberatung", "html": "<p>Die von LIBERIA angezeigten Kennzahlen, Scores, Pläne und Empfehlungen — ob aus dem lokalen Generator oder dem KI-Assistenten — <strong>stellen keine Finanz-, Steuer-, Rechts- oder Anlageberatung dar</strong>. Sie stammen nicht von einer qualifizierten Fachperson. Bevor du eine wichtige Entscheidung triffst, konsultiere einen auf deine Situation abgestimmten Berater. Siehe auch unseren <a href=\"/legal\">vollständigen Haftungsausschluss</a>.</p>" },
-      { "heading": "3. Nutzerkonto", "html": "<p>Du musst mindestens 18 Jahre alt sein (oder das gesetzliche Volljährigkeitsalter in deiner Gerichtsbarkeit), um ein Konto zu erstellen. Du bist verantwortlich für die Vertraulichkeit deines Passworts und die Aktivität auf deinem Konto. Du kannst dein Konto jederzeit aus deinen Einstellungen löschen — die Löschung ist dauerhaft und unumkehrbar.</p>" },
-      { "heading": "4. Kostenlose Testphase und Abo", "html": "<p>LIBERIA bietet eine 14-tägige kostenlose Testphase. Eine gültige Zahlungsmethode ist erforderlich, um die Testphase zu starten. Nach 14 Tagen wird dein gewähltes Abo (monatlich oder jährlich) automatisch abgebucht. Du kannst jederzeit aus deinem Abo-Portal kündigen — ohne Begründung, ohne Fragen.</p><p><strong>Anti-Missbrauch:</strong> Die kostenlose Testphase ist auf eine pro Konto beschränkt. Ein neues Abo nach einer Kündigung startet sofort zum Standardtarif.</p>" },
-      { "heading": "5. Preise", "html": "<ul><li>Monatsabo: 14.99 CHF / Monat, jeden Monat nach der 14-tägigen Testphase abgebucht.</li><li>Jahresabo: 119.99 CHF / Jahr (ungefähr 9.99 CHF / Monat, ≈ 60 CHF Ersparnis pro Jahr), einmal im Jahr abgebucht.</li></ul><p>Preise sind in Schweizer Franken (CHF) angegeben, inklusive aller Steuern. Keine versteckten Kosten.</p>" },
-      { "heading": "6. Kündigung und Widerruf", "html": "<p>Du kannst dein Abo jederzeit aus deinem Abo-Portal (Stripe) kündigen. Die Kündigung wird am Ende der laufenden Periode wirksam — dein Zugang bleibt bis dahin aktiv. Keine zusätzliche Abbuchung wird vorgenommen.</p><p>Wenn du während der 14-tägigen Testphase kündigst, wird kein Betrag abgebucht.</p>" },
-      { "heading": "7. Rückerstattung", "html": "<p>Aufgrund des digitalen Dienstleistungsformats mit sofortigem Zugang ist nach Bezahlung der Periode keine Rückerstattung geschuldet. Bei einem grösseren technischen Problem, das dich an der Nutzung gehindert hat, wende dich an <strong>support@liberia.app</strong> — wir prüfen jeden Fall.</p>" },
-      { "heading": "8. Akzeptable Nutzung", "html": "<p>Du verpflichtest dich, LIBERIA in gutem Glauben zu nutzen: nicht zu versuchen, auf Daten zuzugreifen, die nicht deine sind, die Infrastruktur nicht zu stören, den Dienst nicht für betrügerische Zwecke zu missbrauchen. Missbräuchliche Nutzung des KI-Assistenten (überhöhtes Volumen, themenfremder Inhalt) kann zu einer Sperrung führen.</p>" },
-      { "heading": "9. Daten und Datenschutz", "html": "<p>Siehe unsere ausführliche <a href=\"/privacy\">Datenschutzerklärung</a>. Kurz: minimale Erhebung, EU-Hosting, kein Verkauf, vollständige Kontrolle auf Nutzerseite (DSGVO-Export, Löschung in zwei Klicks).</p>" },
-      { "heading": "10. Haftung", "html": "<p>LIBERIA stellt ein informatives Werkzeug bereit. Wir können nicht für die finanziellen Folgen einer Entscheidung haftbar gemacht werden, die ausschliesslich aufgrund der in der App gezeigten Informationen getroffen wurde. Jede wichtige Finanzentscheidung bleibt allein in deiner Verantwortung.</p>" },
-      { "heading": "11. Änderungen", "html": "<p>Diese Bedingungen können sich ändern. Jede wesentliche Änderung (Preisänderung, neue E-Mail-Kategorie, Änderung der Datenverarbeitung) wird dir per E-Mail mit angemessener Vorankündigung mitgeteilt. Eine fortgesetzte Nutzung nach Benachrichtigung gilt als Zustimmung.</p>" },
-      { "heading": "12. Anwendbares Recht", "html": "<p>Diese Bedingungen unterliegen Schweizer Recht. Jeder Streit fällt unter die Zuständigkeit der Genfer Gerichte, vorbehaltlich der zwingenden Verbraucherschutzbestimmungen, die in deinem gewöhnlichen Aufenthaltsort gelten.</p>" },
-      { "heading": "13. Kontakt", "html": "<p>Für jede Frage zu deinem Abo oder diesen Bedingungen: <strong>support@liberia.app</strong>.</p>" }
+      {
+        "heading": "1. Zweck",
+        "html": "<p>LIBERIA ist ein persönliches Finanz-Steuerungswerkzeug, das dir helfen soll, deine Situation zu verstehen, dein Budget zu strukturieren und auf deine Ziele zuzusteuern. Die App wird in Genf (Schweiz) herausgegeben und in erster Linie für den Schweizer Markt entwickelt, eine internationale Nutzung ist möglich.</p>"
+      },
+      {
+        "heading": "2. Keine Finanzberatung",
+        "html": "<p>Die von LIBERIA angezeigten Kennzahlen, Scores, Pläne und Empfehlungen — ob aus dem lokalen Generator oder dem KI-Assistenten — <strong>stellen keine Finanz-, Steuer-, Rechts- oder Anlageberatung dar</strong>. Sie stammen nicht von einer qualifizierten Fachperson. Bevor du eine wichtige Entscheidung triffst, konsultiere einen auf deine Situation abgestimmten Berater. Siehe auch unseren <a href=\"/legal\">vollständigen Haftungsausschluss</a>.</p>"
+      },
+      {
+        "heading": "3. Nutzerkonto",
+        "html": "<p>Du musst mindestens 18 Jahre alt sein (oder das gesetzliche Volljährigkeitsalter in deiner Gerichtsbarkeit), um ein Konto zu erstellen. Du bist verantwortlich für die Vertraulichkeit deines Passworts und die Aktivität auf deinem Konto. Du kannst dein Konto jederzeit aus deinen Einstellungen löschen — die Löschung ist dauerhaft und unumkehrbar.</p>"
+      },
+      {
+        "heading": "4. Kostenlose Testphase und Abo",
+        "html": "<p>LIBERIA bietet eine 14-tägige kostenlose Testphase. Eine gültige Zahlungsmethode ist erforderlich, um die Testphase zu starten. Nach 14 Tagen wird dein gewähltes Abo (monatlich oder jährlich) automatisch abgebucht. Du kannst jederzeit aus deinem Abo-Portal kündigen — ohne Begründung, ohne Fragen.</p><p><strong>Anti-Missbrauch:</strong> Die kostenlose Testphase ist auf eine pro Konto beschränkt. Ein neues Abo nach einer Kündigung startet sofort zum Standardtarif.</p>"
+      },
+      {
+        "heading": "5. Preise",
+        "html": "<ul><li>Monatsabo: 14.99 CHF / Monat, jeden Monat nach der 14-tägigen Testphase abgebucht.</li><li>Jahresabo: 119.99 CHF / Jahr (ungefähr 9.99 CHF / Monat, ≈ 60 CHF Ersparnis pro Jahr), einmal im Jahr abgebucht.</li></ul><p>Preise sind in Schweizer Franken (CHF) angegeben, inklusive aller Steuern. Keine versteckten Kosten.</p>"
+      },
+      {
+        "heading": "6. Kündigung und Widerruf",
+        "html": "<p>Du kannst dein Abo jederzeit aus deinem Abo-Portal (Stripe) kündigen. Die Kündigung wird am Ende der laufenden Periode wirksam — dein Zugang bleibt bis dahin aktiv. Keine zusätzliche Abbuchung wird vorgenommen.</p><p>Wenn du während der 14-tägigen Testphase kündigst, wird kein Betrag abgebucht.</p>"
+      },
+      {
+        "heading": "7. Rückerstattung",
+        "html": "<p>Aufgrund des digitalen Dienstleistungsformats mit sofortigem Zugang ist nach Bezahlung der Periode keine Rückerstattung geschuldet. Bei einem grösseren technischen Problem, das dich an der Nutzung gehindert hat, wende dich an <strong>support@liberia.app</strong> — wir prüfen jeden Fall.</p>"
+      },
+      {
+        "heading": "8. Akzeptable Nutzung",
+        "html": "<p>Du verpflichtest dich, LIBERIA in gutem Glauben zu nutzen: nicht zu versuchen, auf Daten zuzugreifen, die nicht deine sind, die Infrastruktur nicht zu stören, den Dienst nicht für betrügerische Zwecke zu missbrauchen. Missbräuchliche Nutzung des KI-Assistenten (überhöhtes Volumen, themenfremder Inhalt) kann zu einer Sperrung führen.</p>"
+      },
+      {
+        "heading": "9. Daten und Datenschutz",
+        "html": "<p>Siehe unsere ausführliche <a href=\"/privacy\">Datenschutzerklärung</a>. Kurz: minimale Erhebung, EU-Hosting, kein Verkauf, vollständige Kontrolle auf Nutzerseite (DSGVO-Export, Löschung in zwei Klicks).</p>"
+      },
+      {
+        "heading": "10. Haftung",
+        "html": "<p>LIBERIA stellt ein informatives Werkzeug bereit. Wir können nicht für die finanziellen Folgen einer Entscheidung haftbar gemacht werden, die ausschliesslich aufgrund der in der App gezeigten Informationen getroffen wurde. Jede wichtige Finanzentscheidung bleibt allein in deiner Verantwortung.</p>"
+      },
+      {
+        "heading": "11. Änderungen",
+        "html": "<p>Diese Bedingungen können sich ändern. Jede wesentliche Änderung (Preisänderung, neue E-Mail-Kategorie, Änderung der Datenverarbeitung) wird dir per E-Mail mit angemessener Vorankündigung mitgeteilt. Eine fortgesetzte Nutzung nach Benachrichtigung gilt als Zustimmung.</p>"
+      },
+      {
+        "heading": "12. Anwendbares Recht",
+        "html": "<p>Diese Bedingungen unterliegen Schweizer Recht. Jeder Streit fällt unter die Zuständigkeit der Genfer Gerichte, vorbehaltlich der zwingenden Verbraucherschutzbestimmungen, die in deinem gewöhnlichen Aufenthaltsort gelten.</p>"
+      },
+      {
+        "heading": "13. Kontakt",
+        "html": "<p>Für jede Frage zu deinem Abo oder diesen Bedingungen: <strong>support@liberia.app</strong>.</p>"
+      }
     ]
   },
   "aiPolicy": {
@@ -245,37 +317,25 @@
     "title": "Eine KI, die dich unterstützt, dich nicht ersetzt.",
     "intro": "Der KI-Assistent von LIBERIA ist gebaut, um dir Klarheit zu verschaffen, konkrete Aktionen vorzuschlagen und seinen Ton an dein Profil anzupassen. Er ist weder ein Finanzberater, noch ein Therapeut, noch ein Orakel.",
     "sections": [
-      { "heading": "Was die KI tut", "html": "<ul><li><strong>Liest deine angegebenen Daten.</strong> Einkommen, Ausgaben, Ziele, aktueller Plan, Coaching-Präferenzen. Nur was du selbst eingegeben hast.</li><li><strong>Schlägt konkrete Aktionen vor.</strong> Kleine wöchentliche Schritte, Budgetanpassungen, Schuldenpriorisierung. Immer mit einer kurzen Erklärung des Warum.</li><li><strong>Passt den Ton an dein Profil an.</strong> Ruhig und beruhigend, direkt und motivierend, strukturiert oder schrittweise — du wählst den Stil in deinen Einstellungen.</li></ul>" },
-      { "heading": "Was die KI nicht tut", "html": "<ul><li><strong>Keine regulierte Beratung.</strong> Keine Anlageempfehlung, keine personalisierte Steueroptimierung, keine Rechtsberatung. Für diese Themen verweist dich der Assistent auf eine qualifizierte Fachperson.</li><li><strong>Kein Finanzversprechen.</strong> Die KI garantiert keine Renditen, sagt die Zukunft nicht voraus und drängt dich nie in unverhältnismässiges Risiko.</li><li><strong>Kein Urteil.</strong> Der Ton ist ruhig, sachlich, freundlich. Keine Schuld, kein künstlicher Druck.</li></ul>" },
-      { "heading": "Deine Daten und die KI", "html": "<ul><li><strong>Kein Training.</strong> Deine Daten werden nie verwendet, um ein KI-Modell zu trainieren oder nachzutrainieren, weder unser noch das unserer Anbieter (Anthropic).</li><li><strong>Bedarfsgerechte Verarbeitung.</strong> Die KI empfängt deine Daten nur, wenn du eine Frage stellst oder einen Plan anforderst. Der gesendete Ausschnitt ist minimal und wird vom LLM-Anbieter über die Verarbeitung hinaus nicht aufbewahrt.</li><li><strong>Lokaler Fallback-Modus.</strong> Wenn der Assistent nicht eingerichtet ist, nutzt LIBERIA einen deterministischen serverseitigen Antwortgenerator — keine Daten verlassen unsere Infrastruktur.</li><li><strong>Vollständige Löschung.</strong> Das Löschen deines Kontos löscht den Konversationsverlauf + alle generierten Pläne. Du kannst auch eine Konversation auf einmal aus der Oberfläche löschen.</li></ul>" },
-      { "heading": "Grenzen und Fehler", "html": "<p>KI-Modelle können falsch liegen, Nuancen missverstehen oder eine Aktion vorschlagen, die für deine besondere Situation unpassend ist. Bevor du auf eine wichtige Empfehlung handelst (einen Kredit zurückzahlen, die Versicherung wechseln, eine Investition starten), nimm dir Zeit zum Nachdenken — und wenn die Einsätze hoch sind, konsultiere eine qualifizierte Fachperson.</p><p>Du kannst eine problematische Antwort melden, indem du direkt auf die Wochenrückblick-E-Mail antwortest oder an <strong>support@liberia.app</strong> schreibst.</p>" }
+      {
+        "heading": "Was die KI tut",
+        "html": "<ul><li><strong>Liest deine angegebenen Daten.</strong> Einkommen, Ausgaben, Ziele, aktueller Plan, Coaching-Präferenzen. Nur was du selbst eingegeben hast.</li><li><strong>Schlägt konkrete Aktionen vor.</strong> Kleine wöchentliche Schritte, Budgetanpassungen, Schuldenpriorisierung. Immer mit einer kurzen Erklärung des Warum.</li><li><strong>Passt den Ton an dein Profil an.</strong> Ruhig und beruhigend, direkt und motivierend, strukturiert oder schrittweise — du wählst den Stil in deinen Einstellungen.</li></ul>"
+      },
+      {
+        "heading": "Was die KI nicht tut",
+        "html": "<ul><li><strong>Keine regulierte Beratung.</strong> Keine Anlageempfehlung, keine personalisierte Steueroptimierung, keine Rechtsberatung. Für diese Themen verweist dich der Assistent auf eine qualifizierte Fachperson.</li><li><strong>Kein Finanzversprechen.</strong> Die KI garantiert keine Renditen, sagt die Zukunft nicht voraus und drängt dich nie in unverhältnismässiges Risiko.</li><li><strong>Kein Urteil.</strong> Der Ton ist ruhig, sachlich, freundlich. Keine Schuld, kein künstlicher Druck.</li></ul>"
+      },
+      {
+        "heading": "Deine Daten und die KI",
+        "html": "<ul><li><strong>Kein Training.</strong> Deine Daten werden nie verwendet, um ein KI-Modell zu trainieren oder nachzutrainieren, weder unser noch das unserer Anbieter (Anthropic).</li><li><strong>Bedarfsgerechte Verarbeitung.</strong> Die KI empfängt deine Daten nur, wenn du eine Frage stellst oder einen Plan anforderst. Der gesendete Ausschnitt ist minimal und wird vom LLM-Anbieter über die Verarbeitung hinaus nicht aufbewahrt.</li><li><strong>Lokaler Fallback-Modus.</strong> Wenn der Assistent nicht eingerichtet ist, nutzt LIBERIA einen deterministischen serverseitigen Antwortgenerator — keine Daten verlassen unsere Infrastruktur.</li><li><strong>Vollständige Löschung.</strong> Das Löschen deines Kontos löscht den Konversationsverlauf + alle generierten Pläne. Du kannst auch eine Konversation auf einmal aus der Oberfläche löschen.</li></ul>"
+      },
+      {
+        "heading": "Grenzen und Fehler",
+        "html": "<p>KI-Modelle können falsch liegen, Nuancen missverstehen oder eine Aktion vorschlagen, die für deine besondere Situation unpassend ist. Bevor du auf eine wichtige Empfehlung handelst (einen Kredit zurückzahlen, die Versicherung wechseln, eine Investition starten), nimm dir Zeit zum Nachdenken — und wenn die Einsätze hoch sind, konsultiere eine qualifizierte Fachperson.</p><p>Du kannst eine problematische Antwort melden, indem du direkt auf die Wochenrückblick-E-Mail antwortest oder an <strong>support@liberia.app</strong> schreibst.</p>"
+      }
     ],
     "ctaSecurity": "Sicherheitsseite ansehen",
     "ctaPrivacy": "Datenschutzerklärung"
-  },
-  "security": {
-    "metadata": {
-      "title": "Sicherheit & Vertrauen",
-      "description": "Wie LIBERIA deine Finanzdaten schützt — Verschlüsselung, Pro-Benutzer-Isolation, vollständige Kontrolle auf Nutzerseite."
-    },
-    "eyebrow": "Sicherheit & Vertrauen",
-    "title": "Deine Finanzen verdienen einen gesunden Rahmen.",
-    "intro": "Wir versprechen dir keine «Banksicherheit» — wir sagen dir, wie es aufgebaut ist, und du urteilst. Die Regel, die alles leitet: je weniger wir deine Daten berühren, desto besser.",
-    "pillars": [
-      { "title": "Verschlüsselung in der Übertragung und im Ruhezustand", "body": "HTTPS erforderlich (TLS) zwischen deinem Browser und unseren Servern. Verschlüsselte Speicherung im Ruhezustand über Supabase Postgres (AES-256 von der Supabase-Infrastruktur verwaltet, EU-Hosting)." },
-      { "title": "Pro-Benutzer-Isolation", "body": "Jede Zeile in deinen Tabellen (Einkommen, Ausgaben, Ziele, Pläne, Konversationen) wird durch PostgreSQL Row-Level Security gefiltert. Du kannst nur deine eigenen Daten lesen — die Datenbank selbst weist kontoübergreifende Abfragen ab." },
-      { "title": "Kein Service-Role auf Browser-Seite", "body": "Der Schlüssel, der RLS umgehen würde, bleibt nur serverseitig. Kein Stripe-, Anthropic- oder Datenbank-Secret wird im Browser-Bundle ausgeliefert." },
-      { "title": "Zahlungen über Stripe", "body": "Wir speichern nie deine Kartennummer. Stripe (PCI Level 1 konform) erfasst und bewahrt die Informationen auf der Stripe-Seite. Wir behalten nur eine Abonnement-Kennung zur Synchronisation deines Status." },
-      { "title": "Signierter, idempotenter Webhook", "body": "Stripe-Ereignisse werden kryptografisch verifiziert, bevor sie angewendet werden. Eine versehentlich wiederholte Zustellung verursacht keine doppelte Verarbeitung (Deduplizierung auf Datenbankebene)." },
-      { "title": "Du behältst die Kontrolle", "body": "DSGVO-Datenexport mit einem Klick. Dauerhafte Kontolöschung in zwei Klicks. Keine Daten werden weiterverkauft — das ist unsere Verpflichtung." }
-    ],
-    "sections": [
-      { "heading": "Was wir bewusst nicht tun", "html": "<ul><li><strong>Keine Bankaggregation.</strong> LIBERIA arbeitet nur mit freiwilliger Erfassung. Du verbindest nie deine Bank — weniger Angriffsfläche, mehr mentale Klarheit.</li><li><strong>Kein Datenverkauf.</strong> Keine Daten verlassen dein Konto zu Werbe- oder kommerziellen Zwecken. Keine Datenpartnerschaft.</li><li><strong>Kein Werbe-Tracking.</strong> Kein Facebook- / Google-Ads-Pixel. Kein Fingerprinting. Du kannst die anonymen internen Zähler in deinen Einstellungen deaktivieren.</li></ul>" },
-      { "heading": "Ehrliche Grenzen", "html": "<p>LIBERIA hat weder ein SOC-2- noch ein ISO-27001-Audit. Wir sind nicht banklizenziert. Es ist eine junge App, die sich auf robuste Anbieter (Supabase, Stripe, Vercel) stützt und grundlegende OWASP-Best-Practices befolgt. Wenn deine Nutzung eine spezifische Zertifizierung erfordert, melde dich — wir dokumentieren, was wir können.</p>" },
-      { "heading": "Eine Schwachstelle melden", "html": "<p>Wenn du ein Sicherheitsproblem identifizierst, schreibe an <strong>security@liberia.app</strong>. Wir antworten innerhalb von 72 Geschäftsstunden. Wir bevorzugen, dass du uns vor jeder Veröffentlichung schreibst — wir würdigen deine Hilfe öffentlich nach dem Fix (Responsible Disclosure).</p>" }
-    ],
-    "ctaPrivacy": "Datenschutzerklärung",
-    "ctaAiPolicy": "Richtlinie für verantwortungsvolle KI"
   },
   "legal": {
     "metadata": {
@@ -310,5 +370,56 @@
     "subtitle": "Erstelle dein Konto in 30 Sekunden — oder entdecke den Demo-Modus ohne Anmeldung.",
     "ctaStart": "Kostenlos loslegen",
     "ctaDemo": "Demo ausprobieren"
+  },
+  "securityPage": {
+    "metadata": {
+      "title": "Sicherheit & Vertrauen",
+      "description": "Wie LIBERIA deine Finanzdaten schützt — Verschlüsselung, Pro-Benutzer-Isolation, vollständige Kontrolle auf Nutzerseite."
+    },
+    "eyebrow": "Sicherheit & Vertrauen",
+    "title": "Deine Finanzen verdienen einen gesunden Rahmen.",
+    "intro": "Wir versprechen dir keine «Banksicherheit» — wir sagen dir, wie es aufgebaut ist, und du urteilst. Die Regel, die alles leitet: je weniger wir deine Daten berühren, desto besser.",
+    "pillars": [
+      {
+        "title": "Verschlüsselung in der Übertragung und im Ruhezustand",
+        "body": "HTTPS erforderlich (TLS) zwischen deinem Browser und unseren Servern. Verschlüsselte Speicherung im Ruhezustand über Supabase Postgres (AES-256 von der Supabase-Infrastruktur verwaltet, EU-Hosting)."
+      },
+      {
+        "title": "Pro-Benutzer-Isolation",
+        "body": "Jede Zeile in deinen Tabellen (Einkommen, Ausgaben, Ziele, Pläne, Konversationen) wird durch PostgreSQL Row-Level Security gefiltert. Du kannst nur deine eigenen Daten lesen — die Datenbank selbst weist kontoübergreifende Abfragen ab."
+      },
+      {
+        "title": "Kein Service-Role auf Browser-Seite",
+        "body": "Der Schlüssel, der RLS umgehen würde, bleibt nur serverseitig. Kein Stripe-, Anthropic- oder Datenbank-Secret wird im Browser-Bundle ausgeliefert."
+      },
+      {
+        "title": "Zahlungen über Stripe",
+        "body": "Wir speichern nie deine Kartennummer. Stripe (PCI Level 1 konform) erfasst und bewahrt die Informationen auf der Stripe-Seite. Wir behalten nur eine Abonnement-Kennung zur Synchronisation deines Status."
+      },
+      {
+        "title": "Signierter, idempotenter Webhook",
+        "body": "Stripe-Ereignisse werden kryptografisch verifiziert, bevor sie angewendet werden. Eine versehentlich wiederholte Zustellung verursacht keine doppelte Verarbeitung (Deduplizierung auf Datenbankebene)."
+      },
+      {
+        "title": "Du behältst die Kontrolle",
+        "body": "DSGVO-Datenexport mit einem Klick. Dauerhafte Kontolöschung in zwei Klicks. Keine Daten werden weiterverkauft — das ist unsere Verpflichtung."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Was wir bewusst nicht tun",
+        "html": "<ul><li><strong>Keine Bankaggregation.</strong> LIBERIA arbeitet nur mit freiwilliger Erfassung. Du verbindest nie deine Bank — weniger Angriffsfläche, mehr mentale Klarheit.</li><li><strong>Kein Datenverkauf.</strong> Keine Daten verlassen dein Konto zu Werbe- oder kommerziellen Zwecken. Keine Datenpartnerschaft.</li><li><strong>Kein Werbe-Tracking.</strong> Kein Facebook- / Google-Ads-Pixel. Kein Fingerprinting. Du kannst die anonymen internen Zähler in deinen Einstellungen deaktivieren.</li></ul>"
+      },
+      {
+        "heading": "Ehrliche Grenzen",
+        "html": "<p>LIBERIA hat weder ein SOC-2- noch ein ISO-27001-Audit. Wir sind nicht banklizenziert. Es ist eine junge App, die sich auf robuste Anbieter (Supabase, Stripe, Vercel) stützt und grundlegende OWASP-Best-Practices befolgt. Wenn deine Nutzung eine spezifische Zertifizierung erfordert, melde dich — wir dokumentieren, was wir können.</p>"
+      },
+      {
+        "heading": "Eine Schwachstelle melden",
+        "html": "<p>Wenn du ein Sicherheitsproblem identifizierst, schreibe an <strong>security@liberia.app</strong>. Wir antworten innerhalb von 72 Geschäftsstunden. Wir bevorzugen, dass du uns vor jeder Veröffentlichung schreibst — wir würdigen deine Hilfe öffentlich nach dem Fix (Responsible Disclosure).</p>"
+      }
+    ],
+    "ctaPrivacy": "Datenschutzerklärung",
+    "ctaAiPolicy": "Richtlinie für verantwortungsvolle KI"
   }
 }

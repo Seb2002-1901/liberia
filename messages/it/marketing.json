@@ -199,17 +199,50 @@
     "title": "Informativa sulla privacy",
     "lastUpdatedLabel": "Ultimo aggiornamento: {date}",
     "sections": [
-      { "heading": "1. Il nostro principio", "html": "<p>Raccogliamo il minimo necessario per far funzionare LIBERIA — nulla di più. I tuoi dati non sono mai venduti, mai noleggiati, mai condivisi per pubblicità.</p>" },
-      { "heading": "2. Dati raccolti", "html": "<p><strong>Account:</strong> indirizzo email, password in hash (mai memorizzata in chiaro), nome facoltativo.</p><p><strong>Dati finanziari:</strong> entrate, spese, obiettivi, note — solo ciò che scegli di inserire volontariamente. LIBERIA non si collega mai alla tua banca.</p><p><strong>Preferenze:</strong> stile di coaching, profilo comportamentale, tratti dichiarati nell'onboarding, note personali.</p><p><strong>Conversazioni con l'assistente:</strong> i tuoi messaggi e le risposte sono conservati per consentirti di ritrovare la cronologia.</p><p><strong>Contatori interni anonimi:</strong> numero di accessi, utilizzo delle funzionalità, mai dati personali, solo aggregati. Disattivabili nelle tue impostazioni.</p>" },
-      { "heading": "3. Hosting e archiviazione", "html": "<p>I dati sono archiviati sull'infrastruttura Supabase (regione UE), cifrati in transito (TLS) e a riposo (AES-256 gestito da Supabase). L'isolamento per utente è applicato a livello PostgreSQL tramite Row-Level Security — ogni utente accede solo ai propri dati.</p>" },
-      { "heading": "4. Pagamenti", "html": "<p>I pagamenti passano da Stripe (conforme PCI livello 1). LIBERIA non memorizza mai il numero della tua carta — solo un identificativo di abbonamento per sincronizzare il tuo stato Premium. Puoi consultare e aggiornare il tuo metodo di pagamento tramite il portale cliente Stripe nelle tue impostazioni.</p>" },
-      { "heading": "5. Intelligenza artificiale", "html": "<p>Quando usi l'assistente IA o generi un piano, un'istantanea minima del tuo contesto finanziario e delle tue preferenze viene inviata ad Anthropic per produrre una risposta. Anthropic non usa questi dati per addestrare i propri modelli (vedi <a href=\"/ai-policy\">la nostra policy IA</a>). Quando l'IA non è attiva, LIBERIA usa un generatore locale — nessun dato lascia la nostra infrastruttura.</p>" },
-      { "heading": "6. Cookie", "html": "<p>LIBERIA usa solo cookie strettamente necessari: il cookie di sessione Supabase per la tua autenticazione. Nessun cookie pubblicitario, nessun cookie di tracciamento di terze parti, nessun banner da accettare.</p>" },
-      { "heading": "7. I tuoi diritti (GDPR)", "html": "<ul><li><strong>Accesso e portabilità:</strong> puoi scaricare tutti i tuoi dati in JSON dalle <a href=\"/settings\">tue impostazioni</a>.</li><li><strong>Cancellazione:</strong> puoi eliminare definitivamente il tuo account in due clic — tutti i tuoi dati vengono cancellati a cascata.</li><li><strong>Rettifica:</strong> modifichi i tuoi dati direttamente dall'app.</li><li><strong>Opposizione:</strong> puoi disattivare i contatori interni anonimi dalle tue impostazioni.</li></ul>" },
-      { "heading": "8. Conservazione", "html": "<p>I tuoi dati sono conservati finché il tuo account è attivo. Alla cancellazione dell'account, la rimozione è definitiva e irreversibile (salvo alcuni obblighi di conservazione contabile lato Stripe, indipendenti da LIBERIA).</p>" },
-      { "heading": "9. Nessuna rivendita, nessuna condivisione commerciale", "html": "<p>Non vendiamo i tuoi dati. Non li noleggiamo. Non li condividiamo con alcun inserzionista, broker, agenzia di marketing o data broker. È il nostro impegno, e resta valido mentre LIBERIA cresce.</p>" },
-      { "heading": "10. Sub-responsabili", "html": "<p>Gli unici terzi che trattano i tuoi dati per nostro conto sono: Supabase (hosting + database, UE), Stripe (pagamenti, UE/USA), Anthropic (modello IA, USA — solo istantanee di conversazione), Resend (consegna email, UE/USA), Vercel (hosting applicativo, UE/USA). Tutti operano sulle nostre istruzioni e sotto le clausole contrattuali standard GDPR.</p>" },
-      { "heading": "11. Contatto", "html": "<p>Per qualsiasi domanda sui tuoi dati: <strong>privacy@liberia.app</strong>. Per segnalare un problema di sicurezza: <strong>security@liberia.app</strong>.</p>" }
+      {
+        "heading": "1. Il nostro principio",
+        "html": "<p>Raccogliamo il minimo necessario per far funzionare LIBERIA — nulla di più. I tuoi dati non sono mai venduti, mai noleggiati, mai condivisi per pubblicità.</p>"
+      },
+      {
+        "heading": "2. Dati raccolti",
+        "html": "<p><strong>Account:</strong> indirizzo email, password in hash (mai memorizzata in chiaro), nome facoltativo.</p><p><strong>Dati finanziari:</strong> entrate, spese, obiettivi, note — solo ciò che scegli di inserire volontariamente. LIBERIA non si collega mai alla tua banca.</p><p><strong>Preferenze:</strong> stile di coaching, profilo comportamentale, tratti dichiarati nell'onboarding, note personali.</p><p><strong>Conversazioni con l'assistente:</strong> i tuoi messaggi e le risposte sono conservati per consentirti di ritrovare la cronologia.</p><p><strong>Contatori interni anonimi:</strong> numero di accessi, utilizzo delle funzionalità, mai dati personali, solo aggregati. Disattivabili nelle tue impostazioni.</p>"
+      },
+      {
+        "heading": "3. Hosting e archiviazione",
+        "html": "<p>I dati sono archiviati sull'infrastruttura Supabase (regione UE), cifrati in transito (TLS) e a riposo (AES-256 gestito da Supabase). L'isolamento per utente è applicato a livello PostgreSQL tramite Row-Level Security — ogni utente accede solo ai propri dati.</p>"
+      },
+      {
+        "heading": "4. Pagamenti",
+        "html": "<p>I pagamenti passano da Stripe (conforme PCI livello 1). LIBERIA non memorizza mai il numero della tua carta — solo un identificativo di abbonamento per sincronizzare il tuo stato Premium. Puoi consultare e aggiornare il tuo metodo di pagamento tramite il portale cliente Stripe nelle tue impostazioni.</p>"
+      },
+      {
+        "heading": "5. Intelligenza artificiale",
+        "html": "<p>Quando usi l'assistente IA o generi un piano, un'istantanea minima del tuo contesto finanziario e delle tue preferenze viene inviata ad Anthropic per produrre una risposta. Anthropic non usa questi dati per addestrare i propri modelli (vedi <a href=\"/ai-policy\">la nostra policy IA</a>). Quando l'IA non è attiva, LIBERIA usa un generatore locale — nessun dato lascia la nostra infrastruttura.</p>"
+      },
+      {
+        "heading": "6. Cookie",
+        "html": "<p>LIBERIA usa solo cookie strettamente necessari: il cookie di sessione Supabase per la tua autenticazione. Nessun cookie pubblicitario, nessun cookie di tracciamento di terze parti, nessun banner da accettare.</p>"
+      },
+      {
+        "heading": "7. I tuoi diritti (GDPR)",
+        "html": "<ul><li><strong>Accesso e portabilità:</strong> puoi scaricare tutti i tuoi dati in JSON dalle <a href=\"/settings\">tue impostazioni</a>.</li><li><strong>Cancellazione:</strong> puoi eliminare definitivamente il tuo account in due clic — tutti i tuoi dati vengono cancellati a cascata.</li><li><strong>Rettifica:</strong> modifichi i tuoi dati direttamente dall'app.</li><li><strong>Opposizione:</strong> puoi disattivare i contatori interni anonimi dalle tue impostazioni.</li></ul>"
+      },
+      {
+        "heading": "8. Conservazione",
+        "html": "<p>I tuoi dati sono conservati finché il tuo account è attivo. Alla cancellazione dell'account, la rimozione è definitiva e irreversibile (salvo alcuni obblighi di conservazione contabile lato Stripe, indipendenti da LIBERIA).</p>"
+      },
+      {
+        "heading": "9. Nessuna rivendita, nessuna condivisione commerciale",
+        "html": "<p>Non vendiamo i tuoi dati. Non li noleggiamo. Non li condividiamo con alcun inserzionista, broker, agenzia di marketing o data broker. È il nostro impegno, e resta valido mentre LIBERIA cresce.</p>"
+      },
+      {
+        "heading": "10. Sub-responsabili",
+        "html": "<p>Gli unici terzi che trattano i tuoi dati per nostro conto sono: Supabase (hosting + database, UE), Stripe (pagamenti, UE/USA), Anthropic (modello IA, USA — solo istantanee di conversazione), Resend (consegna email, UE/USA), Vercel (hosting applicativo, UE/USA). Tutti operano sulle nostre istruzioni e sotto le clausole contrattuali standard GDPR.</p>"
+      },
+      {
+        "heading": "11. Contatto",
+        "html": "<p>Per qualsiasi domanda sui tuoi dati: <strong>privacy@liberia.app</strong>. Per segnalare un problema di sicurezza: <strong>security@liberia.app</strong>.</p>"
+      }
     ]
   },
   "terms": {
@@ -221,19 +254,58 @@
     "title": "Termini di servizio",
     "lastUpdatedLabel": "Ultimo aggiornamento: {date}",
     "sections": [
-      { "heading": "1. Oggetto", "html": "<p>LIBERIA è uno strumento di pilotaggio finanziario personale pensato per aiutarti a capire la tua situazione, strutturare il tuo budget e avanzare verso i tuoi obiettivi. L'app è pubblicata a Ginevra (Svizzera) e progettata principalmente per il mercato svizzero, con possibilità d'uso internazionale.</p>" },
-      { "heading": "2. Nessuna consulenza finanziaria", "html": "<p>Gli indicatori, i punteggi, i piani e le raccomandazioni mostrati da LIBERIA — sia dal generatore locale sia dall'assistente IA — <strong>non costituiscono consulenza finanziaria, fiscale, legale o d'investimento</strong>. Non provengono da un professionista qualificato. Prima di qualsiasi decisione importante, consulta un consulente adatto alla tua situazione. Vedi anche la nostra <a href=\"/legal\">avvertenza completa</a>.</p>" },
-      { "heading": "3. Account utente", "html": "<p>Devi avere almeno 18 anni (o l'età di maggior età legale nella tua giurisdizione) per creare un account. Sei responsabile della riservatezza della tua password e dell'attività sul tuo account. Puoi eliminare il tuo account in qualsiasi momento dalle tue impostazioni — la cancellazione è definitiva e irreversibile.</p>" },
-      { "heading": "4. Prova gratuita e abbonamento", "html": "<p>LIBERIA offre una prova gratuita di 14 giorni. È richiesto un metodo di pagamento valido per avviare la prova. Dopo 14 giorni, l'abbonamento scelto (mensile o annuale) viene addebitato automaticamente. Puoi disdire in qualsiasi momento dal tuo portale abbonamento — senza giustificazione, senza domande.</p><p><strong>Anti-abuso:</strong> la prova gratuita è limitata a una per account. Una nuova sottoscrizione dopo una disdetta inizia immediatamente alla tariffa standard.</p>" },
-      { "heading": "5. Prezzi", "html": "<ul><li>Abbonamento mensile: 14.99 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li>Abbonamento annuale: 119.99 CHF / anno (circa 9.99 CHF / mese, ≈ 60 CHF risparmiati all'anno), addebitato una volta all'anno.</li></ul><p>I prezzi sono indicati in franchi svizzeri (CHF), tasse incluse. Nessuna spesa nascosta.</p>" },
-      { "heading": "6. Disdetta e recesso", "html": "<p>Puoi disdire il tuo abbonamento in qualsiasi momento dal portale abbonamento (Stripe). La disdetta ha effetto alla fine del periodo in corso — il tuo accesso resta attivo fino allora. Nessun addebito aggiuntivo sarà effettuato.</p><p>Se disdici durante la prova di 14 giorni, nessun importo viene addebitato.</p>" },
-      { "heading": "7. Rimborso", "html": "<p>Dato il formato del servizio digitale con accesso immediato, nessun rimborso è dovuto una volta che il periodo è stato pagato. Per un problema tecnico importante che ti ha impedito di usare l'app, contatta <strong>support@liberia.app</strong> — esaminiamo ogni caso.</p>" },
-      { "heading": "8. Uso accettabile", "html": "<p>Ti impegni a usare LIBERIA in buona fede: non tentare di accedere a dati non tuoi, non perturbare l'infrastruttura, non riutilizzare il servizio per scopi fraudolenti. L'uso abusivo dell'assistente IA (volume eccessivo, contenuto fuori ambito) può comportare la sospensione.</p>" },
-      { "heading": "9. Dati e privacy", "html": "<p>Vedi la nostra <a href=\"/privacy\">informativa sulla privacy</a> dettagliata. In breve: raccolta minima, hosting in UE, nessuna rivendita, controllo completo lato utente (export GDPR, cancellazione in due clic).</p>" },
-      { "heading": "10. Responsabilità", "html": "<p>LIBERIA fornisce uno strumento informativo. Non possiamo essere ritenuti responsabili delle conseguenze finanziarie di una decisione presa esclusivamente sulla base delle informazioni mostrate nell'app. Qualsiasi decisione finanziaria importante resta di tua esclusiva responsabilità.</p>" },
-      { "heading": "11. Modifiche", "html": "<p>Questi termini possono evolvere. Qualsiasi modifica sostanziale (cambio di prezzo, nuova categoria di email, modifica del trattamento dei dati) ti sarà notificata via email con ragionevole preavviso. L'uso continuato dopo la notifica equivale ad accettazione.</p>" },
-      { "heading": "12. Legge applicabile", "html": "<p>Questi termini sono regolati dal diritto svizzero. Qualsiasi controversia rientra nella giurisdizione dei tribunali di Ginevra, fatte salve le disposizioni imperative sulla protezione del consumatore applicabili nella tua residenza abituale.</p>" },
-      { "heading": "13. Contatto", "html": "<p>Per qualsiasi domanda sul tuo abbonamento o su questi termini: <strong>support@liberia.app</strong>.</p>" }
+      {
+        "heading": "1. Oggetto",
+        "html": "<p>LIBERIA è uno strumento di pilotaggio finanziario personale pensato per aiutarti a capire la tua situazione, strutturare il tuo budget e avanzare verso i tuoi obiettivi. L'app è pubblicata a Ginevra (Svizzera) e progettata principalmente per il mercato svizzero, con possibilità d'uso internazionale.</p>"
+      },
+      {
+        "heading": "2. Nessuna consulenza finanziaria",
+        "html": "<p>Gli indicatori, i punteggi, i piani e le raccomandazioni mostrati da LIBERIA — sia dal generatore locale sia dall'assistente IA — <strong>non costituiscono consulenza finanziaria, fiscale, legale o d'investimento</strong>. Non provengono da un professionista qualificato. Prima di qualsiasi decisione importante, consulta un consulente adatto alla tua situazione. Vedi anche la nostra <a href=\"/legal\">avvertenza completa</a>.</p>"
+      },
+      {
+        "heading": "3. Account utente",
+        "html": "<p>Devi avere almeno 18 anni (o l'età di maggior età legale nella tua giurisdizione) per creare un account. Sei responsabile della riservatezza della tua password e dell'attività sul tuo account. Puoi eliminare il tuo account in qualsiasi momento dalle tue impostazioni — la cancellazione è definitiva e irreversibile.</p>"
+      },
+      {
+        "heading": "4. Prova gratuita e abbonamento",
+        "html": "<p>LIBERIA offre una prova gratuita di 14 giorni. È richiesto un metodo di pagamento valido per avviare la prova. Dopo 14 giorni, l'abbonamento scelto (mensile o annuale) viene addebitato automaticamente. Puoi disdire in qualsiasi momento dal tuo portale abbonamento — senza giustificazione, senza domande.</p><p><strong>Anti-abuso:</strong> la prova gratuita è limitata a una per account. Una nuova sottoscrizione dopo una disdetta inizia immediatamente alla tariffa standard.</p>"
+      },
+      {
+        "heading": "5. Prezzi",
+        "html": "<ul><li>Abbonamento mensile: 14.99 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li>Abbonamento annuale: 119.99 CHF / anno (circa 9.99 CHF / mese, ≈ 60 CHF risparmiati all'anno), addebitato una volta all'anno.</li></ul><p>I prezzi sono indicati in franchi svizzeri (CHF), tasse incluse. Nessuna spesa nascosta.</p>"
+      },
+      {
+        "heading": "6. Disdetta e recesso",
+        "html": "<p>Puoi disdire il tuo abbonamento in qualsiasi momento dal portale abbonamento (Stripe). La disdetta ha effetto alla fine del periodo in corso — il tuo accesso resta attivo fino allora. Nessun addebito aggiuntivo sarà effettuato.</p><p>Se disdici durante la prova di 14 giorni, nessun importo viene addebitato.</p>"
+      },
+      {
+        "heading": "7. Rimborso",
+        "html": "<p>Dato il formato del servizio digitale con accesso immediato, nessun rimborso è dovuto una volta che il periodo è stato pagato. Per un problema tecnico importante che ti ha impedito di usare l'app, contatta <strong>support@liberia.app</strong> — esaminiamo ogni caso.</p>"
+      },
+      {
+        "heading": "8. Uso accettabile",
+        "html": "<p>Ti impegni a usare LIBERIA in buona fede: non tentare di accedere a dati non tuoi, non perturbare l'infrastruttura, non riutilizzare il servizio per scopi fraudolenti. L'uso abusivo dell'assistente IA (volume eccessivo, contenuto fuori ambito) può comportare la sospensione.</p>"
+      },
+      {
+        "heading": "9. Dati e privacy",
+        "html": "<p>Vedi la nostra <a href=\"/privacy\">informativa sulla privacy</a> dettagliata. In breve: raccolta minima, hosting in UE, nessuna rivendita, controllo completo lato utente (export GDPR, cancellazione in due clic).</p>"
+      },
+      {
+        "heading": "10. Responsabilità",
+        "html": "<p>LIBERIA fornisce uno strumento informativo. Non possiamo essere ritenuti responsabili delle conseguenze finanziarie di una decisione presa esclusivamente sulla base delle informazioni mostrate nell'app. Qualsiasi decisione finanziaria importante resta di tua esclusiva responsabilità.</p>"
+      },
+      {
+        "heading": "11. Modifiche",
+        "html": "<p>Questi termini possono evolvere. Qualsiasi modifica sostanziale (cambio di prezzo, nuova categoria di email, modifica del trattamento dei dati) ti sarà notificata via email con ragionevole preavviso. L'uso continuato dopo la notifica equivale ad accettazione.</p>"
+      },
+      {
+        "heading": "12. Legge applicabile",
+        "html": "<p>Questi termini sono regolati dal diritto svizzero. Qualsiasi controversia rientra nella giurisdizione dei tribunali di Ginevra, fatte salve le disposizioni imperative sulla protezione del consumatore applicabili nella tua residenza abituale.</p>"
+      },
+      {
+        "heading": "13. Contatto",
+        "html": "<p>Per qualsiasi domanda sul tuo abbonamento o su questi termini: <strong>support@liberia.app</strong>.</p>"
+      }
     ]
   },
   "aiPolicy": {
@@ -245,37 +317,25 @@
     "title": "Un'IA che ti sostiene, non ti sostituisce.",
     "intro": "L'assistente IA di LIBERIA è progettato per aiutarti a vedere chiaro, proporre azioni concrete e adattare il tono al tuo profilo. Non è né un consulente finanziario, né un terapeuta, né un oracolo.",
     "sections": [
-      { "heading": "Cosa fa l'IA", "html": "<ul><li><strong>Legge i tuoi dati dichiarati.</strong> Entrate, spese, obiettivi, piano attuale, preferenze di coaching. Solo ciò che hai inserito tu.</li><li><strong>Propone azioni concrete.</strong> Piccoli passi settimanali, aggiustamenti di budget, priorità del debito. Sempre con una breve spiegazione del perché.</li><li><strong>Adatta il tono al tuo profilo.</strong> Calmo e rassicurante, diretto e motivante, strutturato o graduale — scegli lo stile nelle tue impostazioni.</li></ul>" },
-      { "heading": "Cosa l'IA non fa", "html": "<ul><li><strong>Nessuna consulenza regolamentata.</strong> Nessuna raccomandazione d'investimento, nessuna ottimizzazione fiscale personalizzata, nessuna consulenza legale. Per questi argomenti, l'assistente ti rinvia a un professionista qualificato.</li><li><strong>Nessuna promessa finanziaria.</strong> L'IA non garantisce rendimenti, non prevede il futuro e non ti spinge mai a un rischio sproporzionato.</li><li><strong>Nessun giudizio.</strong> Il tono è calmo, fattuale, gentile. Nessuna colpa, nessuna pressione artificiale.</li></ul>" },
-      { "heading": "I tuoi dati e l'IA", "html": "<ul><li><strong>Nessun addestramento.</strong> I tuoi dati non sono mai usati per addestrare o riaddestrare un modello IA, né il nostro né quello dei nostri fornitori (Anthropic).</li><li><strong>Elaborazione a richiesta.</strong> L'IA riceve i tuoi dati solo quando poni una domanda o richiedi un piano. L'istantanea inviata è minima e non viene mai conservata dal fornitore LLM oltre l'elaborazione.</li><li><strong>Modalità di fallback locale.</strong> Quando l'assistente non è collegato, LIBERIA usa un generatore di risposta deterministico lato server — nessun dato lascia la nostra infrastruttura.</li><li><strong>Cancellazione completa.</strong> L'eliminazione del tuo account cancella la cronologia delle conversazioni + tutti i piani generati. Puoi anche eliminare una conversazione alla volta dall'interfaccia.</li></ul>" },
-      { "heading": "Limiti ed errori", "html": "<p>I modelli IA possono sbagliare, fraintendere sfumature o proporre un'azione poco adatta alla tua situazione particolare. Prima di agire su una raccomandazione importante (rimborsare un prestito, cambiare assicurazione, avviare un investimento), prenditi il tempo di riflettere — e se la posta in gioco è alta, consulta un professionista qualificato.</p><p>Puoi segnalare una risposta problematica rispondendo direttamente all'email del riepilogo settimanale o scrivendo a <strong>support@liberia.app</strong>.</p>" }
+      {
+        "heading": "Cosa fa l'IA",
+        "html": "<ul><li><strong>Legge i tuoi dati dichiarati.</strong> Entrate, spese, obiettivi, piano attuale, preferenze di coaching. Solo ciò che hai inserito tu.</li><li><strong>Propone azioni concrete.</strong> Piccoli passi settimanali, aggiustamenti di budget, priorità del debito. Sempre con una breve spiegazione del perché.</li><li><strong>Adatta il tono al tuo profilo.</strong> Calmo e rassicurante, diretto e motivante, strutturato o graduale — scegli lo stile nelle tue impostazioni.</li></ul>"
+      },
+      {
+        "heading": "Cosa l'IA non fa",
+        "html": "<ul><li><strong>Nessuna consulenza regolamentata.</strong> Nessuna raccomandazione d'investimento, nessuna ottimizzazione fiscale personalizzata, nessuna consulenza legale. Per questi argomenti, l'assistente ti rinvia a un professionista qualificato.</li><li><strong>Nessuna promessa finanziaria.</strong> L'IA non garantisce rendimenti, non prevede il futuro e non ti spinge mai a un rischio sproporzionato.</li><li><strong>Nessun giudizio.</strong> Il tono è calmo, fattuale, gentile. Nessuna colpa, nessuna pressione artificiale.</li></ul>"
+      },
+      {
+        "heading": "I tuoi dati e l'IA",
+        "html": "<ul><li><strong>Nessun addestramento.</strong> I tuoi dati non sono mai usati per addestrare o riaddestrare un modello IA, né il nostro né quello dei nostri fornitori (Anthropic).</li><li><strong>Elaborazione a richiesta.</strong> L'IA riceve i tuoi dati solo quando poni una domanda o richiedi un piano. L'istantanea inviata è minima e non viene mai conservata dal fornitore LLM oltre l'elaborazione.</li><li><strong>Modalità di fallback locale.</strong> Quando l'assistente non è collegato, LIBERIA usa un generatore di risposta deterministico lato server — nessun dato lascia la nostra infrastruttura.</li><li><strong>Cancellazione completa.</strong> L'eliminazione del tuo account cancella la cronologia delle conversazioni + tutti i piani generati. Puoi anche eliminare una conversazione alla volta dall'interfaccia.</li></ul>"
+      },
+      {
+        "heading": "Limiti ed errori",
+        "html": "<p>I modelli IA possono sbagliare, fraintendere sfumature o proporre un'azione poco adatta alla tua situazione particolare. Prima di agire su una raccomandazione importante (rimborsare un prestito, cambiare assicurazione, avviare un investimento), prenditi il tempo di riflettere — e se la posta in gioco è alta, consulta un professionista qualificato.</p><p>Puoi segnalare una risposta problematica rispondendo direttamente all'email del riepilogo settimanale o scrivendo a <strong>support@liberia.app</strong>.</p>"
+      }
     ],
     "ctaSecurity": "Vedere la pagina sulla sicurezza",
     "ctaPrivacy": "Informativa sulla privacy"
-  },
-  "security": {
-    "metadata": {
-      "title": "Sicurezza e fiducia",
-      "description": "Come LIBERIA protegge i tuoi dati finanziari — crittografia, isolamento per utente, controllo completo lato utente."
-    },
-    "eyebrow": "Sicurezza e fiducia",
-    "title": "Le tue finanze meritano un quadro sano.",
-    "intro": "Non ti promettiamo «sicurezza di livello bancario» — ti diciamo come è costruita, e tu giudichi. La regola che guida tutto: meno tocchiamo i tuoi dati, meglio è.",
-    "pillars": [
-      { "title": "Crittografia in transito e a riposo", "body": "HTTPS richiesto (TLS) tra il tuo browser e i nostri server. Archiviazione cifrata a riposo via Supabase Postgres (AES-256 gestito dall'infrastruttura Supabase, hosting UE)." },
-      { "title": "Isolamento per utente", "body": "Ogni riga delle tue tabelle (entrate, spese, obiettivi, piani, conversazioni) è filtrata dalla Row-Level Security PostgreSQL. Puoi leggere solo i tuoi dati — il database stesso rifiuta le query tra account." },
-      { "title": "Nessun service-role lato browser", "body": "La chiave che aggirerebbe la RLS resta solo lato server. Nessun segreto Stripe, Anthropic o database viene spedito nel bundle del browser." },
-      { "title": "Pagamenti gestiti da Stripe", "body": "Non memorizziamo mai il numero della tua carta. Stripe (conforme PCI livello 1) cattura e conserva le informazioni lato Stripe. Conserviamo solo un identificativo di abbonamento per sincronizzare il tuo stato." },
-      { "title": "Webhook firmato e idempotente", "body": "Gli eventi Stripe sono verificati crittograficamente prima di essere applicati. Una consegna riprodotta per errore non causa una doppia elaborazione (deduplica a livello di database)." },
-      { "title": "Resti in controllo", "body": "Export dati GDPR in un clic. Cancellazione definitiva dell'account in due clic. Nessun dato viene rivenduto — è il nostro impegno." }
-    ],
-    "sections": [
-      { "heading": "Ciò che non facciamo (volutamente)", "html": "<ul><li><strong>Nessuna aggregazione bancaria.</strong> LIBERIA lavora solo con inserimento volontario. Non colleghi mai la tua banca — meno superficie d'attacco, più chiarezza mentale.</li><li><strong>Nessuna rivendita di dati.</strong> Nessun dato lascia il tuo account a fini pubblicitari o commerciali. Nessuna partnership sui dati.</li><li><strong>Nessun tracciamento pubblicitario.</strong> Nessun pixel Facebook / Google Ads. Nessun fingerprinting. Puoi disattivare i contatori interni anonimi nelle tue impostazioni.</li></ul>" },
-      { "heading": "Limiti onesti", "html": "<p>LIBERIA non ha né audit SOC 2 né ISO 27001. Non siamo certificati come banca. È un'app giovane che si appoggia a fornitori robusti (Supabase, Stripe, Vercel) e segue le best practice OWASP di base. Se il tuo utilizzo richiede una certificazione specifica, mettiti in contatto — documenteremo ciò che possiamo.</p>" },
-      { "heading": "Segnalare una vulnerabilità", "html": "<p>Se identifichi un problema di sicurezza, scrivi a <strong>security@liberia.app</strong>. Rispondiamo entro 72 ore lavorative. Preferiamo che ci scrivi prima di qualsiasi pubblicazione — riconosciamo pubblicamente il tuo aiuto dopo la correzione (responsible disclosure).</p>" }
-    ],
-    "ctaPrivacy": "Informativa sulla privacy",
-    "ctaAiPolicy": "Policy IA responsabile"
   },
   "legal": {
     "metadata": {
@@ -310,5 +370,56 @@
     "subtitle": "Crea il tuo account in 30 secondi — o esplora la modalità demo senza registrazione.",
     "ctaStart": "Iniziare gratuitamente",
     "ctaDemo": "Provare la demo"
+  },
+  "securityPage": {
+    "metadata": {
+      "title": "Sicurezza e fiducia",
+      "description": "Come LIBERIA protegge i tuoi dati finanziari — crittografia, isolamento per utente, controllo completo lato utente."
+    },
+    "eyebrow": "Sicurezza e fiducia",
+    "title": "Le tue finanze meritano un quadro sano.",
+    "intro": "Non ti promettiamo «sicurezza di livello bancario» — ti diciamo come è costruita, e tu giudichi. La regola che guida tutto: meno tocchiamo i tuoi dati, meglio è.",
+    "pillars": [
+      {
+        "title": "Crittografia in transito e a riposo",
+        "body": "HTTPS richiesto (TLS) tra il tuo browser e i nostri server. Archiviazione cifrata a riposo via Supabase Postgres (AES-256 gestito dall'infrastruttura Supabase, hosting UE)."
+      },
+      {
+        "title": "Isolamento per utente",
+        "body": "Ogni riga delle tue tabelle (entrate, spese, obiettivi, piani, conversazioni) è filtrata dalla Row-Level Security PostgreSQL. Puoi leggere solo i tuoi dati — il database stesso rifiuta le query tra account."
+      },
+      {
+        "title": "Nessun service-role lato browser",
+        "body": "La chiave che aggirerebbe la RLS resta solo lato server. Nessun segreto Stripe, Anthropic o database viene spedito nel bundle del browser."
+      },
+      {
+        "title": "Pagamenti gestiti da Stripe",
+        "body": "Non memorizziamo mai il numero della tua carta. Stripe (conforme PCI livello 1) cattura e conserva le informazioni lato Stripe. Conserviamo solo un identificativo di abbonamento per sincronizzare il tuo stato."
+      },
+      {
+        "title": "Webhook firmato e idempotente",
+        "body": "Gli eventi Stripe sono verificati crittograficamente prima di essere applicati. Una consegna riprodotta per errore non causa una doppia elaborazione (deduplica a livello di database)."
+      },
+      {
+        "title": "Resti in controllo",
+        "body": "Export dati GDPR in un clic. Cancellazione definitiva dell'account in due clic. Nessun dato viene rivenduto — è il nostro impegno."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Ciò che non facciamo (volutamente)",
+        "html": "<ul><li><strong>Nessuna aggregazione bancaria.</strong> LIBERIA lavora solo con inserimento volontario. Non colleghi mai la tua banca — meno superficie d'attacco, più chiarezza mentale.</li><li><strong>Nessuna rivendita di dati.</strong> Nessun dato lascia il tuo account a fini pubblicitari o commerciali. Nessuna partnership sui dati.</li><li><strong>Nessun tracciamento pubblicitario.</strong> Nessun pixel Facebook / Google Ads. Nessun fingerprinting. Puoi disattivare i contatori interni anonimi nelle tue impostazioni.</li></ul>"
+      },
+      {
+        "heading": "Limiti onesti",
+        "html": "<p>LIBERIA non ha né audit SOC 2 né ISO 27001. Non siamo certificati come banca. È un'app giovane che si appoggia a fornitori robusti (Supabase, Stripe, Vercel) e segue le best practice OWASP di base. Se il tuo utilizzo richiede una certificazione specifica, mettiti in contatto — documenteremo ciò che possiamo.</p>"
+      },
+      {
+        "heading": "Segnalare una vulnerabilità",
+        "html": "<p>Se identifichi un problema di sicurezza, scrivi a <strong>security@liberia.app</strong>. Rispondiamo entro 72 ore lavorative. Preferiamo che ci scrivi prima di qualsiasi pubblicazione — riconosciamo pubblicamente il tuo aiuto dopo la correzione (responsible disclosure).</p>"
+      }
+    ],
+    "ctaPrivacy": "Informativa sulla privacy",
+    "ctaAiPolicy": "Policy IA responsabile"
   }
 }

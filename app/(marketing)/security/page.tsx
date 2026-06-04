@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("marketing.security.metadata");
+  const t = await getTranslations("marketing.securityPage.metadata");
   return {
     title: t("title"),
     description: t("description"),
@@ -34,7 +34,7 @@ type Pillar = { title: string; body: string };
 type Section = { heading: string; html: string };
 
 export default async function SecurityPage() {
-  const t = await getTranslations("marketing.security");
+  const t = await getTranslations("marketing.securityPage");
   const pillars = t.raw("pillars") as Pillar[];
   const sections = t.raw("sections") as Section[];
 

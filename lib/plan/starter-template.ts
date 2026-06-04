@@ -41,56 +41,59 @@ type StepDef = {
   category: StarterStep["category"];
 };
 
+// IDs are underscore-separated. next-intl rejects "." in JSON keys
+// (INVALID_KEY at message initialisation), so we keep the IDs in lock-step
+// with the actual JSON property names under app.plan.starter.content.steps.
 const COMMON_DEFS: StepDef[] = [
-  { id: "common.w1.s1", week_number: 1, category: "review" },
-  { id: "common.w1.s2", week_number: 1, category: "review" },
-  { id: "common.w2.s1", week_number: 2, category: "habit" },
-  { id: "common.w3.s1", week_number: 3, category: "save" },
-  { id: "common.w4.s1", week_number: 4, category: "save" },
+  { id: "common_w1_s1", week_number: 1, category: "review" },
+  { id: "common_w1_s2", week_number: 1, category: "review" },
+  { id: "common_w2_s1", week_number: 2, category: "habit" },
+  { id: "common_w3_s1", week_number: 3, category: "save" },
+  { id: "common_w4_s1", week_number: 4, category: "save" },
 ];
 
 const STRUGGLING_DEFS: StepDef[] = [
-  { id: "struggling.w5.s1", week_number: 5, category: "debt_payoff" },
-  { id: "struggling.w6.s1", week_number: 6, category: "review" },
-  { id: "struggling.w7.s1", week_number: 7, category: "habit" },
-  { id: "struggling.w8.s1", week_number: 8, category: "review" },
-  { id: "struggling.w9.s1", week_number: 9, category: "income_boost" },
-  { id: "struggling.w10.s1", week_number: 10, category: "income_boost" },
-  { id: "struggling.w11.s1", week_number: 11, category: "save" },
-  { id: "struggling.w12.s1", week_number: 12, category: "review" },
+  { id: "struggling_w5_s1", week_number: 5, category: "debt_payoff" },
+  { id: "struggling_w6_s1", week_number: 6, category: "review" },
+  { id: "struggling_w7_s1", week_number: 7, category: "habit" },
+  { id: "struggling_w8_s1", week_number: 8, category: "review" },
+  { id: "struggling_w9_s1", week_number: 9, category: "income_boost" },
+  { id: "struggling_w10_s1", week_number: 10, category: "income_boost" },
+  { id: "struggling_w11_s1", week_number: 11, category: "save" },
+  { id: "struggling_w12_s1", week_number: 12, category: "review" },
 ];
 
 const TIGHT_DEFS: StepDef[] = [
-  { id: "tight.w5.s1", week_number: 5, category: "review" },
-  { id: "tight.w6.s1", week_number: 6, category: "habit" },
-  { id: "tight.w7.s1", week_number: 7, category: "save" },
-  { id: "tight.w8.s1", week_number: 8, category: "save" },
-  { id: "tight.w9.s1", week_number: 9, category: "debt_payoff" },
-  { id: "tight.w10.s1", week_number: 10, category: "debt_payoff" },
-  { id: "tight.w11.s1", week_number: 11, category: "habit" },
-  { id: "tight.w12.s1", week_number: 12, category: "review" },
+  { id: "tight_w5_s1", week_number: 5, category: "review" },
+  { id: "tight_w6_s1", week_number: 6, category: "habit" },
+  { id: "tight_w7_s1", week_number: 7, category: "save" },
+  { id: "tight_w8_s1", week_number: 8, category: "save" },
+  { id: "tight_w9_s1", week_number: 9, category: "debt_payoff" },
+  { id: "tight_w10_s1", week_number: 10, category: "debt_payoff" },
+  { id: "tight_w11_s1", week_number: 11, category: "habit" },
+  { id: "tight_w12_s1", week_number: 12, category: "review" },
 ];
 
 const STABLE_DEFS: StepDef[] = [
-  { id: "stable.w5.s1", week_number: 5, category: "save" },
-  { id: "stable.w6.s1", week_number: 6, category: "review" },
-  { id: "stable.w7.s1", week_number: 7, category: "save" },
-  { id: "stable.w8.s1", week_number: 8, category: "save" },
-  { id: "stable.w9.s1", week_number: 9, category: "review" },
-  { id: "stable.w10.s1", week_number: 10, category: "review" },
-  { id: "stable.w11.s1", week_number: 11, category: "save" },
-  { id: "stable.w12.s1", week_number: 12, category: "review" },
+  { id: "stable_w5_s1", week_number: 5, category: "save" },
+  { id: "stable_w6_s1", week_number: 6, category: "review" },
+  { id: "stable_w7_s1", week_number: 7, category: "save" },
+  { id: "stable_w8_s1", week_number: 8, category: "save" },
+  { id: "stable_w9_s1", week_number: 9, category: "review" },
+  { id: "stable_w10_s1", week_number: 10, category: "review" },
+  { id: "stable_w11_s1", week_number: 11, category: "save" },
+  { id: "stable_w12_s1", week_number: 12, category: "review" },
 ];
 
 const COMFORTABLE_DEFS: StepDef[] = [
-  { id: "comfortable.w5.s1", week_number: 5, category: "review" },
-  { id: "comfortable.w6.s1", week_number: 6, category: "review" },
-  { id: "comfortable.w7.s1", week_number: 7, category: "save" },
-  { id: "comfortable.w8.s1", week_number: 8, category: "review" },
-  { id: "comfortable.w9.s1", week_number: 9, category: "save" },
-  { id: "comfortable.w10.s1", week_number: 10, category: "save" },
-  { id: "comfortable.w11.s1", week_number: 11, category: "income_boost" },
-  { id: "comfortable.w12.s1", week_number: 12, category: "review" },
+  { id: "comfortable_w5_s1", week_number: 5, category: "review" },
+  { id: "comfortable_w6_s1", week_number: 6, category: "review" },
+  { id: "comfortable_w7_s1", week_number: 7, category: "save" },
+  { id: "comfortable_w8_s1", week_number: 8, category: "review" },
+  { id: "comfortable_w9_s1", week_number: 9, category: "save" },
+  { id: "comfortable_w10_s1", week_number: 10, category: "save" },
+  { id: "comfortable_w11_s1", week_number: 11, category: "income_boost" },
+  { id: "comfortable_w12_s1", week_number: 12, category: "review" },
 ];
 
 const DEFS_BY_SITUATION: Record<Situation, StepDef[]> = {
@@ -105,9 +108,9 @@ export function getStarterPlan(
   t: StarterTranslator,
 ): StarterPlan {
   const defs = [...COMMON_DEFS, ...DEFS_BY_SITUATION[situation]];
-  // Step IDs contain dots (e.g. "common.w1.s1"), which next-intl would
-  // interpret as a nested path. Use the raw dictionary so the literal
-  // key is preserved and we look it up ourselves.
+  // Step IDs are flat underscore-separated keys so they survive the
+  // next-intl INVALID_KEY guard (dots are reserved for nesting). Pull
+  // the whole table at once via raw() so we control the lookup.
   const stepsTable = t.raw("steps") as Record<
     string,
     { focus: string; title: string; description: string }

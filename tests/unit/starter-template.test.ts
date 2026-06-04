@@ -23,10 +23,13 @@ const LOCALES = [
 ] as const;
 
 function makeTranslator(locale: string, app: unknown): StarterTranslator {
+  // Cast the whole call through `unknown` — next-intl's namespace param
+  // is typed against the message shape; we pin it to the inner subtree
+  // that getStarterPlan expects.
   return createTranslator({
     locale,
-    messages: { app },
-    namespace: "app.plan.starter.content",
+    messages: { app } as unknown as Record<string, unknown>,
+    namespace: "app.plan.starter.content" as never,
   }) as unknown as StarterTranslator;
 }
 
