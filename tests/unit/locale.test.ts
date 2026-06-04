@@ -30,12 +30,18 @@ describe("locale catalogs — V1.1 surface", () => {
     ]);
   });
 
-  it("ships every requested language", () => {
-    const ids = new Set(LANGUAGES.map((l) => l.id));
-    [
-      "fr","fr-CH","fr-FR","en","en-US","en-GB",
-      "de","it","es","pt","hr","sr","bs","sq","tr","ar",
-    ].forEach((id) => expect(ids.has(id as never)).toBe(true));
+  it("ships every fully-translated language (base + region variants)", () => {
+    expect(LANGUAGES.map((l) => l.id)).toEqual([
+      "fr","fr-CH","fr-FR",
+      "en","en-US","en-GB",
+      "de","it","es","pt",
+    ]);
+  });
+
+  it("rejects languages whose catalogue isn't shipped", () => {
+    for (const id of ["hr","sr","bs","sq","tr","ar"]) {
+      expect(isLanguageId(id)).toBe(false);
+    }
   });
 
   it("guards inputs at the type boundary", () => {
@@ -61,8 +67,18 @@ describe("country → suggested defaults", () => {
     expect(getDefaultLanguageForCountry("IT")).toBe("it");
     expect(getDefaultCurrencyForCountry("DE")).toBe("EUR");
     expect(getDefaultLanguageForCountry("DE")).toBe("de");
-    expect(getDefaultCurrencyForCountry("HR")).toBe("EUR");
-    expect(getDefaultLanguageForCountry("HR")).toBe("hr");
+  });
+
+  it("countries without a translated native language default to en", () => {
+    // Croatian / Serbian / Bosnian / Albanian / Turkish catalogues
+    // aren't shipped — the country still selects EUR/TRY for currency
+    // but defaults the UI to English instead of staring at a blank
+    // fallback.
+    expect(getDefaultLanguageForCountry("HR")).toBe("en");
+    expect(getDefaultLanguageForCountry("RS")).toBe("en");
+    expect(getDefaultLanguageForCountry("BA")).toBe("en");
+    expect(getDefaultLanguageForCountry("AL")).toBe("en");
+    expect(getDefaultLanguageForCountry("TR")).toBe("en");
   });
 
   it("USD / GBP / CAD / TRY each map to the right country", () => {
@@ -97,8 +113,8 @@ describe("getLocaleForLanguage — country-aware tag resolution", () => {
   });
 
   it("returns bare language when country is missing", () => {
-    expect(getLocaleForLanguage("hr")).toBe("hr");
-    expect(getLocaleForLanguage("ar", null)).toBe("ar");
+    expect(getLocaleForLanguage("pt")).toBe("pt");
+    expect(getLocaleForLanguage("de", null)).toBe("de");
   });
 
   it("defaults to 'fr' when language is empty", () => {
@@ -118,9 +134,9 @@ describe("required V1.1 combinations all validate", () => {
     ["CH", "CHF", "en"],
     ["FR", "EUR", "fr-FR"],
     ["IT", "EUR", "it"],
-    ["HR", "EUR", "hr"],
+    ["HR", "EUR", "en"],
     ["US", "USD", "en-US"],
-    ["TR", "TRY", "tr"],
+    ["TR", "TRY", "en"],
   ];
   for (const [country, currency, language] of combos) {
     it(`${country} + ${currency} + ${language}`, () => {

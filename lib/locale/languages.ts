@@ -7,9 +7,12 @@
  * gets `'1'234 CHF'` formatting and a French French user gets
  * `'1 234 €'`.
  *
- * The UI itself is in French for the V1 launch — the language field
- * prepares for a future translation catalog without coupling country
- * to language (a Swiss user can perfectly pick German or English).
+ * Only languages with a complete `messages/<base>/*.json` catalogue
+ * appear here — exposing a language in the selector without shipping
+ * its translations leaves users staring at fallback English with no
+ * indication anything is wrong. Region variants of fr/en stay because
+ * they resolve to the same base catalogue but drive locale-aware
+ * number / date formatting via `getLocaleForLanguage`.
  */
 export type LanguageId =
   | "fr"
@@ -21,13 +24,7 @@ export type LanguageId =
   | "de"
   | "it"
   | "es"
-  | "pt"
-  | "hr"
-  | "sr"
-  | "bs"
-  | "sq"
-  | "tr"
-  | "ar";
+  | "pt";
 
 export type Language = {
   id: LanguageId;
@@ -45,12 +42,6 @@ export const LANGUAGES: readonly Language[] = [
   { id: "it", label: "Italiano" },
   { id: "es", label: "Español" },
   { id: "pt", label: "Português" },
-  { id: "hr", label: "Hrvatski" },
-  { id: "sr", label: "Srpski" },
-  { id: "bs", label: "Bosanski" },
-  { id: "sq", label: "Shqip" },
-  { id: "tr", label: "Türkçe" },
-  { id: "ar", label: "العربية" },
 ] as const;
 
 export function isLanguageId(value: unknown): value is LanguageId {
@@ -75,12 +66,6 @@ const ENGLISH_NAMES: Record<LanguageId, string> = {
   it: "Italian",
   es: "Spanish",
   pt: "Portuguese",
-  hr: "Croatian",
-  sr: "Serbian",
-  bs: "Bosnian",
-  sq: "Albanian",
-  tr: "Turkish",
-  ar: "Arabic",
 };
 
 export function getLanguageEnglishName(

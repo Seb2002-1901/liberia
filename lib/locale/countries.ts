@@ -44,11 +44,14 @@ export const COUNTRIES: readonly Country[] = [
   { id: "CA", label: "Canada",                  defaultCurrency: "CAD", defaultLanguage: "en"    },
   { id: "PT", label: "Portugal",                defaultCurrency: "EUR", defaultLanguage: "pt"    },
   { id: "ES", label: "Espagne",                 defaultCurrency: "EUR", defaultLanguage: "es"    },
-  { id: "HR", label: "Croatie",                 defaultCurrency: "EUR", defaultLanguage: "hr"    },
-  { id: "RS", label: "Serbie",                  defaultCurrency: "EUR", defaultLanguage: "sr"    },
-  { id: "BA", label: "Bosnie-Herzégovine",      defaultCurrency: "EUR", defaultLanguage: "bs"    },
-  { id: "AL", label: "Albanie",                 defaultCurrency: "EUR", defaultLanguage: "sq"    },
-  { id: "TR", label: "Turquie",                 defaultCurrency: "TRY", defaultLanguage: "tr"    },
+  // Countries whose native language doesn't (yet) have a complete
+  // catalogue default to English — the country selection still works
+  // for currency / formatting, the language stays user-overridable.
+  { id: "HR", label: "Croatie",                 defaultCurrency: "EUR", defaultLanguage: "en"    },
+  { id: "RS", label: "Serbie",                  defaultCurrency: "EUR", defaultLanguage: "en"    },
+  { id: "BA", label: "Bosnie-Herzégovine",      defaultCurrency: "EUR", defaultLanguage: "en"    },
+  { id: "AL", label: "Albanie",                 defaultCurrency: "EUR", defaultLanguage: "en"    },
+  { id: "TR", label: "Turquie",                 defaultCurrency: "TRY", defaultLanguage: "en"    },
 ] as const;
 
 export function isCountryId(value: unknown): value is CountryId {

@@ -4,13 +4,15 @@
  * - `locales` lists every BCP-47 base tag the app can present an
  *   interface in. Mirrors `lib/locale/languages.ts` minus the region-
  *   qualified variants (region affects formatting, not translations).
+ *   Every locale listed here MUST ship a complete catalogue under
+ *   `messages/<locale>/*.json` — the parity test in
+ *   `tests/unit/messages-coverage.test.ts` fails otherwise.
  * - `defaultLocale` is the ultimate fallback when no preference can
  *   be derived (anonymous request without cookie or Accept-Language).
- * - `FULLY_TRANSLATED` lists the locales whose message catalogue is
- *   considered production-ready. Locales outside this set silently
- *   fall back to English: the profile selector keeps them visible so
- *   a user can pin their language for later, but the UI renders in EN
- *   until human translations land.
+ * - `FULLY_TRANSLATED` historically distinguished production-ready
+ *   locales from placeholders. We now require every locale in
+ *   `locales` to be production-ready, so the set is identical — kept
+ *   as a named export for back-compat with `loadLocaleFor` callers.
  */
 export const locales = [
   "fr",
@@ -19,26 +21,15 @@ export const locales = [
   "it",
   "es",
   "pt",
-  "hr",
-  "sr",
-  "bs",
-  "sq",
-  "tr",
-  "ar",
 ] as const;
 
 export type AppLocale = (typeof locales)[number];
 
 export const defaultLocale: AppLocale = "en";
 
-export const FULLY_TRANSLATED: ReadonlySet<AppLocale> = new Set<AppLocale>([
-  "fr",
-  "en",
-  "de",
-  "it",
-  "es",
-  "pt",
-]);
+export const FULLY_TRANSLATED: ReadonlySet<AppLocale> = new Set<AppLocale>(
+  locales,
+);
 
 export function isAppLocale(value: unknown): value is AppLocale {
   return typeof value === "string" && (locales as readonly string[]).includes(value);
@@ -59,9 +50,9 @@ export function resolveAppLocale(input: string | null | undefined): AppLocale {
 }
 
 /**
- * For locales without a production catalogue yet, fall back to EN
- * messages so the UI is never blank. Returns the locale to actually
- * load JSON for.
+ * Every supported locale now ships a complete catalogue, so this is a
+ * no-op — kept as a stable entry point in case we ever reintroduce
+ * partial-translation locales.
  */
 export function loadLocaleFor(requested: AppLocale): AppLocale {
   return FULLY_TRANSLATED.has(requested) ? requested : "en";
