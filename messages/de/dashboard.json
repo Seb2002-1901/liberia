@@ -1,1 +1,268 @@
-{}
+{
+  "metadata": {
+    "title": "Dashboard"
+  },
+  "header": {
+    "eyebrow": "Übersicht",
+    "title": "Hallo, {firstName}",
+    "description": "Hier ist deine aktuelle Finanzübersicht. Du kannst Einkommen, Ausgaben und Ziele jederzeit anpassen.",
+    "demoBadge": "Demo-Modus",
+    "addExpense": "Ausgabe hinzufügen",
+    "addIncome": "Einkommen hinzufügen"
+  },
+  "stats": {
+    "stressLabel": "Finanzieller Stress",
+    "stressHintHigh": "Konzentriere dich diesen Monat auf das Wesentliche.",
+    "stressHintLow": "Beherrschbares Niveau, halte den Kurs.",
+    "income": "Monatliches Einkommen",
+    "expenses": "Monatliche Ausgaben",
+    "leftover": "Verfügbares Geld",
+    "leftoverHint": "Sparquote {rate}",
+    "emergency": "Notgroschen",
+    "monthsSuffix": "{months} Monate"
+  },
+  "alerts": {
+    "title": "Hinweise",
+    "emptyTitle": "Trage deine Daten ein, um loszulegen",
+    "emptyText": "Erfasse dein Einkommen und deine Ausgaben, um deine ersten Hinweise zu sehen — ein paar Minuten reichen.",
+    "cashflowNegativeTitle": "Du gibst mehr aus, als du verdienst",
+    "cashflowNegativeText": "Finde 1 oder 2 nicht-essenzielle Ausgaben zum Kürzen.",
+    "cashflowPositiveTitle": "Dein Monatsfluss ist positiv",
+    "cashflowPositiveText": "Überlege, eine monatliche Sparüberweisung zu automatisieren.",
+    "runwayLowTitle": "Notgroschen sehr gering",
+    "runwayLowText": "Kurzfristiges Ziel: 1 Monat Ausgaben zur Seite legen.",
+    "runwaySolidTitle": "Notgroschen solide",
+    "runwaySolidText": "Erhalte ihn — er ist deine Ruhe.",
+    "runwayBuildingTitle": "Notgroschen wächst",
+    "runwayBuildingText": "Strebe schrittweise 3 Monate Ausgaben an."
+  },
+  "dailyInsight": {
+    "eyebrow": "Einsicht des Tages",
+    "deepen": "Mit dem Coach vertiefen",
+    "nextAction": "Nächste Aktion"
+  },
+  "insights": {
+    "cashflowNegative": {
+      "headline": "Du gibst ungefähr {gap} mehr aus, als du jeden Monat verdienst.",
+      "bodyAvoidant": "Unangenehm hinzusehen — das ist normal. Wir gehen sanft vor, eine Ausgabe nach der anderen.",
+      "bodyDefault": "Gute Nachricht: Es ist messbar, also adressierbar. Wir nehmen eine Kategorie nach der anderen.",
+      "metricLabel": "Monatliche Lücke",
+      "nextAction": "Identifiziere eine wiederkehrende Ausgabe, die du diesen Monat um ungefähr {targetCut} kürzen kannst."
+    },
+    "highDti": {
+      "headline": "Deine Rückzahlungen machen {pct}% deines Einkommens aus.",
+      "body": "Über 30% belasten sie dein verfügbares Einkommen stark. Wir können dieses Verhältnis senken, bevor wir Sparen angehen.",
+      "metricLabel": "Schulden / Einkommen",
+      "nextAction": "Liste deine Kredite nach Zinssatz auf und konzentriere dich auf den teuersten."
+    },
+    "emergencyFundFirst": {
+      "headline": "Dein erster Meilenstein: einen Monat Ausgaben zur Seite legen.",
+      "bodyAnxious": "Ein finanzielles Polster reduziert die tägliche Angst — auch klein verändert es alles.",
+      "bodyDefault": "Ein Notgroschen schützt dich vor Überraschungen, bevor du ehrgeizigere Ziele angehst.",
+      "metricLabel": "Vorgeschlagene automatische Überweisung",
+      "nextAction": "Plane eine automatische Überweisung von {monthlyTarget} zu Monatsbeginn auf ein separates Konto."
+    },
+    "lowSavings": {
+      "headline": "Du könntest wahrscheinlich rund {estimate} pro Monat freisetzen.",
+      "body": "Nicht-essenzielle Kategorien machen oft 5-10% der Ausgaben aus, ohne dass du es bemerkst. Eine schnelle Prüfung reicht.",
+      "metricLabel": "Geschätzter potenzieller Spielraum",
+      "nextAction": "Prüfe deine aktiven Abos und kündige die, die du diesen Monat nicht genutzt hast."
+    },
+    "solidAcceleration": {
+      "headline": "Du sparst bereits {pct}% deines Einkommens.",
+      "body": "Deine Basis ist solide. Du kannst ein Ziel beschleunigen, deinen Notgroschen festigen oder beginnen, einen Teil deiner Ersparnisse arbeiten zu lassen.",
+      "metricLabel": "Monatliche Sparkapazität",
+      "nextAction": "Wähle ein 6-bis-12-Monats-Zahlenziel und richte einen Teil deines verfügbaren Einkommens darauf aus."
+    },
+    "intermediate": {
+      "headlinePositive": "Du könntest in 12 Monaten bei deinem aktuellen Tempo ungefähr {projection} sparen.",
+      "headlineNeutral": "Du bist im Gleichgewicht — das ist eine gesunde Arbeitsgrundlage.",
+      "bodyDirect": "Du hast die Basis. Setze ein 90-Tage-Zahlenziel und handle.",
+      "bodyStructured": "Setze 1 messbare Gewohnheit, gib dir einen wöchentlichen Meilenstein, messe in 30 Tagen.",
+      "bodyGentle": "Schritt für Schritt summieren sich einfache Anpassungen. Kein Druck, nur Konstanz.",
+      "bodyMotivated": "Du scheinst bereit zu handeln. Wir können diese Energie in einfache, dauerhafte Gewohnheiten verwandeln.",
+      "bodyCalm": "Schritt für Schritt summieren sich einfache Anpassungen. Das Ziel ist nicht Perfektion, sondern Konstanz.",
+      "metricLabelPositive": "12-Monats-Projektion",
+      "metricLabelNeutral": "Monatlich verfügbar",
+      "nextActionStructured": "Wähle 1 Schlüsselkennzahl (Sparquote, Reichweite) und verfolge sie wöchentlich 30 Tage lang.",
+      "nextActionDirect": "Wähle 1 konkrete Finanzgewohnheit und starte sie diese Woche — automatische Überweisung oder Einkaufsdeckel.",
+      "nextActionCalm": "Wähle 1 Finanzgewohnheit zum Testen für 30 Tage — automatische Überweisung, Einkaufsbudget oder wöchentliche Prüfung."
+    }
+  },
+  "weeklyRecap": {
+    "eyebrow": "Diese Woche",
+    "deltaUp": "+{delta} vs. letzte Woche",
+    "deltaDown": "{delta} vs. letzte Woche",
+    "deltaSame": "gleiches Tempo",
+    "activeDay": "aktiver Tag",
+    "activeDays": "aktive Tage",
+    "entry": "Bewegung",
+    "entries": "Bewegungen",
+    "step": "Schritt",
+    "steps": "Schritte",
+    "victoryLabel": "Erwähnenswert",
+    "nextPriorityLabel": "Nächste Priorität",
+    "victories": {
+      "stepOne": "Ein Planschritt diese Woche erledigt — jede Stufe zählt.",
+      "stepsMany": "{count} Planschritte diese Woche erledigt — solide Konstanz.",
+      "activeFive": "Stetige Präsenz diese Woche — das macht langfristig den Unterschied.",
+      "activeThree": "Mehrere aktive Tage diese Woche — der Rhythmus baut sich auf.",
+      "runwaySolid": "Dein Notgroschen bleibt solide. Bewahre ihn weiter.",
+      "savingsRateHigh": "Deine Sparquote bleibt über 15% — das ist selten und wertvoll.",
+      "activeOne": "Du bist diese Woche zurückgekommen. Konstanz schlägt Intensität.",
+      "presence": "Du bist hier. Das ist schon ein erster Schritt — wir starten sanft wieder."
+    },
+    "priorities": {
+      "cashflowNegative": "Wähle diese Woche eine Ausgabe zum Kürzen — beginne mit der einfachsten.",
+      "noEmergency": "Plane eine automatische Überweisung auf ein separates Sparkonto.",
+      "planContinue": "Setze deinen Plan fort — der nächste Schritt steht im Plan-Tab.",
+      "subscriptions": "Prüfe deine aktiven Abos — das ist die wirkungsvollste Aktion.",
+      "twelveMonthGoal": "Wähle ein 12-Monats-Zahlenziel und richte einen Teil deines verfügbaren Einkommens darauf aus.",
+      "trackingHabit": "Erfasse diese Woche 1 oder 2 Ausgaben, um den Tracking-Reflex zu erhalten."
+    },
+    "actions": {
+      "checkin": "Check-in machen",
+      "viewPlan": "Meinen Plan anzeigen",
+      "myGoals": "Meine Ziele"
+    }
+  },
+  "proactiveCard": {
+    "eyebrow": "Coach",
+    "longInactive": {
+      "headlineDirect": "Es sind ein paar Tage her — wollen wir uns kurz austauschen?",
+      "headlineStructured": "Ein paar Tage ohne Tracking — starten wir sanft wieder.",
+      "headlineCalm": "Wir haben uns ein paar Tage nicht gesehen. Lust, sanft wieder einzusteigen?",
+      "actionLabel": "Mit dem Coach Kontakt aufnehmen"
+    },
+    "goalClose": {
+      "headline": "Dein Ziel « {title} » steht bei {pct}%.",
+      "body": "Nur noch {remaining}, um es abzuschliessen.",
+      "actionLabel": "Meine Ziele ansehen"
+    },
+    "tightMonth": {
+      "headlineDirect": "Deine Ausgaben übersteigen dein Einkommen um etwa {gap}/Monat.",
+      "headlineCalm": "Ein knapper Monat — etwa {gap} mehr als dein Einkommen.",
+      "bodyGentle": "Keine Panik. Eine Ausgabe nach der anderen reicht.",
+      "bodyCalm": "Wir können eine Kategorie nach der anderen angehen, ohne Druck.",
+      "actionLabel": "Mit dem Coach sprechen"
+    },
+    "solidProgress": {
+      "headline": "Du bewegst dich in die richtige Richtung.",
+      "body": "Reichweite von {months} Monaten und Sparquote über 15%.",
+      "bodyNoExpense": "Sparquote über 15% und keine wiederkehrenden Belastungen — solide.",
+      "actionLabel": "12-Monats-Ziel setzen"
+    },
+    "emergencyGap": {
+      "headline": "Du hast noch keinen dedizierten Notgroschen.",
+      "body": "Klein anfangen reicht — die Automatisierung erledigt den Rest.",
+      "actionLabel": "Meinen Plan ansehen"
+    }
+  },
+  "planTeaser": {
+    "emptyTitle": "Dein Finanzplan",
+    "emptyDescription": "Ein 30-, 60- oder 90-Tage-Aktionsplan basierend auf deinen Daten.",
+    "generate": "Meinen Plan erstellen",
+    "comingSoon": "Demnächst verfügbar",
+    "subtitle": "{days}-Tage-Plan · {done}/{total} Schritte",
+    "open": "Öffnen",
+    "nextStepLabel": "Nächster Schritt · Woche {week}"
+  },
+  "coachTeaser": {
+    "title": "Einsichten",
+    "subtitle": "Marker, die aus deinen Daten berechnet werden.",
+    "coachCta": "Coach",
+    "empty": "Erfasse Einkommen und Ausgaben, um deine ersten Einsichten zu sehen.",
+    "askCta": "Eine Frage an den Coach stellen",
+    "labels": {
+      "cashflowNegative": "Negatives verfügbares Einkommen",
+      "savingsLow": "Geringe Sparquote",
+      "savingsGood": "Guter Spielraum",
+      "emergencyFund": "Notgroschen"
+    },
+    "texts": {
+      "categoryShare": "Diese Kategorie macht {pct}% deiner Ausgaben aus ({amount}/Monat). −20% für einen Monat ausprobieren?",
+      "cashflowNegative": "Du gibst etwa {amount} mehr aus, als du verdienst. Wir können tiefer graben, wo zu kürzen ist.",
+      "savingsLow": "Aktuell {rate}. Auch eine symbolische automatische Überweisung sichert die Gewohnheit.",
+      "savingsGood": "Sparquote {rate}. Du kannst ein Ziel beschleunigen oder den Notgroschen festigen.",
+      "emergencyLow": "Weniger als ein Monat Ausgaben zur Seite gelegt. Erster Schritt: 1 Monat anstreben.",
+      "emergencyBuilding": "{months} Monate abgedeckt. Nächste solide Stufe: 3 Monate."
+    }
+  },
+  "stability": {
+    "label": "Finanzielle Stabilität",
+    "tiers": {
+      "danger": {
+        "label": "Angespannt",
+        "description": "Wir nehmen die Dinge Schritt für Schritt wieder auf."
+      },
+      "warning": {
+        "label": "Fragil",
+        "description": "Konzentriere dich auf die essenziellen Ausgaben."
+      },
+      "neutral": {
+        "label": "In Bewegung",
+        "description": "Ein paar Anpassungen machen den Unterschied."
+      },
+      "success": {
+        "label": "Stabil",
+        "description": "Du bist auf einem guten Weg."
+      },
+      "gold": {
+        "label": "Solide",
+        "description": "Du baust auf gesunden Fundamenten auf."
+      }
+    }
+  },
+  "expenseBreakdown": {
+    "title": "Aufschlüsselung der Ausgaben",
+    "empty": "Noch keine Ausgaben erfasst."
+  },
+  "goalsSummary": {
+    "title": "Ziele",
+    "active": "Aktive Ziele",
+    "all": "Alle",
+    "emptyTitle": "Noch keine Ziele",
+    "emptyDescription": "Erstelle dein erstes Finanzziel, um Schritt für Schritt voranzukommen.",
+    "emptyCta": "Ein Ziel erstellen"
+  },
+  "cashflowChart": {
+    "title": "Monatlicher Fluss",
+    "preview": "Geglättete Vorschau",
+    "monthsAgo": "−{n} Mo.",
+    "thisMonth": "Diesen Monat",
+    "income": "Einkommen",
+    "expenses": "Ausgaben"
+  },
+  "categories": {
+    "expenses": {
+      "housing": "Wohnen",
+      "food": "Lebensmittel",
+      "transport": "Transport",
+      "utilities": "Rechnungen & Energie",
+      "insurance": "Versicherung",
+      "health": "Gesundheit",
+      "debt": "Kredite / Schulden",
+      "subscriptions": "Abos",
+      "leisure": "Freizeit",
+      "shopping": "Shopping",
+      "family": "Familie / Kinder",
+      "education": "Bildung",
+      "other": "Andere"
+    },
+    "frequencies": {
+      "monthly": "Monatlich",
+      "weekly": "Wöchentlich",
+      "yearly": "Jährlich",
+      "one_time": "Einmalig"
+    },
+    "incomeCategories": {
+      "salary": "Lohn",
+      "freelance": "Freelance",
+      "business": "Geschäft",
+      "investments": "Investitionen",
+      "aid": "Leistungen / Beihilfe",
+      "rental": "Mieteinnahmen",
+      "other": "Andere"
+    }
+  }
+}

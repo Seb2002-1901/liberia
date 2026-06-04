@@ -1,1 +1,130 @@
-{}
+{
+  "eyebrowOnboarding": "Onboarding",
+  "eyebrowFirstInsight": "Primera lectura",
+  "skip": "Saltar por ahora",
+  "stepCounter": "Paso {current} / {total}",
+  "actions": {
+    "back": "Atrás",
+    "continue": "Continuar",
+    "finish": "Iniciar LIBERIA"
+  },
+  "submit": {
+    "successTitle": "Perfil financiero creado.",
+    "successBody": "Tenemos todo lo necesario para empezar.",
+    "invalidPayload": "Datos no válidos"
+  },
+  "steps": {
+    "situation": {
+      "title": "¿Cómo estás financieramente?",
+      "subtitle": "Sin juicio, solo para calibrar."
+    },
+    "income": {
+      "title": "Tus ingresos mensuales.",
+      "subtitle": "Lo que realmente entra, ya descontados los impuestos.",
+      "label": "Ingresos netos mensuales",
+      "placeholder": "2 400",
+      "helper": "Indica lo que entra cada mes, sumando todas las fuentes."
+    },
+    "expenses": {
+      "title": "Tus gastos mensuales.",
+      "subtitle": "Una estimación honesta basta y sobra.",
+      "expensesLabel": "Gastos mensuales estimados",
+      "expensesPlaceholder": "1 900",
+      "debtLabel": "Pagos mensuales de deuda / crédito",
+      "debtPlaceholder": "0"
+    },
+    "savings": {
+      "title": "Tus ahorros disponibles.",
+      "subtitle": "Efectivo accesible, sin contar inmuebles.",
+      "label": "Ahorros disponibles",
+      "placeholder": "1 200",
+      "emergencyFundTitle": "Tengo un fondo de emergencia dedicado",
+      "emergencyFundHelper": "Un importe aparte, intocable salvo emergencias (idealmente 3-6 meses de gastos)."
+    },
+    "goal": {
+      "title": "¿Qué meta persigues?",
+      "subtitle": "Una a la vez es más efectivo."
+    },
+    "behavior": {
+      "title": "¿Cómo describirías tu relación con el dinero?",
+      "subtitle": "Elige lo que encaje (las que quieras)."
+    },
+    "stress": {
+      "title": "Tu nivel de estrés.",
+      "subtitle": "Para hacer seguimiento a tu serenidad con el tiempo."
+    },
+    "insight": {
+      "title": "Esto es lo que tendremos en cuenta.",
+      "subtitle": "Una primera mirada a tu situación — profundizaremos juntos.",
+      "nextAction": "Próxima acción concreta",
+      "footnote": "Estas primeras cifras se calculan desde tus respuestas. A medida que registres tus datos reales, el coach afinará sus recomendaciones."
+    }
+  },
+  "situations": {
+    "struggling": {
+      "label": "Estoy con dificultades",
+      "description": "Mis gastos superan mis ingresos."
+    },
+    "tight": {
+      "label": "Apenas llego",
+      "description": "Termino el mes sin margen."
+    },
+    "stable": {
+      "label": "Estoy estable",
+      "description": "Consigo apartar un poco."
+    },
+    "comfortable": {
+      "label": "Estoy cómoda",
+      "description": "Ahorro y quiero optimizar."
+    }
+  },
+  "stressLevels": {
+    "1": "Sin estrés",
+    "2": "Ligero",
+    "3": "Moderado",
+    "4": "Alto",
+    "5": "Muy alto"
+  },
+  "goals": {
+    "emergency_fund": "Fondo de emergencia",
+    "debt_payoff": "Pagar deudas",
+    "savings": "Ahorro",
+    "purchase": "Gran compra",
+    "travel": "Viaje",
+    "other": "Otro"
+  },
+  "traits": {
+    "impulsive": {
+      "label": "Compras impulsivas",
+      "description": "A veces gasto sin haberlo previsto."
+    },
+    "avoidant": {
+      "label": "Evito mirar",
+      "description": "Mis finanzas me estresan, prefiero no pensar en ellas."
+    },
+    "organized": {
+      "label": "Más bien organizada",
+      "description": "Llevo un seguimiento, me gusta saber a dónde va el dinero."
+    },
+    "anxious": {
+      "label": "Ansiosa con el dinero",
+      "description": "Pensar en dinero me tensa."
+    },
+    "motivated": {
+      "label": "Muy motivada",
+      "description": "Quiero pasar a la acción, ahora."
+    },
+    "lost": {
+      "label": "Un poco perdida",
+      "description": "Ya no sé por dónde empezar."
+    },
+    "disciplined": {
+      "label": "Disciplinada",
+      "description": "Cumplo los compromisos cuando los tomo."
+    },
+    "rebuilding": {
+      "label": "Reconstruyéndome",
+      "description": "Salgo de una época difícil, voy remontando."
+    }
+  }
+}

@@ -1,1 +1,103 @@
-{}
+{
+  "common": {
+    "greeting": "Hola {firstName},",
+    "openApp": "Abrir LIBERIA",
+    "unsubscribe": "Darse de baja",
+    "disclaimer": "LIBERIA no es asesoramiento financiero regulado.",
+    "appDisclaimer": "LIBERIA es una herramienta de pilotaje personal. Ninguna información aquí es asesoramiento financiero regulado.",
+    "defaultFooterDisclaimer": "Recibes este correo porque concierne a tu cuenta LIBERIA. Puedes ajustar tus preferencias desde <a href=\"{settingsUrl}\" style=\"color:#9999a3;\">tus ajustes</a>.",
+    "unsubscribeNonEssential": "Darse de baja de los correos no esenciales"
+  },
+  "welcome": {
+    "subject": "Bienvenida a LIBERIA",
+    "eyebrow": "Bienvenida",
+    "heroBody": "Nos alegra tenerte aquí. LIBERIA es tu espacio para recuperar el control de tus finanzas — con calma, sin juicios, a tu ritmo.",
+    "noticeEyebrow": "Para empezar",
+    "noticeBody": "Bastan tres minutos: indica tus ingresos, tus gastos principales y tu meta. Afinamos el resto juntos a lo largo de las semanas.",
+    "cta": "Completar mi perfil",
+    "footer": "Recibes este correo porque acabas de crear tu cuenta LIBERIA. Tus preferencias son editables en tus ajustes.",
+    "textHero": "Nos alegra tenerte en LIBERIA. Es tu espacio para recuperar el control de tus finanzas — con calma, sin juicios, a tu ritmo.",
+    "textNotice": "Para empezar: bastan tres minutos. Indica tus ingresos, tus gastos principales y tu meta. Afinamos el resto juntos.",
+    "textCtaLine": "Completar mi perfil"
+  },
+  "weekly": {
+    "subject": "Tu resumen LIBERIA — puntuación {score}/100",
+    "eyebrow": "Resumen semanal",
+    "heroBody": "Aquí tienes tu instantánea financiera de la semana. Tu disponible es {tone}, tu puntuación de estabilidad es <strong>{score}/100</strong>.",
+    "tonePositive": "positivo",
+    "toneNegative": "ajustado",
+    "metrics": {
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "leftover": "Disponible",
+      "savingsRate": "Tasa de ahorro"
+    },
+    "planEyebrow": "Tu plan",
+    "planBodyDoneAndRemaining": "Has validado <strong>{done}</strong> {doneNoun} esta semana. Quedan <strong>{remaining}</strong> {remainingNoun} por completar — uno a uno, sin presión.",
+    "planBodyRemaining": "Quedan <strong>{remaining}</strong> {remainingNoun} por completar — uno a uno, sin presión.",
+    "stepSingular": "paso",
+    "stepPlural": "pasos",
+    "cta": "Abrir LIBERIA",
+    "footer": "Recibes este correo porque activaste el resumen semanal en tus ajustes."
+  },
+  "encouragement": {
+    "subject": "Vas en la dirección correcta",
+    "eyebrow": "Progreso",
+    "heroBodyTail": "Es el tipo de progreso que cuenta con el tiempo.",
+    "cta": "Ver mi panel",
+    "footer": "Recibes este correo porque los ánimos de progreso están activados en tus ajustes."
+  },
+  "goalMilestone": {
+    "subject100": "« {goal} » — meta alcanzada",
+    "subject80": "« {goal} » — solo queda el 20%",
+    "subject50": "« {goal} » — hito del 50% superado",
+    "eyebrow": "Meta",
+    "hero100": "Tu meta <strong>« {goal} »</strong> está alcanzada. {amount} apartados. Está asegurado.",
+    "hero80": "Estás al <strong>80%</strong> de tu meta <strong>« {goal} »</strong>. Solo quedan {remaining}.",
+    "hero50": "Acabas de cruzar el hito del <strong>50%</strong> en <strong>« {goal} »</strong>. La mitad del camino está hecha.",
+    "noticeEyebrow": "Qué sigue",
+    "notice100": "Puedes cerrar esta meta en LIBERIA o evolucionarla a un siguiente nivel — tú decides.",
+    "noticeRest": "Mantén este ritmo. No hace falta acelerar a la fuerza — la constancia hace la mayor parte del trabajo.",
+    "cta": "Ver mis metas",
+    "footer": "Recibes este correo porque los recordatorios de hitos de meta están activados en tus ajustes.",
+    "text100": "« {goal} » está alcanzada. {amount} apartados.",
+    "text80": "Estás al 80% de « {goal} ». Solo quedan {remaining}.",
+    "text50": "Acabas de cruzar el 50% en « {goal} »."
+  },
+  "inactivity": {
+    "subject": "¿Hacemos un check-in rápido juntos?",
+    "eyebrow": "Vuelta serena",
+    "since21": "Han pasado unas semanas desde nuestro último cruce.",
+    "since14": "Han pasado dos semanas desde la última vez.",
+    "sinceShort": "Han pasado unos días desde la última vez.",
+    "heroBodyTail": "Sin preocupaciones — la constancia gana a la intensidad. Si quieres retomar, abre LIBERIA y haz un check-in rápido. Reanudamos con calma.",
+    "noticeEyebrow": "Si quieres",
+    "noticeBody": "¿No te apetece abrir la app? Puedes desactivar estos recordatorios con un clic. LIBERIA estará aquí cuando vuelvas.",
+    "ctaCoach": "Hacer un check-in con el coach",
+    "ctaApp": "Abrir LIBERIA",
+    "footer": "Recibes este correo porque los recordatorios de seguimiento están activados en tus ajustes."
+  },
+  "paymentFailed": {
+    "subject": "Tu pago LIBERIA no ha podido procesarse",
+    "eyebrow": "Pago pendiente",
+    "heroBody": "El último cargo de tu suscripción no ha pasado. Suele ser un método de pago caducado o sin saldo — nada más.",
+    "noticeEyebrow": "Tus datos están a salvo",
+    "noticeBody": "Tus metas, tu plan y tu historial permanecen intactos. Actualiza tu método de pago cuando quieras y tu acceso se reactiva automáticamente.",
+    "cta": "Actualizar mi pago",
+    "footer": "Este correo se envía porque concierne directamente a tu suscripción LIBERIA."
+  },
+  "trialEnding": {
+    "subject1": "Tu prueba LIBERIA termina mañana",
+    "subject3": "Tu prueba LIBERIA termina en 3 días",
+    "eyebrow": "Prueba gratuita",
+    "hero1": "Tu prueba termina <strong>mañana ({date})</strong>. Tu suscripción Premium tomará el relevo automáticamente a <strong>{amount}/mes</strong>, sin interrupción.",
+    "hero3": "Tu prueba termina en <strong>3 días ({date})</strong>. Después tu suscripción Premium toma el relevo automáticamente a <strong>{amount}/mes</strong>.",
+    "noticeEyebrow": "Sigues al mando",
+    "noticeBody": "Puedes cancelar en cualquier momento desde tu portal de suscripción — sin motivo, sin fricción. Si continúas, tu acceso queda sin interrupción.",
+    "ctaManage": "Gestionar mi suscripción",
+    "ctaApp": "Abrir LIBERIA",
+    "footer": "Este correo se envía porque concierne directamente a tu suscripción LIBERIA. Puedes gestionarla desde tu área de suscripción.",
+    "text1": "Tu prueba LIBERIA termina mañana ({date}). Tu suscripción Premium toma el relevo automáticamente a {amount}/mes.",
+    "text3": "Tu prueba LIBERIA termina en 3 días ({date}). Después tu suscripción Premium toma el relevo a {amount}/mes."
+  }
+}

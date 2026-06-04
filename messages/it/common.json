@@ -1,1 +1,90 @@
-{}
+{
+  "appName": "LIBERIA",
+  "tagline": "Riprendi il controllo del tuo denaro.",
+  "metadata": {
+    "description": "Riprendi il controllo delle tue finanze con calma, senza tecnicismi. LIBERIA ti aiuta a capire la tua situazione, strutturare il tuo budget e avanzare verso i tuoi obiettivi.",
+    "keywords": [
+      "finanze personali",
+      "budget",
+      "risparmio",
+      "stabilità finanziaria",
+      "stress finanziario",
+      "fondo di emergenza"
+    ],
+    "openGraphLocale": "it_CH"
+  },
+  "actions": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "confirm": "Conferma",
+    "back": "Indietro",
+    "next": "Avanti",
+    "continue": "Continua",
+    "loading": "Caricamento…",
+    "submit": "Invia"
+  },
+  "shell": {
+    "sectionPilotage": "Pilotaggio",
+    "sectionAccount": "Account",
+    "demoBadge": "Modalità demo",
+    "demoBottomNote": "Modalità demo · sola lettura",
+    "nav": {
+      "dashboard": "Dashboard",
+      "coach": "Coach IA",
+      "plan": "Piano",
+      "budget": "Budget",
+      "incomes": "Entrate",
+      "expenses": "Spese",
+      "goals": "Obiettivi",
+      "profile": "Profilo",
+      "settings": "Impostazioni",
+      "subscription": "Abbonamento"
+    },
+    "mobileNav": {
+      "dashboard": "Home",
+      "coach": "Coach",
+      "plan": "Piano",
+      "budget": "Budget",
+      "goals": "Obiettivi"
+    },
+    "menu": {
+      "ariaLabel": "Menu account",
+      "createAccount": "Crea il mio account",
+      "login": "Accedi",
+      "profile": "Profilo",
+      "settings": "Impostazioni",
+      "subscription": "Abbonamento",
+      "signOut": "Esci",
+      "disabledTooltip": "Disponibile con un account"
+    },
+    "upgradeCard": {
+      "eyebrowDemo": "Demo",
+      "demoBody": "Crea il tuo account per pilotare i tuoi dati reali.",
+      "demoCta": "Crea il mio account",
+      "eyebrowPremium": "Premium",
+      "premiumActive": "Piano Premium attivo",
+      "premiumThanks": "Grazie per il tuo supporto.",
+      "trialCta": "Iniziare la mia prova di 14 giorni",
+      "trialBody": "14 giorni gratuiti, poi 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento.",
+      "resumeCta": "Riprendere il mio abbonamento",
+      "resumeBody": "Il tuo accesso è in pausa. Riprendi il tuo abbonamento a 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento."
+    }
+  },
+  "errorPages": {
+    "global": {
+      "eyebrow": "Si è verificato un errore",
+      "title": "Qualcosa si è rotto.",
+      "body": "Abbiamo registrato l'incidente. Puoi riprovare o tornare alla home — i tuoi dati restano intatti.",
+      "retry": "Riprova",
+      "home": "Home"
+    },
+    "notFound": {
+      "eyebrow": "Errore 404",
+      "title": "Questa pagina si è persa.",
+      "body": "Il link potrebbe essere errato o la pagina è stata spostata. Torna serenamente alla home.",
+      "cta": "Torna alla home"
+    }
+  },
+  "smoke": "i18n attivo"
+}

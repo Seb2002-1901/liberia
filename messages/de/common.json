@@ -1,1 +1,90 @@
-{}
+{
+  "appName": "LIBERIA",
+  "tagline": "Übernimm wieder die Kontrolle über dein Geld.",
+  "metadata": {
+    "description": "Übernimm ruhig und ohne Fachjargon wieder die Kontrolle über deine Finanzen. LIBERIA hilft dir, deine Lage zu verstehen, dein Budget zu strukturieren und auf deine Ziele zuzusteuern.",
+    "keywords": [
+      "Privatfinanzen",
+      "Budget",
+      "Sparen",
+      "finanzielle Stabilität",
+      "finanzieller Stress",
+      "Notgroschen"
+    ],
+    "openGraphLocale": "de_CH"
+  },
+  "actions": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "continue": "Fortfahren",
+    "loading": "Lädt …",
+    "submit": "Senden"
+  },
+  "shell": {
+    "sectionPilotage": "Steuerung",
+    "sectionAccount": "Konto",
+    "demoBadge": "Demo-Modus",
+    "demoBottomNote": "Demo-Modus · nur Ansicht",
+    "nav": {
+      "dashboard": "Dashboard",
+      "coach": "KI-Coach",
+      "plan": "Plan",
+      "budget": "Budget",
+      "incomes": "Einkommen",
+      "expenses": "Ausgaben",
+      "goals": "Ziele",
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "subscription": "Abo"
+    },
+    "mobileNav": {
+      "dashboard": "Start",
+      "coach": "Coach",
+      "plan": "Plan",
+      "budget": "Budget",
+      "goals": "Ziele"
+    },
+    "menu": {
+      "ariaLabel": "Kontomenü",
+      "createAccount": "Konto erstellen",
+      "login": "Anmelden",
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "subscription": "Abo",
+      "signOut": "Abmelden",
+      "disabledTooltip": "Mit einem Konto verfügbar"
+    },
+    "upgradeCard": {
+      "eyebrowDemo": "Demo",
+      "demoBody": "Erstelle dein Konto, um deine echten Daten zu steuern.",
+      "demoCta": "Konto erstellen",
+      "eyebrowPremium": "Premium",
+      "premiumActive": "Premium-Abo aktiv",
+      "premiumThanks": "Danke für deine Unterstützung.",
+      "trialCta": "Meine 14-tägige Testphase starten",
+      "trialBody": "14 Tage kostenlos, danach 14.99 CHF/Monat oder 119.99 CHF/Jahr. Jederzeit kündbar.",
+      "resumeCta": "Mein Abo fortsetzen",
+      "resumeBody": "Dein Zugang ist pausiert. Setze dein Abo für 14.99 CHF/Monat oder 119.99 CHF/Jahr fort. Jederzeit kündbar."
+    }
+  },
+  "errorPages": {
+    "global": {
+      "eyebrow": "Ein Fehler ist aufgetreten",
+      "title": "Etwas ist schiefgegangen.",
+      "body": "Wir haben den Vorfall protokolliert. Du kannst es erneut versuchen oder zur Startseite zurückkehren — deine Daten bleiben unberührt.",
+      "retry": "Erneut versuchen",
+      "home": "Startseite"
+    },
+    "notFound": {
+      "eyebrow": "Fehler 404",
+      "title": "Diese Seite hat sich verirrt.",
+      "body": "Der Link ist vielleicht falsch oder die Seite wurde verschoben. Kehre in Ruhe zur Startseite zurück.",
+      "cta": "Zur Startseite"
+    }
+  },
+  "smoke": "i18n aktiv"
+}

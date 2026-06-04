@@ -1,1 +1,130 @@
-{}
+{
+  "eyebrowOnboarding": "Onboarding",
+  "eyebrowFirstInsight": "Erste Einsicht",
+  "skip": "Vorerst überspringen",
+  "stepCounter": "Schritt {current} / {total}",
+  "actions": {
+    "back": "Zurück",
+    "continue": "Fortfahren",
+    "finish": "LIBERIA starten"
+  },
+  "submit": {
+    "successTitle": "Finanzprofil erstellt.",
+    "successBody": "Wir haben alles, was wir brauchen, um loszulegen.",
+    "invalidPayload": "Ungültige Daten"
+  },
+  "steps": {
+    "situation": {
+      "title": "Wie geht es dir finanziell?",
+      "subtitle": "Kein Urteil, nur zur Kalibrierung."
+    },
+    "income": {
+      "title": "Dein monatliches Einkommen.",
+      "subtitle": "Was tatsächlich nach Steuern eingeht.",
+      "label": "Netto-Monatseinkommen",
+      "placeholder": "2 400",
+      "helper": "Trage ein, was jeden Monat eingeht, aus allen Quellen zusammen."
+    },
+    "expenses": {
+      "title": "Deine monatlichen Ausgaben.",
+      "subtitle": "Eine ehrliche Schätzung reicht völlig.",
+      "expensesLabel": "Geschätzte monatliche Ausgaben",
+      "expensesPlaceholder": "1 900",
+      "debtLabel": "Monatliche Schulden- / Kreditrückzahlungen",
+      "debtPlaceholder": "0"
+    },
+    "savings": {
+      "title": "Deine verfügbaren Ersparnisse.",
+      "subtitle": "Verfügbares Bargeld, ohne Immobilien.",
+      "label": "Verfügbare Ersparnisse",
+      "placeholder": "1 200",
+      "emergencyFundTitle": "Ich habe einen dedizierten Notgroschen",
+      "emergencyFundHelper": "Ein separater Betrag, unantastbar ausser für Notfälle (ideal 3-6 Monate Ausgaben)."
+    },
+    "goal": {
+      "title": "Welches Ziel verfolgst du?",
+      "subtitle": "Eines nach dem anderen ist wirksamer."
+    },
+    "behavior": {
+      "title": "Wie würdest du deine Beziehung zum Geld beschreiben?",
+      "subtitle": "Wähle, was passt (so viele du willst)."
+    },
+    "stress": {
+      "title": "Dein Stresslevel.",
+      "subtitle": "Um deine innere Ruhe über die Zeit zu verfolgen."
+    },
+    "insight": {
+      "title": "Das werden wir im Hinterkopf behalten.",
+      "subtitle": "Ein erster Blick auf deine Situation — wir vertiefen das gemeinsam.",
+      "nextAction": "Konkrete nächste Aktion",
+      "footnote": "Diese ersten Zahlen werden aus deinen Antworten berechnet. Sobald du deine echten Daten erfasst, verfeinert der Coach seine Empfehlungen."
+    }
+  },
+  "situations": {
+    "struggling": {
+      "label": "Ich habe Schwierigkeiten",
+      "description": "Meine Ausgaben sind höher als mein Einkommen."
+    },
+    "tight": {
+      "label": "Ich komme gerade so über die Runden",
+      "description": "Ich beende den Monat ohne Spielraum."
+    },
+    "stable": {
+      "label": "Ich bin stabil",
+      "description": "Ich schaffe es, etwas zur Seite zu legen."
+    },
+    "comfortable": {
+      "label": "Ich stehe gut da",
+      "description": "Ich spare und möchte optimieren."
+    }
+  },
+  "stressLevels": {
+    "1": "Kein Stress",
+    "2": "Leicht",
+    "3": "Mittel",
+    "4": "Hoch",
+    "5": "Sehr hoch"
+  },
+  "goals": {
+    "emergency_fund": "Notgroschen",
+    "debt_payoff": "Schulden abbauen",
+    "savings": "Sparen",
+    "purchase": "Grössere Anschaffung",
+    "travel": "Reisen",
+    "other": "Andere"
+  },
+  "traits": {
+    "impulsive": {
+      "label": "Impulsiv kaufen",
+      "description": "Manchmal lasse ich mich ungeplant hinreissen."
+    },
+    "avoidant": {
+      "label": "Ich vermeide hinzusehen",
+      "description": "Meine Finanzen stressen mich, ich denke lieber nicht daran."
+    },
+    "organized": {
+      "label": "Eher organisiert",
+      "description": "Ich behalte den Überblick, ich will wissen, wohin das Geld geht."
+    },
+    "anxious": {
+      "label": "Angespannt beim Thema Geld",
+      "description": "An Geld zu denken setzt mich unter Druck."
+    },
+    "motivated": {
+      "label": "Sehr motiviert",
+      "description": "Ich will jetzt handeln."
+    },
+    "lost": {
+      "label": "Etwas verloren",
+      "description": "Ich weiss nicht mehr, wo ich anfangen soll."
+    },
+    "disciplined": {
+      "label": "Diszipliniert",
+      "description": "Ich halte meine Verpflichtungen ein, wenn ich sie eingehe."
+    },
+    "rebuilding": {
+      "label": "Im Wiederaufbau",
+      "description": "Ich komme aus einer schwierigen Zeit, gehe wieder bergauf."
+    }
+  }
+}

@@ -1,1 +1,268 @@
-{}
+{
+  "metadata": {
+    "title": "Panel"
+  },
+  "header": {
+    "eyebrow": "Resumen",
+    "title": "Hola, {firstName}",
+    "description": "Aquí tienes tu instantánea financiera actual. Puedes ajustar ingresos, gastos y metas en cualquier momento.",
+    "demoBadge": "Modo demo",
+    "addExpense": "Añadir un gasto",
+    "addIncome": "Añadir ingreso"
+  },
+  "stats": {
+    "stressLabel": "Estrés financiero",
+    "stressHintHigh": "Concéntrate en lo esencial este mes.",
+    "stressHintLow": "Nivel manejable, mantén el rumbo.",
+    "income": "Ingresos mensuales",
+    "expenses": "Gastos mensuales",
+    "leftover": "Dinero disponible",
+    "leftoverHint": "Tasa de ahorro {rate}",
+    "emergency": "Fondo de emergencia",
+    "monthsSuffix": "{months} meses"
+  },
+  "alerts": {
+    "title": "Avisos",
+    "emptyTitle": "Introduce tus datos para empezar",
+    "emptyText": "Añade tus ingresos y tus gastos para ver tus primeros avisos — bastan unos minutos.",
+    "cashflowNegativeTitle": "Estás gastando más de lo que ingresas",
+    "cashflowNegativeText": "Identifica 1 o 2 gastos no esenciales que recortar.",
+    "cashflowPositiveTitle": "Tu flujo mensual es positivo",
+    "cashflowPositiveText": "Considera automatizar una transferencia mensual de ahorro.",
+    "runwayLowTitle": "Fondo de emergencia muy bajo",
+    "runwayLowText": "Meta a corto plazo: 1 mes de gastos apartado.",
+    "runwaySolidTitle": "Fondo de emergencia sólido",
+    "runwaySolidText": "Mantenlo intacto, es tu tranquilidad.",
+    "runwayBuildingTitle": "Fondo de emergencia creciendo",
+    "runwayBuildingText": "Apunta progresivamente a 3 meses de gastos."
+  },
+  "dailyInsight": {
+    "eyebrow": "Lectura del día",
+    "deepen": "Profundizar con el coach",
+    "nextAction": "Próxima acción"
+  },
+  "insights": {
+    "cashflowNegative": {
+      "headline": "Estás gastando alrededor de {gap} más de lo que ingresas cada mes.",
+      "bodyAvoidant": "Incómodo de mirar — es normal. Iremos con calma, un gasto cada vez.",
+      "bodyDefault": "Buena noticia: es medible, así que abordable. Apuntamos a una categoría a la vez.",
+      "metricLabel": "Brecha mensual",
+      "nextAction": "Identifica un gasto recurrente que puedas recortar en torno a {targetCut} este mes."
+    },
+    "highDti": {
+      "headline": "Tus pagos suponen el {pct}% de tus ingresos.",
+      "body": "Por encima del 30% pesan mucho en tu disponible. Podemos bajar este ratio antes de apuntar al ahorro.",
+      "metricLabel": "Deuda / ingresos",
+      "nextAction": "Lista tus créditos por tipo de interés y concéntrate en el más caro."
+    },
+    "emergencyFundFirst": {
+      "headline": "Tu primer hito: apartar un mes de gastos.",
+      "bodyAnxious": "Un colchón financiero reduce la ansiedad diaria — incluso pequeño lo cambia todo.",
+      "bodyDefault": "Un fondo de emergencia te protege de imprevistos antes de apuntar a metas más ambiciosas.",
+      "metricLabel": "Transferencia automática sugerida",
+      "nextAction": "Programa una transferencia automática de {monthlyTarget} a principio de mes a una cuenta aparte."
+    },
+    "lowSavings": {
+      "headline": "Probablemente podrías liberar unos {estimate} al mes.",
+      "body": "Las categorías no esenciales suelen ser el 5-10% de los gastos sin que te des cuenta. Basta con una revisión rápida.",
+      "metricLabel": "Margen potencial estimado",
+      "nextAction": "Revisa tus suscripciones activas y cancela las que no hayas usado este mes."
+    },
+    "solidAcceleration": {
+      "headline": "Ya ahorras el {pct}% de tus ingresos.",
+      "body": "Tu base es sólida. Puedes acelerar una meta, consolidar tu fondo de emergencia o empezar a poner a trabajar parte de tus ahorros.",
+      "metricLabel": "Capacidad de ahorro mensual",
+      "nextAction": "Elige una meta numérica a 6-12 meses y dirige parte de tu disponible hacia ella."
+    },
+    "intermediate": {
+      "headlinePositive": "A tu ritmo actual podrías ahorrar unos {projection} en 12 meses.",
+      "headlineNeutral": "Estás en equilibrio — es una base sana de partida.",
+      "bodyDirect": "Tienes la base. Fija una meta numérica a 90 días y actúa.",
+      "bodyStructured": "Implanta 1 hábito medible, date un hito semanal, mide a los 30 días.",
+      "bodyGentle": "Poco a poco, los ajustes simples se suman. Sin presión, solo constancia.",
+      "bodyMotivated": "Parece que estás listo para actuar. Podemos convertir esa energía en hábitos sencillos que se mantengan.",
+      "bodyCalm": "Poco a poco, los ajustes simples se suman. La meta no es la perfección, sino la constancia.",
+      "metricLabelPositive": "Proyección a 12 meses",
+      "metricLabelNeutral": "Disponible mensual",
+      "nextActionStructured": "Fija 1 indicador clave (tasa de ahorro, runway) y síguelo cada semana durante 30 días.",
+      "nextActionDirect": "Elige 1 hábito financiero concreto y láncalo esta semana — transferencia automática o tope de gasto.",
+      "nextActionCalm": "Elige 1 hábito financiero para probar 30 días — transferencia automática, presupuesto de compras o revisión semanal."
+    }
+  },
+  "weeklyRecap": {
+    "eyebrow": "Esta semana",
+    "deltaUp": "+{delta} vs semana pasada",
+    "deltaDown": "{delta} vs semana pasada",
+    "deltaSame": "mismo ritmo",
+    "activeDay": "día activo",
+    "activeDays": "días activos",
+    "entry": "movimiento",
+    "entries": "movimientos",
+    "step": "paso",
+    "steps": "pasos",
+    "victoryLabel": "Vale la pena recordar",
+    "nextPriorityLabel": "Próxima prioridad",
+    "victories": {
+      "stepOne": "Un paso del plan validado esta semana — cada nivel cuenta.",
+      "stepsMany": "{count} pasos del plan validados esta semana — constancia sólida.",
+      "activeFive": "Presencia constante esta semana — eso marca la diferencia a largo plazo.",
+      "activeThree": "Varios días activos esta semana — el ritmo se está construyendo.",
+      "runwaySolid": "Tu fondo de emergencia sigue sólido. Sigue preservándolo.",
+      "savingsRateHigh": "Tu tasa de ahorro se mantiene por encima del 15% — es raro y valioso.",
+      "activeOne": "Has vuelto esta semana. La constancia gana a la intensidad.",
+      "presence": "Estás aquí. Ya es un primer paso — reanudamos con calma."
+    },
+    "priorities": {
+      "cashflowNegative": "Elige un gasto que recortar esta semana — empieza por el más fácil.",
+      "noEmergency": "Programa una transferencia automática a una cuenta de ahorro aparte.",
+      "planContinue": "Continúa tu plan — el siguiente paso está en la pestaña Plan.",
+      "subscriptions": "Revisa tus suscripciones activas — es la acción de mayor impacto.",
+      "twelveMonthGoal": "Elige una meta numérica a 12 meses y dirige parte de tu disponible hacia ella.",
+      "trackingHabit": "Registra 1 o 2 gastos esta semana para mantener el reflejo del seguimiento."
+    },
+    "actions": {
+      "checkin": "Hacer un check-in",
+      "viewPlan": "Ver mi plan",
+      "myGoals": "Mis metas"
+    }
+  },
+  "proactiveCard": {
+    "eyebrow": "Coach",
+    "longInactive": {
+      "headlineDirect": "Han pasado unos días — ¿hacemos un check-in?",
+      "headlineStructured": "Unos días sin seguimiento — reanudemos con calma.",
+      "headlineCalm": "Hace unos días que no nos vemos. ¿Volvemos con calma?",
+      "actionLabel": "Hacer check-in con el coach"
+    },
+    "goalClose": {
+      "headline": "Tu meta « {title } » está al {pct}%.",
+      "body": "Solo quedan {remaining} para cerrarla.",
+      "actionLabel": "Ver mis metas"
+    },
+    "tightMonth": {
+      "headlineDirect": "Tus gastos superan tus ingresos en unos {gap}/mes.",
+      "headlineCalm": "Un mes ajustado — unos {gap} más que tus ingresos.",
+      "bodyGentle": "Sin pánico. Un gasto a la vez basta.",
+      "bodyCalm": "Podemos abordar una categoría a la vez, sin presión.",
+      "actionLabel": "Hablar con el coach"
+    },
+    "solidProgress": {
+      "headline": "Vas en la dirección correcta.",
+      "body": "Runway de {months} meses y tasa de ahorro por encima del 15%.",
+      "bodyNoExpense": "Tasa de ahorro por encima del 15% y sin cargos recurrentes — sólido.",
+      "actionLabel": "Fijar una meta a 12 meses"
+    },
+    "emergencyGap": {
+      "headline": "Aún no tienes un fondo de emergencia dedicado.",
+      "body": "Empezar con poco basta — la automatización hace el resto.",
+      "actionLabel": "Ver mi plan"
+    }
+  },
+  "planTeaser": {
+    "emptyTitle": "Tu plan financiero",
+    "emptyDescription": "Un plan de acción a 30, 60 o 90 días basado en tus datos.",
+    "generate": "Generar mi plan",
+    "comingSoon": "Próximamente",
+    "subtitle": "Plan {days} días · {done}/{total} pasos",
+    "open": "Abrir",
+    "nextStepLabel": "Próximo paso · semana {week}"
+  },
+  "coachTeaser": {
+    "title": "Lecturas",
+    "subtitle": "Marcadores calculados desde tus datos.",
+    "coachCta": "Coach",
+    "empty": "Añade algunos ingresos y gastos para ver tus primeras lecturas.",
+    "askCta": "Hacer una pregunta al coach",
+    "labels": {
+      "cashflowNegative": "Disponible negativo",
+      "savingsLow": "Tasa de ahorro baja",
+      "savingsGood": "Buen margen",
+      "emergencyFund": "Fondo de emergencia"
+    },
+    "texts": {
+      "categoryShare": "Esta categoría es el {pct}% de tus gastos ({amount}/mes). ¿Probar con -20% durante un mes?",
+      "cashflowNegative": "Estás gastando unos {amount} más de lo que ingresas. Podemos ver dónde recortar.",
+      "savingsLow": "Actualmente {rate}. Incluso una transferencia automática simbólica asegura el hábito.",
+      "savingsGood": "Tasa de ahorro {rate}. Puedes acelerar una meta o consolidar el fondo de emergencia.",
+      "emergencyLow": "Menos de un mes de gastos apartado. Primer paso: apuntar a 1 mes.",
+      "emergencyBuilding": "{months} meses cubiertos. Próximo nivel sólido: 3 meses."
+    }
+  },
+  "stability": {
+    "label": "Estabilidad financiera",
+    "tiers": {
+      "danger": {
+        "label": "Apretado",
+        "description": "Retomamos las cosas paso a paso."
+      },
+      "warning": {
+        "label": "Frágil",
+        "description": "Concéntrate en los gastos esenciales."
+      },
+      "neutral": {
+        "label": "Avanzando",
+        "description": "Algunos ajustes marcarán la diferencia."
+      },
+      "success": {
+        "label": "Estable",
+        "description": "Vas por buen camino."
+      },
+      "gold": {
+        "label": "Sólido",
+        "description": "Estás construyendo sobre bases sanas."
+      }
+    }
+  },
+  "expenseBreakdown": {
+    "title": "Reparto de gastos",
+    "empty": "Aún no hay gastos registrados."
+  },
+  "goalsSummary": {
+    "title": "Metas",
+    "active": "Metas activas",
+    "all": "Todas",
+    "emptyTitle": "Aún sin metas",
+    "emptyDescription": "Crea tu primera meta financiera para avanzar paso a paso.",
+    "emptyCta": "Crear una meta"
+  },
+  "cashflowChart": {
+    "title": "Flujo mensual",
+    "preview": "Vista suavizada",
+    "monthsAgo": "−{n} mes",
+    "thisMonth": "Este mes",
+    "income": "Ingresos",
+    "expenses": "Gastos"
+  },
+  "categories": {
+    "expenses": {
+      "housing": "Vivienda",
+      "food": "Alimentación",
+      "transport": "Transporte",
+      "utilities": "Facturas y energía",
+      "insurance": "Seguros",
+      "health": "Salud",
+      "debt": "Crédito / Deuda",
+      "subscriptions": "Suscripciones",
+      "leisure": "Ocio",
+      "shopping": "Compras",
+      "family": "Familia / Hijos",
+      "education": "Educación",
+      "other": "Otro"
+    },
+    "frequencies": {
+      "monthly": "Mensual",
+      "weekly": "Semanal",
+      "yearly": "Anual",
+      "one_time": "Puntual"
+    },
+    "incomeCategories": {
+      "salary": "Salario",
+      "freelance": "Freelance",
+      "business": "Negocio",
+      "investments": "Inversiones",
+      "aid": "Prestaciones / Ayudas",
+      "rental": "Ingresos por alquiler",
+      "other": "Otro"
+    }
+  }
+}

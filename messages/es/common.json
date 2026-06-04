@@ -1,1 +1,90 @@
-{}
+{
+  "appName": "LIBERIA",
+  "tagline": "Recupera el control de tu dinero.",
+  "metadata": {
+    "description": "Recupera el control de tus finanzas con calma, sin jerga. LIBERIA te ayuda a entender tu situación, estructurar tu presupuesto y avanzar hacia tus metas.",
+    "keywords": [
+      "finanzas personales",
+      "presupuesto",
+      "ahorro",
+      "estabilidad financiera",
+      "estrés financiero",
+      "fondo de emergencia"
+    ],
+    "openGraphLocale": "es_ES"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "continue": "Continuar",
+    "loading": "Cargando…",
+    "submit": "Enviar"
+  },
+  "shell": {
+    "sectionPilotage": "Pilotaje",
+    "sectionAccount": "Cuenta",
+    "demoBadge": "Modo demo",
+    "demoBottomNote": "Modo demo · solo lectura",
+    "nav": {
+      "dashboard": "Panel",
+      "coach": "Coach IA",
+      "plan": "Plan",
+      "budget": "Presupuesto",
+      "incomes": "Ingresos",
+      "expenses": "Gastos",
+      "goals": "Metas",
+      "profile": "Perfil",
+      "settings": "Ajustes",
+      "subscription": "Suscripción"
+    },
+    "mobileNav": {
+      "dashboard": "Inicio",
+      "coach": "Coach",
+      "plan": "Plan",
+      "budget": "Presupuesto",
+      "goals": "Metas"
+    },
+    "menu": {
+      "ariaLabel": "Menú de cuenta",
+      "createAccount": "Crear mi cuenta",
+      "login": "Iniciar sesión",
+      "profile": "Perfil",
+      "settings": "Ajustes",
+      "subscription": "Suscripción",
+      "signOut": "Cerrar sesión",
+      "disabledTooltip": "Disponible con una cuenta"
+    },
+    "upgradeCard": {
+      "eyebrowDemo": "Demo",
+      "demoBody": "Crea tu cuenta para pilotar tus datos reales.",
+      "demoCta": "Crear mi cuenta",
+      "eyebrowPremium": "Premium",
+      "premiumActive": "Plan Premium activo",
+      "premiumThanks": "Gracias por tu apoyo.",
+      "trialCta": "Iniciar mi prueba de 14 días",
+      "trialBody": "14 días gratis, luego 14.99 CHF/mes o 119.99 CHF/año. Cancela cuando quieras.",
+      "resumeCta": "Reanudar mi suscripción",
+      "resumeBody": "Tu acceso está en pausa. Reanuda tu suscripción por 14.99 CHF/mes o 119.99 CHF/año. Cancela cuando quieras."
+    }
+  },
+  "errorPages": {
+    "global": {
+      "eyebrow": "Se produjo un error",
+      "title": "Algo se rompió.",
+      "body": "Registramos el incidente. Puedes reintentar o volver al inicio — tus datos permanecen intactos.",
+      "retry": "Reintentar",
+      "home": "Inicio"
+    },
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "Esta página se ha extraviado.",
+      "body": "Es posible que el enlace sea incorrecto o que la página se haya movido. Vuelve con calma al inicio.",
+      "cta": "Volver al inicio"
+    }
+  },
+  "smoke": "i18n activo"
+}
