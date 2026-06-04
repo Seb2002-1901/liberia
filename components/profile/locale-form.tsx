@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -51,6 +52,7 @@ export function LocaleForm({
   initialLocale,
 }: Props) {
   const t = useTranslations("app.profile.locale");
+  const router = useRouter();
   const [country, setCountry] = React.useState(() => safeCountry(initialCountry));
   const [currency, setCurrency] = React.useState(() =>
     safeCurrency(initialCurrency),
@@ -76,6 +78,10 @@ export function LocaleForm({
       });
       if (res.ok) {
         toast.success(t("saved"));
+        // Force a full RSC refresh so the new NEXT_LOCALE cookie is
+        // picked up immediately — every translated surface re-renders
+        // with the chosen language without a hard reload.
+        router.refresh();
       } else {
         toast.error(res.error);
       }

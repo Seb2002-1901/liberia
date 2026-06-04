@@ -58,8 +58,15 @@ export async function updateProfileLocale(input: {
   // Sync NEXT_LOCALE so next-intl picks up the new language on the
   // very next render. Without this the user keeps seeing the previous
   // language until the middleware-side cookie expires.
+  //
+  // The cookie MUST hold a base AppLocale ("fr" / "en" / "de" / "it" /
+  // "es" / "pt"), never a region-qualified variant — next-intl loads
+  // catalogues by base only. `resolveAppLocale` enforces this by
+  // splitting on "-" and falling back to defaultLocale when the base
+  // isn't shipped.
+  const baseLocale = resolveAppLocale(parsed.data.locale);
   const cookieStore = await cookies();
-  cookieStore.set("NEXT_LOCALE", resolveAppLocale(parsed.data.locale), {
+  cookieStore.set("NEXT_LOCALE", baseLocale, {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
     sameSite: "lax",

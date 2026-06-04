@@ -39,7 +39,17 @@ export default getRequestConfig(async () => {
 async function detectLocale(): Promise<AppLocale> {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get(COOKIE_NAME)?.value;
-  if (cookieValue && isAppLocale(cookieValue)) return cookieValue;
+  // Normalise via resolveAppLocale so stale region-qualified cookies
+  // (`fr-CH`, `en-GB`) or values from previous deploys that listed
+  // locales we no longer ship (e.g. `hr`, `tr`) still resolve to a
+  // supported base. If the cookie is genuinely unknown,
+  // `resolveAppLocale` returns `defaultLocale` ("en") — we treat that
+  // as "cookie was junk" and fall through to Accept-Language unless
+  // the cookie was explicitly an English variant.
+  if (cookieValue) {
+    const base = cookieValue.toLowerCase().split("-")[0];
+    if (isAppLocale(base)) return base;
+  }
 
   const headerStore = await headers();
   const accept = headerStore.get("accept-language");
