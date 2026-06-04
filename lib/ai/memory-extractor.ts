@@ -73,12 +73,18 @@ export function shouldRunExtraction(input: ExtractInput): boolean {
 export async function extractMemoryEntries(
   input: ExtractInput,
 ): Promise<ExtractedEntry[]> {
-  if (!shouldRunExtraction(input)) return [];
+  if (!shouldRunExtraction(input)) {
+    console.log(
+      `[memory] shouldRunExtraction=false userChars=${input.userMessage.trim().length} asstChars=${input.assistantReply.trim().length} (mins ${MIN_USER_CHARS}/${MIN_ASSISTANT_CHARS})`,
+    );
+    return [];
+  }
 
   const claude = getAnthropic();
   const userBlock = truncate(input.userMessage, 1500);
   const assistantBlock = truncate(input.assistantReply, 1500);
 
+  console.log(`[memory] calling Haiku ${EXTRACTOR_MODEL} for extraction`);
   const response = await claude.messages.create({
     model: EXTRACTOR_MODEL,
     max_tokens: EXTRACTOR_MAX_TOKENS,
@@ -109,12 +115,28 @@ export async function extractMemoryEntries(
     ],
   });
 
+  console.log(
+    `[memory] Haiku usage: in=${response.usage.input_tokens} out=${response.usage.output_tokens} stop=${response.stop_reason}`,
+  );
+
   const textBlock = response.content.find(
     (b): b is Extract<typeof response.content[number], { type: "text" }> =>
       b.type === "text",
   );
-  if (!textBlock) return [];
-  return parseAndValidate(textBlock.text);
+  if (!textBlock) {
+    console.error("[memory] Haiku returned no text block");
+    return [];
+  }
+  // Truncate the raw text in logs so we never blow up the log volume —
+  // 400 chars is enough to see the JSON shape.
+  console.log(
+    `[memory] Haiku raw text (first 400 chars): ${textBlock.text.slice(0, 400).replace(/\s+/g, " ")}`,
+  );
+  const parsed = parseAndValidate(textBlock.text);
+  console.log(
+    `[memory] parseAndValidate kept ${parsed.length} entries from raw text`,
+  );
+  return parsed;
 }
 
 /**

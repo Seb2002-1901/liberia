@@ -85,10 +85,15 @@ export async function selectEntriesForPrompt(
   userId: string,
   limit: number = MEMORY_PROMPT_LIMIT,
 ): Promise<UserMemoryEntry[]> {
-  if (!isAdminConfigured()) return [];
+  if (!isAdminConfigured()) {
+    console.error(
+      "[memory] selectEntriesForPrompt: admin client not configured",
+    );
+    return [];
+  }
   const admin = getAdminClient();
   const nowIso = new Date().toISOString();
-  const { data } = await admin
+  const { data, error } = await admin
     .from("user_memory_entries")
     .select("*")
     .eq("user_id", userId)
@@ -97,7 +102,17 @@ export async function selectEntriesForPrompt(
     .order("importance", { ascending: false })
     .order("last_referenced_at", { ascending: false, nullsFirst: false })
     .limit(limit);
-  return (data as UserMemoryEntry[] | null) ?? [];
+  if (error) {
+    console.error(
+      `[memory] selectEntriesForPrompt failed: ${error.code ?? "?"} ${error.message} — ${error.details ?? ""} (hint: ${error.hint ?? "none"})`,
+    );
+    return [];
+  }
+  const list = (data as UserMemoryEntry[] | null) ?? [];
+  console.log(
+    `[memory] selectEntriesForPrompt user=${userId.slice(0, 8)} returned ${list.length} entries (limit=${limit})`,
+  );
+  return list;
 }
 
 /**
@@ -142,7 +157,15 @@ export interface UpsertMemoryEntryInput {
 export async function upsertMemoryEntry(
   input: UpsertMemoryEntryInput,
 ): Promise<UserMemoryEntry | null> {
-  if (!isAdminConfigured()) return null;
+  if (!isAdminConfigured()) {
+    // Loud failure rather than silent null — the chat route relies on
+    // this path to land entries, so an unconfigured admin client is a
+    // misconfiguration that ops needs to see in the logs.
+    console.error(
+      "[memory] upsertMemoryEntry: admin client not configured (SUPABASE_SERVICE_ROLE_KEY missing)",
+    );
+    return null;
+  }
   const admin = getAdminClient();
   const payload = {
     user_id: input.userId,
@@ -156,11 +179,19 @@ export async function upsertMemoryEntry(
     conversation_id: input.conversationId ?? null,
     expires_at: input.expiresAt ?? null,
   };
-  const { data } = await admin
+  const { data, error } = await admin
     .from("user_memory_entries")
     .upsert(payload, { onConflict: "user_id,kind,key" })
     .select("*")
     .maybeSingle();
+  if (error) {
+    // Surface the real PostgREST error so ops can fix it (RLS issue,
+    // CHECK violation, missing column after a partial migration).
+    console.error(
+      `[memory] upsertMemoryEntry failed kind=${input.kind} key=${input.key}: ${error.code ?? "?"} ${error.message} — ${error.details ?? ""} (hint: ${error.hint ?? "none"})`,
+    );
+    return null;
+  }
   return (data as UserMemoryEntry | null) ?? null;
 }
 

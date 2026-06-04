@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
@@ -162,6 +163,9 @@ export async function POST(request: Request) {
   const memoryBlock = memoryEnabled
     ? buildMemoryEntriesBlock(memoryEntries)
     : null;
+  console.log(
+    `[memory] pre-prompt: enabled=${memoryEnabled} entriesSelected=${memoryEntries.length} blockChars=${memoryBlock?.length ?? 0}`,
+  );
   const financeContext = buildFinanceContext(financeData);
   const useLLM = isAnthropicConfigured();
 
@@ -418,17 +422,33 @@ export async function POST(request: Request) {
           .eq("user_id", user.id);
 
         // Premium memory: touch the entries we just injected so the
-        // recency ranking keeps active ones near the top, AND fire the
-        // extractor in the background. We never await it — a slow
-        // Haiku call must not delay the user's next prompt.
+        // recency ranking keeps active ones near the top, AND schedule
+        // the extractor to run AFTER the response is sent. We use
+        // next/server `after()` here rather than `void promise` — on
+        // Vercel serverless the function instance can be reclaimed
+        // the moment the SSE stream closes, which silently kills any
+        // in-flight fire-and-forget promises (root cause of the
+        // "user_memory_entries stays empty after every conversation"
+        // bug we shipped in d1bb576). `after()` keeps the function
+        // alive until the callback resolves.
+        console.log(
+          `[memory] post-stream gate: enabled=${memoryEnabled} useLLM=${useLLM} assistantChars=${assistantBuffer.length} injectedEntries=${memoryEntries.length}`,
+        );
         if (memoryEnabled) {
           const injectedIds = memoryEntries.map((e) => e.id);
           if (injectedIds.length > 0) {
-            void touchMemoryEntries(user.id, injectedIds).catch((err) => {
-              console.error(
-                "[ai/chat] touchMemoryEntries failed:",
-                err instanceof Error ? err.message : String(err),
-              );
+            after(async () => {
+              try {
+                await touchMemoryEntries(user.id, injectedIds);
+                console.log(
+                  `[memory] touched ${injectedIds.length} injected entries`,
+                );
+              } catch (err) {
+                console.error(
+                  "[memory] touchMemoryEntries failed:",
+                  err instanceof Error ? err.message : String(err),
+                );
+              }
             });
           }
 
@@ -436,14 +456,20 @@ export async function POST(request: Request) {
           // local fallback is deterministic and recycles existing
           // context — no new memory to learn from it.
           if (useLLM && assistantBuffer) {
-            void runExtractionInBackground({
-              userId: user.id,
-              conversationId: conversation.id,
-              userMessage: parsed.data.content,
-              assistantReply: assistantBuffer,
-              locale: financeData.profile.locale ?? "fr",
-              fullName: financeData.profile.full_name,
+            after(async () => {
+              await runExtractionInBackground({
+                userId: user.id,
+                conversationId: conversation.id,
+                userMessage: parsed.data.content,
+                assistantReply: assistantBuffer,
+                locale: financeData.profile.locale ?? "fr",
+                fullName: financeData.profile.full_name,
+              });
             });
+          } else {
+            console.log(
+              `[memory] extraction skipped — useLLM=${useLLM} hasBuffer=${Boolean(assistantBuffer)}`,
+            );
           }
         }
 
@@ -514,6 +540,10 @@ interface RunExtractionInput {
 async function runExtractionInBackground(
   input: RunExtractionInput,
 ): Promise<void> {
+  const t0 = Date.now();
+  console.log(
+    `[memory] extractor start user=${input.userId.slice(0, 8)} conv=${input.conversationId.slice(0, 8)} userChars=${input.userMessage.length} asstChars=${input.assistantReply.length}`,
+  );
   try {
     const extracted = await extractMemoryEntries({
       userMessage: input.userMessage,
@@ -521,14 +551,19 @@ async function runExtractionInBackground(
       locale: input.locale,
       fullName: input.fullName,
     });
+    const dt = Date.now() - t0;
+    console.log(
+      `[memory] extractor returned ${extracted.length} entries in ${dt}ms`,
+    );
     if (extracted.length === 0) return;
 
     const now = Date.now();
+    let written = 0;
     for (const entry of extracted) {
       const expiresAt = entry.expiresInDays
         ? new Date(now + entry.expiresInDays * 86400000).toISOString()
         : null;
-      await upsertMemoryEntry({
+      const result = await upsertMemoryEntry({
         userId: input.userId,
         kind: entry.kind,
         key: entry.key,
@@ -540,11 +575,22 @@ async function runExtractionInBackground(
         conversationId: input.conversationId,
         expiresAt,
       });
+      if (result) {
+        written += 1;
+        console.log(
+          `[memory] upsert ok kind=${entry.kind} key=${entry.key} importance=${entry.importance}`,
+        );
+      } else {
+        console.error(
+          `[memory] upsert returned null kind=${entry.kind} key=${entry.key} — admin client unconfigured or query failed silently`,
+        );
+      }
     }
+    console.log(`[memory] extraction done: ${written}/${extracted.length} written`);
   } catch (err) {
     console.error(
-      "[ai/chat] memory extraction failed:",
-      err instanceof Error ? `${err.name}: ${err.message}` : String(err),
+      "[memory] extraction failed:",
+      err instanceof Error ? `${err.name}: ${err.message}\n${err.stack}` : String(err),
     );
   }
 }
