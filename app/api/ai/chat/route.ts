@@ -188,68 +188,120 @@ export async function POST(request: Request) {
 
       try {
         if (useLLM) {
-          const claude = getAnthropic();
-          // Cost-control: cap aggregate history at SOFT_INPUT_BUDGET
-          // (~30k tokens ≈ 0.10 CHF / call). The history query already
-          // bounds count at 80; this bounds total tokens too. Drops
-          // oldest turns first, ALWAYS keeps the latest user message.
-          const { messages: budgetedHistory } = truncateMessagesForBudget(
-            (history ?? []).map((m) => ({
-              role: m.role as "user" | "assistant",
-              content: m.content,
-            })),
-          );
-          const apiMessages = budgetedHistory;
+          try {
+            const claude = getAnthropic();
+            // Cost-control: cap aggregate history at SOFT_INPUT_BUDGET
+            // (~30k tokens ≈ 0.10 CHF / call). The history query already
+            // bounds count at 80; this bounds total tokens too. Drops
+            // oldest turns first, ALWAYS keeps the latest user message.
+            const { messages: budgetedHistory } = truncateMessagesForBudget(
+              (history ?? []).map((m) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              })),
+            );
+            const apiMessages = budgetedHistory;
 
-          // Language injection: appended as the last system block so it
-          // takes precedence over any earlier nudge in the coach prompt
-          // or finance context (both currently French). Sonnet honours
-          // English meta-instructions reliably across locales.
-          const userLanguageName = getLanguageEnglishName(
-            financeData.profile.locale,
-          );
+            // Language injection: appended as the last system block so it
+            // takes precedence over any earlier nudge in the coach prompt
+            // or finance context (both currently French). Sonnet honours
+            // English meta-instructions reliably across locales.
+            const userLanguageName = getLanguageEnglishName(
+              financeData.profile.locale,
+            );
 
-          const claudeStream = claude.messages.stream({
-            model: COACH_MODEL,
-            max_tokens: COACH_MAX_TOKENS,
-            system: [
-              {
-                type: "text",
-                text: COACH_SYSTEM_PROMPT,
-              },
-              {
-                type: "text",
-                text: financeContext,
-                // Cache the system + finance context together. The whole
-                // block typically lands above the 2048-token Sonnet 4.6
-                // minimum once the user has any data; below that, the
-                // cache silently no-ops.
-                cache_control: { type: "ephemeral" },
-              },
-              {
-                type: "text",
-                text: `Always respond exclusively in ${userLanguageName}. Match the user's tone in that language. Never switch to a different language even if the finance context above is in French — that is internal data, not a hint about the user's preferred language.`,
-              },
-            ],
-            messages: apiMessages,
-            thinking: { type: "adaptive" },
-          });
+            const claudeStream = claude.messages.stream({
+              model: COACH_MODEL,
+              max_tokens: COACH_MAX_TOKENS,
+              system: [
+                {
+                  type: "text",
+                  text: COACH_SYSTEM_PROMPT,
+                },
+                {
+                  type: "text",
+                  text: financeContext,
+                  // Cache the system + finance context together. The whole
+                  // block typically lands above the 2048-token Sonnet 4.6
+                  // minimum once the user has any data; below that, the
+                  // cache silently no-ops.
+                  cache_control: { type: "ephemeral" },
+                },
+                {
+                  type: "text",
+                  text: `Always respond exclusively in ${userLanguageName}. Match the user's tone in that language. Never switch to a different language even if the finance context above is in French — that is internal data, not a hint about the user's preferred language.`,
+                },
+              ],
+              messages: apiMessages,
+              thinking: { type: "adaptive" },
+            });
 
-          for await (const event of claudeStream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              assistantBuffer += event.delta.text;
-              send("delta", { text: event.delta.text });
+            for await (const event of claudeStream) {
+              if (
+                event.type === "content_block_delta" &&
+                event.delta.type === "text_delta"
+              ) {
+                assistantBuffer += event.delta.text;
+                send("delta", { text: event.delta.text });
+              }
             }
-          }
 
-          const final = await claudeStream.finalMessage();
-          tokensIn = final.usage.input_tokens ?? 0;
-          tokensOut = final.usage.output_tokens ?? 0;
-          cacheRead = final.usage.cache_read_input_tokens ?? 0;
-          cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
+            const final = await claudeStream.finalMessage();
+            tokensIn = final.usage.input_tokens ?? 0;
+            tokensOut = final.usage.output_tokens ?? 0;
+            cacheRead = final.usage.cache_read_input_tokens ?? 0;
+            cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
+          } catch (llmErr) {
+            // Anthropic returned 5xx / network hiccupped / rate-limit
+            // upstream. Don't break the conversation — fall back to the
+            // local deterministic engine and surface to ops via stderr
+            // (Vercel + Sentry pick it up). Reset any partial buffer so
+            // we don't mix half-LLM half-local content.
+            console.error(
+              "[ai/chat] Anthropic stream failed, falling back to local engine:",
+              llmErr instanceof Error
+                ? `${llmErr.name}: ${llmErr.message}`
+                : String(llmErr),
+            );
+            assistantBuffer = "";
+            tokensIn = 0;
+            tokensOut = 0;
+            cacheRead = 0;
+            cacheWrite = 0;
+            const monthlyIncome =
+              totalMonthly(financeData.incomes) ||
+              financeData.financialProfile?.monthly_income ||
+              0;
+            const monthlyExpenses =
+              totalMonthly(financeData.expenses) ||
+              financeData.financialProfile?.monthly_expenses ||
+              0;
+            const localT = await getTranslations({
+              locale: financeData.profile.locale ?? "fr",
+              namespace: "app.coach.local",
+            });
+            const localReply = generateLocalCoachReply(
+              {
+                userMessage: parsed.data.content,
+                history: history.map((m) => ({
+                  role: m.role as "user" | "assistant",
+                  content: m.content,
+                })),
+                fullName: financeData.profile.full_name,
+                financialProfile: financeData.financialProfile,
+                memory,
+                monthlyIncome,
+                monthlyExpenses,
+                currentSavings: financeData.financialProfile?.current_savings ?? 0,
+                monthlyDebt: financeData.financialProfile?.monthly_debt ?? 0,
+                currency: financeData.profile.currency || "CHF",
+                locale: financeData.profile.locale ?? "fr",
+              },
+              localT,
+            );
+            assistantBuffer = localReply;
+            send("delta", { text: localReply });
+          }
         } else {
           // Local fallback — deterministic, no LLM tokens, no external
           // call. Same SSE shape as the LLM path so the client renders
@@ -337,9 +389,16 @@ export async function POST(request: Request) {
           /* already closed by client */
         }
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : tErr("coachStreamError");
-        send("error", { message });
+        // Outer catch — survives only if persistence or the local
+        // fallback itself failed. Log to stderr so Vercel + Sentry
+        // capture the root cause; surface a translated, generic
+        // message to the user (the original `err.message` may be a
+        // technical Anthropic / Supabase error not safe to display).
+        console.error(
+          "[ai/chat] Stream pipeline failed:",
+          err instanceof Error ? `${err.name}: ${err.message}` : String(err),
+        );
+        send("error", { message: tErr("coachStreamError") });
         try {
           controller.close();
         } catch {
