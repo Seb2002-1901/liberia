@@ -18,9 +18,10 @@ import {
   COUNTRIES,
   getDefaultCurrencyForCountry,
   getDefaultLanguageForCountry,
+  isCountryId,
 } from "@/lib/locale/countries";
-import { CURRENCIES } from "@/lib/locale/currencies";
-import { LANGUAGES } from "@/lib/locale/languages";
+import { CURRENCIES, isCurrencyId } from "@/lib/locale/currencies";
+import { LANGUAGES, isLanguageId } from "@/lib/locale/languages";
 
 type Props = {
   initialCountry: string;
@@ -28,15 +29,35 @@ type Props = {
   initialLocale: string;
 };
 
+// Defensive normalisation: radix-ui Select treats `value` as a string
+// identity. If it doesn't match any SelectItem, the trigger renders
+// blank and (with React 19 + radix-select 2.2) the next render after a
+// state change inside the Portal can throw on the next interaction.
+// Pin every controlled value to a known catalog entry up-front so the
+// trigger and the items always agree.
+function safeCountry(value: string): string {
+  return isCountryId(value) ? value : "CH";
+}
+function safeCurrency(value: string): string {
+  return isCurrencyId(value) ? value : "CHF";
+}
+function safeLanguage(value: string): string {
+  return isLanguageId(value) ? value : "fr-CH";
+}
+
 export function LocaleForm({
   initialCountry,
   initialCurrency,
   initialLocale,
 }: Props) {
   const t = useTranslations("app.profile.locale");
-  const [country, setCountry] = React.useState(initialCountry);
-  const [currency, setCurrency] = React.useState(initialCurrency);
-  const [language, setLanguage] = React.useState(initialLocale);
+  const [country, setCountry] = React.useState(() => safeCountry(initialCountry));
+  const [currency, setCurrency] = React.useState(() =>
+    safeCurrency(initialCurrency),
+  );
+  const [language, setLanguage] = React.useState(() =>
+    safeLanguage(initialLocale),
+  );
   const [pending, startTransition] = React.useTransition();
 
   const onCountryChange = (next: string) => {
@@ -62,9 +83,9 @@ export function LocaleForm({
   };
 
   const changed =
-    country !== initialCountry ||
-    currency !== initialCurrency ||
-    language !== initialLocale;
+    country !== safeCountry(initialCountry) ||
+    currency !== safeCurrency(initialCurrency) ||
+    language !== safeLanguage(initialLocale);
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -73,7 +94,7 @@ export function LocaleForm({
           <Label htmlFor="country">{t("country")}</Label>
           <Select value={country} onValueChange={onCountryChange}>
             <SelectTrigger id="country">
-              <SelectValue />
+              <SelectValue placeholder={t("country")} />
             </SelectTrigger>
             <SelectContent>
               {COUNTRIES.map((c) => (
@@ -88,7 +109,7 @@ export function LocaleForm({
           <Label htmlFor="currency">{t("currency")}</Label>
           <Select value={currency} onValueChange={setCurrency}>
             <SelectTrigger id="currency">
-              <SelectValue />
+              <SelectValue placeholder={t("currency")} />
             </SelectTrigger>
             <SelectContent>
               {CURRENCIES.map((c) => (
@@ -103,7 +124,7 @@ export function LocaleForm({
           <Label htmlFor="language">{t("language")}</Label>
           <Select value={language} onValueChange={setLanguage}>
             <SelectTrigger id="language">
-              <SelectValue />
+              <SelectValue placeholder={t("language")} />
             </SelectTrigger>
             <SelectContent>
               {LANGUAGES.map((l) => (

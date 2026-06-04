@@ -26,10 +26,12 @@ export type StarterPlan = {
   steps: StarterStep[];
 };
 
-export type StarterTranslator = (
+export type StarterTranslator = ((
   key: string,
   values?: Record<string, string | number>,
-) => string;
+) => string) & {
+  raw: (key: string) => unknown;
+};
 
 type Situation = "struggling" | "tight" | "stable" | "comfortable";
 
@@ -103,15 +105,25 @@ export function getStarterPlan(
   t: StarterTranslator,
 ): StarterPlan {
   const defs = [...COMMON_DEFS, ...DEFS_BY_SITUATION[situation]];
+  // Step IDs contain dots (e.g. "common.w1.s1"), which next-intl would
+  // interpret as a nested path. Use the raw dictionary so the literal
+  // key is preserved and we look it up ourselves.
+  const stepsTable = t.raw("steps") as Record<
+    string,
+    { focus: string; title: string; description: string }
+  >;
   return {
     title: t(`titles.${situation}`),
     summary: t(`summaries.${situation}`),
-    steps: defs.map((d) => ({
-      week_number: d.week_number,
-      focus: t(`steps.${d.id}.focus`),
-      title: t(`steps.${d.id}.title`),
-      description: t(`steps.${d.id}.description`),
-      category: d.category,
-    })),
+    steps: defs.map((d) => {
+      const s = stepsTable[d.id];
+      return {
+        week_number: d.week_number,
+        focus: s.focus,
+        title: s.title,
+        description: s.description,
+        category: d.category,
+      };
+    }),
   };
 }
