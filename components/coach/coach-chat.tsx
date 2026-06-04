@@ -40,6 +40,7 @@ export function CoachChat({
   const [streaming, setStreaming] = React.useState(false);
   const [streamedText, setStreamedText] = React.useState("");
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const bottomRef = React.useRef<HTMLDivElement | null>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const abortRef = React.useRef<AbortController | null>(null);
 
@@ -56,21 +57,57 @@ export function CoachChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
-  // First-paint scroll-to-bottom + focus the input on desktop. When the
-  // user opens an existing conversation with N messages, the scroll
-  // container starts at the top — they have to manually drag to see the
-  // latest exchange. Pin to the bottom once per conversation switch.
-  // Skip focus on touch devices so iOS / Android don't pop the keyboard
-  // and obscure the conversation behind the IME.
+  // First-paint scroll-to-bottom + focus the input on desktop.
+  //
+  // Why double rAF + a 50ms fallback:
+  //   - On mount, React commits the message list synchronously but the
+  //     browser hasn't laid out / painted yet. Calling scrollIntoView
+  //     in the same tick measures the OLD scrollHeight (often 0) and
+  //     no-ops.
+  //   - Double requestAnimationFrame is the canonical pattern — first
+  //     rAF runs before the browser paints, second rAF runs AFTER the
+  //     paint when scrollHeight is settled.
+  //   - The 50ms setTimeout fallback handles slow fonts: when the
+  //     coach prompt suggestions or markdown renders pull a webfont,
+  //     the second rAF can still fire before the font swap repaints,
+  //     leaving us a few pixels short. The timeout catches the
+  //     trailing layout shift without ever yanking the user (since
+  //     this only runs once per conversationId).
+  //
+  // Skip focus on touch devices so iOS / Android don't pop the IME
+  // and obscure the conversation behind the keyboard.
   React.useEffect(() => {
-    const scroller = scrollRef.current;
-    if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    const scrollToBottom = () => {
+      const bottom = bottomRef.current;
+      if (bottom) bottom.scrollIntoView({ block: "end" });
+      else if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    };
+
+    const raf1 = window.requestAnimationFrame(() => {
+      const raf2 = window.requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+      // Stash the inner id on the outer one so the cleanup cancels both
+      // without an extra ref.
+      (raf1 as unknown as { __inner?: number }).__inner = raf2;
+    });
+    const fallback = window.setTimeout(scrollToBottom, 50);
+
     if (typeof window !== "undefined") {
       const isTouch =
         window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ??
         false;
       if (!isTouch) textareaRef.current?.focus({ preventScroll: true });
     }
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      const inner = (raf1 as unknown as { __inner?: number }).__inner;
+      if (inner !== undefined) window.cancelAnimationFrame(inner);
+      window.clearTimeout(fallback);
+    };
   }, [conversationId]);
 
   // Auto-scroll the chat to the bottom, but ONLY when the user is
@@ -82,7 +119,9 @@ export function CoachChat({
     if (!el) return;
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
     if (distanceFromBottom < 120) {
-      el.scrollTop = el.scrollHeight;
+      const bottom = bottomRef.current;
+      if (bottom) bottom.scrollIntoView({ block: "end" });
+      else el.scrollTop = el.scrollHeight;
     }
   }, [messages, streamedText]);
 
@@ -241,6 +280,14 @@ export function CoachChat({
               {t("thinking")}
             </div>
           )}
+
+          {/*
+            Sentinel for scroll-to-bottom. Kept as the LAST child of the
+            scroll container so scrollIntoView({ block: "end" }) lands on
+            the true bottom even after late layout shifts (font swap,
+            markdown reflow, streaming bubble height change).
+          */}
+          <div ref={bottomRef} aria-hidden />
         </div>
       </div>
 
