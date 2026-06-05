@@ -19,7 +19,15 @@
     "leftover": "Dinheiro disponível",
     "leftoverHint": "Taxa de poupança {rate}",
     "emergency": "Fundo de emergência",
-    "monthsSuffix": "{months} meses"
+    "monthsSuffix": "{months} meses",
+    "fixedExpenses": "Despesas fixas",
+    "fixedExpensesHint": "Recorrentes, normalizadas por mês",
+    "variableExpenses": "Despesas variáveis",
+    "variableExpensesHint": "Transações pontuais este mês",
+    "totalExpenses": "Despesas totais",
+    "totalExpensesHint": "Fixas + variáveis este mês",
+    "transactions": "Transações",
+    "transactionsHint": "Número de despesas pontuais este mês"
   },
   "alerts": {
     "title": "Alertas",

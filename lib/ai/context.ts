@@ -134,8 +134,11 @@ Mode : ${data.isDemo ? "démo (données fictives)" : "réel"}
 
 ## Indicateurs clés
 - Revenus mensuels : ${fmt(monthlyIncome)}
-- Dépenses mensuelles : ${fmt(monthlyExpenses)}
-- Reste à vivre : ${fmt(cashflow)}
+- Dépenses fixes (récurrent normalisé mensuel) : ${fmt(data.expenseBuckets.fixed)}
+- Dépenses variables (transactions ponctuelles ce mois) : ${fmt(data.expenseBuckets.variable)}
+- Dépenses totales ce mois : ${fmt(data.expenseBuckets.total)}
+- Transactions ponctuelles ce mois : ${data.expenseBuckets.transactions}
+- Reste à vivre (sur la base des dépenses récurrentes) : ${fmt(cashflow)}
 - Taux d'épargne : ${formatPercent(savingsRate)}
 - Ratio dépenses / revenus : ${formatPercent(expenseRatio)}
 - Épargne disponible : ${fmt(currentSavings)}
@@ -157,5 +160,6 @@ ${goalsSection}
 - Si tu cites un montant, prends-le dans la liste ci-dessus. N'invente pas.
 - Si une donnée manque, demande-la avant d'extrapoler.
 - Garde un ton calme et concret.
-- "Objectifs actuels" est la source de vérité COMPLÈTE des objectifs : tu y trouves les objectifs formalisés dans /goals ET ceux mentionnés en conversation (étiquetés "source: mémoire conversation"). Ne dis JAMAIS "aucun objectif actif" si cette section liste au moins un élément. Quand un objectif vient de la mémoire sans être encore dans /goals, propose à l'utilisateur de le formaliser (montant cible, échéance) sans le lui imposer.`;
+- "Objectifs actuels" est la source de vérité COMPLÈTE des objectifs : tu y trouves les objectifs formalisés dans /goals ET ceux mentionnés en conversation (étiquetés "source: mémoire conversation"). Ne dis JAMAIS "aucun objectif actif" si cette section liste au moins un élément. Quand un objectif vient de la mémoire sans être encore dans /goals, propose à l'utilisateur de le formaliser (montant cible, échéance) sans le lui imposer.
+- Dépenses : utilise toujours "Dépenses totales ce mois" pour comparer au revenu et juger du reste à vivre RÉEL. "Dépenses fixes" couvre seulement le récurrent (loyer, abonnements, assurances…) ; "Dépenses variables" couvre les transactions ponctuelles du mois en cours (courses, restaurants, achats imprévus). NE confonds JAMAIS les deux et NE prétends JAMAIS que les "dépenses mensuelles" sont uniquement les fixes — le total est ce qui compte pour l'utilisateur.`;
 }

@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { ArrowDownCircle } from "lucide-react";
+import {
+  ArrowDownCircle,
+  Layers,
+  Receipt,
+  ShoppingCart,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { TransactionList } from "@/components/finance/transaction-list";
-import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { getFinanceData } from "@/lib/services/finance";
 import {
   createExpense,
   deleteExpense,
@@ -19,8 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ExpensesPage() {
   const t = await getTranslations("app.finance.expenses");
+  const tDashboard = await getTranslations("app.dashboard.stats");
   const data = await getFinanceData();
-  const monthly = totalMonthly(data.expenses);
+  const { fixed, variable, total, transactions } = data.expenseBuckets;
 
   return (
     <div className="space-y-6">
@@ -30,16 +36,35 @@ export default async function ExpensesPage() {
         description={t("header.description")}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/*
+        Phase 3.1.1 — 4 KPIs reflecting the canonical split. Shares
+        the same labels as the dashboard so the user sees identical
+        numbers wherever they navigate.
+      */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label={t("stats.monthly")}
-          value={formatCurrency(monthly, data.profile.currency)}
+          label={tDashboard("fixedExpenses")}
+          value={formatCurrency(fixed, data.profile.currency)}
           icon={<ArrowDownCircle className="h-4 w-4" />}
+          hint={tDashboard("fixedExpensesHint")}
         />
         <StatCard
-          label={t("stats.lines")}
-          value={`${data.expenses.length}`}
-          hint={t("stats.linesHint")}
+          label={tDashboard("variableExpenses")}
+          value={formatCurrency(variable, data.profile.currency)}
+          icon={<ShoppingCart className="h-4 w-4" />}
+          hint={tDashboard("variableExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("totalExpenses")}
+          value={formatCurrency(total, data.profile.currency)}
+          icon={<Layers className="h-4 w-4" />}
+          hint={tDashboard("totalExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("transactions")}
+          value={String(transactions)}
+          icon={<Receipt className="h-4 w-4" />}
+          hint={tDashboard("transactionsHint")}
         />
       </div>
 

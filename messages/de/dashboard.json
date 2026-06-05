@@ -19,7 +19,15 @@
     "leftover": "Verfügbares Geld",
     "leftoverHint": "Sparquote {rate}",
     "emergency": "Notgroschen",
-    "monthsSuffix": "{months} Monate"
+    "monthsSuffix": "{months} Monate",
+    "fixedExpenses": "Fixe Ausgaben",
+    "fixedExpensesHint": "Wiederkehrend, auf den Monat normiert",
+    "variableExpenses": "Variable Ausgaben",
+    "variableExpensesHint": "Einmalige Transaktionen diesen Monat",
+    "totalExpenses": "Ausgaben gesamt",
+    "totalExpensesHint": "Fixe + variable diesen Monat",
+    "transactions": "Transaktionen",
+    "transactionsHint": "Anzahl einmaliger Ausgaben diesen Monat"
   },
   "alerts": {
     "title": "Hinweise",

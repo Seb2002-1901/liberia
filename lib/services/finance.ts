@@ -3,7 +3,11 @@ import { cache } from "react";
 import { getTranslations } from "next-intl/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { normalizeToMonthly } from "@/lib/calculations/finance";
-import { frequencyMultiplier } from "@/lib/calculations/aggregate";
+import {
+  computeExpenseBuckets,
+  frequencyMultiplier,
+  type ExpenseBuckets,
+} from "@/lib/calculations/aggregate";
 import {
   demoFinancialProfile,
   getDemoExpenses,
@@ -43,6 +47,13 @@ export type FinanceData = {
   incomes: Income[];
   expenses: Expense[];
   goals: Goal[];
+  /**
+   * Phase 3.1.1 — precomputed fixed/variable/total split. Computed
+   * once per request from `expenses` so every consumer (dashboard,
+   * budget, /expenses, coach context, demo) shows the same numbers
+   * to the cent without re-running the aggregation logic.
+   */
+  expenseBuckets: ExpenseBuckets;
   isDemo: boolean;
 };
 
@@ -133,6 +144,8 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
       profileData = retry.data as typeof profileData;
     }
 
+    const expensesList = (expRes.data as Expense[] | null) ?? [];
+
     return {
       profile: {
         full_name: profileData?.full_name ?? null,
@@ -161,8 +174,11 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
       },
       financialProfile: (fpRes.data as FinancialProfile | null) ?? null,
       incomes: (incRes.data as Income[] | null) ?? [],
-      expenses: (expRes.data as Expense[] | null) ?? [],
+      expenses: expensesList,
       goals: (goalsRes.data as Goal[] | null) ?? [],
+      // Computed once here so every downstream consumer sees the
+      // same split (avoids drift between dashboard, budget, /coach).
+      expenseBuckets: computeExpenseBuckets(expensesList),
       isDemo: false,
     };
   } catch {
@@ -174,6 +190,7 @@ async function buildDemoData(): Promise<FinanceData> {
   const t = await getTranslations("app.demo.data");
   const tString = (key: string) => t(key);
   const demoProfile = getDemoProfile(tString);
+  const demoExpenses = getDemoExpenses(tString);
   return {
     profile: {
       full_name: demoProfile.full_name,
@@ -196,8 +213,9 @@ async function buildDemoData(): Promise<FinanceData> {
     },
     financialProfile: demoFinancialProfile,
     incomes: getDemoIncomes(tString),
-    expenses: getDemoExpenses(tString),
+    expenses: demoExpenses,
     goals: getDemoGoals(tString),
+    expenseBuckets: computeExpenseBuckets(demoExpenses),
     isDemo: true,
   };
 }

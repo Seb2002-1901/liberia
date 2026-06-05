@@ -19,7 +19,15 @@
     "leftover": "Soldi disponibili",
     "leftoverHint": "Tasso di risparmio {rate}",
     "emergency": "Fondo di emergenza",
-    "monthsSuffix": "{months} mesi"
+    "monthsSuffix": "{months} mesi",
+    "fixedExpenses": "Spese fisse",
+    "fixedExpensesHint": "Ricorrenti, normalizzate al mese",
+    "variableExpenses": "Spese variabili",
+    "variableExpensesHint": "Transazioni occasionali di questo mese",
+    "totalExpenses": "Spese totali",
+    "totalExpensesHint": "Fisse + variabili di questo mese",
+    "transactions": "Transazioni",
+    "transactionsHint": "Numero di spese occasionali di questo mese"
   },
   "alerts": {
     "title": "Avvisi",

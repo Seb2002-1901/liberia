@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Layers,
+  Receipt,
+  Scale,
+  ShoppingCart,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -26,19 +33,39 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BudgetPage() {
   const t = await getTranslations("app.finance.budget");
+  const tDashboard = await getTranslations("app.dashboard.stats");
   const data = await getFinanceData();
 
   const monthlyIncome = totalMonthly(data.incomes);
-  const monthlyExpenses = totalMonthly(data.expenses);
-  const cashflow = calculateNetCashflow({ monthlyIncome, monthlyExpenses });
-  const savingsRate = calculateSavingsRate({ monthlyIncome, monthlyExpenses });
+  // Budget planning logic stays on the RECURRING base (essentials
+  // vs non-essentials, expense ratio): these are structural
+  // indicators of long-term spending balance, not month-to-month
+  // transaction noise. The new variable / total cards expose the
+  // actual lived spending alongside.
+  const {
+    fixed: monthlyExpenses,
+    variable: variableExpenses,
+    total: totalExpenses,
+    transactions: transactionsCount,
+  } = data.expenseBuckets;
+  const cashflow = calculateNetCashflow({
+    monthlyIncome,
+    monthlyExpenses: totalExpenses,
+  });
+  const savingsRate = calculateSavingsRate({
+    monthlyIncome,
+    monthlyExpenses: totalExpenses,
+  });
   const expenseRatio = calculateExpenseRatio({ monthlyIncome, monthlyExpenses });
 
   const essentialIds = new Set(
     EXPENSE_CATEGORIES.filter((c) => c.essential).map((c) => c.id),
   );
   const essentialTotal = data.expenses
-    .filter((e) => essentialIds.has(e.category as never))
+    .filter(
+      (e) =>
+        essentialIds.has(e.category as never) && e.frequency !== "one_time",
+    )
     .reduce(
       (sum, e) => sum + e.amount * frequencyMultiplier(e.frequency),
       0,
@@ -55,17 +82,12 @@ export default async function BudgetPage() {
         description={t("header.description")}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label={t("stats.income")}
           value={formatCurrency(monthlyIncome, data.profile.currency)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
-        />
-        <StatCard
-          label={t("stats.expenses")}
-          value={formatCurrency(monthlyExpenses, data.profile.currency)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
           label={t("stats.leftover")}
@@ -78,6 +100,35 @@ export default async function BudgetPage() {
           label={t("stats.ratio")}
           value={formatPercent(expenseRatio)}
           hint={expenseRatio > 100 ? t("stats.ratioOver") : t("stats.ratioOk")}
+        />
+      </div>
+
+      {/* Phase 3.1.1 — same 4-card breakdown row as dashboard /
+          expenses so the numbers match across every surface. */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label={tDashboard("fixedExpenses")}
+          value={formatCurrency(monthlyExpenses, data.profile.currency)}
+          icon={<ArrowDownCircle className="h-4 w-4" />}
+          hint={tDashboard("fixedExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("variableExpenses")}
+          value={formatCurrency(variableExpenses, data.profile.currency)}
+          icon={<ShoppingCart className="h-4 w-4" />}
+          hint={tDashboard("variableExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("totalExpenses")}
+          value={formatCurrency(totalExpenses, data.profile.currency)}
+          icon={<Layers className="h-4 w-4" />}
+          hint={tDashboard("totalExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("transactions")}
+          value={String(transactionsCount)}
+          icon={<Receipt className="h-4 w-4" />}
+          hint={tDashboard("transactionsHint")}
         />
       </div>
 

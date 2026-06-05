@@ -4,7 +4,10 @@ import {
   ArrowDownCircle,
   ArrowUpCircle,
   HeartPulse,
+  Layers,
   PiggyBank,
+  Receipt,
+  ShoppingCart,
   Sparkles,
   Wallet,
 } from "lucide-react";
@@ -35,7 +38,10 @@ import {
 } from "@/lib/calculations/finance";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
-import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
+import {
+  aggregateMonthlyByCategory,
+  computeExpenseBuckets,
+} from "@/lib/calculations/aggregate";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app.demo.metadata");
@@ -46,9 +52,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DemoDashboardPage() {
-  const [t, tData] = await Promise.all([
+  const [t, tData, tDashboard] = await Promise.all([
     getTranslations("app.demo"),
     getTranslations("app.demo.data"),
+    getTranslations("app.dashboard.stats"),
   ]);
   const tDataString = (key: string) => tData(key);
   const demoIncomes = getDemoIncomes(tDataString);
@@ -56,7 +63,8 @@ export default async function DemoDashboardPage() {
   const demoGoals = getDemoGoals(tDataString);
 
   const monthlyIncome = totalMonthly(demoIncomes);
-  const monthlyExpenses = totalMonthly(demoExpenses);
+  const expenseBuckets = computeExpenseBuckets(demoExpenses);
+  const monthlyExpenses = expenseBuckets.fixed;
   const currentSavings = demoFinancialProfile.current_savings;
   const dti =
     monthlyIncome > 0
@@ -121,17 +129,12 @@ export default async function DemoDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label={t("stats.monthlyIncome")}
           value={formatCurrency(monthlyIncome)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
-        />
-        <StatCard
-          label={t("stats.monthlyExpenses")}
-          value={formatCurrency(monthlyExpenses)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
           label={t("stats.netCashflow")}
@@ -149,6 +152,35 @@ export default async function DemoDashboardPage() {
           }
           icon={<PiggyBank className="h-4 w-4" />}
           hint={formatCurrency(currentSavings)}
+        />
+      </div>
+
+      {/* Phase 3.1.1 — same expense breakdown row as the real
+          dashboard so the demo accurately represents the product. */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label={tDashboard("fixedExpenses")}
+          value={formatCurrency(expenseBuckets.fixed)}
+          icon={<ArrowDownCircle className="h-4 w-4" />}
+          hint={tDashboard("fixedExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("variableExpenses")}
+          value={formatCurrency(expenseBuckets.variable)}
+          icon={<ShoppingCart className="h-4 w-4" />}
+          hint={tDashboard("variableExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("totalExpenses")}
+          value={formatCurrency(expenseBuckets.total)}
+          icon={<Layers className="h-4 w-4" />}
+          hint={tDashboard("totalExpensesHint")}
+        />
+        <StatCard
+          label={tDashboard("transactions")}
+          value={String(expenseBuckets.transactions)}
+          icon={<Receipt className="h-4 w-4" />}
+          hint={tDashboard("transactionsHint")}
         />
       </div>
 

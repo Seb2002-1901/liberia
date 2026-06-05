@@ -4,7 +4,10 @@ import {
   ArrowDownCircle,
   ArrowUpCircle,
   HeartPulse,
+  Layers,
   PiggyBank,
+  Receipt,
+  ShoppingCart,
   Sparkles,
   Wallet,
 } from "lucide-react";
@@ -60,13 +63,39 @@ export default async function DashboardPage() {
   );
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
-  const monthlyExpenses =
-    totalMonthly(data.expenses) || data.financialProfile?.monthly_expenses || 0;
+  // Phase 3.1.1 — three distinct expense numbers, never confused:
+  //   - fixed     = recurring lines normalised to monthly (rent,
+  //                 subscriptions, insurance...). Drives long-term
+  //                 health metrics: stability score, runway, savings
+  //                 rate, expense ratio — none of those should jitter
+  //                 with one-off purchases.
+  //   - variable  = one_time transactions logged THIS calendar month
+  //                 (typically from the coach's propose_expense flow).
+  //   - total     = fixed + variable. Drives the "Leftover" KPI and
+  //                 the headline "Dépenses totales" card — what the
+  //                 user actually has left to live on this month.
+  // Fallback to the onboarding-time monthly_expenses on the legacy
+  // monthly-fixed path so empty new accounts still show non-zero KPIs.
+  const fixedExpenses =
+    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
+  const variableExpenses = data.expenseBuckets.variable;
+  const totalExpenses = fixedExpenses + variableExpenses;
+  const transactionsCount = data.expenseBuckets.transactions;
+  // Long-term health metrics intentionally use FIXED, not TOTAL —
+  // stability is about your recurring burn rate vs income, not about
+  // a single month of variable spending.
+  const monthlyExpenses = fixedExpenses;
   const currentSavings = data.financialProfile?.current_savings ?? 0;
   const monthlyDebt = data.financialProfile?.monthly_debt ?? 0;
   const dti = monthlyIncome > 0 ? (monthlyDebt / monthlyIncome) * 100 : 0;
 
-  const cashflow = calculateNetCashflow({ monthlyIncome, monthlyExpenses });
+  // The user's "Reste à vivre" KPI must reflect real-life spending
+  // (including variable). Stability calcs below stay on the recurring
+  // base — different concepts, different formulas.
+  const cashflow = calculateNetCashflow({
+    monthlyIncome,
+    monthlyExpenses: totalExpenses,
+  });
   const savingsRate = calculateSavingsRate({ monthlyIncome, monthlyExpenses });
   const runway = calculateRunway({ currentSavings, monthlyExpenses });
   const expenseRatio = calculateExpenseRatio({ monthlyIncome, monthlyExpenses });
@@ -173,17 +202,12 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label={t("stats.income")}
           value={formatUserCurrency(monthlyIncome, data.profile)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
-        />
-        <StatCard
-          label={t("stats.expenses")}
-          value={formatUserCurrency(monthlyExpenses, data.profile)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
         />
         <StatCard
           label={t("stats.leftover")}
@@ -202,6 +226,40 @@ export default async function DashboardPage() {
           icon={<PiggyBank className="h-4 w-4" />}
           tone={runway >= 3 ? "positive" : "neutral"}
           hint={formatUserCurrency(currentSavings, data.profile)}
+        />
+      </div>
+
+      {/*
+        Phase 3.1.1 — explicit expense breakdown row. Each card is a
+        distinct concept; never confuse "fixed" with "monthly total".
+        Total = fixed + variable, locked by the computeExpenseBuckets
+        invariant + unit tests in tests/unit/expense-buckets.test.ts.
+      */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label={t("stats.fixedExpenses")}
+          value={formatUserCurrency(fixedExpenses, data.profile)}
+          icon={<ArrowDownCircle className="h-4 w-4" />}
+          hint={t("stats.fixedExpensesHint")}
+        />
+        <StatCard
+          label={t("stats.variableExpenses")}
+          value={formatUserCurrency(variableExpenses, data.profile)}
+          icon={<ShoppingCart className="h-4 w-4" />}
+          hint={t("stats.variableExpensesHint")}
+        />
+        <StatCard
+          label={t("stats.totalExpenses")}
+          value={formatUserCurrency(totalExpenses, data.profile)}
+          icon={<Layers className="h-4 w-4" />}
+          tone={totalExpenses > monthlyIncome ? "negative" : "neutral"}
+          hint={t("stats.totalExpensesHint")}
+        />
+        <StatCard
+          label={t("stats.transactions")}
+          value={String(transactionsCount)}
+          icon={<Receipt className="h-4 w-4" />}
+          hint={t("stats.transactionsHint")}
         />
       </div>
 

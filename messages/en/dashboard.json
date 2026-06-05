@@ -19,7 +19,15 @@
     "leftover": "Take-home money",
     "leftoverHint": "Savings rate {rate}",
     "emergency": "Emergency fund",
-    "monthsSuffix": "{months} months"
+    "monthsSuffix": "{months} months",
+    "fixedExpenses": "Fixed expenses",
+    "fixedExpensesHint": "Recurring, normalised per month",
+    "variableExpenses": "Variable expenses",
+    "variableExpensesHint": "One-off transactions this month",
+    "totalExpenses": "Total expenses",
+    "totalExpensesHint": "Fixed + variable this month",
+    "transactions": "Transactions",
+    "transactionsHint": "Number of one-off expenses this month"
   },
   "alerts": {
     "title": "Alerts",

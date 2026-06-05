@@ -59,6 +59,7 @@ function makeFinanceData(goals: Goal[] = []): FinanceData {
     incomes: [],
     expenses: [],
     goals,
+    expenseBuckets: { fixed: 0, variable: 0, total: 0, transactions: 0 },
     isDemo: false,
   };
 }
