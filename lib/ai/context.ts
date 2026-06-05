@@ -27,6 +27,10 @@ import {
   computeGoalAchievementScore,
   computePotentialSavings,
 } from "@/lib/calculations/budget-goals";
+import {
+  computeFinancialCompleteness,
+  type MissingArea,
+} from "@/lib/calculations/completeness";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -283,6 +287,30 @@ export function buildFinanceContext(
     monthlyTransactions: data.expenseBuckets.transactions,
   });
 
+  // Phase 3.1.5 — data completeness gate. The coach reads this
+  // section and adjusts the confidence of every estimate
+  // accordingly (the rule block at the bottom forbids aggressive
+  // economy claims when reliability is low). The user-facing
+  // analytics page does the same via the FiabilityWarning banner.
+  const completeness = computeFinancialCompleteness({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    categoryBudgets: data.categoryBudgets,
+  });
+  const completenessSection =
+    completeness.missing.length === 0
+      ? "Profil financier complet (100%)."
+      : [
+          `Score : ${completeness.score}% (${completeness.detected.length} catégories renseignées).`,
+          "",
+          "Catégories absentes :",
+          ...completeness.missing.map(
+            (m) => `- ${areaLabel(m.area)} (sévérité ${severityLabel(m.severity)})`,
+          ),
+        ].join("\n");
+  const reliabilitySection = `Niveau : ${reliabilityLabel(completeness.reliability)} (score ${completeness.score}/100).`;
+
   return `# Contexte financier de l'utilisateur
 
 Devise : ${currency}
@@ -337,6 +365,12 @@ ${savingsSection}
 Score : ${discipline.score}/100 — ${disciplineTierLabel(discipline.tier)}
 Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.breakdown.savings}/30 · urgence ${discipline.breakdown.emergency}/25 · suivi ${discipline.breakdown.tracking}/10
 
+## Complétude financière
+${completenessSection}
+
+## Fiabilité des analyses
+${reliabilitySection}
+
 ## Règles importantes
 - Si tu cites un montant, prends-le dans la liste ci-dessus. N'invente pas.
 - Si une donnée manque, demande-la avant d'extrapoler.
@@ -347,7 +381,8 @@ Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.bre
 - "Discipline budgétaire" résume ta vision de la santé budgétaire courante. Tu peux la mentionner ("ton score de discipline est à 82/100 — très bon contrôle") pour rassurer ou pointer le composant le plus faible, sans en faire un objet de stress.
 - "Objectifs budgétaires" est la liste complète des limites mensuelles que l'utilisateur s'est fixées par catégorie, avec leur statut OK / ATTENTION / DÉPASSÉ. Pour répondre à "quels objectifs ai-je dépassés ?", liste les statuts DÉPASSÉ en citant le couple dépensé / cible. Pour "quels budgets sont respectés ?", cite les OK. Ne réinvente jamais ces chiffres : ils viennent directement de la table category_budgets.
 - "Score budgétaire" exprime la proportion d'objectifs SUCCESS sur le total défini. Un score 4/5 = 80 % signifie que 4 budgets sur 5 sont sous 80 % de leur cible. Tu peux dire "tu respectes 4 budgets sur 5 ce mois — bien joué" sans paraphraser inutilement.
-- "Économies potentielles" agrège l'impact mensuel et annuel des opportunités ci-dessus. Pour "combien puis-je économiser sur une année ?", cite la ligne "Total cumulé sur l'ensemble des opportunités" en montrant l'annuel (la projection 12 × mensuel parle plus). Précise toujours qu'il s'agit d'une ESTIMATION basée sur les heuristiques (10-20 % de réduction sur les leviers identifiés), pas d'une garantie : "tu pourrais viser environ X par an si tu agis sur les leviers haute priorité — c'est un ordre de grandeur, pas une promesse".`;
+- "Économies potentielles" agrège l'impact mensuel et annuel des opportunités ci-dessus. Pour "combien puis-je économiser sur une année ?", cite la ligne "Total cumulé sur l'ensemble des opportunités" en montrant l'annuel (la projection 12 × mensuel parle plus). Précise toujours qu'il s'agit d'une ESTIMATION basée sur les heuristiques (10-20 % de réduction sur les leviers identifiés), pas d'une garantie : "tu pourrais viser environ X par an si tu agis sur les leviers haute priorité — c'est un ordre de grandeur, pas une promesse".
+- "Complétude financière" et "Fiabilité des analyses" sont CRUCIAUX. Si la fiabilité est BASSE ou MOYENNE (score < 90), tu DOIS calmer toute projection d'économies et le dire explicitement : "Cette estimation est probablement incomplète car plusieurs catégories importantes ne sont pas encore renseignées (cite-les)". NE JAMAIS donner un chiffre agressif d'économies (>5% du revenu) sans d'abord rappeler que les données peuvent être lacunaires. Quand la fiabilité est HAUTE (≥ 90%), tu peux parler avec assurance. Si l'utilisateur demande "combien puis-je économiser ?" et que la fiabilité est faible, ta première phrase doit l'inviter à compléter son profil (carte Complétude financière sur le dashboard) avant de citer un chiffre.`;
 }
 
 /**
@@ -419,4 +454,41 @@ function disciplineTierLabel(
     case "low":
       return "Discipline fragile — premier levier à activer";
   }
+}
+
+function areaLabel(area: MissingArea["area"]): string {
+  switch (area) {
+    case "income":
+      return "Revenus";
+    case "housing":
+      return "Logement";
+    case "food":
+      return "Alimentation";
+    case "insurance":
+      return "Assurances";
+    case "transport":
+      return "Transport";
+    case "telecom":
+      return "Télécommunications (factures & énergie)";
+    case "subscriptions":
+      return "Abonnements";
+    case "leisure":
+      return "Loisirs";
+    case "goal":
+      return "Objectifs définis";
+    case "category_budget":
+      return "Budgets par catégorie";
+  }
+}
+
+function severityLabel(s: "low" | "medium" | "high"): string {
+  return s === "high" ? "haute" : s === "medium" ? "moyenne" : "basse";
+}
+
+function reliabilityLabel(r: "low" | "medium" | "high"): string {
+  return r === "high"
+    ? "ÉLEVÉE — tu peux te baser sur ces chiffres avec confiance"
+    : r === "medium"
+      ? "MOYENNE — certaines catégories majeures manquent, calme les projections"
+      : "FAIBLE — données très incomplètes, n'avance aucun chiffre agressif d'économies sans inviter à compléter le profil";
 }

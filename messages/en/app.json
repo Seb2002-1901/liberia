@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Analysis reliability",
+        "description": {
+          "high": "Your data is complete. The numbers below are reliable.",
+          "medium": "Some major categories seem missing. Opportunities may be underestimated.",
+          "low": "Data very incomplete. Take the conclusions below with caution."
+        },
+        "missingLabel": "Categories to fill in first:",
+        "caveat": "Complete your profile from the \"Financial completeness\" card on the dashboard to get a fairer analysis."
+      },
       "potentialSavings": {
         "title": "Potential savings",
         "description": "Aggregate of detected opportunities. Estimate based on conservative assumptions (10-20% cut on identified levers), not a guarantee.",

@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Fiabilidade da análise",
+        "description": {
+          "high": "Os teus dados estão completos. Os números abaixo são fiáveis.",
+          "medium": "Algumas categorias importantes parecem em falta. As oportunidades podem estar subestimadas.",
+          "low": "Dados muito incompletos. Trata as conclusões abaixo com prudência."
+        },
+        "missingLabel": "Categorias a preencher primeiro:",
+        "caveat": "Completa o teu perfil a partir do cartão « Completude financeira » no dashboard para uma análise mais precisa."
+      },
       "potentialSavings": {
         "title": "Poupanças potenciais",
         "description": "Soma das oportunidades detetadas. Estimativa baseada em hipóteses prudentes (10-20% de redução nas alavancas identificadas), sem garantia.",

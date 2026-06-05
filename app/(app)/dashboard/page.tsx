@@ -42,6 +42,8 @@ import {
   computeGoalAchievementScore,
   computePotentialSavings,
 } from "@/lib/calculations/budget-goals";
+import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
+import { CompletenessCard } from "@/components/dashboard/completeness-card";
 import { DisciplineCard } from "@/components/dashboard/discipline-card";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
@@ -166,6 +168,16 @@ export default async function DashboardPage() {
     savingsRate,
   });
   const potentialSavings = computePotentialSavings(dashboardOpportunities);
+
+  // Phase 3.1.5 — data completeness gate. The card surfaces the
+  // score + missing areas; the assistant modal lets the user
+  // back-fill in 30s.
+  const completeness = computeFinancialCompleteness({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    categoryBudgets: data.categoryBudgets,
+  });
 
   const expenseByCategory = aggregateMonthlyByCategory(data.expenses);
 
@@ -297,6 +309,15 @@ export default async function DashboardPage() {
           hint={formatUserCurrency(currentSavings, data.profile)}
         />
       </div>
+
+      {/* Phase 3.1.5 — completeness card. Lives ABOVE the
+          optimisation row because it gates the trust the user
+          should place in the metrics below. When the score is low
+          we want them to act on this card first. */}
+      <CompletenessCard
+        completeness={completeness}
+        currency={data.profile.currency}
+      />
 
       {/* Phase 3.1.4 — optimisation row. Discipline + Objectifs +
           Économies potentielles, side by side. Each is a stat card

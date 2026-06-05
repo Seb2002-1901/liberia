@@ -41,6 +41,80 @@
     "potentialSavingsHint": "≈ {yearly} per year — estimate, not a guarantee",
     "perMonthSuffix": " / month"
   },
+  "completeness": {
+    "eyebrow": "Financial completeness",
+    "quality": {
+      "high": "Very complete data",
+      "medium": "Decent data",
+      "low": "Very incomplete data"
+    },
+    "missingLabel": "Missing categories:",
+    "emptyState": "Profile complete — every number on this page can be trusted.",
+    "cta": "Complete my data",
+    "area": {
+      "income": "Income",
+      "housing": "Housing",
+      "food": "Food",
+      "insurance": "Insurance",
+      "transport": "Transport",
+      "telecom": "Telecom",
+      "subscriptions": "Subscriptions",
+      "leisure": "Leisure",
+      "goal": "Financial goal",
+      "category_budget": "Per-category budget"
+    },
+    "assistant": {
+      "title": "Complete my financial profile",
+      "description": "Toggle the rows that apply to you and enter the monthly amount. You can edit everything later under /expenses.",
+      "perMonth": "{currency} / month",
+      "save": "Save all",
+      "cancel": "Later",
+      "savedToast": "{count, plural, one {# expense saved} other {# expenses saved}}.",
+      "invalidAmount": "Invalid amount for {name}.",
+      "candidate": {
+        "health_insurance": {
+          "label": "Health insurance",
+          "hint": "Often 300-450 CHF / month in Switzerland (LAMal)."
+        },
+        "car_insurance": {
+          "label": "Car insurance",
+          "hint": "Liability + comprehensive."
+        },
+        "phone": {
+          "label": "Phone plan",
+          "hint": "Mobile contract."
+        },
+        "internet": {
+          "label": "Internet",
+          "hint": "Fibre / cable / TV."
+        },
+        "netflix": {
+          "label": "Netflix",
+          "hint": "Video streaming."
+        },
+        "spotify": {
+          "label": "Spotify / Apple Music",
+          "hint": "Music streaming."
+        },
+        "gym": {
+          "label": "Gym / fitness",
+          "hint": "Fitness, yoga, club."
+        },
+        "leasing": {
+          "label": "Car leasing",
+          "hint": "Monthly leasing payment."
+        },
+        "credit": {
+          "label": "Loan / credit",
+          "hint": "Monthly loan repayment."
+        },
+        "other_subscription": {
+          "label": "Other subscription",
+          "hint": "iCloud, SaaS, magazine…"
+        }
+      }
+    }
+  },
   "discipline": {
     "eyebrow": "Budget discipline",
     "tier": {

@@ -55,6 +55,8 @@ export default async function ExpensesAnalyticsPage() {
         <ExpenseAnalyticsClient
           expenses={data.expenses}
           categoryBudgets={data.categoryBudgets}
+          incomes={data.incomes}
+          goals={data.goals}
           currency={data.profile.currency}
         />
       )}

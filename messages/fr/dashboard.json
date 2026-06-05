@@ -41,6 +41,80 @@
     "potentialSavingsHint": "≈ {yearly} sur l'année — estimation, pas une garantie",
     "perMonthSuffix": " / mois"
   },
+  "completeness": {
+    "eyebrow": "Complétude financière",
+    "quality": {
+      "high": "Données très complètes",
+      "medium": "Données correctes",
+      "low": "Données très incomplètes"
+    },
+    "missingLabel": "Catégories manquantes :",
+    "emptyState": "Profil financier complet — tu peux te baser sur tous les chiffres avec confiance.",
+    "cta": "Compléter mes données",
+    "area": {
+      "income": "Revenus",
+      "housing": "Logement",
+      "food": "Alimentation",
+      "insurance": "Assurances",
+      "transport": "Transport",
+      "telecom": "Télécommunications",
+      "subscriptions": "Abonnements",
+      "leisure": "Loisirs",
+      "goal": "Objectif financier",
+      "category_budget": "Budget par catégorie"
+    },
+    "assistant": {
+      "title": "Compléter mon profil financier",
+      "description": "Active les lignes qui te concernent et indique le montant mensuel. Tu pourras tout ajuster ensuite depuis /expenses.",
+      "perMonth": "{currency} / mois",
+      "save": "Tout enregistrer",
+      "cancel": "Plus tard",
+      "savedToast": "{count, plural, one {# dépense enregistrée} other {# dépenses enregistrées}}.",
+      "invalidAmount": "Montant invalide pour {name}.",
+      "candidate": {
+        "health_insurance": {
+          "label": "Assurance maladie",
+          "hint": "LAMal (assurance de base) — souvent 300-450 CHF / mois en Suisse."
+        },
+        "car_insurance": {
+          "label": "Assurance véhicule",
+          "hint": "RC + casco — selon véhicule et bonus."
+        },
+        "phone": {
+          "label": "Abonnement téléphone",
+          "hint": "Forfait mobile."
+        },
+        "internet": {
+          "label": "Abonnement internet",
+          "hint": "Fibre / TV / box."
+        },
+        "netflix": {
+          "label": "Netflix",
+          "hint": "Streaming vidéo."
+        },
+        "spotify": {
+          "label": "Spotify / Apple Music",
+          "hint": "Streaming musical."
+        },
+        "gym": {
+          "label": "Salle de sport",
+          "hint": "Fitness, yoga, club."
+        },
+        "leasing": {
+          "label": "Leasing voiture",
+          "hint": "Mensualité leasing."
+        },
+        "credit": {
+          "label": "Crédit / prêt",
+          "hint": "Mensualité crédit conso ou perso."
+        },
+        "other_subscription": {
+          "label": "Autre abonnement",
+          "hint": "iCloud, SaaS, magazine, club…"
+        }
+      }
+    }
+  },
   "discipline": {
     "eyebrow": "Discipline budgétaire",
     "tier": {

@@ -40,13 +40,22 @@ import {
   computePotentialSavings,
   type PotentialSavings,
 } from "@/lib/calculations/budget-goals";
+import {
+  computeFinancialCompleteness,
+  type CompletenessResult,
+} from "@/lib/calculations/completeness";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryId } from "@/lib/constants";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
   deleteCategoryBudgetAction,
   upsertCategoryBudgetAction,
 } from "@/app/actions/category-budgets";
-import type { CategoryBudget, Expense } from "@/types/database";
+import type {
+  CategoryBudget,
+  Expense,
+  Goal,
+  Income,
+} from "@/types/database";
 import {
   AlertTriangle,
   ArrowDownRight,
@@ -59,12 +68,16 @@ import {
 interface Props {
   expenses: Expense[];
   categoryBudgets: CategoryBudget[];
+  incomes: Income[];
+  goals: Goal[];
   currency: string;
 }
 
 export function ExpenseAnalyticsClient({
   expenses,
   categoryBudgets: initialBudgets,
+  incomes,
+  goals,
   currency,
 }: Props) {
   const t = useTranslations("app.finance.analytics");
@@ -146,6 +159,19 @@ export function ExpenseAnalyticsClient({
   const potentialSavings = React.useMemo(
     () => computePotentialSavings(opportunities),
     [opportunities],
+  );
+
+  // Phase 3.1.5 — completeness derived from the SAME input the
+  // dashboard uses, so the two pages always agree on reliability.
+  const completeness = React.useMemo(
+    () =>
+      computeFinancialCompleteness({
+        incomes,
+        expenses,
+        goals,
+        categoryBudgets: budgets,
+      }),
+    [incomes, expenses, goals, budgets],
   );
 
   const onBudgetSaved = (next: CategoryBudget) => {
@@ -319,6 +345,8 @@ export function ExpenseAnalyticsClient({
           />
         </CardContent>
       </Card>
+
+      <ReliabilityBanner completeness={completeness} />
 
       <PerformanceTable budgetStatus={budgetStatus} currency={currency} />
 
@@ -648,6 +676,74 @@ function priorityTone(priority: OpportunityPriority): string {
 /* -------------------------------------------------------------------------- */
 /*  Phase 3.1.3 — category history view                                         */
 /* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*  Phase 3.1.5 — reliability banner (when data is too thin to trust)           */
+/* -------------------------------------------------------------------------- */
+
+function ReliabilityBanner({
+  completeness,
+}: {
+  completeness: CompletenessResult;
+}) {
+  const t = useTranslations("app.finance.analytics.reliability");
+  const tArea = useTranslations("dashboard.completeness.area");
+  // High reliability = no banner. The page reads cleaner without
+  // a green "everything's fine" tile; the dashboard already shows
+  // the headline.
+  if (completeness.reliability === "high") return null;
+
+  const tone =
+    completeness.reliability === "low"
+      ? "border-rose-500/40 bg-rose-500/5 text-foreground"
+      : "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.05)] text-foreground";
+
+  // List the top 3 missing areas (high-severity first per
+  // detectMissingFinancialAreas() ordering).
+  const highlightMissing = completeness.missing
+    .filter((m) => m.severity !== "low")
+    .slice(0, 3);
+
+  return (
+    <Card className={cn("border", tone)}>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between text-base">
+          <span>{t("title")}</span>
+          <span className="text-sm tabular-nums">{completeness.score}%</span>
+        </CardTitle>
+        <CardDescription>
+          {t(`description.${completeness.reliability}`)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {highlightMissing.length > 0 && (
+          <>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {t("missingLabel")}
+            </p>
+            <ul className="mt-2 space-y-1 text-sm">
+              {highlightMissing.map((m) => (
+                <li key={m.area} className="flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "inline-block h-1.5 w-1.5 rounded-full",
+                      m.severity === "high"
+                        ? "bg-rose-500"
+                        : "bg-[hsl(var(--gold))]",
+                    )}
+                  />
+                  {tArea(m.area)}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p className="mt-3 text-xs text-muted-foreground">{t("caveat")}</p>
+      </CardContent>
+    </Card>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
 /*  Phase 3.1.4 — potential savings (aggregate impact)                          */

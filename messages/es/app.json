@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Fiabilidad del análisis",
+        "description": {
+          "high": "Tus datos están completos. Los números de abajo son fiables.",
+          "medium": "Algunas categorías importantes parecen ausentes. Las oportunidades pueden estar subestimadas.",
+          "low": "Datos muy incompletos. Toma las conclusiones de abajo con prudencia."
+        },
+        "missingLabel": "Categorías por rellenar primero:",
+        "caveat": "Completa tu perfil desde la tarjeta « Completitud financiera » del dashboard para un análisis más preciso."
+      },
       "potentialSavings": {
         "title": "Ahorros potenciales",
         "description": "Suma de las oportunidades detectadas. Estimación basada en hipótesis prudentes (10-20% de reducción en las palancas identificadas), no garantía.",

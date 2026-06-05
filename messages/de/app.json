@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Zuverlässigkeit der Analyse",
+        "description": {
+          "high": "Deine Daten sind vollständig. Die untenstehenden Zahlen sind zuverlässig.",
+          "medium": "Einige wichtige Kategorien scheinen zu fehlen. Opportunitäten könnten unterschätzt sein.",
+          "low": "Sehr unvollständige Daten. Behandle die Schlussfolgerungen mit Vorsicht."
+        },
+        "missingLabel": "Zuerst zu ergänzende Kategorien:",
+        "caveat": "Ergänze dein Profil über die Karte „Finanzielle Vollständigkeit\" auf dem Dashboard, um eine genauere Analyse zu erhalten."
+      },
       "potentialSavings": {
         "title": "Potenzielle Ersparnis",
         "description": "Summe der erkannten Opportunitäten. Schätzung mit konservativen Annahmen (10-20% Kürzung auf den identifizierten Hebeln), keine Garantie.",

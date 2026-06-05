@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Affidabilità dell'analisi",
+        "description": {
+          "high": "I tuoi dati sono completi. I numeri qui sotto sono affidabili.",
+          "medium": "Alcune categorie importanti sembrano mancare. Le opportunità potrebbero essere sottostimate.",
+          "low": "Dati molto incompleti. Prendi le conclusioni qui sotto con prudenza."
+        },
+        "missingLabel": "Categorie da inserire prima:",
+        "caveat": "Completa il tuo profilo dalla card « Completezza finanziaria » sul dashboard per un'analisi più precisa."
+      },
       "potentialSavings": {
         "title": "Risparmio potenziale",
         "description": "Somma delle opportunità rilevate. Stima basata su ipotesi prudenti (10-20% di riduzione sui leveraggi identificati), non una garanzia.",

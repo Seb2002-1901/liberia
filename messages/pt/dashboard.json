@@ -41,6 +41,80 @@
     "potentialSavingsHint": "≈ {yearly} por ano — estimativa, sem garantia",
     "perMonthSuffix": " / mês"
   },
+  "completeness": {
+    "eyebrow": "Completude financeira",
+    "quality": {
+      "high": "Dados muito completos",
+      "medium": "Dados razoáveis",
+      "low": "Dados muito incompletos"
+    },
+    "missingLabel": "Categorias em falta:",
+    "emptyState": "Perfil completo — todos os números são confiáveis.",
+    "cta": "Completar os meus dados",
+    "area": {
+      "income": "Rendimentos",
+      "housing": "Habitação",
+      "food": "Alimentação",
+      "insurance": "Seguros",
+      "transport": "Transporte",
+      "telecom": "Telecom",
+      "subscriptions": "Subscrições",
+      "leisure": "Lazer",
+      "goal": "Objetivo financeiro",
+      "category_budget": "Orçamento por categoria"
+    },
+    "assistant": {
+      "title": "Completar o meu perfil financeiro",
+      "description": "Ativa as linhas que te dizem respeito e indica o valor mensal. Podes ajustar tudo depois em /expenses.",
+      "perMonth": "{currency} / mês",
+      "save": "Guardar tudo",
+      "cancel": "Mais tarde",
+      "savedToast": "{count, plural, one {# despesa guardada} other {# despesas guardadas}}.",
+      "invalidAmount": "Montante inválido para {name}.",
+      "candidate": {
+        "health_insurance": {
+          "label": "Seguro de saúde",
+          "hint": "Em geral 300-450 CHF/mês na Suíça (LAMal)."
+        },
+        "car_insurance": {
+          "label": "Seguro automóvel",
+          "hint": "RC + danos próprios."
+        },
+        "phone": {
+          "label": "Tarifário móvel",
+          "hint": "Contrato móvel."
+        },
+        "internet": {
+          "label": "Internet",
+          "hint": "Fibra / cabo / TV."
+        },
+        "netflix": {
+          "label": "Netflix",
+          "hint": "Streaming de vídeo."
+        },
+        "spotify": {
+          "label": "Spotify / Apple Music",
+          "hint": "Streaming de música."
+        },
+        "gym": {
+          "label": "Ginásio",
+          "hint": "Fitness, yoga, clube."
+        },
+        "leasing": {
+          "label": "Leasing automóvel",
+          "hint": "Prestação mensal."
+        },
+        "credit": {
+          "label": "Crédito",
+          "hint": "Prestação mensal."
+        },
+        "other_subscription": {
+          "label": "Outra subscrição",
+          "hint": "iCloud, SaaS, revista…"
+        }
+      }
+    }
+  },
   "discipline": {
     "eyebrow": "Disciplina orçamental",
     "tier": {

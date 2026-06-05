@@ -890,6 +890,16 @@
           }
         }
       },
+      "reliability": {
+        "title": "Fiabilité de l'analyse",
+        "description": {
+          "high": "Tes données sont complètes. Les chiffres ci-dessous sont fiables.",
+          "medium": "Certaines catégories majeures semblent absentes. Les opportunités peuvent être sous-estimées.",
+          "low": "Données très incomplètes. Les conclusions ci-dessous sont à prendre avec prudence."
+        },
+        "missingLabel": "Catégories à renseigner en priorité :",
+        "caveat": "Complète ton profil depuis la carte « Complétude financière » sur le dashboard pour obtenir une analyse plus juste."
+      },
       "potentialSavings": {
         "title": "Économies potentielles",
         "description": "Total cumulé des opportunités détectées. Estimation issue d'hypothèses prudentes (10-20 % de réduction sur les leviers identifiés), pas une garantie.",

@@ -41,6 +41,80 @@
     "potentialSavingsHint": "≈ {yearly} pro Jahr — Schätzung, keine Garantie",
     "perMonthSuffix": " / Monat"
   },
+  "completeness": {
+    "eyebrow": "Finanzielle Vollständigkeit",
+    "quality": {
+      "high": "Sehr vollständige Daten",
+      "medium": "Solide Daten",
+      "low": "Sehr unvollständige Daten"
+    },
+    "missingLabel": "Fehlende Kategorien:",
+    "emptyState": "Profil vollständig — jeder Wert hier ist vertrauenswürdig.",
+    "cta": "Daten ergänzen",
+    "area": {
+      "income": "Einkommen",
+      "housing": "Wohnen",
+      "food": "Lebensmittel",
+      "insurance": "Versicherungen",
+      "transport": "Transport",
+      "telecom": "Telekom",
+      "subscriptions": "Abonnements",
+      "leisure": "Freizeit",
+      "goal": "Finanzielles Ziel",
+      "category_budget": "Kategorien-Budget"
+    },
+    "assistant": {
+      "title": "Mein Finanzprofil ergänzen",
+      "description": "Aktiviere die zutreffenden Zeilen und gib den Monatsbetrag ein. Du kannst alles später unter /expenses anpassen.",
+      "perMonth": "{currency} / Monat",
+      "save": "Alles speichern",
+      "cancel": "Später",
+      "savedToast": "{count, plural, one {# Ausgabe gespeichert} other {# Ausgaben gespeichert}}.",
+      "invalidAmount": "Ungültiger Betrag für {name}.",
+      "candidate": {
+        "health_insurance": {
+          "label": "Krankenversicherung",
+          "hint": "Oft 300-450 CHF/Monat in der Schweiz (Grundversicherung)."
+        },
+        "car_insurance": {
+          "label": "Autoversicherung",
+          "hint": "Haftpflicht + Kasko."
+        },
+        "phone": {
+          "label": "Handy-Abo",
+          "hint": "Mobilfunkvertrag."
+        },
+        "internet": {
+          "label": "Internet",
+          "hint": "Glasfaser / Kabel / TV."
+        },
+        "netflix": {
+          "label": "Netflix",
+          "hint": "Video-Streaming."
+        },
+        "spotify": {
+          "label": "Spotify / Apple Music",
+          "hint": "Musik-Streaming."
+        },
+        "gym": {
+          "label": "Fitnessstudio",
+          "hint": "Fitness, Yoga, Club."
+        },
+        "leasing": {
+          "label": "Auto-Leasing",
+          "hint": "Monatliche Leasingrate."
+        },
+        "credit": {
+          "label": "Kredit",
+          "hint": "Monatliche Kreditrate."
+        },
+        "other_subscription": {
+          "label": "Anderes Abo",
+          "hint": "iCloud, SaaS, Magazin…"
+        }
+      }
+    }
+  },
   "discipline": {
     "eyebrow": "Budget-Disziplin",
     "tier": {
