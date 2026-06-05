@@ -24,6 +24,11 @@ import {
 import { buildMemoryEntriesBlock } from "@/lib/ai/memory-context";
 import { extractMemoryEntries } from "@/lib/ai/memory-extractor";
 import { requirePremiumAccess } from "@/lib/services/access";
+import {
+  PROPOSE_EXPENSE_TOOL,
+  PROPOSE_EXPENSE_TOOL_NAME,
+  type ProposeExpenseInput,
+} from "@/lib/coach/tools";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getLanguageEnglishName } from "@/lib/locale/languages";
@@ -290,6 +295,14 @@ export async function POST(request: Request) {
               system: systemBlocks,
               messages: apiMessages,
               thinking: { type: "adaptive" },
+              // Phase 3.1 — coach can propose an expense to log. The
+              // tool is a structured-output channel: the UI renders a
+              // confirmation card from the validated input, the user
+              // decides whether to persist. We never feed back a
+              // tool_result; the next turn starts with text history
+              // only (see persistence below) so no orphan handshake
+              // is created.
+              tools: [PROPOSE_EXPENSE_TOOL],
             });
 
             for await (const event of claudeStream) {
@@ -307,6 +320,34 @@ export async function POST(request: Request) {
             tokensOut = final.usage.output_tokens ?? 0;
             cacheRead = final.usage.cache_read_input_tokens ?? 0;
             cacheWrite = final.usage.cache_creation_input_tokens ?? 0;
+
+            // Phase 3.1 — if Sonnet decided this is a real expense
+            // report, surface the structured suggestion to the client.
+            // We pick the FIRST matching tool_use block and ignore any
+            // subsequent ones (the prompt forbids double-calls; this
+            // is a belt-and-braces guard). The SDK already validated
+            // the input against PROPOSE_EXPENSE_TOOL.input_schema, so
+            // we can pass it straight through.
+            for (const block of final.content) {
+              if (
+                block.type === "tool_use" &&
+                block.name === PROPOSE_EXPENSE_TOOL_NAME
+              ) {
+                const input = block.input as ProposeExpenseInput;
+                console.log(
+                  `[coach/propose_expense] amount=${input.amount} ${input.currency} label=${input.label} category=${input.category}`,
+                );
+                send("propose_expense", {
+                  toolUseId: block.id,
+                  amount: input.amount,
+                  currency: input.currency,
+                  label: input.label,
+                  category: input.category,
+                  notes: input.notes ?? null,
+                });
+                break;
+              }
+            }
           } catch (llmErr) {
             // Anthropic returned 5xx / network hiccupped / rate-limit
             // upstream. Don't break the conversation — fall back to the

@@ -274,6 +274,15 @@
         ]
       }
     },
+    "proposeExpense": {
+      "title": "Spesa rilevata",
+      "categoryLine": "Categoria suggerita: {category}",
+      "confirm": "Salva",
+      "cancel": "Annulla",
+      "savedToast": "Spesa salvata.",
+      "savedInline": "{amount} da {label} salvato nelle tue spese.",
+      "cancelledInline": "Suggerimento ignorato."
+    },
     "sidebar": {
       "newConversation": "Nuova conversazione",
       "demoToast": "Modalità demo: crea un account per aprire una conversazione.",

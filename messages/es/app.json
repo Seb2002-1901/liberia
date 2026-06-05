@@ -274,6 +274,15 @@
         ]
       }
     },
+    "proposeExpense": {
+      "title": "Gasto detectado",
+      "categoryLine": "Categoría sugerida: {category}",
+      "confirm": "Guardar",
+      "cancel": "Cancelar",
+      "savedToast": "Gasto guardado.",
+      "savedInline": "{amount} en {label} guardado en tus gastos.",
+      "cancelledInline": "Sugerencia descartada."
+    },
     "sidebar": {
       "newConversation": "Nueva conversación",
       "demoToast": "Modo demo: crea una cuenta para abrir una conversación.",

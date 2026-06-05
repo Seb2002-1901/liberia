@@ -8,6 +8,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Markdown } from "@/components/coach/markdown";
+import {
+  ExpenseConfirmCard,
+  type PendingExpense,
+} from "@/components/coach/expense-confirm-card";
 import { cn } from "@/lib/utils";
 import type { CoachMessage } from "@/lib/services/coach";
 
@@ -39,6 +43,14 @@ export function CoachChat({
   const [input, setInput] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
   const [streamedText, setStreamedText] = React.useState("");
+  // Phase 3.1 — coach-proposed expenses awaiting user confirmation.
+  // Keyed by assistant message id so each card sits beneath the right
+  // bubble. The map is in-memory only: a refresh wipes pending cards
+  // (the next coach reply doesn't re-emit them — that's fine, the
+  // user can either re-prompt or log via /expenses).
+  const [pendingByMessage, setPendingByMessage] = React.useState<
+    Record<string, PendingExpense[]>
+  >({});
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
@@ -169,6 +181,11 @@ export function CoachChat({
       const ac = new AbortController();
       abortRef.current = ac;
 
+      // Phase 3.1 — collect any propose_expense events that arrive
+      // during this turn so we can attach them to the new assistant
+      // message once we know its id.
+      const pendingFromStream: PendingExpense[] = [];
+
       try {
         const res = await fetch("/api/ai/chat", {
           method: "POST",
@@ -213,6 +230,28 @@ export function CoachChat({
               if (event === "delta" && typeof parsed.text === "string") {
                 assembled += parsed.text;
                 setStreamedText(assembled);
+              } else if (event === "propose_expense") {
+                // Trust the server to have validated the payload —
+                // it came from Anthropic tool_use which the SDK
+                // already schema-checked. Still guard the shape
+                // minimally before pushing into state.
+                if (
+                  typeof parsed.toolUseId === "string" &&
+                  typeof parsed.amount === "number" &&
+                  typeof parsed.currency === "string" &&
+                  typeof parsed.label === "string" &&
+                  typeof parsed.category === "string"
+                ) {
+                  pendingFromStream.push({
+                    toolUseId: parsed.toolUseId,
+                    amount: parsed.amount,
+                    currency: parsed.currency,
+                    label: parsed.label,
+                    category: parsed.category,
+                    notes:
+                      typeof parsed.notes === "string" ? parsed.notes : null,
+                  });
+                }
               } else if (event === "error" && typeof parsed.message === "string") {
                 throw new Error(parsed.message);
               }
@@ -222,15 +261,22 @@ export function CoachChat({
           }
         }
 
+        const newAsstId = `local-asst-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`}`;
         setMessages((prev) => [
           ...prev,
           {
-            id: `local-asst-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`}`,
+            id: newAsstId,
             role: "assistant",
             content: assembled,
             created_at: new Date().toISOString(),
           },
         ]);
+        if (pendingFromStream.length > 0) {
+          setPendingByMessage((prev) => ({
+            ...prev,
+            [newAsstId]: pendingFromStream,
+          }));
+        }
         setStreamedText("");
         router.refresh();
       } catch (err) {
@@ -246,6 +292,28 @@ export function CoachChat({
       }
     },
     [conversationId, disabled, router, t],
+  );
+
+  // Drop the resolved card from the message → entries map. We don't
+  // hide the inline "saved" / "cancelled" footer the card itself
+  // renders — that's the user's audit trail for the turn. The map
+  // entry only feeds the live PENDING cards.
+  const onExpenseResolved = React.useCallback(
+    (toolUseId: string, action: "confirmed" | "cancelled") => {
+      // On success, also nudge the parent layout to re-fetch finance
+      // data so the next coach reply sees the new expense in its
+      // context block.
+      if (action === "confirmed") router.refresh();
+      setPendingByMessage((prev) => {
+        const next: Record<string, PendingExpense[]> = {};
+        for (const [msgId, list] of Object.entries(prev)) {
+          const filtered = list.filter((p) => p.toolUseId !== toolUseId);
+          if (filtered.length > 0) next[msgId] = filtered;
+        }
+        return next;
+      });
+    },
+    [router],
   );
 
   const onSubmit = (e: React.FormEvent) => {
@@ -288,7 +356,17 @@ export function CoachChat({
           )}
 
           {messages.map((m) => (
-            <MessageBubble key={m.id} role={m.role} content={m.content} />
+            <MessageBubble
+              key={m.id}
+              role={m.role}
+              content={m.content}
+              pendingExpenses={
+                m.role === "assistant"
+                  ? pendingByMessage[m.id] ?? []
+                  : []
+              }
+              onExpenseResolved={onExpenseResolved}
+            />
           ))}
 
           {streamedText && (
@@ -361,10 +439,17 @@ function MessageBubble({
   role,
   content,
   pending,
+  pendingExpenses,
+  onExpenseResolved,
 }: {
   role: "user" | "assistant";
   content: string;
   pending?: boolean;
+  pendingExpenses?: PendingExpense[];
+  onExpenseResolved?: (
+    toolUseId: string,
+    action: "confirmed" | "cancelled",
+  ) => void;
 }) {
   if (role === "user") {
     return (
@@ -387,6 +472,17 @@ function MessageBubble({
         <Markdown text={content} />
         {pending && (
           <span className="ml-1 inline-block h-3 w-1.5 animate-pulse rounded bg-foreground/40 align-baseline" />
+        )}
+        {pendingExpenses && pendingExpenses.length > 0 && onExpenseResolved && (
+          <div className="space-y-2">
+            {pendingExpenses.map((p) => (
+              <ExpenseConfirmCard
+                key={p.toolUseId}
+                pending={p}
+                onResolved={onExpenseResolved}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

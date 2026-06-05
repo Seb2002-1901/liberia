@@ -274,6 +274,15 @@
         ]
       }
     },
+    "proposeExpense": {
+      "title": "Ausgabe erkannt",
+      "categoryLine": "Vorgeschlagene Kategorie: {category}",
+      "confirm": "Speichern",
+      "cancel": "Abbrechen",
+      "savedToast": "Ausgabe gespeichert.",
+      "savedInline": "{amount} bei {label} in deinen Ausgaben gespeichert.",
+      "cancelledInline": "Vorschlag verworfen."
+    },
     "sidebar": {
       "newConversation": "Neue Konversation",
       "demoToast": "Demo-Modus: Erstelle ein Konto, um eine Konversation zu öffnen.",
