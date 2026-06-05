@@ -27,7 +27,25 @@
     "totalExpenses": "Spese totali",
     "totalExpensesHint": "Fisse + variabili di questo mese",
     "transactions": "Transazioni",
-    "transactionsHint": "Numero di spese occasionali di questo mese"
+    "transactionsHint": "Numero di spese occasionali di questo mese",
+    "analyticsCtaTitle": "Analisi dettagliata",
+    "analyticsCtaBody": "Fisse vs variabili, budget per categoria, opportunità, storico — tutto in /expenses/analytics.",
+    "analyticsCtaButton": "Apri analisi"
+  },
+  "discipline": {
+    "eyebrow": "Disciplina di budget",
+    "tier": {
+      "excellent": "Eccellente",
+      "good": "Buona",
+      "fair": "Discreta",
+      "low": "Fragile"
+    },
+    "weakest": {
+      "none": "Tieni la rotta — budget rispettati, risparmio in crescita, fondo di emergenza al posto giusto.",
+      "budget": "Almeno un budget è sforato questo mese — il primo passo da fare.",
+      "savings": "Il tuo tasso di risparmio è basso. Un piccolo bonifico automatico mensile basta spesso ad avviare la macchina.",
+      "emergency": "Il tuo fondo di emergenza copre meno di un mese. Punta ad almeno 1 mese di spese prima di altri obiettivi."
+    }
   },
   "alerts": {
     "title": "Avvisi",

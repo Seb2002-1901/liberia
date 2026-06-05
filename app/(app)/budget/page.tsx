@@ -1,14 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowDownCircle,
-  ArrowRight,
-  ArrowUpCircle,
-  Layers,
-  Receipt,
-  Scale,
-  ShoppingCart,
-} from "lucide-react";
+import { ArrowRight, ArrowUpCircle, Scale } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -47,7 +39,6 @@ export default async function BudgetPage() {
   // actual lived spending alongside.
   const {
     fixed: monthlyExpenses,
-    variable: variableExpenses,
     total: totalExpenses,
     transactions: transactionsCount,
   } = data.expenseBuckets;
@@ -106,36 +97,24 @@ export default async function BudgetPage() {
         />
       </div>
 
-      {/* Phase 3.1.1 — same 4-card breakdown row as dashboard /
-          expenses so the numbers match across every surface. */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={tDashboard("fixedExpenses")}
-          value={formatCurrency(monthlyExpenses, data.profile.currency)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
-          hint={tDashboard("fixedExpensesHint")}
-        />
-        <StatCard
-          label={tDashboard("variableExpenses")}
-          value={formatCurrency(variableExpenses, data.profile.currency)}
-          icon={<ShoppingCart className="h-4 w-4" />}
-          hint={tDashboard("variableExpensesHint")}
-        />
-        <StatCard
-          label={tDashboard("totalExpenses")}
-          value={formatCurrency(totalExpenses, data.profile.currency)}
-          icon={<Layers className="h-4 w-4" />}
-          hint={tDashboard("totalExpensesHint")}
-        />
-        <StatCard
-          label={tDashboard("transactions")}
-          value={String(transactionsCount)}
-          icon={<Receipt className="h-4 w-4" />}
-          hint={tDashboard("transactionsHint")}
-        />
-      </div>
-
-      <div className="flex justify-end">
+      {/*
+        Phase 3.1.3 — /budget stays a summary surface. The Fixed/
+        Variable/Transactions detail moved to /expenses/analytics so
+        the user has ONE place to drill, not three. Inline CTA
+        keeps that path obvious.
+      */}
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-sm">
+        <div className="flex-1 min-w-0 space-y-0.5">
+          <p className="font-medium">
+            {tDashboard("totalExpenses")} ·{" "}
+            <span className="tabular-nums">
+              {formatCurrency(totalExpenses, data.profile.currency)}
+            </span>
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t("analyticsHint", { transactions: transactionsCount })}
+          </p>
+        </div>
         <Button asChild variant="outline" size="sm">
           <Link href={ROUTES.expenseAnalytics}>
             {t("openAnalytics")} <ArrowRight className="h-4 w-4" />

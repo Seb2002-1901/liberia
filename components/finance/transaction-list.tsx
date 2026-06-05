@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TransactionForm } from "@/components/finance/transaction-form";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import {
   EXPENSE_CATEGORIES,
   FREQUENCIES,
@@ -55,6 +55,7 @@ export function TransactionList({
   const tFreq = useTranslations("dashboard.categories.frequencies");
   const tIncomeCat = useTranslations("dashboard.categories.incomeCategories");
   const tExpenseCat = useTranslations("dashboard.categories.expenses");
+  const tType = useTranslations("app.finance.list.typeTag");
   const [open, setOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Item | null>(null);
   const [pending, startTransition] = React.useTransition();
@@ -161,6 +162,17 @@ export function TransactionList({
               const known = categories.find((c) => c.id === item.category);
               const freq = FREQUENCIES.find((f) => f.id === item.frequency);
               const freqLabel = freq ? tFreq(freq.id) : item.frequency;
+              // Phase 3.1.3 — show the Type tag (FIXE / VARIABLE) on
+              // expense lines so the user sees the canonical split at
+              // a glance ("Loyer  FIXE · Mensuel" vs "Coop  VARIABLE
+              // · Ponctuelle"). Incomes keep the simple category/freq
+              // pairing — Type doesn't apply.
+              const typeTag =
+                kind === "expense"
+                  ? item.frequency === "one_time"
+                    ? tType("variable")
+                    : tType("fixed")
+                  : null;
               return (
                 <div
                   key={item.id}
@@ -176,6 +188,18 @@ export function TransactionList({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{item.label}</p>
                     <p className="text-xs text-muted-foreground">
+                      {typeTag && (
+                        <span
+                          className={cn(
+                            "mr-1 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                            item.frequency === "one_time"
+                              ? "bg-secondary/40 text-foreground/70"
+                              : "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]",
+                          )}
+                        >
+                          {typeTag}
+                        </span>
+                      )}
                       {catLabel} · {freqLabel}
                     </p>
                   </div>

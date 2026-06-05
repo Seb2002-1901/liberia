@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import {
-  ArrowDownCircle,
-  Layers,
-  Receipt,
-  ShoppingCart,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Layers } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { TransactionList } from "@/components/finance/transaction-list";
 import { getFinanceData } from "@/lib/services/finance";
@@ -16,6 +13,7 @@ import {
   updateExpense,
 } from "@/app/actions/expenses";
 import { formatCurrency } from "@/lib/utils";
+import { ROUTES } from "@/lib/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app.finance.expenses.metadata");
@@ -26,7 +24,7 @@ export default async function ExpensesPage() {
   const t = await getTranslations("app.finance.expenses");
   const tDashboard = await getTranslations("dashboard.stats");
   const data = await getFinanceData();
-  const { fixed, variable, total, transactions } = data.expenseBuckets;
+  const { total, transactions } = data.expenseBuckets;
 
   return (
     <div className="space-y-6">
@@ -37,35 +35,26 @@ export default async function ExpensesPage() {
       />
 
       {/*
-        Phase 3.1.1 — 4 KPIs reflecting the canonical split. Shares
-        the same labels as the dashboard so the user sees identical
-        numbers wherever they navigate.
+        Phase 3.1.3 — /expenses stays focused on the LIST. The
+        headline of this page is the transaction list itself. We keep
+        two anchor KPIs (total + tx count) so the user always knows
+        the magnitude of what they're scrolling through, but the full
+        fixed/variable/category breakdown lives on /expenses/analytics.
       */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={tDashboard("fixedExpenses")}
-          value={formatCurrency(fixed, data.profile.currency)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
-          hint={tDashboard("fixedExpensesHint")}
-        />
-        <StatCard
-          label={tDashboard("variableExpenses")}
-          value={formatCurrency(variable, data.profile.currency)}
-          icon={<ShoppingCart className="h-4 w-4" />}
-          hint={tDashboard("variableExpensesHint")}
-        />
+      <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label={tDashboard("totalExpenses")}
           value={formatCurrency(total, data.profile.currency)}
           icon={<Layers className="h-4 w-4" />}
           hint={tDashboard("totalExpensesHint")}
+          className="sm:col-span-2"
         />
-        <StatCard
-          label={tDashboard("transactions")}
-          value={String(transactions)}
-          icon={<Receipt className="h-4 w-4" />}
-          hint={tDashboard("transactionsHint")}
-        />
+        <Button asChild variant="outline" size="sm" className="h-full">
+          <Link href={ROUTES.expenseAnalytics}>
+            {t("stats.openAnalytics", { transactions })}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
 
       <TransactionList

@@ -277,3 +277,109 @@ export function buildBudgetStatus(
     };
   });
 }
+
+/**
+ * Phase 3.1.3 — multi-period category history with a simple trend.
+ *
+ * For each requested category, returns the total spent in EACH of the
+ * last N calendar months ending at `now`. The trend tag is computed
+ * from the last two months only (current vs previous):
+ *   - "up"    when current > previous * 1.15
+ *   - "down"  when current < previous * 0.85
+ *   - "flat"  otherwise (including when previous is 0 and current is 0)
+ *
+ * Recurring entries count at face value in the month their cadence
+ * "lands" — for monthly that's every month, weekly is normalised to
+ * monthly * 1, yearly normalises to monthly across all 12 buckets.
+ * It's not a perfect representation of when the money actually left
+ * the account (we don't have a transaction date column), but it
+ * matches the user's mental model: "my rent is 1500 every month".
+ *
+ * One_time entries are counted in the calendar month of their
+ * `created_at`.
+ */
+export type HistoryTrend = "up" | "down" | "flat";
+
+export interface CategoryHistoryRow {
+  category: string;
+  /** Series of monthly totals, oldest first; length === months arg. */
+  monthly: number[];
+  /** Sum of `monthly` — the rolling-period total. */
+  total: number;
+  trend: HistoryTrend;
+  /** Average monthly spend across the rolling window. */
+  average: number;
+}
+
+export function buildCategoryHistory(
+  expenses: readonly AnalyticsExpense[],
+  monthsBack: number,
+  categoryIds: readonly string[],
+  now: Date = new Date(),
+): CategoryHistoryRow[] {
+  if (monthsBack < 1) monthsBack = 1;
+  // Boundaries from `monthsBack` months ago through the end of the
+  // current month. Always UTC so the boundaries don't shift with the
+  // user's local DST.
+  const buckets: { start: number; end: number }[] = [];
+  for (let i = monthsBack - 1; i >= 0; i--) {
+    const start = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1);
+    const end = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i + 1, 1);
+    buckets.push({ start, end });
+  }
+
+  const rows = new Map<string, CategoryHistoryRow>();
+  for (const id of categoryIds) {
+    rows.set(id, {
+      category: id,
+      monthly: new Array(monthsBack).fill(0),
+      total: 0,
+      trend: "flat",
+      average: 0,
+    });
+  }
+
+  for (const e of expenses) {
+    const row = rows.get(e.category);
+    if (!row) continue;
+    if (e.frequency === "one_time") {
+      const ts = Date.parse(e.created_at);
+      if (!Number.isFinite(ts)) continue;
+      // Find which bucket this transaction belongs to (binary search
+      // is overkill at N ≤ 13). Skip if outside the rolling window.
+      for (let i = 0; i < buckets.length; i++) {
+        if (ts >= buckets[i].start && ts < buckets[i].end) {
+          row.monthly[i] += e.amount;
+          break;
+        }
+      }
+    } else {
+      // Recurring: monthly equivalent applied to every bucket.
+      const monthly = e.amount * frequencyMultiplier(e.frequency);
+      for (let i = 0; i < buckets.length; i++) {
+        row.monthly[i] += monthly;
+      }
+    }
+  }
+
+  // Finalise totals + trend tag.
+  for (const row of rows.values()) {
+    row.total = row.monthly.reduce((s, v) => s + v, 0);
+    row.average = row.total / row.monthly.length;
+    if (row.monthly.length >= 2) {
+      const current = row.monthly[row.monthly.length - 1];
+      const previous = row.monthly[row.monthly.length - 2];
+      if (previous > 0) {
+        const ratio = current / previous;
+        if (ratio > 1.15) row.trend = "up";
+        else if (ratio < 0.85) row.trend = "down";
+      } else if (current > 0) {
+        row.trend = "up";
+      }
+    }
+  }
+
+  // Sort by total descending so the analytics page reads top-down
+  // and the coach can pick the top N for its prompt.
+  return Array.from(rows.values()).sort((a, b) => b.total - a.total);
+}

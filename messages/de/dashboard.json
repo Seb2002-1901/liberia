@@ -27,7 +27,25 @@
     "totalExpenses": "Ausgaben gesamt",
     "totalExpensesHint": "Fixe + variable diesen Monat",
     "transactions": "Transaktionen",
-    "transactionsHint": "Anzahl einmaliger Ausgaben diesen Monat"
+    "transactionsHint": "Anzahl einmaliger Ausgaben diesen Monat",
+    "analyticsCtaTitle": "Detailanalyse",
+    "analyticsCtaBody": "Fix vs variabel, Kategorienbudgets, Opportunitäten, Verlauf — alles unter /expenses/analytics.",
+    "analyticsCtaButton": "Analyse öffnen"
+  },
+  "discipline": {
+    "eyebrow": "Budget-Disziplin",
+    "tier": {
+      "excellent": "Ausgezeichnet",
+      "good": "Gut",
+      "fair": "Solide",
+      "low": "Fragil"
+    },
+    "weakest": {
+      "none": "Du hältst Kurs — Budgets eingehalten, Sparen läuft, Notgroschen ist da.",
+      "budget": "Mindestens ein Budget ist diesen Monat überschritten — der erste Hebel zum Anpacken.",
+      "savings": "Deine Sparquote ist niedrig. Ein kleiner monatlicher Dauerauftrag reicht oft, um die Maschine zu starten.",
+      "emergency": "Dein Notgroschen deckt weniger als einen Monat. Ziele auf mindestens 1 Monat Ausgaben, bevor andere Ziele kommen."
+    }
   },
   "alerts": {
     "title": "Hinweise",

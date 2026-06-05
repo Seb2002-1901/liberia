@@ -6,8 +6,6 @@ import {
   HeartPulse,
   Layers,
   PiggyBank,
-  Receipt,
-  ShoppingCart,
   Sparkles,
   Wallet,
 } from "lucide-react";
@@ -33,6 +31,9 @@ import {
 import { formatPercent, formatUserCurrency } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
+import { buildBudgetStatus } from "@/lib/calculations/analytics";
+import { computeDisciplineScore } from "@/lib/calculations/discipline";
+import { DisciplineCard } from "@/components/dashboard/discipline-card";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { PlanTeaser } from "@/components/dashboard/plan-teaser";
@@ -81,6 +82,16 @@ export default async function DashboardPage() {
   const variableExpenses = data.expenseBuckets.variable;
   const totalExpenses = fixedExpenses + variableExpenses;
   const transactionsCount = data.expenseBuckets.transactions;
+  // Phase 3.1.3 — discipline score for the headline card. The
+  // analytics page reuses the same helper for its detailed breakdown
+  // so dashboard and /expenses/analytics never disagree.
+  const monthBudgetStatus = buildBudgetStatus(
+    data.expenses,
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+  );
   // Long-term health metrics intentionally use FIXED, not TOTAL —
   // stability is about your recurring burn rate vs income, not about
   // a single month of variable spending.
@@ -111,6 +122,12 @@ export default async function DashboardPage() {
     expenseRatio,
     runwayMonths: runway,
     cashflow,
+  });
+  const discipline = computeDisciplineScore({
+    budgetStatus: monthBudgetStatus,
+    savingsRate,
+    runwayMonths: runway,
+    monthlyTransactions: transactionsCount,
   });
 
   const expenseByCategory = aggregateMonthlyByCategory(data.expenses);
@@ -202,12 +219,27 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/*
+        Phase 3.1.3 — dashboard simplified. Top 4 KPIs only: Revenus
+        · Dépenses totales · Reste à vivre · Fonds d'urgence. The
+        detailed expense breakdown (fixed / variable / transactions /
+        category history / opportunities) lives on /expenses/analytics
+        so the dashboard reads as a 5-second pulse, not a metrics
+        wall.
+      */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={t("stats.income")}
           value={formatUserCurrency(monthlyIncome, data.profile)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
+        />
+        <StatCard
+          label={t("stats.totalExpenses")}
+          value={formatUserCurrency(totalExpenses, data.profile)}
+          icon={<ArrowDownCircle className="h-4 w-4" />}
+          tone={totalExpenses > monthlyIncome ? "negative" : "neutral"}
+          hint={t("stats.totalExpensesHint")}
         />
         <StatCard
           label={t("stats.leftover")}
@@ -229,38 +261,34 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/*
-        Phase 3.1.1 — explicit expense breakdown row. Each card is a
-        distinct concept; never confuse "fixed" with "monthly total".
-        Total = fixed + variable, locked by the computeExpenseBuckets
-        invariant + unit tests in tests/unit/expense-buckets.test.ts.
-      */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={t("stats.fixedExpenses")}
-          value={formatUserCurrency(fixedExpenses, data.profile)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
-          hint={t("stats.fixedExpensesHint")}
+      {/* Phase 3.1.3 — discipline score + analytics drill-down. The
+          dashboard surfaces ONLY the headline number; the breakdown
+          and opportunities engine live on /expenses/analytics. */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <DisciplineCard
+          score={discipline.score}
+          tier={discipline.tier}
+          weakest={discipline.weakest}
+          className="lg:col-span-2"
         />
-        <StatCard
-          label={t("stats.variableExpenses")}
-          value={formatUserCurrency(variableExpenses, data.profile)}
-          icon={<ShoppingCart className="h-4 w-4" />}
-          hint={t("stats.variableExpensesHint")}
-        />
-        <StatCard
-          label={t("stats.totalExpenses")}
-          value={formatUserCurrency(totalExpenses, data.profile)}
-          icon={<Layers className="h-4 w-4" />}
-          tone={totalExpenses > monthlyIncome ? "negative" : "neutral"}
-          hint={t("stats.totalExpensesHint")}
-        />
-        <StatCard
-          label={t("stats.transactions")}
-          value={String(transactionsCount)}
-          icon={<Receipt className="h-4 w-4" />}
-          hint={t("stats.transactionsHint")}
-        />
+        <Card className="flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle className="text-base">
+              {t("stats.analyticsCtaTitle")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              {t("stats.analyticsCtaBody")}
+            </p>
+            <Button asChild variant="gold" size="sm" className="w-full">
+              <Link href={ROUTES.expenseAnalytics}>
+                <Layers className="h-4 w-4" />
+                {t("stats.analyticsCtaButton")}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

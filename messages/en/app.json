@@ -682,6 +682,12 @@
         "titleEditIncome": "Edit income",
         "titleEditExpense": "Edit expense",
         "description": "Enter the amount and its frequency. You can edit any time.",
+        "typeLabel": "Expense type",
+        "typeFixedTitle": "Fixed / recurring",
+        "typeFixedHelp": "Rent, insurance, subscription.",
+        "typeVariableTitle": "Variable / one-off",
+        "typeVariableHelp": "Groceries, restaurant, fuel.",
+        "variableHint": "This one-off expense will be dated to today.",
         "label": "Label",
         "placeholderIncome": "e.g. Salary",
         "placeholderExpense": "e.g. Rent",
@@ -716,6 +722,10 @@
       }
     },
     "list": {
+      "typeTag": {
+        "fixed": "Fixed",
+        "variable": "Variable"
+      },
       "demoBanner": "Demo mode · read-only. Create your account to add your data.",
       "demoBannerGoals": "Demo mode · read-only. Create your account to manage your goals.",
       "demoToastInfoTitle": "Demo mode · create an account to save.",
@@ -766,7 +776,8 @@
       "barEssential": "Essential expenses",
       "barNonEssential": "Non-essential expenses",
       "barLeftover": "Take-home / Savings",
-      "openAnalytics": "Open detailed analytics"
+      "openAnalytics": "Open detailed analytics",
+      "analyticsHint": "{transactions, plural, =0 {No transactions this month} one {# one-off transaction this month} other {# one-off transactions this month}} — see fixed vs variable, budgets and opportunities in /expenses/analytics."
     },
     "analytics": {
       "metaTitle": "Expense analytics",
@@ -815,6 +826,74 @@
         "savedToast": "Budget saved.",
         "deletedToast": "Budget deleted.",
         "invalidAmount": "Invalid amount."
+      },
+      "performance": {
+        "title": "Budget performance",
+        "description": "For each budgeted category: target, actual, gap and status.",
+        "colCategory": "Category",
+        "colBudget": "Budget",
+        "colReal": "Actual",
+        "colDelta": "Delta",
+        "colStatus": "Status",
+        "status": {
+          "ok": "OK",
+          "warning": "Watch",
+          "over": "Over"
+        }
+      },
+      "opportunities": {
+        "title": "Opportunities detected",
+        "description": "Computed from your actual data. High priority = look at this first.",
+        "empty": "Everything's under control this month. Keep going.",
+        "impactLine": "Estimated impact: {monthly}/month (≈ {yearly}/year)",
+        "priority": {
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        },
+        "kind": {
+          "budget_over": {
+            "title": "{category} budget over",
+            "body": "You spent {amount} above your {limit} limit this month."
+          },
+          "high_variable_share": {
+            "title": "High one-off spending",
+            "body": "Your variable spending is {share}% of your income this month ({variable})."
+          },
+          "low_emergency_fund": {
+            "title": "Emergency fund too low",
+            "body": "You cover {months} months of expenses (target 3 months)."
+          },
+          "high_fixed_ratio": {
+            "title": "Very high fixed costs",
+            "body": "Your fixed costs are {share}% of your income. Good time to audit insurance, subscriptions, telecom."
+          },
+          "high_insurance_share": {
+            "title": "High insurance share",
+            "body": "You pay {amount}/month in insurance ({share}% of income). Useful to compare premiums and check your deductible."
+          },
+          "high_subscriptions_share": {
+            "title": "Subscriptions worth auditing",
+            "body": "{amount}/month of subscriptions ({share}% of income). Good moment for a clean-up."
+          },
+          "audit_top_variable_category": {
+            "title": "{category} concentrates your one-off spending",
+            "body": "{amount} spent across {transactions} transaction(s) this month."
+          }
+        }
+      },
+      "history": {
+        "title": "Category history",
+        "description": "Month-by-month evolution over the chosen window.",
+        "3m": "3 months",
+        "12m": "12 months",
+        "empty": "No expenses over the selected window.",
+        "avgPerMonth": "avg {amount}/month",
+        "trend": {
+          "up": "rising",
+          "down": "falling",
+          "flat": "stable"
+        }
       }
     },
     "incomes": {
@@ -844,7 +923,8 @@
       "stats": {
         "monthly": "Monthly expenses",
         "lines": "Recorded lines",
-        "linesHint": "You can edit or delete them any time."
+        "linesHint": "You can edit or delete them any time.",
+        "openAnalytics": "{transactions, plural, =0 {No transactions} one {# transaction} other {# transactions}} this month · open analytics"
       }
     },
     "goals": {

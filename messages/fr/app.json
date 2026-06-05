@@ -682,6 +682,12 @@
         "titleEditIncome": "Modifier le revenu",
         "titleEditExpense": "Modifier la dépense",
         "description": "Renseigne le montant et sa fréquence. Tu pourras modifier à tout moment.",
+        "typeLabel": "Type de dépense",
+        "typeFixedTitle": "Fixe / récurrente",
+        "typeFixedHelp": "Loyer, assurance, abonnement.",
+        "typeVariableTitle": "Variable / ponctuelle",
+        "typeVariableHelp": "Courses, restaurant, essence.",
+        "variableHint": "Cette dépense ponctuelle sera datée du jour de l'enregistrement.",
         "label": "Libellé",
         "placeholderIncome": "Ex. Salaire",
         "placeholderExpense": "Ex. Loyer",
@@ -716,6 +722,10 @@
       }
     },
     "list": {
+      "typeTag": {
+        "fixed": "Fixe",
+        "variable": "Variable"
+      },
       "demoBanner": "Mode démo · lecture seule. Crée ton compte pour ajouter tes données.",
       "demoBannerGoals": "Mode démo · lecture seule. Crée ton compte pour gérer tes objectifs.",
       "demoToastInfoTitle": "Mode démo · crée un compte pour sauvegarder.",
@@ -766,7 +776,8 @@
       "barEssential": "Dépenses essentielles",
       "barNonEssential": "Dépenses non essentielles",
       "barLeftover": "Reste à vivre / Épargne",
-      "openAnalytics": "Voir l'analyse détaillée"
+      "openAnalytics": "Voir l'analyse détaillée",
+      "analyticsHint": "{transactions, plural, =0 {Aucune transaction ce mois} one {# transaction ponctuelle ce mois} other {# transactions ponctuelles ce mois}} — vois les fixes vs variables, les budgets et les opportunités dans /expenses/analytics."
     },
     "analytics": {
       "metaTitle": "Analyse des dépenses",
@@ -815,6 +826,74 @@
         "savedToast": "Budget enregistré.",
         "deletedToast": "Budget supprimé.",
         "invalidAmount": "Montant invalide."
+      },
+      "performance": {
+        "title": "Performance budgétaire",
+        "description": "Pour chaque catégorie avec un budget : ce que tu as prévu, ce que tu as dépensé, l'écart et le statut.",
+        "colCategory": "Catégorie",
+        "colBudget": "Budget",
+        "colReal": "Réel",
+        "colDelta": "Écart",
+        "colStatus": "Statut",
+        "status": {
+          "ok": "OK",
+          "warning": "Attention",
+          "over": "Dépassé"
+        }
+      },
+      "opportunities": {
+        "title": "Opportunités détectées",
+        "description": "Calculées à partir de tes données réelles. Priorité haute = à regarder en premier.",
+        "empty": "Tout est sous contrôle ce mois-ci. Continue comme ça.",
+        "impactLine": "Impact estimé : {monthly}/mois (≈ {yearly}/an)",
+        "priority": {
+          "high": "Haute",
+          "medium": "Moyenne",
+          "low": "Basse"
+        },
+        "kind": {
+          "budget_over": {
+            "title": "Budget {category} dépassé",
+            "body": "Tu as dépensé {amount} au-delà de ta limite de {limit} ce mois."
+          },
+          "high_variable_share": {
+            "title": "Dépenses ponctuelles élevées",
+            "body": "Tes dépenses variables représentent {share}% de tes revenus ce mois ({variable})."
+          },
+          "low_emergency_fund": {
+            "title": "Fonds d'urgence insuffisant",
+            "body": "Tu couvres {months} mois de dépenses (cible 3 mois)."
+          },
+          "high_fixed_ratio": {
+            "title": "Charges fixes très élevées",
+            "body": "Tes charges fixes représentent {share}% de tes revenus. Bonne occasion d'auditer assurances, abonnements, télécoms."
+          },
+          "high_insurance_share": {
+            "title": "Assurances élevées",
+            "body": "Tu paies {amount}/mois en assurances ({share}% du revenu). Il peut être utile de comparer les primes et de vérifier la franchise."
+          },
+          "high_subscriptions_share": {
+            "title": "Abonnements à auditer",
+            "body": "{amount}/mois d'abonnements ({share}% du revenu). Bon moment pour faire le tri."
+          },
+          "audit_top_variable_category": {
+            "title": "{category} concentre tes dépenses ponctuelles",
+            "body": "{amount} dépensé en {transactions} transaction(s) ce mois."
+          }
+        }
+      },
+      "history": {
+        "title": "Historique par catégorie",
+        "description": "Évolution mois par mois sur la période choisie.",
+        "3m": "3 mois",
+        "12m": "12 mois",
+        "empty": "Aucune dépense sur la période sélectionnée.",
+        "avgPerMonth": "{amount}/mois en moyenne",
+        "trend": {
+          "up": "en hausse",
+          "down": "en baisse",
+          "flat": "stable"
+        }
       }
     },
     "incomes": {
@@ -844,7 +923,8 @@
       "stats": {
         "monthly": "Dépenses mensuelles",
         "lines": "Lignes enregistrées",
-        "linesHint": "Tu peux les modifier ou supprimer à tout moment."
+        "linesHint": "Tu peux les modifier ou supprimer à tout moment.",
+        "openAnalytics": "{transactions, plural, =0 {Aucune transaction} one {# transaction} other {# transactions}} ce mois · ouvrir l'analyse"
       }
     },
     "goals": {

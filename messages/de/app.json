@@ -682,6 +682,12 @@
         "titleEditIncome": "Einkommen bearbeiten",
         "titleEditExpense": "Ausgabe bearbeiten",
         "description": "Trage den Betrag und seine Häufigkeit ein. Du kannst jederzeit ändern.",
+        "typeLabel": "Ausgabetyp",
+        "typeFixedTitle": "Fix / wiederkehrend",
+        "typeFixedHelp": "Miete, Versicherung, Abo.",
+        "typeVariableTitle": "Variabel / einmalig",
+        "typeVariableHelp": "Einkäufe, Restaurant, Benzin.",
+        "variableHint": "Diese einmalige Ausgabe wird auf heute datiert.",
         "label": "Bezeichnung",
         "placeholderIncome": "z. B. Lohn",
         "placeholderExpense": "z. B. Miete",
@@ -716,6 +722,10 @@
       }
     },
     "list": {
+      "typeTag": {
+        "fixed": "Fix",
+        "variable": "Variabel"
+      },
       "demoBanner": "Demo-Modus · nur Ansicht. Erstelle dein Konto, um deine Daten hinzuzufügen.",
       "demoBannerGoals": "Demo-Modus · nur Ansicht. Erstelle dein Konto, um deine Ziele zu verwalten.",
       "demoToastInfoTitle": "Demo-Modus · erstelle ein Konto zum Speichern.",
@@ -766,7 +776,8 @@
       "barEssential": "Essenzielle Ausgaben",
       "barNonEssential": "Nicht-essenzielle Ausgaben",
       "barLeftover": "Verfügbar / Sparen",
-      "openAnalytics": "Detaillierte Analyse öffnen"
+      "openAnalytics": "Detaillierte Analyse öffnen",
+      "analyticsHint": "{transactions, plural, =0 {Keine Transaktionen diesen Monat} one {# einmalige Transaktion diesen Monat} other {# einmalige Transaktionen diesen Monat}} — sieh dir Fix vs Variabel, Budgets und Opportunitäten unter /expenses/analytics an."
     },
     "analytics": {
       "metaTitle": "Ausgabenanalyse",
@@ -815,6 +826,74 @@
         "savedToast": "Budget gespeichert.",
         "deletedToast": "Budget gelöscht.",
         "invalidAmount": "Ungültiger Betrag."
+      },
+      "performance": {
+        "title": "Budget-Performance",
+        "description": "Für jede Kategorie mit Budget: Ziel, Ist, Differenz und Status.",
+        "colCategory": "Kategorie",
+        "colBudget": "Budget",
+        "colReal": "Ist",
+        "colDelta": "Differenz",
+        "colStatus": "Status",
+        "status": {
+          "ok": "OK",
+          "warning": "Achtung",
+          "over": "Über"
+        }
+      },
+      "opportunities": {
+        "title": "Erkannte Opportunitäten",
+        "description": "Aus deinen echten Daten berechnet. Hohe Priorität = zuerst anschauen.",
+        "empty": "Diesen Monat ist alles unter Kontrolle. Weiter so.",
+        "impactLine": "Geschätzter Effekt: {monthly}/Monat (≈ {yearly}/Jahr)",
+        "priority": {
+          "high": "Hoch",
+          "medium": "Mittel",
+          "low": "Niedrig"
+        },
+        "kind": {
+          "budget_over": {
+            "title": "Budget {category} überschritten",
+            "body": "Du hast {amount} über deinem Limit von {limit} diesen Monat ausgegeben."
+          },
+          "high_variable_share": {
+            "title": "Hohe einmalige Ausgaben",
+            "body": "Deine variablen Ausgaben sind {share}% deines Einkommens diesen Monat ({variable})."
+          },
+          "low_emergency_fund": {
+            "title": "Notgroschen zu niedrig",
+            "body": "Du deckst {months} Monate an Ausgaben (Ziel 3 Monate)."
+          },
+          "high_fixed_ratio": {
+            "title": "Sehr hohe Fixkosten",
+            "body": "Deine Fixkosten sind {share}% deines Einkommens. Guter Moment, Versicherungen, Abos und Telekom zu prüfen."
+          },
+          "high_insurance_share": {
+            "title": "Hoher Versicherungsanteil",
+            "body": "Du zahlst {amount}/Monat an Versicherungen ({share}% des Einkommens). Es kann sich lohnen, Prämien zu vergleichen und die Franchise zu prüfen."
+          },
+          "high_subscriptions_share": {
+            "title": "Abonnements im Check",
+            "body": "{amount}/Monat an Abonnements ({share}% des Einkommens). Guter Moment zum Aufräumen."
+          },
+          "audit_top_variable_category": {
+            "title": "{category} dominiert deine einmaligen Ausgaben",
+            "body": "{amount} verteilt auf {transactions} Transaktion(en) diesen Monat."
+          }
+        }
+      },
+      "history": {
+        "title": "Kategorienverlauf",
+        "description": "Monatliche Entwicklung über das gewählte Fenster.",
+        "3m": "3 Monate",
+        "12m": "12 Monate",
+        "empty": "Keine Ausgaben im gewählten Fenster.",
+        "avgPerMonth": "Ø {amount}/Monat",
+        "trend": {
+          "up": "steigend",
+          "down": "fallend",
+          "flat": "stabil"
+        }
       }
     },
     "incomes": {
@@ -844,7 +923,8 @@
       "stats": {
         "monthly": "Monatliche Ausgaben",
         "lines": "Erfasste Zeilen",
-        "linesHint": "Du kannst sie jederzeit bearbeiten oder löschen."
+        "linesHint": "Du kannst sie jederzeit bearbeiten oder löschen.",
+        "openAnalytics": "{transactions, plural, =0 {Keine Transaktionen} one {# Transaktion} other {# Transaktionen}} diesen Monat · Analyse öffnen"
       }
     },
     "goals": {

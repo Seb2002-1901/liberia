@@ -682,6 +682,12 @@
         "titleEditIncome": "Editar receita",
         "titleEditExpense": "Editar despesa",
         "description": "Indica o montante e a sua frequência. Podes editar a qualquer momento.",
+        "typeLabel": "Tipo de despesa",
+        "typeFixedTitle": "Fixa / recorrente",
+        "typeFixedHelp": "Renda, seguro, subscrição.",
+        "typeVariableTitle": "Variável / pontual",
+        "typeVariableHelp": "Compras, restaurante, combustível.",
+        "variableHint": "Esta despesa pontual ficará datada de hoje.",
         "label": "Rótulo",
         "placeholderIncome": "ex. Salário",
         "placeholderExpense": "ex. Renda",
@@ -716,6 +722,10 @@
       }
     },
     "list": {
+      "typeTag": {
+        "fixed": "Fixa",
+        "variable": "Variável"
+      },
       "demoBanner": "Modo demo · só leitura. Cria a tua conta para adicionar os teus dados.",
       "demoBannerGoals": "Modo demo · só leitura. Cria a tua conta para gerir os teus objetivos.",
       "demoToastInfoTitle": "Modo demo · cria uma conta para guardar.",
@@ -766,7 +776,8 @@
       "barEssential": "Despesas essenciais",
       "barNonEssential": "Despesas não essenciais",
       "barLeftover": "Disponível / Poupança",
-      "openAnalytics": "Abrir análise detalhada"
+      "openAnalytics": "Abrir análise detalhada",
+      "analyticsHint": "{transactions, plural, =0 {Sem transações este mês} one {# transação pontual este mês} other {# transações pontuais este mês}} — vê fixas vs variáveis, orçamentos e oportunidades em /expenses/analytics."
     },
     "analytics": {
       "metaTitle": "Análise de despesas",
@@ -815,6 +826,74 @@
         "savedToast": "Orçamento guardado.",
         "deletedToast": "Orçamento eliminado.",
         "invalidAmount": "Montante inválido."
+      },
+      "performance": {
+        "title": "Desempenho orçamental",
+        "description": "Para cada categoria com orçamento: objetivo, real, desvio e estado.",
+        "colCategory": "Categoria",
+        "colBudget": "Orçamento",
+        "colReal": "Real",
+        "colDelta": "Desvio",
+        "colStatus": "Estado",
+        "status": {
+          "ok": "OK",
+          "warning": "Atenção",
+          "over": "Ultrapassado"
+        }
+      },
+      "opportunities": {
+        "title": "Oportunidades detetadas",
+        "description": "Calculadas a partir dos teus dados reais. Prioridade alta = ver primeiro.",
+        "empty": "Tudo sob controlo este mês. Continua assim.",
+        "impactLine": "Impacto estimado: {monthly}/mês (≈ {yearly}/ano)",
+        "priority": {
+          "high": "Alta",
+          "medium": "Média",
+          "low": "Baixa"
+        },
+        "kind": {
+          "budget_over": {
+            "title": "Orçamento {category} ultrapassado",
+            "body": "Gastaste {amount} acima do teu limite de {limit} este mês."
+          },
+          "high_variable_share": {
+            "title": "Despesas pontuais elevadas",
+            "body": "As tuas despesas variáveis são {share}% do rendimento este mês ({variable})."
+          },
+          "low_emergency_fund": {
+            "title": "Fundo de emergência insuficiente",
+            "body": "Cobres {months} meses de despesas (objetivo 3 meses)."
+          },
+          "high_fixed_ratio": {
+            "title": "Encargos fixos muito elevados",
+            "body": "Os teus encargos fixos são {share}% do rendimento. Bom momento para auditar seguros, subscrições, telecom."
+          },
+          "high_insurance_share": {
+            "title": "Seguros elevados",
+            "body": "Pagas {amount}/mês em seguros ({share}% do rendimento). Útil comparar prémios e verificar a franquia."
+          },
+          "high_subscriptions_share": {
+            "title": "Subscrições a rever",
+            "body": "{amount}/mês em subscrições ({share}% do rendimento). Bom momento para fazer limpeza."
+          },
+          "audit_top_variable_category": {
+            "title": "{category} concentra as tuas despesas pontuais",
+            "body": "{amount} gastos em {transactions} transação(ões) este mês."
+          }
+        }
+      },
+      "history": {
+        "title": "Histórico por categoria",
+        "description": "Evolução mês a mês sobre o período escolhido.",
+        "3m": "3 meses",
+        "12m": "12 meses",
+        "empty": "Sem despesas no período selecionado.",
+        "avgPerMonth": "média {amount}/mês",
+        "trend": {
+          "up": "a subir",
+          "down": "a descer",
+          "flat": "estável"
+        }
       }
     },
     "incomes": {
@@ -844,7 +923,8 @@
       "stats": {
         "monthly": "Despesas mensais",
         "lines": "Linhas registadas",
-        "linesHint": "Podes editá-las ou eliminá-las a qualquer momento."
+        "linesHint": "Podes editá-las ou eliminá-las a qualquer momento.",
+        "openAnalytics": "{transactions, plural, =0 {Sem transações} one {# transação} other {# transações}} este mês · abrir análise"
       }
     },
     "goals": {

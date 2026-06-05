@@ -682,6 +682,12 @@
         "titleEditIncome": "Modifica entrata",
         "titleEditExpense": "Modifica spesa",
         "description": "Inserisci l'importo e la sua frequenza. Puoi modificarli in qualsiasi momento.",
+        "typeLabel": "Tipo di spesa",
+        "typeFixedTitle": "Fissa / ricorrente",
+        "typeFixedHelp": "Affitto, assicurazione, abbonamento.",
+        "typeVariableTitle": "Variabile / occasionale",
+        "typeVariableHelp": "Spesa, ristorante, benzina.",
+        "variableHint": "Questa spesa occasionale sarà datata a oggi.",
         "label": "Etichetta",
         "placeholderIncome": "es. Stipendio",
         "placeholderExpense": "es. Affitto",
@@ -716,6 +722,10 @@
       }
     },
     "list": {
+      "typeTag": {
+        "fixed": "Fissa",
+        "variable": "Variabile"
+      },
       "demoBanner": "Modalità demo · sola lettura. Crea il tuo account per aggiungere i tuoi dati.",
       "demoBannerGoals": "Modalità demo · sola lettura. Crea il tuo account per gestire i tuoi obiettivi.",
       "demoToastInfoTitle": "Modalità demo · crea un account per salvare.",
@@ -766,7 +776,8 @@
       "barEssential": "Spese essenziali",
       "barNonEssential": "Spese non essenziali",
       "barLeftover": "Disponibile / Risparmio",
-      "openAnalytics": "Apri analisi dettagliata"
+      "openAnalytics": "Apri analisi dettagliata",
+      "analyticsHint": "{transactions, plural, =0 {Nessuna transazione questo mese} one {# transazione occasionale questo mese} other {# transazioni occasionali questo mese}} — vedi fisse vs variabili, budget e opportunità in /expenses/analytics."
     },
     "analytics": {
       "metaTitle": "Analisi delle spese",
@@ -815,6 +826,74 @@
         "savedToast": "Budget salvato.",
         "deletedToast": "Budget eliminato.",
         "invalidAmount": "Importo non valido."
+      },
+      "performance": {
+        "title": "Performance budget",
+        "description": "Per ogni categoria con budget: obiettivo, reale, scarto e stato.",
+        "colCategory": "Categoria",
+        "colBudget": "Budget",
+        "colReal": "Reale",
+        "colDelta": "Scarto",
+        "colStatus": "Stato",
+        "status": {
+          "ok": "OK",
+          "warning": "Attenzione",
+          "over": "Sforato"
+        }
+      },
+      "opportunities": {
+        "title": "Opportunità rilevate",
+        "description": "Calcolate dai tuoi dati reali. Alta priorità = da guardare per primo.",
+        "empty": "Tutto sotto controllo questo mese. Continua così.",
+        "impactLine": "Impatto stimato: {monthly}/mese (≈ {yearly}/anno)",
+        "priority": {
+          "high": "Alta",
+          "medium": "Media",
+          "low": "Bassa"
+        },
+        "kind": {
+          "budget_over": {
+            "title": "Budget {category} sforato",
+            "body": "Hai speso {amount} oltre il limite di {limit} questo mese."
+          },
+          "high_variable_share": {
+            "title": "Spese occasionali elevate",
+            "body": "Le tue spese variabili sono {share}% del reddito questo mese ({variable})."
+          },
+          "low_emergency_fund": {
+            "title": "Fondo di emergenza insufficiente",
+            "body": "Copri {months} mesi di spese (obiettivo 3 mesi)."
+          },
+          "high_fixed_ratio": {
+            "title": "Spese fisse molto elevate",
+            "body": "Le tue spese fisse sono {share}% del reddito. Buon momento per auditare assicurazioni, abbonamenti, telecom."
+          },
+          "high_insurance_share": {
+            "title": "Assicurazioni elevate",
+            "body": "Paghi {amount}/mese in assicurazioni ({share}% del reddito). Utile confrontare i premi e verificare la franchigia."
+          },
+          "high_subscriptions_share": {
+            "title": "Abbonamenti da rivedere",
+            "body": "{amount}/mese in abbonamenti ({share}% del reddito). Buon momento per fare ordine."
+          },
+          "audit_top_variable_category": {
+            "title": "{category} concentra le tue spese occasionali",
+            "body": "{amount} spesi in {transactions} transazione/i questo mese."
+          }
+        }
+      },
+      "history": {
+        "title": "Storico per categoria",
+        "description": "Evoluzione mese per mese sul periodo scelto.",
+        "3m": "3 mesi",
+        "12m": "12 mesi",
+        "empty": "Nessuna spesa nel periodo selezionato.",
+        "avgPerMonth": "media {amount}/mese",
+        "trend": {
+          "up": "in aumento",
+          "down": "in calo",
+          "flat": "stabile"
+        }
       }
     },
     "incomes": {
@@ -844,7 +923,8 @@
       "stats": {
         "monthly": "Spese mensili",
         "lines": "Voci registrate",
-        "linesHint": "Puoi modificarle o eliminarle in qualsiasi momento."
+        "linesHint": "Puoi modificarle o eliminarle in qualsiasi momento.",
+        "openAnalytics": "{transactions, plural, =0 {Nessuna transazione} one {# transazione} other {# transazioni}} questo mese · apri analisi"
       }
     },
     "goals": {

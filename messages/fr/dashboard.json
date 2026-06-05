@@ -27,7 +27,25 @@
     "totalExpenses": "Dépenses totales",
     "totalExpensesHint": "Fixes + variables ce mois",
     "transactions": "Transactions",
-    "transactionsHint": "Nombre de dépenses ponctuelles ce mois"
+    "transactionsHint": "Nombre de dépenses ponctuelles ce mois",
+    "analyticsCtaTitle": "Analyse détaillée",
+    "analyticsCtaBody": "Fixes vs variables, budgets par catégorie, opportunités, historique : tout dans /expenses/analytics.",
+    "analyticsCtaButton": "Ouvrir l'analyse"
+  },
+  "discipline": {
+    "eyebrow": "Discipline budgétaire",
+    "tier": {
+      "excellent": "Excellente",
+      "good": "Bonne",
+      "fair": "Correcte",
+      "low": "Fragile"
+    },
+    "weakest": {
+      "none": "Tu tiens bien tes axes : budgets respectés, épargne en marche, fonds d'urgence en place.",
+      "budget": "Au moins un budget est dépassé ce mois — c'est le premier levier à activer.",
+      "savings": "Ton taux d'épargne est faible. Bloquer un petit virement automatique mensuel peut suffire à amorcer la machine.",
+      "emergency": "Ton fonds d'urgence couvre moins d'un mois. Vise au moins 1 mois de dépenses avant tout autre objectif."
+    }
   },
   "alerts": {
     "title": "Alertes",

@@ -12,7 +12,16 @@ import {
 import { EXPENSE_CATEGORIES, GOAL_TYPES, INCOME_CATEGORIES } from "@/lib/constants";
 import { totalMonthly } from "@/lib/services/finance";
 import { formatCurrency, formatPercent } from "@/lib/utils";
-import { buildBudgetStatus } from "@/lib/calculations/analytics";
+import {
+  buildBudgetStatus,
+  buildCategoryBreakdown,
+  buildCategoryHistory,
+} from "@/lib/calculations/analytics";
+import { computeDisciplineScore } from "@/lib/calculations/discipline";
+import {
+  detectOpportunities,
+  type Opportunity,
+} from "@/lib/calculations/opportunities";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -163,6 +172,65 @@ export function buildFinanceContext(
           })
           .join("\n");
 
+  // Phase 3.1.3 — top categories this month (by total), 3-month
+  // rolling trend per category, opportunities engine, and discipline
+  // score. Each block is small enough to keep the prompt cacheable
+  // and answers the brief's bullets: "quelles sont mes trois plus
+  // grosses dépenses ?", "quelle catégorie augmente le plus ?",
+  // "que dois-je optimiser en priorité ?".
+  const categoryIds = EXPENSE_CATEGORIES.map((c) => c.id);
+  const monthBreakdown = buildCategoryBreakdown(
+    data.expenses,
+    "month",
+    categoryIds,
+  );
+  const topCategoriesSection = monthBreakdown
+    .filter((r) => r.total > 0)
+    .slice(0, 3)
+    .map((r, idx) => {
+      const label =
+        EXPENSE_CATEGORIES.find((c) => c.id === r.category)?.label ??
+        r.category;
+      return `${idx + 1}. ${label} : ${fmt(r.total)} (${Math.round(r.share * 100)}% du total${
+        r.transactions > 0 ? `, ${r.transactions} tx ponctuelle(s)` : ""
+      })`;
+    })
+    .join("\n");
+
+  const history = buildCategoryHistory(data.expenses, 3, categoryIds);
+  const trendsSection = history
+    .filter((r) => r.total > 0 && r.trend !== "flat")
+    .slice(0, 4)
+    .map((r) => {
+      const label =
+        EXPENSE_CATEGORIES.find((c) => c.id === r.category)?.label ??
+        r.category;
+      const arrow = r.trend === "up" ? "↑" : "↓";
+      const verb = r.trend === "up" ? "en hausse" : "en baisse";
+      return `- ${label} ${arrow} ${verb} (moyenne ${fmt(r.average)}/mois sur 3 mois)`;
+    })
+    .join("\n");
+
+  const opportunities = detectOpportunities({
+    expenseBuckets: data.expenseBuckets,
+    budgetStatus: budgetRows,
+    categoryBreakdown: monthBreakdown,
+    monthlyIncome,
+    runwayMonths: runway,
+  });
+  const opportunitiesSection = opportunities.length === 0
+    ? "Aucune opportunité d'optimisation prioritaire détectée."
+    : opportunities
+        .map((o) => renderOpportunity(o, fmt))
+        .join("\n");
+
+  const discipline = computeDisciplineScore({
+    budgetStatus: budgetRows,
+    savingsRate,
+    runwayMonths: runway,
+    monthlyTransactions: data.expenseBuckets.transactions,
+  });
+
   return `# Contexte financier de l'utilisateur
 
 Devise : ${currency}
@@ -195,10 +263,90 @@ ${goalsSection}
 ## Budgets par catégorie (ce mois)
 ${budgetsSection}
 
+## Top catégories de dépense (ce mois)
+${topCategoriesSection || "Aucune dépense enregistrée ce mois."}
+
+## Tendances 3 mois (catégories en mouvement)
+${trendsSection || "Aucune variation marquée détectée."}
+
+## Opportunités d'optimisation détectées
+${opportunitiesSection}
+
+## Discipline budgétaire
+Score : ${discipline.score}/100 — ${disciplineTierLabel(discipline.tier)}
+Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.breakdown.savings}/30 · urgence ${discipline.breakdown.emergency}/25 · suivi ${discipline.breakdown.tracking}/10
+
 ## Règles importantes
 - Si tu cites un montant, prends-le dans la liste ci-dessus. N'invente pas.
 - Si une donnée manque, demande-la avant d'extrapoler.
 - Garde un ton calme et concret.
 - "Objectifs actuels" est la source de vérité COMPLÈTE des objectifs : tu y trouves les objectifs formalisés dans /goals ET ceux mentionnés en conversation (étiquetés "source: mémoire conversation"). Ne dis JAMAIS "aucun objectif actif" si cette section liste au moins un élément. Quand un objectif vient de la mémoire sans être encore dans /goals, propose à l'utilisateur de le formaliser (montant cible, échéance) sans le lui imposer.
-- Dépenses : utilise toujours "Dépenses totales ce mois" pour comparer au revenu et juger du reste à vivre RÉEL. "Dépenses fixes" couvre seulement le récurrent (loyer, abonnements, assurances…) ; "Dépenses variables" couvre les transactions ponctuelles du mois en cours (courses, restaurants, achats imprévus). NE confonds JAMAIS les deux et NE prétends JAMAIS que les "dépenses mensuelles" sont uniquement les fixes — le total est ce qui compte pour l'utilisateur.`;
+- Dépenses : utilise toujours "Dépenses totales ce mois" pour comparer au revenu et juger du reste à vivre RÉEL. "Dépenses fixes" couvre seulement le récurrent (loyer, abonnements, assurances…) ; "Dépenses variables" couvre les transactions ponctuelles du mois en cours (courses, restaurants, achats imprévus). NE confonds JAMAIS les deux et NE prétends JAMAIS que les "dépenses mensuelles" sont uniquement les fixes — le total est ce qui compte pour l'utilisateur.
+- "Opportunités d'optimisation détectées" et "Top catégories" sont calculées automatiquement à partir des données réelles. Tu peux les citer telles quelles ("ton budget restau est dépassé de 60 CHF ce mois", "tes trois plus grosses catégories sont logement, alimentation, transport") sans inventer de chiffres. Si l'utilisateur demande "où puis-je économiser ?", commence par la première opportunité haute priorité de la liste. Si l'utilisateur demande "quelle catégorie augmente le plus ?", cite la section "Tendances 3 mois". Reste prudent sur les conseils réglementés : suggère "il peut être utile de comparer les primes / d'auditer les abonnements", JAMAIS "tu dois changer d'assureur pour X".
+- "Discipline budgétaire" résume ta vision de la santé budgétaire courante. Tu peux la mentionner ("ton score de discipline est à 82/100 — très bon contrôle") pour rassurer ou pointer le composant le plus faible, sans en faire un objet de stress.`;
+}
+
+/**
+ * Render one opportunity as a single line for the coach prompt. The
+ * Anthropic call ALWAYS receives French copy regardless of the user's
+ * locale (the system prompt's language directive handles output
+ * locale); only the user-visible UI is translated. We embed the
+ * priority tag so the coach can grade its tone.
+ */
+function renderOpportunity(
+  o: Opportunity,
+  fmt: (n: number) => string,
+): string {
+  const tag = o.priority === "high"
+    ? "HAUTE"
+    : o.priority === "medium"
+      ? "MOYENNE"
+      : "BASSE";
+  const impact =
+    o.monthlyImpact > 0
+      ? ` (impact mensuel estimé : ${fmt(o.monthlyImpact)}, soit ${fmt(o.yearlyImpact)} sur l'année)`
+      : "";
+  switch (o.kind) {
+    case "budget_over": {
+      const label = categoryLabel(o.payload.category as string);
+      return `- [${tag}] Budget ${label} dépassé de ${fmt(o.payload.amount as number)} ce mois (limite ${fmt(o.payload.limit as number)})${impact}`;
+    }
+    case "high_variable_share":
+      return `- [${tag}] Dépenses variables élevées : ${o.payload.share}% du revenu ce mois${impact}`;
+    case "low_emergency_fund":
+      return `- [${tag}] Fonds d'urgence insuffisant : ${o.payload.months} mois de couverture (cible 3 mois)`;
+    case "high_fixed_ratio":
+      return `- [${tag}] Charges fixes très élevées : ${o.payload.share}% du revenu — bonne opportunité d'audit (assurances, abonnements, télécoms)`;
+    case "high_insurance_share":
+      return `- [${tag}] Assurances à ${o.payload.share}% du revenu (${fmt(o.payload.amount as number)}/mois) — il peut être utile de comparer les primes et vérifier la franchise${impact}`;
+    case "high_subscriptions_share":
+      return `- [${tag}] Abonnements à ${o.payload.share}% du revenu (${fmt(o.payload.amount as number)}/mois) — bon moment pour faire le tri${impact}`;
+    case "audit_top_variable_category": {
+      const label = categoryLabel(o.payload.category as string);
+      return `- [${tag}] ${label} concentre une grosse part de tes dépenses ponctuelles (${fmt(o.payload.amount as number)} ce mois, ${o.payload.transactions} tx)${impact}`;
+    }
+    default: {
+      const _exhaust: never = o.kind;
+      return `- [${tag}] ${_exhaust as string}`;
+    }
+  }
+}
+
+function categoryLabel(id: string): string {
+  return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
+}
+
+function disciplineTierLabel(
+  tier: "low" | "fair" | "good" | "excellent",
+): string {
+  switch (tier) {
+    case "excellent":
+      return "Excellente discipline";
+    case "good":
+      return "Bonne discipline";
+    case "fair":
+      return "Discipline correcte, axes d'amélioration clairs";
+    case "low":
+      return "Discipline fragile — premier levier à activer";
+  }
 }

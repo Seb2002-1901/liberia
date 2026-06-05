@@ -27,7 +27,25 @@
     "totalExpenses": "Total expenses",
     "totalExpensesHint": "Fixed + variable this month",
     "transactions": "Transactions",
-    "transactionsHint": "Number of one-off expenses this month"
+    "transactionsHint": "Number of one-off expenses this month",
+    "analyticsCtaTitle": "Detailed analytics",
+    "analyticsCtaBody": "Fixed vs variable, per-category budgets, opportunities, history — all in /expenses/analytics.",
+    "analyticsCtaButton": "Open analytics"
+  },
+  "discipline": {
+    "eyebrow": "Budget discipline",
+    "tier": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "low": "Fragile"
+    },
+    "weakest": {
+      "none": "You're holding the line — budgets respected, savings progressing, emergency fund in place.",
+      "budget": "At least one budget is over this month — your first lever to pull.",
+      "savings": "Your savings rate is low. A small monthly auto-transfer is often enough to start the engine.",
+      "emergency": "Your emergency fund covers less than a month. Aim for at least 1 month of expenses before any other goal."
+    }
   },
   "alerts": {
     "title": "Alerts",

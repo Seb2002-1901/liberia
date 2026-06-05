@@ -27,7 +27,25 @@
     "totalExpenses": "Gastos totales",
     "totalExpensesHint": "Fijos + variables este mes",
     "transactions": "Transacciones",
-    "transactionsHint": "Número de gastos puntuales este mes"
+    "transactionsHint": "Número de gastos puntuales este mes",
+    "analyticsCtaTitle": "Análisis detallado",
+    "analyticsCtaBody": "Fijos vs variables, presupuestos por categoría, oportunidades, historial — todo en /expenses/analytics.",
+    "analyticsCtaButton": "Abrir análisis"
+  },
+  "discipline": {
+    "eyebrow": "Disciplina presupuestaria",
+    "tier": {
+      "excellent": "Excelente",
+      "good": "Buena",
+      "fair": "Correcta",
+      "low": "Frágil"
+    },
+    "weakest": {
+      "none": "Mantienes la línea — presupuestos respetados, ahorro en marcha, fondo de emergencia en su sitio.",
+      "budget": "Al menos un presupuesto está superado este mes — la primera palanca que activar.",
+      "savings": "Tu tasa de ahorro es baja. Una pequeña transferencia automática mensual suele bastar para arrancar.",
+      "emergency": "Tu fondo de emergencia cubre menos de un mes. Apunta a al menos 1 mes de gastos antes de otros objetivos."
+    }
   },
   "alerts": {
     "title": "Avisos",

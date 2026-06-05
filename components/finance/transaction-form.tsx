@@ -36,8 +36,22 @@ import {
   type ExpenseInput,
   type IncomeInput,
 } from "@/lib/validations/finance";
+import { cn } from "@/lib/utils";
 
 type TransactionKind = "income" | "expense";
+
+// Phase 3.1.3 — explicit Type / Frequency split. We don't store a
+// separate `expense_type` column in the DB (the coach tool needs it
+// because the LLM has to declare its intent, but here the form can
+// derive it from the frequency: one_time ⇒ variable, anything else
+// ⇒ fixed). Showing the choice up-front makes the UX intent obvious
+// and prevents the "Mensuel/Hebdo/Annuel/Ponctuel — wait, which one
+// is a recurring rent?" confusion the brief flagged.
+type ExpenseTypeUi = "fixed" | "variable";
+
+function frequencyToType(freq: string | undefined): ExpenseTypeUi {
+  return freq === "one_time" ? "variable" : "fixed";
+}
 
 type Initial = {
   id?: string;
@@ -79,6 +93,8 @@ export function TransactionForm({
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<IncomeInput | ExpenseInput>({
     resolver: zodResolver(schema),
@@ -102,6 +118,30 @@ export function TransactionForm({
       });
     }
   }, [open, initial, reset, categories]);
+
+  // Watch the canonical frequency from the form state — the Type
+  // toggle below WRITES into `frequency` rather than carrying its
+  // own state, so there's no drift between UI and submitted value.
+  const currentFrequency = watch("frequency") as string | undefined;
+  const expenseTypeUi: ExpenseTypeUi = frequencyToType(currentFrequency);
+
+  /**
+   * Type toggle handler. Variable forces frequency=one_time. Fixed
+   * defaults to monthly (the most common case for the "rent /
+   * insurance / subscription" trio); the user picks the exact
+   * cadence in the dropdown that re-appears just below.
+   */
+  const onPickType = (next: ExpenseTypeUi) => {
+    if (next === "variable") {
+      setValue("frequency", "one_time" as IncomeInput["frequency"], {
+        shouldDirty: true,
+      });
+    } else if (currentFrequency === "one_time" || !currentFrequency) {
+      setValue("frequency", "monthly" as IncomeInput["frequency"], {
+        shouldDirty: true,
+      });
+    }
+  };
 
   const submit = handleSubmit(async (values) => {
     const res = await onSubmit(values, initial?.id);
@@ -138,6 +178,40 @@ export function TransactionForm({
         </DialogHeader>
 
         <form onSubmit={submit} className="space-y-4" noValidate>
+          {kind === "expense" && (
+            <div className="space-y-1.5">
+              <Label>{t("typeLabel")}</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onPickType("fixed")}
+                  className={cn(
+                    "rounded-xl border px-3 py-2.5 text-left text-sm transition-colors",
+                    expenseTypeUi === "fixed"
+                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.08)] text-foreground"
+                      : "border-border/60 bg-card/40 text-muted-foreground hover:border-border hover:bg-card/60",
+                  )}
+                >
+                  <p className="font-medium">{t("typeFixedTitle")}</p>
+                  <p className="text-xs">{t("typeFixedHelp")}</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onPickType("variable")}
+                  className={cn(
+                    "rounded-xl border px-3 py-2.5 text-left text-sm transition-colors",
+                    expenseTypeUi === "variable"
+                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.08)] text-foreground"
+                      : "border-border/60 bg-card/40 text-muted-foreground hover:border-border hover:bg-card/60",
+                  )}
+                >
+                  <p className="font-medium">{t("typeVariableTitle")}</p>
+                  <p className="text-xs">{t("typeVariableHelp")}</p>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="label">{t("label")}</Label>
             <Input
@@ -156,7 +230,14 @@ export function TransactionForm({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div
+            className={cn(
+              "grid gap-3",
+              kind === "expense" && expenseTypeUi === "variable"
+                ? "grid-cols-1"
+                : "grid-cols-2",
+            )}
+          >
             <div className="space-y-1.5">
               <Label htmlFor="amount">{t("amount")}</Label>
               <Input
@@ -173,28 +254,48 @@ export function TransactionForm({
                 </p>
               )}
             </div>
-            <div className="space-y-1.5">
-              <Label>{t("frequency")}</Label>
-              <Controller
-                control={control}
-                name="frequency"
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("frequency")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FREQUENCIES.map((f) => (
-                        <SelectItem key={f.id} value={f.id}>
-                          {tFreq(f.id)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
+            {/*
+              Frequency picker:
+                - For incomes: always shown, all 4 cadences.
+                - For expense + variable: HIDDEN (we forced one_time
+                  on type pick); shown as a static one-time label
+                  below the amount instead.
+                - For expense + fixed: shown but constrained to
+                  {monthly, weekly, yearly}.
+            */}
+            {(kind === "income" || expenseTypeUi === "fixed") && (
+              <div className="space-y-1.5">
+                <Label>{t("frequency")}</Label>
+                <Controller
+                  control={control}
+                  name="frequency"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("frequency")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FREQUENCIES.filter((f) =>
+                          kind === "income"
+                            ? true
+                            : f.id !== "one_time",
+                        ).map((f) => (
+                          <SelectItem key={f.id} value={f.id}>
+                            {tFreq(f.id)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
           </div>
+          {kind === "expense" && expenseTypeUi === "variable" && (
+            <p className="text-xs text-muted-foreground">
+              {t("variableHint")}
+            </p>
+          )}
 
           <div className="space-y-1.5">
             <Label>{t("category")}</Label>

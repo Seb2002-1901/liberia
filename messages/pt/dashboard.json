@@ -27,7 +27,25 @@
     "totalExpenses": "Despesas totais",
     "totalExpensesHint": "Fixas + variáveis este mês",
     "transactions": "Transações",
-    "transactionsHint": "Número de despesas pontuais este mês"
+    "transactionsHint": "Número de despesas pontuais este mês",
+    "analyticsCtaTitle": "Análise detalhada",
+    "analyticsCtaBody": "Fixas vs variáveis, orçamentos por categoria, oportunidades, histórico — tudo em /expenses/analytics.",
+    "analyticsCtaButton": "Abrir análise"
+  },
+  "discipline": {
+    "eyebrow": "Disciplina orçamental",
+    "tier": {
+      "excellent": "Excelente",
+      "good": "Boa",
+      "fair": "Correta",
+      "low": "Frágil"
+    },
+    "weakest": {
+      "none": "Manténs a linha — orçamentos respeitados, poupança em andamento, fundo de emergência no lugar.",
+      "budget": "Pelo menos um orçamento foi ultrapassado este mês — a primeira alavanca a ativar.",
+      "savings": "A tua taxa de poupança é baixa. Uma pequena transferência automática mensal costuma chegar para arrancar.",
+      "emergency": "O teu fundo de emergência cobre menos de um mês. Aponta a pelo menos 1 mês de despesas antes de outros objetivos."
+    }
   },
   "alerts": {
     "title": "Alertas",
