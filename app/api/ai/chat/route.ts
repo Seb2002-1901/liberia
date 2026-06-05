@@ -160,13 +160,26 @@ export async function POST(request: Request) {
     selectEntriesForPrompt(user.id),
   ]);
   const memoryEnabled = memoryFlagRow.data?.coach_memory_enabled ?? true;
+  // Split memory entries by kind. Goals merge into the finance
+  // "Objectifs actuels" section so the coach sees ONE goal list; the
+  // remaining kinds (preference / event / blocker) feed the
+  // dedicated memory block. Without this split the coach would see
+  // the same goal in two prompt sections AND treat the "Objectifs"
+  // section as authoritative — claiming "aucun objectif actif" when
+  // memory clearly contained one.
+  const memoryGoals = memoryEnabled
+    ? memoryEntries.filter((e) => e.kind === "goal")
+    : [];
+  const nonGoalMemoryEntries = memoryEnabled
+    ? memoryEntries.filter((e) => e.kind !== "goal")
+    : [];
   const memoryBlock = memoryEnabled
-    ? buildMemoryEntriesBlock(memoryEntries)
+    ? buildMemoryEntriesBlock(nonGoalMemoryEntries)
     : null;
   console.log(
-    `[memory] pre-prompt: enabled=${memoryEnabled} entriesSelected=${memoryEntries.length} blockChars=${memoryBlock?.length ?? 0}`,
+    `[memory] pre-prompt: enabled=${memoryEnabled} entriesSelected=${memoryEntries.length} goalEntries=${memoryGoals.length} nonGoalEntries=${nonGoalMemoryEntries.length} blockChars=${memoryBlock?.length ?? 0}`,
   );
-  const financeContext = buildFinanceContext(financeData);
+  const financeContext = buildFinanceContext(financeData, { memoryGoals });
   const useLLM = isAnthropicConfigured();
 
   // If this is the first user message, derive a short title for the
