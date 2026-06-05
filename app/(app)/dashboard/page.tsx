@@ -7,6 +7,7 @@ import {
   Layers,
   PiggyBank,
   Sparkles,
+  Target,
   Wallet,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -29,11 +30,20 @@ import {
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
 import { formatPercent, formatUserCurrency } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
 import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
-import { buildBudgetStatus } from "@/lib/calculations/analytics";
+import {
+  buildBudgetStatus,
+  buildCategoryBreakdown,
+} from "@/lib/calculations/analytics";
 import { computeDisciplineScore } from "@/lib/calculations/discipline";
+import { detectOpportunities } from "@/lib/calculations/opportunities";
+import {
+  computeBudgetProgress,
+  computeGoalAchievementScore,
+  computePotentialSavings,
+} from "@/lib/calculations/budget-goals";
 import { DisciplineCard } from "@/components/dashboard/discipline-card";
+import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { PlanTeaser } from "@/components/dashboard/plan-teaser";
@@ -129,6 +139,33 @@ export default async function DashboardPage() {
     runwayMonths: runway,
     monthlyTransactions: transactionsCount,
   });
+
+  // Phase 3.1.4 — goal achievement + potential savings for the
+  // dashboard's optimisation row. Reusing the existing analytics
+  // primitives + the same monthBudgetStatus we computed for
+  // discipline so the numbers stay consistent across cards.
+  const budgetProgress = computeBudgetProgress(
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+    data.expenses,
+  );
+  const goalAchievement = computeGoalAchievementScore(budgetProgress);
+  const monthCategoryBreakdown = buildCategoryBreakdown(
+    data.expenses,
+    "month",
+    EXPENSE_CATEGORIES.map((c) => c.id),
+  );
+  const dashboardOpportunities = detectOpportunities({
+    expenseBuckets: data.expenseBuckets,
+    budgetStatus: monthBudgetStatus,
+    categoryBreakdown: monthCategoryBreakdown,
+    monthlyIncome,
+    runwayMonths: runway,
+    savingsRate,
+  });
+  const potentialSavings = computePotentialSavings(dashboardOpportunities);
 
   const expenseByCategory = aggregateMonthlyByCategory(data.expenses);
 
@@ -261,34 +298,71 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Phase 3.1.3 — discipline score + analytics drill-down. The
-          dashboard surfaces ONLY the headline number; the breakdown
-          and opportunities engine live on /expenses/analytics. */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      {/* Phase 3.1.4 — optimisation row. Discipline + Objectifs +
+          Économies potentielles, side by side. Each is a stat card
+          the user can scan in one second; the analytics CTA moves
+          below as a less prominent button so the headline metrics
+          dominate. */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DisciplineCard
           score={discipline.score}
           tier={discipline.tier}
           weakest={discipline.weakest}
-          className="lg:col-span-2"
         />
-        <Card className="flex flex-col justify-between">
-          <CardHeader>
-            <CardTitle className="text-base">
-              {t("stats.analyticsCtaTitle")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-xs text-muted-foreground">
-              {t("stats.analyticsCtaBody")}
-            </p>
-            <Button asChild variant="gold" size="sm" className="w-full">
-              <Link href={ROUTES.expenseAnalytics}>
-                <Layers className="h-4 w-4" />
-                {t("stats.analyticsCtaButton")}
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <StatCard
+          label={t("stats.goalsRespected")}
+          value={
+            goalAchievement.total === 0
+              ? t("stats.goalsEmpty")
+              : `${goalAchievement.respected} / ${goalAchievement.total}`
+          }
+          icon={<Target className="h-4 w-4" />}
+          tone={
+            goalAchievement.total === 0
+              ? "neutral"
+              : goalAchievement.score >= 0.8
+                ? "positive"
+                : goalAchievement.score >= 0.5
+                  ? "neutral"
+                  : "negative"
+          }
+          hint={
+            goalAchievement.total === 0
+              ? t("stats.goalsEmptyHint")
+              : t("stats.goalsHint", {
+                  pct: Math.round(goalAchievement.score * 100),
+                })
+          }
+        />
+        <StatCard
+          label={t("stats.potentialSavings")}
+          value={
+            potentialSavings.monthly > 0
+              ? `${formatUserCurrency(potentialSavings.monthly, data.profile)}${t("stats.perMonthSuffix")}`
+              : t("stats.potentialSavingsEmpty")
+          }
+          icon={<Sparkles className="h-4 w-4" />}
+          tone={potentialSavings.monthly > 0 ? "gold" : "neutral"}
+          hint={
+            potentialSavings.monthly > 0
+              ? t("stats.potentialSavingsHint", {
+                  yearly: formatUserCurrency(
+                    potentialSavings.yearly,
+                    data.profile,
+                  ),
+                })
+              : t("stats.potentialSavingsEmptyHint")
+          }
+        />
+      </div>
+
+      <div className="flex justify-end">
+        <Button asChild variant="outline" size="sm">
+          <Link href={ROUTES.expenseAnalytics}>
+            <Layers className="h-4 w-4" />
+            {t("stats.analyticsCtaButton")}
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

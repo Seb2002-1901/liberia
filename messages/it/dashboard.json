@@ -30,7 +30,16 @@
     "transactionsHint": "Numero di spese occasionali di questo mese",
     "analyticsCtaTitle": "Analisi dettagliata",
     "analyticsCtaBody": "Fisse vs variabili, budget per categoria, opportunità, storico — tutto in /expenses/analytics.",
-    "analyticsCtaButton": "Apri analisi"
+    "analyticsCtaButton": "Apri analisi",
+    "goalsRespected": "Obiettivi rispettati",
+    "goalsEmpty": "Nessuno",
+    "goalsEmptyHint": "Imposta il tuo primo budget nell'analisi dettagliata.",
+    "goalsHint": "Punteggio budget {pct}%",
+    "potentialSavings": "Risparmio potenziale",
+    "potentialSavingsEmpty": "Tutto a posto",
+    "potentialSavingsEmptyHint": "Nessuna opportunità prioritaria di risparmio questo mese.",
+    "potentialSavingsHint": "≈ {yearly} all'anno — stima, non una garanzia",
+    "perMonthSuffix": " / mese"
   },
   "discipline": {
     "eyebrow": "Disciplina di budget",

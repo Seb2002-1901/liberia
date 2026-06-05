@@ -36,6 +36,10 @@ import {
   type Opportunity,
   type OpportunityPriority,
 } from "@/lib/calculations/opportunities";
+import {
+  computePotentialSavings,
+  type PotentialSavings,
+} from "@/lib/calculations/budget-goals";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryId } from "@/lib/constants";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -134,6 +138,14 @@ export function ExpenseAnalyticsClient({
     // the full set server-side). The user-visible list focuses on
     // budget overruns + category audits — the high-signal cases.
     [budgetStatus, monthBreakdown, monthTotals],
+  );
+
+  // Phase 3.1.4 — aggregate impact of all opportunities, with the
+  // per-priority breakdown so the Économies potentielles card can
+  // highlight the high-priority subset prominently.
+  const potentialSavings = React.useMemo(
+    () => computePotentialSavings(opportunities),
+    [opportunities],
   );
 
   const onBudgetSaved = (next: CategoryBudget) => {
@@ -309,6 +321,12 @@ export function ExpenseAnalyticsClient({
       </Card>
 
       <PerformanceTable budgetStatus={budgetStatus} currency={currency} />
+
+      <PotentialSavingsCard
+        savings={potentialSavings}
+        opportunitiesCount={opportunities.length}
+        currency={currency}
+      />
 
       <OpportunitiesCard opportunities={opportunities} currency={currency} />
 
@@ -630,6 +648,78 @@ function priorityTone(priority: OpportunityPriority): string {
 /* -------------------------------------------------------------------------- */
 /*  Phase 3.1.3 — category history view                                         */
 /* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*  Phase 3.1.4 — potential savings (aggregate impact)                          */
+/* -------------------------------------------------------------------------- */
+
+function PotentialSavingsCard({
+  savings,
+  opportunitiesCount,
+  currency,
+}: {
+  savings: PotentialSavings;
+  opportunitiesCount: number;
+  currency: string;
+}) {
+  const t = useTranslations("app.finance.analytics.potentialSavings");
+  if (opportunitiesCount === 0 || savings.monthly <= 0) {
+    return null;
+  }
+  // Three priority pills laid out responsively. On mobile they stack
+  // beneath the headline figure; on desktop they sit on the right of
+  // the card so the user reads "X / month → high / medium / low
+  // breakdown" left to right.
+  return (
+    <Card className="border-[hsl(var(--gold)/0.3)] bg-gradient-to-br from-[hsl(var(--gold)/0.05)] via-card/40 to-card/40">
+      <CardHeader>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="font-display text-3xl font-semibold tabular-nums text-[hsl(var(--gold))]">
+              {formatCurrency(savings.monthly, currency)}
+              <span className="text-base text-muted-foreground"> / {t("perMonth")}</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t("yearlyLine", {
+                yearly: formatCurrency(savings.yearly, currency),
+              })}
+            </p>
+          </div>
+          <ul className="grid gap-2 sm:grid-cols-1">
+            {(["high", "medium", "low"] as const).map((p) =>
+              savings.byPriority[p].monthly > 0 ? (
+                <li
+                  key={p}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-card/50 px-3 py-1.5 text-xs"
+                >
+                  <span
+                    className={cn(
+                      "rounded px-1.5 py-0.5 font-semibold uppercase tracking-wider",
+                      priorityTone(p),
+                    )}
+                  >
+                    {t(`priority.${p}`)}
+                  </span>
+                  <span className="tabular-nums">
+                    {formatCurrency(savings.byPriority[p].monthly, currency)} /
+                    {t("perMonth")}
+                  </span>
+                </li>
+              ) : null,
+            )}
+          </ul>
+        </div>
+        <p className="mt-4 text-[11px] text-muted-foreground">
+          {t("disclaimer")}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 function CategoryHistoryCard({
   history,

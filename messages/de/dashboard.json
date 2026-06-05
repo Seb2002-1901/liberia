@@ -30,7 +30,16 @@
     "transactionsHint": "Anzahl einmaliger Ausgaben diesen Monat",
     "analyticsCtaTitle": "Detailanalyse",
     "analyticsCtaBody": "Fix vs variabel, Kategorienbudgets, Opportunitäten, Verlauf — alles unter /expenses/analytics.",
-    "analyticsCtaButton": "Analyse öffnen"
+    "analyticsCtaButton": "Analyse öffnen",
+    "goalsRespected": "Eingehaltene Ziele",
+    "goalsEmpty": "Keines gesetzt",
+    "goalsEmptyHint": "Setze dein erstes Budget in der Detailanalyse.",
+    "goalsHint": "Budget-Score {pct}%",
+    "potentialSavings": "Potenzielle Ersparnis",
+    "potentialSavingsEmpty": "Alles sauber",
+    "potentialSavingsEmptyHint": "Diesen Monat keine priorisierte Sparmöglichkeit erkannt.",
+    "potentialSavingsHint": "≈ {yearly} pro Jahr — Schätzung, keine Garantie",
+    "perMonthSuffix": " / Monat"
   },
   "discipline": {
     "eyebrow": "Budget-Disziplin",

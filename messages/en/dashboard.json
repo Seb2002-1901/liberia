@@ -30,7 +30,16 @@
     "transactionsHint": "Number of one-off expenses this month",
     "analyticsCtaTitle": "Detailed analytics",
     "analyticsCtaBody": "Fixed vs variable, per-category budgets, opportunities, history — all in /expenses/analytics.",
-    "analyticsCtaButton": "Open analytics"
+    "analyticsCtaButton": "Open analytics",
+    "goalsRespected": "Goals on track",
+    "goalsEmpty": "None set",
+    "goalsEmptyHint": "Set your first budget in detailed analytics.",
+    "goalsHint": "Budget score {pct}%",
+    "potentialSavings": "Potential savings",
+    "potentialSavingsEmpty": "All clean",
+    "potentialSavingsEmptyHint": "No prioritised savings opportunity detected this month.",
+    "potentialSavingsHint": "≈ {yearly} per year — estimate, not a guarantee",
+    "perMonthSuffix": " / month"
   },
   "discipline": {
     "eyebrow": "Budget discipline",

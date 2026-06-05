@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} concentrates your one-off spending",
             "body": "{amount} spent across {transactions} transaction(s) this month."
+          },
+          "dominant_category": {
+            "title": "{category} dominates your spending",
+            "body": "{amount}/month — {share}% of your total spending. It's the structural item to keep an eye on."
+          },
+          "low_savings_rate": {
+            "title": "Low savings rate",
+            "body": "You save {rate}% of your income (starter target {target}%). A small monthly auto-transfer is often enough to get going."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Potential savings",
+        "description": "Aggregate of detected opportunities. Estimate based on conservative assumptions (10-20% cut on identified levers), not a guarantee.",
+        "perMonth": "month",
+        "yearlyLine": "≈ {yearly} per year",
+        "disclaimer": "This projection is built from the opportunities below. The real amount depends on the concrete actions you take.",
+        "priority": {
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
         }
       },
       "history": {

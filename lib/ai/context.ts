@@ -22,6 +22,11 @@ import {
   detectOpportunities,
   type Opportunity,
 } from "@/lib/calculations/opportunities";
+import {
+  computeBudgetProgress,
+  computeGoalAchievementScore,
+  computePotentialSavings,
+} from "@/lib/calculations/budget-goals";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -217,12 +222,59 @@ export function buildFinanceContext(
     categoryBreakdown: monthBreakdown,
     monthlyIncome,
     runwayMonths: runway,
+    // Phase 3.1.4 — the engine can now flag low_savings_rate; we
+    // pass the canonical decimal computed above.
+    savingsRate,
   });
   const opportunitiesSection = opportunities.length === 0
     ? "Aucune opportunité d'optimisation prioritaire détectée."
     : opportunities
         .map((o) => renderOpportunity(o, fmt))
         .join("\n");
+
+  // Phase 3.1.4 — budget goals: per-budget progress, achievement
+  // score, and aggregate potential savings. All three derive from
+  // primitives the dashboard / analytics reuse, so the coach NEVER
+  // contradicts what the user sees on those surfaces.
+  const budgetProgress = computeBudgetProgress(
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+    data.expenses,
+  );
+  const achievement = computeGoalAchievementScore(budgetProgress);
+  const savings = computePotentialSavings(opportunities);
+  const budgetProgressSection =
+    budgetProgress.length === 0
+      ? "Aucun objectif budgétaire défini par l'utilisateur."
+      : budgetProgress
+          .map((p) => {
+            const label = categoryLabel(p.category);
+            const tag =
+              p.status === "OVER_LIMIT"
+                ? "DÉPASSÉ"
+                : p.status === "WARNING"
+                  ? "ATTENTION"
+                  : "OK";
+            const pct = Math.round(p.percentage * 100);
+            const detail =
+              p.overrun > 0
+                ? `dépassement ${fmt(p.overrun)}`
+                : `restant ${fmt(p.remaining)}`;
+            return `- ${label} : ${fmt(p.currentSpent)} / ${fmt(p.targetAmount)} (${pct}%) — ${tag}, ${detail}`;
+          })
+          .join("\n");
+
+  const achievementSection =
+    achievement.total === 0
+      ? "Score budgétaire non applicable (aucun budget défini)."
+      : `Objectifs respectés : ${achievement.respected} / ${achievement.total} — Score ${Math.round(achievement.score * 100)}%`;
+
+  const savingsSection =
+    savings.monthly <= 0
+      ? "Aucune économie chiffrable détectée. (Certaines opportunités sont qualitatives — voir Opportunités d'optimisation.)"
+      : `Total cumulé sur l'ensemble des opportunités : ${fmt(savings.monthly)} / mois (${fmt(savings.yearly)} / an).\nDont haute priorité : ${fmt(savings.byPriority.high.monthly)} / mois (${fmt(savings.byPriority.high.yearly)} / an).\nDont priorité moyenne : ${fmt(savings.byPriority.medium.monthly)} / mois.\nDont priorité basse : ${fmt(savings.byPriority.low.monthly)} / mois.`;
 
   const discipline = computeDisciplineScore({
     budgetStatus: budgetRows,
@@ -272,6 +324,15 @@ ${trendsSection || "Aucune variation marquée détectée."}
 ## Opportunités d'optimisation détectées
 ${opportunitiesSection}
 
+## Objectifs budgétaires (ce mois)
+${budgetProgressSection}
+
+## Score budgétaire (objectifs respectés)
+${achievementSection}
+
+## Économies potentielles (issues des opportunités ci-dessus)
+${savingsSection}
+
 ## Discipline budgétaire
 Score : ${discipline.score}/100 — ${disciplineTierLabel(discipline.tier)}
 Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.breakdown.savings}/30 · urgence ${discipline.breakdown.emergency}/25 · suivi ${discipline.breakdown.tracking}/10
@@ -283,7 +344,10 @@ Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.bre
 - "Objectifs actuels" est la source de vérité COMPLÈTE des objectifs : tu y trouves les objectifs formalisés dans /goals ET ceux mentionnés en conversation (étiquetés "source: mémoire conversation"). Ne dis JAMAIS "aucun objectif actif" si cette section liste au moins un élément. Quand un objectif vient de la mémoire sans être encore dans /goals, propose à l'utilisateur de le formaliser (montant cible, échéance) sans le lui imposer.
 - Dépenses : utilise toujours "Dépenses totales ce mois" pour comparer au revenu et juger du reste à vivre RÉEL. "Dépenses fixes" couvre seulement le récurrent (loyer, abonnements, assurances…) ; "Dépenses variables" couvre les transactions ponctuelles du mois en cours (courses, restaurants, achats imprévus). NE confonds JAMAIS les deux et NE prétends JAMAIS que les "dépenses mensuelles" sont uniquement les fixes — le total est ce qui compte pour l'utilisateur.
 - "Opportunités d'optimisation détectées" et "Top catégories" sont calculées automatiquement à partir des données réelles. Tu peux les citer telles quelles ("ton budget restau est dépassé de 60 CHF ce mois", "tes trois plus grosses catégories sont logement, alimentation, transport") sans inventer de chiffres. Si l'utilisateur demande "où puis-je économiser ?", commence par la première opportunité haute priorité de la liste. Si l'utilisateur demande "quelle catégorie augmente le plus ?", cite la section "Tendances 3 mois". Reste prudent sur les conseils réglementés : suggère "il peut être utile de comparer les primes / d'auditer les abonnements", JAMAIS "tu dois changer d'assureur pour X".
-- "Discipline budgétaire" résume ta vision de la santé budgétaire courante. Tu peux la mentionner ("ton score de discipline est à 82/100 — très bon contrôle") pour rassurer ou pointer le composant le plus faible, sans en faire un objet de stress.`;
+- "Discipline budgétaire" résume ta vision de la santé budgétaire courante. Tu peux la mentionner ("ton score de discipline est à 82/100 — très bon contrôle") pour rassurer ou pointer le composant le plus faible, sans en faire un objet de stress.
+- "Objectifs budgétaires" est la liste complète des limites mensuelles que l'utilisateur s'est fixées par catégorie, avec leur statut OK / ATTENTION / DÉPASSÉ. Pour répondre à "quels objectifs ai-je dépassés ?", liste les statuts DÉPASSÉ en citant le couple dépensé / cible. Pour "quels budgets sont respectés ?", cite les OK. Ne réinvente jamais ces chiffres : ils viennent directement de la table category_budgets.
+- "Score budgétaire" exprime la proportion d'objectifs SUCCESS sur le total défini. Un score 4/5 = 80 % signifie que 4 budgets sur 5 sont sous 80 % de leur cible. Tu peux dire "tu respectes 4 budgets sur 5 ce mois — bien joué" sans paraphraser inutilement.
+- "Économies potentielles" agrège l'impact mensuel et annuel des opportunités ci-dessus. Pour "combien puis-je économiser sur une année ?", cite la ligne "Total cumulé sur l'ensemble des opportunités" en montrant l'annuel (la projection 12 × mensuel parle plus). Précise toujours qu'il s'agit d'une ESTIMATION basée sur les heuristiques (10-20 % de réduction sur les leviers identifiés), pas d'une garantie : "tu pourrais viser environ X par an si tu agis sur les leviers haute priorité — c'est un ordre de grandeur, pas une promesse".`;
 }
 
 /**
@@ -325,6 +389,12 @@ function renderOpportunity(
       const label = categoryLabel(o.payload.category as string);
       return `- [${tag}] ${label} concentre une grosse part de tes dépenses ponctuelles (${fmt(o.payload.amount as number)} ce mois, ${o.payload.transactions} tx)${impact}`;
     }
+    case "dominant_category": {
+      const label = categoryLabel(o.payload.category as string);
+      return `- [${tag}] ${label} représente ${o.payload.share}% de tes dépenses totales (${fmt(o.payload.amount as number)}/mois) — c'est le poste structurel à surveiller${impact}`;
+    }
+    case "low_savings_rate":
+      return `- [${tag}] Taux d'épargne faible : ${o.payload.rate}% (cible de démarrage ${o.payload.target}%). Programmer un virement automatique mensuel est souvent suffisant pour amorcer${impact}`;
     default: {
       const _exhaust: never = o.kind;
       return `- [${tag}] ${_exhaust as string}`;

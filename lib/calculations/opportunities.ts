@@ -24,7 +24,9 @@ export type OpportunityKind =
   | "high_fixed_ratio"
   | "high_insurance_share"
   | "high_subscriptions_share"
-  | "audit_top_variable_category";
+  | "audit_top_variable_category"
+  | "dominant_category"
+  | "low_savings_rate";
 
 export type OpportunityPriority = "low" | "medium" | "high";
 
@@ -42,6 +44,13 @@ export interface Opportunity {
   monthlyImpact: number;
   /** Yearly impact = monthlyImpact * 12 (computed for convenience). */
   yearlyImpact: number;
+  /**
+   * Phase 3.1.4 — stable action key for i18n lookup. The UI renders
+   * the localised verb-phrase ("Réduire les dépenses de
+   * restauration") so the user immediately sees WHAT to do, not just
+   * what's wrong. The coach reads this too as a concrete CTA.
+   */
+  action: string;
 }
 
 export interface DetectInput {
@@ -51,6 +60,12 @@ export interface DetectInput {
   categoryBreakdown: readonly CategoryBreakdownRow[];
   monthlyIncome: number;
   runwayMonths: number;
+  /**
+   * Phase 3.1.4 — savings rate (decimal, e.g. 0.12 for 12 %).
+   * Optional so existing callers don't have to pass it before they
+   * compute it; rules that need it just no-op when undefined.
+   */
+  savingsRate?: number;
 }
 
 const MAX_OPPORTUNITIES = 5;
@@ -60,11 +75,19 @@ const HIGH_VARIABLE_SHARE = 0.25; // variable > 25 % of income is loose
 const HIGH_INSURANCE_SHARE = 0.07; // insurance > 7 % of income worth auditing
 const HIGH_SUBSCRIPTIONS_SHARE = 0.04;
 const TOP_VARIABLE_CATEGORY_SHARE = 0.25; // top variable cat > 25 % of variable
+const DOMINANT_CATEGORY_SHARE = 0.5; // single category > 50 % of total spend
+const LOW_SAVINGS_RATE = 0.05; // savings rate < 5 % is a flag
 
 export function detectOpportunities(input: DetectInput): Opportunity[] {
   const out: Opportunity[] = [];
-  const { expenseBuckets, budgetStatus, categoryBreakdown, monthlyIncome, runwayMonths } =
-    input;
+  const {
+    expenseBuckets,
+    budgetStatus,
+    categoryBreakdown,
+    monthlyIncome,
+    runwayMonths,
+    savingsRate,
+  } = input;
 
   // 1) Budget over — one entry per over-budget category, capped at 2
   //    here (the top two by absolute overrun). Priority high if the
@@ -86,6 +109,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
       },
       monthlyImpact: round2(overshoot),
       yearlyImpact: round2(overshoot * 12),
+      action: `reduce_${o.category}`,
     });
   }
 
@@ -108,6 +132,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
       },
       monthlyImpact: round2(impact),
       yearlyImpact: round2(impact * 12),
+      action: "cap_variable_spending",
     });
   }
 
@@ -125,6 +150,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
         },
         monthlyImpact: 0,
         yearlyImpact: 0,
+        action: "build_emergency_fund",
       });
     } else if (runwayMonths < 3) {
       push(out, {
@@ -133,6 +159,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
         payload: { months: round2(runwayMonths) },
         monthlyImpact: 0,
         yearlyImpact: 0,
+        action: "build_emergency_fund",
       });
     }
   }
@@ -150,6 +177,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
       },
       monthlyImpact: 0,
       yearlyImpact: 0,
+      action: "audit_fixed_costs",
     });
   }
 
@@ -166,6 +194,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
         },
         monthlyImpact: 0,
         yearlyImpact: 0,
+        action: "compare_insurance_premiums",
       });
     }
   }
@@ -185,6 +214,7 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
         // optimistic impact estimate for "audit and cut".
         monthlyImpact: round2(subs * 0.5),
         yearlyImpact: round2(subs * 0.5 * 12),
+        action: "audit_subscriptions",
       });
     }
   }
@@ -209,8 +239,68 @@ export function detectOpportunities(input: DetectInput): Opportunity[] {
         },
         monthlyImpact: round2(topVariable.total * 0.2),
         yearlyImpact: round2(topVariable.total * 0.2 * 12),
+        action: `reduce_${topVariable.category}`,
       });
     }
+  }
+
+  // 8) Dominant category — when ONE category takes more than half of
+  //    total spending, it's the structural lever. Different from the
+  //    "top variable" rule because dominant_category covers RECURRING
+  //    too (e.g. housing 60 % of total → not a quick fix, but the
+  //    coach needs to see it so it doesn't suggest cutting Netflix
+  //    when the real problem is rent).
+  if (expenseBuckets.total > 0) {
+    const dominant = categoryBreakdown
+      .slice(0, 1)
+      .find((r) => r.total / expenseBuckets.total > DOMINANT_CATEGORY_SHARE);
+    if (dominant) {
+      // Priority depends on whether it's a housing-class fixed cost
+      // (low priority — the user can't move next week) vs anything
+      // else (medium priority — there's room to act).
+      const isStructural = dominant.category === "housing";
+      push(out, {
+        kind: "dominant_category",
+        priority: isStructural ? "low" : "medium",
+        payload: {
+          category: dominant.category,
+          share: round2((dominant.total / expenseBuckets.total) * 100),
+          amount: round2(dominant.total),
+        },
+        // Structural costs: no quick monthly impact to commit to.
+        // Other categories: aim at a 10 % shave as an honest opener.
+        monthlyImpact: isStructural ? 0 : round2(dominant.total * 0.1),
+        yearlyImpact: isStructural ? 0 : round2(dominant.total * 0.1 * 12),
+        action: isStructural
+          ? "review_housing_costs"
+          : `reduce_${dominant.category}`,
+      });
+    }
+  }
+
+  // 9) Low savings rate — < 5 % means the user is barely setting
+  //    anything aside. The impact estimate is the amount needed to
+  //    reach the 10 % "starter" target, not the 20 % healthy target,
+  //    because going from 0 → 10 is a realistic next step.
+  if (
+    monthlyIncome > 0 &&
+    typeof savingsRate === "number" &&
+    Number.isFinite(savingsRate) &&
+    savingsRate < LOW_SAVINGS_RATE
+  ) {
+    const targetRate = 0.1;
+    const gap = Math.max(0, (targetRate - savingsRate) * monthlyIncome);
+    push(out, {
+      kind: "low_savings_rate",
+      priority: savingsRate <= 0 ? "high" : "medium",
+      payload: {
+        rate: round2(savingsRate * 100),
+        target: round2(targetRate * 100),
+      },
+      monthlyImpact: round2(gap),
+      yearlyImpact: round2(gap * 12),
+      action: "automate_savings_transfer",
+    });
   }
 
   // Final ordering: high-priority first, then medium, then low.

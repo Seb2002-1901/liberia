@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} concentra le tue spese occasionali",
             "body": "{amount} spesi in {transactions} transazione/i questo mese."
+          },
+          "dominant_category": {
+            "title": "{category} domina le tue spese",
+            "body": "{amount}/mese — {share}% del totale speso. Voce strutturale da monitorare."
+          },
+          "low_savings_rate": {
+            "title": "Tasso di risparmio basso",
+            "body": "Risparmi {rate}% del tuo reddito (obiettivo di partenza {target}%). Un piccolo bonifico automatico mensile spesso basta per iniziare."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Risparmio potenziale",
+        "description": "Somma delle opportunità rilevate. Stima basata su ipotesi prudenti (10-20% di riduzione sui leveraggi identificati), non una garanzia.",
+        "perMonth": "mese",
+        "yearlyLine": "≈ {yearly} all'anno",
+        "disclaimer": "Questa proiezione si basa sulle opportunità qui sotto. L'importo reale dipende dalle azioni concrete che farai.",
+        "priority": {
+          "high": "Alta",
+          "medium": "Media",
+          "low": "Bassa"
         }
       },
       "history": {

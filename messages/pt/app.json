@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} concentra as tuas despesas pontuais",
             "body": "{amount} gastos em {transactions} transação(ões) este mês."
+          },
+          "dominant_category": {
+            "title": "{category} domina as tuas despesas",
+            "body": "{amount}/mês — {share}% do total. É o item estrutural a vigiar."
+          },
+          "low_savings_rate": {
+            "title": "Taxa de poupança baixa",
+            "body": "Poupas {rate}% do teu rendimento (objetivo inicial {target}%). Uma pequena transferência automática mensal costuma chegar para arrancar."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Poupanças potenciais",
+        "description": "Soma das oportunidades detetadas. Estimativa baseada em hipóteses prudentes (10-20% de redução nas alavancas identificadas), sem garantia.",
+        "perMonth": "mês",
+        "yearlyLine": "≈ {yearly} por ano",
+        "disclaimer": "Esta projeção baseia-se nas oportunidades abaixo. O valor real depende das ações concretas que tomares.",
+        "priority": {
+          "high": "Alta",
+          "medium": "Média",
+          "low": "Baixa"
         }
       },
       "history": {

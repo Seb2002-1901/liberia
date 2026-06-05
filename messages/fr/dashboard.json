@@ -30,7 +30,16 @@
     "transactionsHint": "Nombre de dépenses ponctuelles ce mois",
     "analyticsCtaTitle": "Analyse détaillée",
     "analyticsCtaBody": "Fixes vs variables, budgets par catégorie, opportunités, historique : tout dans /expenses/analytics.",
-    "analyticsCtaButton": "Ouvrir l'analyse"
+    "analyticsCtaButton": "Ouvrir l'analyse",
+    "goalsRespected": "Objectifs respectés",
+    "goalsEmpty": "Aucun défini",
+    "goalsEmptyHint": "Définis ton premier budget dans l'analyse détaillée.",
+    "goalsHint": "Score budgétaire {pct}%",
+    "potentialSavings": "Économies potentielles",
+    "potentialSavingsEmpty": "Tout est sain",
+    "potentialSavingsEmptyHint": "Aucune optimisation chiffrée prioritaire détectée ce mois.",
+    "potentialSavingsHint": "≈ {yearly} sur l'année — estimation, pas une garantie",
+    "perMonthSuffix": " / mois"
   },
   "discipline": {
     "eyebrow": "Discipline budgétaire",

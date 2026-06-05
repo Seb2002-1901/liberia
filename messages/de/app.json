@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} dominiert deine einmaligen Ausgaben",
             "body": "{amount} verteilt auf {transactions} Transaktion(en) diesen Monat."
+          },
+          "dominant_category": {
+            "title": "{category} dominiert deine Ausgaben",
+            "body": "{amount}/Monat — {share}% deiner Gesamtausgaben. Der strukturelle Posten zum Beobachten."
+          },
+          "low_savings_rate": {
+            "title": "Niedrige Sparquote",
+            "body": "Du sparst {rate}% deines Einkommens (Startziel {target}%). Ein kleiner monatlicher Dauerauftrag reicht oft, um anzufangen."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Potenzielle Ersparnis",
+        "description": "Summe der erkannten Opportunitäten. Schätzung mit konservativen Annahmen (10-20% Kürzung auf den identifizierten Hebeln), keine Garantie.",
+        "perMonth": "Monat",
+        "yearlyLine": "≈ {yearly} pro Jahr",
+        "disclaimer": "Diese Projektion basiert auf den unten aufgeführten Opportunitäten. Der reale Betrag hängt von deinen konkreten Schritten ab.",
+        "priority": {
+          "high": "Hoch",
+          "medium": "Mittel",
+          "low": "Niedrig"
         }
       },
       "history": {

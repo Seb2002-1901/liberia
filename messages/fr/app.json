@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} concentre tes dépenses ponctuelles",
             "body": "{amount} dépensé en {transactions} transaction(s) ce mois."
+          },
+          "dominant_category": {
+            "title": "{category} domine tes dépenses",
+            "body": "{amount}/mois — {share}% de tes dépenses totales. C'est le poste structurel à surveiller."
+          },
+          "low_savings_rate": {
+            "title": "Taux d'épargne faible",
+            "body": "Tu épargnes {rate}% de ton revenu (cible de démarrage {target}%). Un virement automatique mensuel suffit souvent à amorcer."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Économies potentielles",
+        "description": "Total cumulé des opportunités détectées. Estimation issue d'hypothèses prudentes (10-20 % de réduction sur les leviers identifiés), pas une garantie.",
+        "perMonth": "mois",
+        "yearlyLine": "Soit ≈ {yearly} sur l'année",
+        "disclaimer": "Cette projection se base sur les opportunités ci-dessous. Le montant réel dépend des actions concrètes que tu mettras en place.",
+        "priority": {
+          "high": "Haute",
+          "medium": "Moyenne",
+          "low": "Basse"
         }
       },
       "history": {

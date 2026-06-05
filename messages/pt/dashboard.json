@@ -30,7 +30,16 @@
     "transactionsHint": "Número de despesas pontuais este mês",
     "analyticsCtaTitle": "Análise detalhada",
     "analyticsCtaBody": "Fixas vs variáveis, orçamentos por categoria, oportunidades, histórico — tudo em /expenses/analytics.",
-    "analyticsCtaButton": "Abrir análise"
+    "analyticsCtaButton": "Abrir análise",
+    "goalsRespected": "Objetivos cumpridos",
+    "goalsEmpty": "Nenhum",
+    "goalsEmptyHint": "Define o teu primeiro orçamento na análise detalhada.",
+    "goalsHint": "Pontuação orçamental {pct}%",
+    "potentialSavings": "Poupanças potenciais",
+    "potentialSavingsEmpty": "Tudo limpo",
+    "potentialSavingsEmptyHint": "Sem oportunidade prioritária de poupança este mês.",
+    "potentialSavingsHint": "≈ {yearly} por ano — estimativa, sem garantia",
+    "perMonthSuffix": " / mês"
   },
   "discipline": {
     "eyebrow": "Disciplina orçamental",

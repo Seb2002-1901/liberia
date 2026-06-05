@@ -879,7 +879,27 @@
           "audit_top_variable_category": {
             "title": "{category} concentra tus gastos puntuales",
             "body": "{amount} gastados en {transactions} transacción(es) este mes."
+          },
+          "dominant_category": {
+            "title": "{category} domina tus gastos",
+            "body": "{amount}/mes — {share}% del total. Es la partida estructural a vigilar."
+          },
+          "low_savings_rate": {
+            "title": "Tasa de ahorro baja",
+            "body": "Ahorras {rate}% de tus ingresos (objetivo de inicio {target}%). Una pequeña transferencia automática mensual suele bastar para arrancar."
           }
+        }
+      },
+      "potentialSavings": {
+        "title": "Ahorros potenciales",
+        "description": "Suma de las oportunidades detectadas. Estimación basada en hipótesis prudentes (10-20% de reducción en las palancas identificadas), no garantía.",
+        "perMonth": "mes",
+        "yearlyLine": "≈ {yearly} al año",
+        "disclaimer": "Esta proyección se basa en las oportunidades de abajo. El importe real depende de las acciones concretas que tomes.",
+        "priority": {
+          "high": "Alta",
+          "medium": "Media",
+          "low": "Baja"
         }
       },
       "history": {
