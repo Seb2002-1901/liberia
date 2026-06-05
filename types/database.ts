@@ -121,6 +121,21 @@ export interface UserSettings {
 
 export type CoachingTone = "calm" | "direct" | "structured" | "gentle";
 
+/**
+ * Phase 3.1.2 — per-category monthly budget. One row per
+ * (user_id, category). The user sets these from /expenses/analytics;
+ * the analytics page + coach context use them to flag overruns.
+ */
+export interface CategoryBudget {
+  id: string;
+  user_id: string;
+  category: string;
+  monthly_limit: number;
+  currency: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface UserMemory {
   id: string;
   user_id: string;

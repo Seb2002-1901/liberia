@@ -16,6 +16,7 @@ import {
   getDemoProfile,
 } from "@/lib/demo/data";
 import type {
+  CategoryBudget,
   Expense,
   FinancialProfile,
   Goal,
@@ -54,6 +55,13 @@ export type FinanceData = {
    * to the cent without re-running the aggregation logic.
    */
   expenseBuckets: ExpenseBuckets;
+  /**
+   * Phase 3.1.2 — per-category monthly budgets the user defined on
+   * /expenses/analytics. The list is small (≤ 13 categories) so we
+   * eagerly load it everywhere FinanceData is fetched; consumers can
+   * compute budget status on demand via buildBudgetStatus.
+   */
+  categoryBudgets: CategoryBudget[];
   isDemo: boolean;
 };
 
@@ -77,7 +85,7 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
       return await buildDemoData();
     }
 
-    const [profileRes, subRes, fpRes, incRes, expRes, goalsRes] = await Promise.all([
+    const [profileRes, subRes, fpRes, incRes, expRes, goalsRes, budgetsRes] = await Promise.all([
       supabase
         .from("profiles")
         .select(
@@ -112,6 +120,10 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("category_budgets")
+        .select("*")
+        .eq("user_id", user.id),
     ]);
 
     // Schema drift fallback: if the profile select errored (typically a
@@ -179,6 +191,9 @@ export const getFinanceData = cache(async (): Promise<FinanceData> => {
       // Computed once here so every downstream consumer sees the
       // same split (avoids drift between dashboard, budget, /coach).
       expenseBuckets: computeExpenseBuckets(expensesList),
+      categoryBudgets: ((budgetsRes.data as CategoryBudget[] | null) ?? []).map(
+        (b) => ({ ...b, monthly_limit: Number(b.monthly_limit) }),
+      ),
       isDemo: false,
     };
   } catch {
@@ -216,6 +231,7 @@ async function buildDemoData(): Promise<FinanceData> {
     expenses: demoExpenses,
     goals: getDemoGoals(tString),
     expenseBuckets: computeExpenseBuckets(demoExpenses),
+    categoryBudgets: [],
     isDemo: true,
   };
 }

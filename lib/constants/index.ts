@@ -35,6 +35,7 @@ export const ROUTES = {
   settings: "/settings",
   subscription: "/settings/subscription",
   memory: "/settings/memory",
+  expenseAnalytics: "/expenses/analytics",
   demo: "/demo",
 } as const;
 

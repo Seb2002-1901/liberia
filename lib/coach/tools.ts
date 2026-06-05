@@ -32,14 +32,33 @@ export const PROPOSE_EXPENSE_TOOL_NAME = "propose_expense" as const;
  * Tool the coach calls when the user reports a real, completed
  * expense (past tense, specific amount). The UI renders a
  * confirmation card; the user decides whether to persist.
+ *
+ * Phase 3.1.2 — the tool now distinguishes fixed recurring expenses
+ * ("Mon loyer est 1500 CHF par mois" → FIXED MONTHLY) from variable
+ * one-off transactions ("J'ai dépensé 42 CHF chez Coop" → VARIABLE
+ * ONE_TIME). Failing to make this distinction logged the loyer as a
+ * one-off and let the recurring backbone of the budget fall through
+ * the cracks.
  */
 export const PROPOSE_EXPENSE_TOOL: Tool = {
   name: PROPOSE_EXPENSE_TOOL_NAME,
   description:
-    "Call this tool when, AND ONLY WHEN, the user reports a REAL completed expense with a specific amount (past tense, e.g. 'J'ai dépensé 42 CHF chez Coop', 'Restaurant 68', 'J'ai payé 12.50 le café'). DO NOT call for hypothetical, future, estimated or planned spending. DO NOT call for recurring expenses (rent, subscriptions) — those go through the normal /expenses page. DO NOT call twice in the same reply. The UI will show the user a confirmation card with Confirm/Cancel buttons; you NEVER persist the expense yourself, NEVER claim it was recorded. Always also write a short natural reply BEFORE calling the tool.",
+    "Call this tool when the user reports an expense — either a REAL completed transaction (past tense, specific amount: 'J'ai dépensé 42 CHF chez Coop', 'Restaurant 68') OR a recurring fixed expense they want recorded (present-tense statement of a monthly/yearly cost: 'Mon loyer est 1500 par mois', 'Mon assurance c'est 220 CHF par mois', 'Je paie 12 CHF par mois pour Netflix'). DO NOT call for hypothetical / future / estimated spending. DO NOT call twice in the same reply. The UI shows a confirmation card with Confirm/Cancel; you NEVER persist the expense yourself, NEVER claim it was recorded. Always write a short natural reply BEFORE calling the tool. Pick `expense_type` carefully: VARIABLE_ONE_TIME for a single past transaction (Coop, restaurant, gas station, café); FIXED_RECURRING for any line that repeats automatically every period (rent, subscription, insurance, phone, loan payment, utilities).",
   input_schema: {
     type: "object",
     properties: {
+      expense_type: {
+        type: "string",
+        enum: ["variable_one_time", "fixed_recurring"],
+        description:
+          "VARIABLE_ONE_TIME for a single past transaction (the typical 'J'ai dépensé X chez Y' case). FIXED_RECURRING for a line that repeats every period (rent, subscription, insurance, phone). When in doubt and the user used past tense with a venue name, prefer variable_one_time.",
+      },
+      frequency: {
+        type: "string",
+        enum: ["one_time", "monthly", "weekly", "yearly"],
+        description:
+          "Cadence. For expense_type=variable_one_time this MUST be 'one_time'. For expense_type=fixed_recurring pick the cadence the user mentioned (default to 'monthly' if unspecified — most household fixed expenses are monthly).",
+      },
       amount: {
         type: "number",
         description:
@@ -53,13 +72,13 @@ export const PROPOSE_EXPENSE_TOOL: Tool = {
       label: {
         type: "string",
         description:
-          "Short descriptive label (merchant, vendor, or brief description). 80 chars max. Examples: 'Coop', 'Restaurant Lac', 'Essence Migrol', 'Café Starbucks'.",
+          "Short descriptive label (merchant, vendor, or brief description). 80 chars max. Examples: 'Coop', 'Restaurant Lac', 'Loyer', 'Netflix', 'Assurance santé'.",
       },
       category: {
         type: "string",
         enum: EXPENSE_CATEGORIES.map((c) => c.id),
         description:
-          "Best-guess category from the allowed list. 'food' for groceries/supermarkets/restaurants, 'transport' for fuel/public transport/taxi, 'leisure' for entertainment/sports/hobbies, 'shopping' for clothes/electronics, 'health' for pharmacy/medical, 'other' when uncertain.",
+          "Best-guess category from the allowed list. 'food' for groceries/supermarkets/restaurants, 'transport' for fuel/public transport/taxi, 'leisure' for entertainment/sports/hobbies, 'shopping' for clothes/electronics, 'health' for pharmacy/medical, 'housing' for rent/mortgage, 'utilities' for energy/internet/phone, 'insurance' for insurance premiums, 'subscriptions' for streaming/SaaS subscriptions, 'other' when uncertain.",
       },
       notes: {
         type: "string",
@@ -67,9 +86,11 @@ export const PROPOSE_EXPENSE_TOOL: Tool = {
           "Optional 1-line free note. Leave empty unless the user provided context worth keeping (e.g. 'cadeau anniv mère').",
       },
     },
-    required: ["amount", "currency", "label", "category"],
+    required: ["expense_type", "frequency", "amount", "currency", "label", "category"],
   },
 };
+
+export type ExpenseTypeId = "variable_one_time" | "fixed_recurring";
 
 /**
  * Validated shape returned to the client after the SDK already
@@ -77,6 +98,8 @@ export const PROPOSE_EXPENSE_TOOL: Tool = {
  * TypeScript type so the client / server action share the contract.
  */
 export interface ProposeExpenseInput {
+  expense_type: ExpenseTypeId;
+  frequency: "one_time" | "monthly" | "weekly" | "yearly";
   amount: number;
   currency: string;
   label: string;

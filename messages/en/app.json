@@ -277,6 +277,15 @@
     "proposeExpense": {
       "title": "Expense detected",
       "categoryLine": "Suggested category: {category}",
+      "typeLine": "Type: {type} · Frequency: {frequency}",
+      "typeFixed": "Fixed / recurring",
+      "typeVariable": "Variable / one-off",
+      "frequency": {
+        "one_time": "One-off",
+        "monthly": "Monthly",
+        "weekly": "Weekly",
+        "yearly": "Yearly"
+      },
       "confirm": "Save",
       "cancel": "Cancel",
       "savedToast": "Expense saved.",
@@ -756,7 +765,57 @@
       "essentialVsPleasure": "Essential vs. pleasure",
       "barEssential": "Essential expenses",
       "barNonEssential": "Non-essential expenses",
-      "barLeftover": "Take-home / Savings"
+      "barLeftover": "Take-home / Savings",
+      "openAnalytics": "Open detailed analytics"
+    },
+    "analytics": {
+      "metaTitle": "Expense analytics",
+      "eyebrow": "Steering",
+      "title": "Detailed expense analytics",
+      "description": "Understand where your money goes and set per-category limits.",
+      "backToBudget": "Back to budget",
+      "demoTitle": "Demo mode",
+      "demoBody": "Create an account to enable detailed analytics on your own expenses.",
+      "period": {
+        "title": "Period",
+        "description": "Pick the analysis window. The \"this month\" numbers match the dashboard and coach exactly.",
+        "week": "This week",
+        "month": "This month",
+        "year": "This year",
+        "twelve_months": "Last 12 months"
+      },
+      "totals": {
+        "fixed": "Recurring expenses",
+        "fixedHint": "Rent, subscriptions, insurance…",
+        "variable": "One-off transactions",
+        "variableHint": "Groceries, restaurants, outings…",
+        "total": "Period total",
+        "totalHint": "{transactions, plural, =0 {No transactions} one {# transaction} other {# transactions}}"
+      },
+      "breakdown": {
+        "title": "Breakdown by category",
+        "description": "Sorted by amount over the selected period.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}"
+      },
+      "budgets": {
+        "title": "Monthly budgets per category",
+        "description": "Set a limit per category. The coach will surface overruns naturally.",
+        "empty": "No budgets set. Add one below to track each category against a target.",
+        "ok": "OK — {remaining} left this month",
+        "warning": "Heads up: {pct}% used ({remaining} left)",
+        "over": "Over by {amount} this month"
+      },
+      "editor": {
+        "title": "Set or update a budget",
+        "categoryLabel": "Category",
+        "amountLabel": "Monthly limit ({currency})",
+        "create": "Add",
+        "update": "Update",
+        "deleteLabel": "Delete budget",
+        "savedToast": "Budget saved.",
+        "deletedToast": "Budget deleted.",
+        "invalidAmount": "Invalid amount."
+      }
     },
     "incomes": {
       "metadata": {

@@ -22,6 +22,8 @@ const expenseCategoryIds = EXPENSE_CATEGORIES.map((c) => c.id) as [
  * happen — DOM tampering, custom client, replay).
  */
 const proposeExpenseSchema = z.object({
+  expense_type: z.enum(["variable_one_time", "fixed_recurring"]),
+  frequency: z.enum(["one_time", "monthly", "weekly", "yearly"]),
   amount: z
     .number()
     .positive("errors.validation.amountPositive")
@@ -39,13 +41,12 @@ export type CoachExpensePayload = z.infer<typeof proposeExpenseSchema>;
 
 /**
  * Inserts the coach-proposed expense once the user clicked Confirm
- * on the in-chat card. Always frequency='one_time' — coach proposals
- * are real-world transactions, not recurring lines (those go through
- * the /expenses page form).
- *
- * Side effects on success: revalidates every surface that displays
- * expense totals so the dashboard, budget and expenses pages reflect
- * the new line on the user's next navigation.
+ * on the in-chat card. The frequency comes from the tool input — the
+ * coach now distinguishes variable_one_time (a single past
+ * transaction) from fixed_recurring (a monthly/yearly recurring
+ * line) explicitly. We trust but verify: the schema below enforces
+ * the same constraint as the system prompt — variable_one_time MUST
+ * be one_time, fixed_recurring MUST NOT be one_time.
  */
 export async function confirmProposedExpenseAction(
   input: CoachExpensePayload,
@@ -56,6 +57,19 @@ export async function confirmProposedExpenseAction(
     console.error(
       "[coach/propose_expense] validation failed:",
       parsed.error.flatten(),
+    );
+    return { ok: false, error: tErr("invalidData") };
+  }
+
+  // Cross-field invariant: one_time iff variable_one_time. Belt-and-
+  // braces — the prompt says the same, but a misbehaving model
+  // shouldn't be able to log a "fixed one_time" or a "variable
+  // monthly" row that would confuse the analytics buckets.
+  const isOneTime = parsed.data.frequency === "one_time";
+  const isVariable = parsed.data.expense_type === "variable_one_time";
+  if (isOneTime !== isVariable) {
+    console.error(
+      `[coach/propose_expense] type/frequency mismatch: ${parsed.data.expense_type}/${parsed.data.frequency}`,
     );
     return { ok: false, error: tErr("invalidData") };
   }
@@ -75,7 +89,7 @@ export async function confirmProposedExpenseAction(
     label: parsed.data.label,
     amount: parsed.data.amount,
     category: parsed.data.category,
-    frequency: "one_time",
+    frequency: parsed.data.frequency,
     notes: parsed.data.notes ?? null,
   });
 

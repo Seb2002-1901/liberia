@@ -12,6 +12,10 @@ import type { FinanceData } from "@/lib/services/finance";
 
 function makeFinanceData(
   buckets: { fixed: number; variable: number; total: number; transactions: number },
+  options: {
+    expenses?: FinanceData["expenses"];
+    categoryBudgets?: FinanceData["categoryBudgets"];
+  } = {},
 ): FinanceData {
   return {
     profile: {
@@ -51,9 +55,10 @@ function makeFinanceData(
       updated_at: "2024-01-01T00:00:00Z",
     },
     incomes: [],
-    expenses: [],
+    expenses: options.expenses ?? [],
     goals: [],
     expenseBuckets: buckets,
+    categoryBudgets: options.categoryBudgets ?? [],
     isDemo: false,
   };
 }
@@ -116,5 +121,84 @@ describe("buildFinanceContext — expense bucket surfacing", () => {
     );
     expect(out.toLowerCase()).toContain("dépenses totales ce mois");
     expect(out.toLowerCase()).toContain("ne confonds jamais les deux");
+  });
+});
+
+describe("buildFinanceContext — per-category budgets (Phase 3.1.2)", () => {
+  it("renders 'Aucun budget' when none configured", () => {
+    const out = buildFinanceContext(
+      makeFinanceData({
+        fixed: 0,
+        variable: 0,
+        total: 0,
+        transactions: 0,
+      }),
+    );
+    expect(out).toContain("Budgets par catégorie");
+    expect(out).toContain("Aucun budget par catégorie défini.");
+  });
+
+  it("flags OK / DÉPASSÉ tags so the coach can quote them naturally", () => {
+    const now = new Date();
+    const monthIso = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 15),
+    ).toISOString();
+    const out = buildFinanceContext(
+      makeFinanceData(
+        { fixed: 0, variable: 730, total: 730, transactions: 4 },
+        {
+          expenses: [
+            {
+              id: "e1",
+              user_id: "u-1",
+              label: "Coop",
+              amount: 420,
+              category: "food",
+              frequency: "one_time",
+              notes: null,
+              created_at: monthIso,
+              updated_at: monthIso,
+            },
+            {
+              id: "e2",
+              user_id: "u-1",
+              label: "Resto",
+              amount: 310,
+              category: "leisure",
+              frequency: "one_time",
+              notes: null,
+              created_at: monthIso,
+              updated_at: monthIso,
+            },
+          ],
+          categoryBudgets: [
+            {
+              id: "b1",
+              user_id: "u-1",
+              category: "food",
+              monthly_limit: 600,
+              currency: "CHF",
+              created_at: monthIso,
+              updated_at: monthIso,
+            },
+            {
+              id: "b2",
+              user_id: "u-1",
+              category: "leisure",
+              monthly_limit: 250,
+              currency: "CHF",
+              created_at: monthIso,
+              updated_at: monthIso,
+            },
+          ],
+        },
+      ),
+    );
+    expect(out).toContain("Alimentation");
+    expect(out).toContain("OK");
+    expect(out).toContain("DÉPASSÉ");
+    // The coach must see the line, the dépassement amount, and the
+    // % so it can rephrase naturally ("dépassé de 60 CHF ce mois").
+    expect(out).toMatch(/Loisirs[^\n]*DÉPASSÉ/);
   });
 });

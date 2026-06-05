@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   ArrowDownCircle,
+  ArrowRight,
   ArrowUpCircle,
   Layers,
   Receipt,
@@ -11,10 +13,11 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
-import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import {
   calculateExpenseRatio,
@@ -33,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BudgetPage() {
   const t = await getTranslations("app.finance.budget");
-  const tDashboard = await getTranslations("app.dashboard.stats");
+  const tDashboard = await getTranslations("dashboard.stats");
   const data = await getFinanceData();
 
   const monthlyIncome = totalMonthly(data.incomes);
@@ -130,6 +133,14 @@ export default async function BudgetPage() {
           icon={<Receipt className="h-4 w-4" />}
           hint={tDashboard("transactionsHint")}
         />
+      </div>
+
+      <div className="flex justify-end">
+        <Button asChild variant="outline" size="sm">
+          <Link href={ROUTES.expenseAnalytics}>
+            {t("openAnalytics")} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

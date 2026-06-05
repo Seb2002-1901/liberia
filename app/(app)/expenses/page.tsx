@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ExpensesPage() {
   const t = await getTranslations("app.finance.expenses");
-  const tDashboard = await getTranslations("app.dashboard.stats");
+  const tDashboard = await getTranslations("dashboard.stats");
   const data = await getFinanceData();
   const { fixed, variable, total, transactions } = data.expenseBuckets;
 

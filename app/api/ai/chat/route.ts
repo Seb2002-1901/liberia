@@ -335,10 +335,12 @@ export async function POST(request: Request) {
               ) {
                 const input = block.input as ProposeExpenseInput;
                 console.log(
-                  `[coach/propose_expense] amount=${input.amount} ${input.currency} label=${input.label} category=${input.category}`,
+                  `[coach/propose_expense] type=${input.expense_type} freq=${input.frequency} amount=${input.amount} ${input.currency} label=${input.label} category=${input.category}`,
                 );
                 send("propose_expense", {
                   toolUseId: block.id,
+                  expense_type: input.expense_type,
+                  frequency: input.frequency,
                   amount: input.amount,
                   currency: input.currency,
                   label: input.label,

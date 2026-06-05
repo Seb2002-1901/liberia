@@ -277,6 +277,15 @@
     "proposeExpense": {
       "title": "Ausgabe erkannt",
       "categoryLine": "Vorgeschlagene Kategorie: {category}",
+      "typeLine": "Typ: {type} · Frequenz: {frequency}",
+      "typeFixed": "Fix / wiederkehrend",
+      "typeVariable": "Variabel / einmalig",
+      "frequency": {
+        "one_time": "Einmalig",
+        "monthly": "Monatlich",
+        "weekly": "Wöchentlich",
+        "yearly": "Jährlich"
+      },
       "confirm": "Speichern",
       "cancel": "Abbrechen",
       "savedToast": "Ausgabe gespeichert.",
@@ -756,7 +765,57 @@
       "essentialVsPleasure": "Essenziell vs. Vergnügen",
       "barEssential": "Essenzielle Ausgaben",
       "barNonEssential": "Nicht-essenzielle Ausgaben",
-      "barLeftover": "Verfügbar / Sparen"
+      "barLeftover": "Verfügbar / Sparen",
+      "openAnalytics": "Detaillierte Analyse öffnen"
+    },
+    "analytics": {
+      "metaTitle": "Ausgabenanalyse",
+      "eyebrow": "Steuerung",
+      "title": "Detaillierte Ausgabenanalyse",
+      "description": "Versteh, wohin dein Geld geht, und setz Limits pro Kategorie.",
+      "backToBudget": "Zurück zum Budget",
+      "demoTitle": "Demo-Modus",
+      "demoBody": "Erstelle ein Konto, um die detaillierte Analyse für deine eigenen Ausgaben zu aktivieren.",
+      "period": {
+        "title": "Zeitraum",
+        "description": "Wähle das Analysefenster. Die Zahlen für \"diesen Monat\" stimmen exakt mit Dashboard und Coach überein.",
+        "week": "Diese Woche",
+        "month": "Diesen Monat",
+        "year": "Dieses Jahr",
+        "twelve_months": "Letzte 12 Monate"
+      },
+      "totals": {
+        "fixed": "Wiederkehrende Ausgaben",
+        "fixedHint": "Miete, Abos, Versicherungen…",
+        "variable": "Einmalige Transaktionen",
+        "variableHint": "Einkäufe, Restaurants, Ausgänge…",
+        "total": "Gesamt im Zeitraum",
+        "totalHint": "{transactions, plural, =0 {Keine Transaktionen} one {# Transaktion} other {# Transaktionen}}"
+      },
+      "breakdown": {
+        "title": "Aufschlüsselung nach Kategorie",
+        "description": "Nach Betrag sortiert über den gewählten Zeitraum.",
+        "transactions": "{count, plural, one {# Tx} other {# Tx}}"
+      },
+      "budgets": {
+        "title": "Monatliche Budgets pro Kategorie",
+        "description": "Setze ein Limit pro Kategorie. Der Coach weist dich auf Überschreitungen hin.",
+        "empty": "Keine Budgets gesetzt. Füge unten eines hinzu, um Kategorien gegen Ziele zu verfolgen.",
+        "ok": "OK — {remaining} diesen Monat übrig",
+        "warning": "Achtung: {pct}% verbraucht ({remaining} übrig)",
+        "over": "Diesen Monat um {amount} überzogen"
+      },
+      "editor": {
+        "title": "Budget setzen oder ändern",
+        "categoryLabel": "Kategorie",
+        "amountLabel": "Monatslimit ({currency})",
+        "create": "Hinzufügen",
+        "update": "Aktualisieren",
+        "deleteLabel": "Budget löschen",
+        "savedToast": "Budget gespeichert.",
+        "deletedToast": "Budget gelöscht.",
+        "invalidAmount": "Ungültiger Betrag."
+      }
     },
     "incomes": {
       "metadata": {

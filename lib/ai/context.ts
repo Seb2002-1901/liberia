@@ -12,6 +12,7 @@ import {
 import { EXPENSE_CATEGORIES, GOAL_TYPES, INCOME_CATEGORIES } from "@/lib/constants";
 import { totalMonthly } from "@/lib/services/finance";
 import { formatCurrency, formatPercent } from "@/lib/utils";
+import { buildBudgetStatus } from "@/lib/calculations/analytics";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -127,6 +128,41 @@ export function buildFinanceContext(
     [goalsList, memoryGoalsList].filter(Boolean).join("\n") ||
     "Aucun objectif actif.";
 
+  // Phase 3.1.2 — surface the user's per-category budgets and their
+  // current status so the coach can answer "ai-je respecté mon
+  // budget X ce mois ?". Categories without a budget configured are
+  // not listed — keeps the prompt short and signals to the model that
+  // "no budget set" is a legitimate state, not data missing.
+  const budgetRows = buildBudgetStatus(
+    data.expenses,
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+  );
+  const budgetsSection =
+    budgetRows.length === 0
+      ? "Aucun budget par catégorie défini."
+      : budgetRows
+          .map((b) => {
+            const label =
+              EXPENSE_CATEGORIES.find((c) => c.id === b.category)?.label ??
+              b.category;
+            const tag =
+              b.status === "over"
+                ? "DÉPASSÉ"
+                : b.status === "warning"
+                  ? "PROCHE LIMITE"
+                  : "OK";
+            const pct = Math.round(b.ratio * 100);
+            const remain =
+              b.remaining >= 0
+                ? `${fmt(b.remaining)} restant`
+                : `${fmt(-b.remaining)} de dépassement`;
+            return `- ${label} : ${fmt(b.spent)} / ${fmt(b.limit)} (${pct}%) — ${tag}, ${remain}`;
+          })
+          .join("\n");
+
   return `# Contexte financier de l'utilisateur
 
 Devise : ${currency}
@@ -155,6 +191,9 @@ ${incomeByLabel || "Aucun revenu enregistré."}
 
 ## Objectifs actuels
 ${goalsSection}
+
+## Budgets par catégorie (ce mois)
+${budgetsSection}
 
 ## Règles importantes
 - Si tu cites un montant, prends-le dans la liste ci-dessus. N'invente pas.

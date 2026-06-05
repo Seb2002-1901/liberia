@@ -277,6 +277,15 @@
     "proposeExpense": {
       "title": "Dépense détectée",
       "categoryLine": "Catégorie suggérée : {category}",
+      "typeLine": "Type : {type} · Fréquence : {frequency}",
+      "typeFixed": "Fixe / récurrente",
+      "typeVariable": "Variable / ponctuelle",
+      "frequency": {
+        "one_time": "Ponctuel",
+        "monthly": "Mensuel",
+        "weekly": "Hebdomadaire",
+        "yearly": "Annuel"
+      },
       "confirm": "Enregistrer",
       "cancel": "Annuler",
       "savedToast": "Dépense enregistrée.",
@@ -756,7 +765,57 @@
       "essentialVsPleasure": "Essentiel vs. plaisir",
       "barEssential": "Dépenses essentielles",
       "barNonEssential": "Dépenses non essentielles",
-      "barLeftover": "Reste à vivre / Épargne"
+      "barLeftover": "Reste à vivre / Épargne",
+      "openAnalytics": "Voir l'analyse détaillée"
+    },
+    "analytics": {
+      "metaTitle": "Analyse des dépenses",
+      "eyebrow": "Pilotage",
+      "title": "Analyse détaillée des dépenses",
+      "description": "Comprends où part ton argent et fixe-toi des limites par catégorie.",
+      "backToBudget": "Retour au budget",
+      "demoTitle": "Mode démo",
+      "demoBody": "Crée un compte pour activer l'analyse détaillée de tes propres dépenses.",
+      "period": {
+        "title": "Période",
+        "description": "Choisis la période d'analyse. Les chiffres « ce mois » correspondent à ceux du dashboard et du coach.",
+        "week": "Cette semaine",
+        "month": "Ce mois",
+        "year": "Cette année",
+        "twelve_months": "12 derniers mois"
+      },
+      "totals": {
+        "fixed": "Charges récurrentes",
+        "fixedHint": "Loyer, abonnements, assurances…",
+        "variable": "Dépenses ponctuelles",
+        "variableHint": "Courses, restaurants, sorties…",
+        "total": "Total de la période",
+        "totalHint": "{transactions, plural, =0 {Aucune transaction} one {# transaction} other {# transactions}}"
+      },
+      "breakdown": {
+        "title": "Répartition par catégorie",
+        "description": "Triées par montant décroissant sur la période sélectionnée.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}"
+      },
+      "budgets": {
+        "title": "Budgets mensuels par catégorie",
+        "description": "Définis une limite par catégorie. Le coach te signalera les dépassements naturellement.",
+        "empty": "Aucun budget défini. Ajoute-en un ci-dessous pour suivre tes objectifs catégorie par catégorie.",
+        "ok": "OK — {remaining} restant ce mois",
+        "warning": "Attention : {pct}% utilisé ({remaining} restant)",
+        "over": "Dépassé de {amount} ce mois"
+      },
+      "editor": {
+        "title": "Définir ou modifier un budget",
+        "categoryLabel": "Catégorie",
+        "amountLabel": "Limite mensuelle ({currency})",
+        "create": "Ajouter",
+        "update": "Modifier",
+        "deleteLabel": "Supprimer le budget",
+        "savedToast": "Budget enregistré.",
+        "deletedToast": "Budget supprimé.",
+        "invalidAmount": "Montant invalide."
+      }
     },
     "incomes": {
       "metadata": {

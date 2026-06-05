@@ -277,6 +277,15 @@
     "proposeExpense": {
       "title": "Spesa rilevata",
       "categoryLine": "Categoria suggerita: {category}",
+      "typeLine": "Tipo: {type} · Frequenza: {frequency}",
+      "typeFixed": "Fissa / ricorrente",
+      "typeVariable": "Variabile / occasionale",
+      "frequency": {
+        "one_time": "Occasionale",
+        "monthly": "Mensile",
+        "weekly": "Settimanale",
+        "yearly": "Annuale"
+      },
       "confirm": "Salva",
       "cancel": "Annulla",
       "savedToast": "Spesa salvata.",
@@ -756,7 +765,57 @@
       "essentialVsPleasure": "Essenziale vs. piacere",
       "barEssential": "Spese essenziali",
       "barNonEssential": "Spese non essenziali",
-      "barLeftover": "Disponibile / Risparmio"
+      "barLeftover": "Disponibile / Risparmio",
+      "openAnalytics": "Apri analisi dettagliata"
+    },
+    "analytics": {
+      "metaTitle": "Analisi delle spese",
+      "eyebrow": "Pilotaggio",
+      "title": "Analisi dettagliata delle spese",
+      "description": "Capisci dove vanno i tuoi soldi e fissa limiti per categoria.",
+      "backToBudget": "Torna al budget",
+      "demoTitle": "Modalità demo",
+      "demoBody": "Crea un account per attivare l'analisi dettagliata delle tue spese.",
+      "period": {
+        "title": "Periodo",
+        "description": "Scegli la finestra di analisi. I numeri \"questo mese\" coincidono esattamente con dashboard e coach.",
+        "week": "Questa settimana",
+        "month": "Questo mese",
+        "year": "Quest'anno",
+        "twelve_months": "Ultimi 12 mesi"
+      },
+      "totals": {
+        "fixed": "Spese ricorrenti",
+        "fixedHint": "Affitto, abbonamenti, assicurazioni…",
+        "variable": "Transazioni occasionali",
+        "variableHint": "Spesa, ristoranti, uscite…",
+        "total": "Totale del periodo",
+        "totalHint": "{transactions, plural, =0 {Nessuna transazione} one {# transazione} other {# transazioni}}"
+      },
+      "breakdown": {
+        "title": "Ripartizione per categoria",
+        "description": "Ordinata per importo sul periodo selezionato.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}"
+      },
+      "budgets": {
+        "title": "Budget mensili per categoria",
+        "description": "Imposta un limite per categoria. Il coach segnalerà gli sforamenti in modo naturale.",
+        "empty": "Nessun budget impostato. Aggiungine uno qui sotto per seguire ogni categoria.",
+        "ok": "OK — {remaining} disponibili questo mese",
+        "warning": "Attenzione: {pct}% usato ({remaining} rimanenti)",
+        "over": "Sforato di {amount} questo mese"
+      },
+      "editor": {
+        "title": "Imposta o modifica un budget",
+        "categoryLabel": "Categoria",
+        "amountLabel": "Limite mensile ({currency})",
+        "create": "Aggiungi",
+        "update": "Aggiorna",
+        "deleteLabel": "Elimina budget",
+        "savedToast": "Budget salvato.",
+        "deletedToast": "Budget eliminato.",
+        "invalidAmount": "Importo non valido."
+      }
     },
     "incomes": {
       "metadata": {

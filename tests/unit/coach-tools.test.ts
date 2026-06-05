@@ -18,10 +18,44 @@ describe("PROPOSE_EXPENSE_TOOL — Anthropic tool contract", () => {
     expect(PROPOSE_EXPENSE_TOOL_NAME).toBe("propose_expense");
   });
 
-  it("declares the four required fields the server action expects", () => {
+  it("declares the six required fields the server action expects", () => {
+    // Phase 3.1.2 added expense_type + frequency so the server can
+    // tell "rent" (fixed_recurring, monthly) from "Coop" (variable_
+    // one_time, one_time) without re-classifying server-side.
     expect(PROPOSE_EXPENSE_TOOL.input_schema.required).toEqual(
-      expect.arrayContaining(["amount", "currency", "label", "category"]),
+      expect.arrayContaining([
+        "expense_type",
+        "frequency",
+        "amount",
+        "currency",
+        "label",
+        "category",
+      ]),
     );
+  });
+
+  it("constrains expense_type to fixed_recurring | variable_one_time", () => {
+    const props = PROPOSE_EXPENSE_TOOL.input_schema.properties as Record<
+      string,
+      { enum?: string[] }
+    >;
+    expect(props.expense_type?.enum?.slice().sort()).toEqual([
+      "fixed_recurring",
+      "variable_one_time",
+    ]);
+  });
+
+  it("constrains frequency to the four legal cadences", () => {
+    const props = PROPOSE_EXPENSE_TOOL.input_schema.properties as Record<
+      string,
+      { enum?: string[] }
+    >;
+    expect(props.frequency?.enum?.slice().sort()).toEqual([
+      "monthly",
+      "one_time",
+      "weekly",
+      "yearly",
+    ]);
   });
 
   it("exposes a category enum that matches EXPENSE_CATEGORIES one-to-one", () => {

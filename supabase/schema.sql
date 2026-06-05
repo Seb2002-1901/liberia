@@ -789,6 +789,43 @@ drop policy if exists "user_memory_entries_self_delete" on public.user_memory_en
 create policy "user_memory_entries_self_delete" on public.user_memory_entries
   for delete using (auth.uid() = user_id);
 
+-- =====================================================
+-- category_budgets (Phase 3.1.2) — per-category monthly limits
+-- =====================================================
+create table if not exists public.category_budgets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  category text not null,
+  monthly_limit numeric(12,2) not null check (monthly_limit >= 0),
+  currency text not null default 'CHF',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (user_id, category)
+);
+
+create index if not exists idx_category_budgets_user
+  on public.category_budgets(user_id);
+
+drop trigger if exists set_updated_at_category_budgets on public.category_budgets;
+create trigger set_updated_at_category_budgets
+before update on public.category_budgets
+for each row execute function public.handle_updated_at();
+
+alter table public.category_budgets enable row level security;
+
+drop policy if exists "category_budgets_self_select" on public.category_budgets;
+create policy "category_budgets_self_select" on public.category_budgets
+  for select using (auth.uid() = user_id);
+drop policy if exists "category_budgets_self_insert" on public.category_budgets;
+create policy "category_budgets_self_insert" on public.category_budgets
+  for insert with check (auth.uid() = user_id);
+drop policy if exists "category_budgets_self_update" on public.category_budgets;
+create policy "category_budgets_self_update" on public.category_budgets
+  for update using (auth.uid() = user_id);
+drop policy if exists "category_budgets_self_delete" on public.category_budgets;
+create policy "category_budgets_self_delete" on public.category_budgets
+  for delete using (auth.uid() = user_id);
+
 -- user_memory: self-only CRUD. The data is sensitive personalization
 -- input — never shared, never cross-user-readable.
 drop policy if exists "user_memory_self_select" on public.user_memory;

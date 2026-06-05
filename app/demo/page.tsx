@@ -55,7 +55,7 @@ export default async function DemoDashboardPage() {
   const [t, tData, tDashboard] = await Promise.all([
     getTranslations("app.demo"),
     getTranslations("app.demo.data"),
-    getTranslations("app.dashboard.stats"),
+    getTranslations("dashboard.stats"),
   ]);
   const tDataString = (key: string) => tData(key);
   const demoIncomes = getDemoIncomes(tDataString);

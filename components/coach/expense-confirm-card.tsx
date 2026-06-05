@@ -18,8 +18,17 @@ import { confirmProposedExpenseAction } from "@/app/actions/coach-actions";
  * the full expense form inline.
  */
 
+export type CoachExpenseType = "variable_one_time" | "fixed_recurring";
+export type CoachExpenseFrequency =
+  | "one_time"
+  | "monthly"
+  | "weekly"
+  | "yearly";
+
 export interface PendingExpense {
   toolUseId: string;
+  expense_type: CoachExpenseType;
+  frequency: CoachExpenseFrequency;
   amount: number;
   currency: string;
   label: string;
@@ -55,6 +64,8 @@ export function ExpenseConfirmCard({
   const onConfirm = async () => {
     setSubmitting(true);
     const res = await confirmProposedExpenseAction({
+      expense_type: pending.expense_type,
+      frequency: pending.frequency,
       amount: pending.amount,
       currency: pending.currency,
       label: pending.label,
@@ -119,6 +130,15 @@ export function ExpenseConfirmCard({
               currency: pending.currency,
             })}{" "}
             · {pending.label}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t("typeLine", {
+              type:
+                pending.expense_type === "fixed_recurring"
+                  ? t("typeFixed")
+                  : t("typeVariable"),
+              frequency: t(`frequency.${pending.frequency}`),
+            })}
           </p>
           <p className="text-xs text-muted-foreground">
             {t("categoryLine", { category: categoryLabel })}

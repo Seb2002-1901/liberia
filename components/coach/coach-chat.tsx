@@ -240,10 +240,17 @@ export function CoachChat({
                   typeof parsed.amount === "number" &&
                   typeof parsed.currency === "string" &&
                   typeof parsed.label === "string" &&
-                  typeof parsed.category === "string"
+                  typeof parsed.category === "string" &&
+                  (parsed.expense_type === "variable_one_time" ||
+                    parsed.expense_type === "fixed_recurring") &&
+                  ["one_time", "monthly", "weekly", "yearly"].includes(
+                    parsed.frequency,
+                  )
                 ) {
                   pendingFromStream.push({
                     toolUseId: parsed.toolUseId,
+                    expense_type: parsed.expense_type,
+                    frequency: parsed.frequency,
                     amount: parsed.amount,
                     currency: parsed.currency,
                     label: parsed.label,
