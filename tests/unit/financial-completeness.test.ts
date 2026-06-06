@@ -124,19 +124,18 @@ describe("computeFinancialCompleteness — barème + boundaries", () => {
     expect(COMPLETENESS_MAX_SCORE).toBe(100);
   });
 
-  it("treats the canonical 'rent + food + income' partial profile as ~40", () => {
+  it("treats the canonical 'rent + food + income' partial profile as < 50 on optimale", () => {
     const r = computeFinancialCompleteness(
       buildInput({
         incomes: [income()],
         expenses: [exp("housing"), exp("food")],
       }),
     );
-    // income 15 + housing 15 + food 10 = 40
+    // Phase 3.1.6 — optimale: income 15 + housing 15 + food 10 = 40.
     expect(r.score).toBe(40);
-    expect(r.reliability).toBe("low");
   });
 
-  it("the bug-case profile (rent + tiny food) lands well under 70", () => {
+  it("the bug-case profile (rent + tiny food) lands well under 70 on optimale", () => {
     // The brief's real-world example: only 3 areas covered.
     const r = computeFinancialCompleteness(
       buildInput({
@@ -148,7 +147,6 @@ describe("computeFinancialCompleteness — barème + boundaries", () => {
       }),
     );
     expect(r.score).toBeLessThan(70);
-    expect(r.reliability).toBe("low");
   });
 });
 
@@ -185,84 +183,10 @@ describe("computeFinancialCompleteness — area mapping", () => {
   });
 });
 
-describe("computeFinancialCompleteness — reliability thresholds", () => {
-  it("score 90+ → reliability 'high'", () => {
-    const r = computeFinancialCompleteness(
-      buildInput({
-        incomes: [income()],
-        expenses: [
-          exp("housing"),
-          exp("food"),
-          exp("insurance"),
-          exp("transport"),
-          exp("utilities"),
-          exp("subscriptions"),
-          exp("leisure"),
-        ],
-        goals: [goal()],
-      }),
-    );
-    // income 15 + housing 15 + food 10 + insurance 15 + transport 10
-    //  + telecom 10 + subscriptions 10 + leisure 5 + goal 5 = 95
-    expect(r.score).toBe(95);
-    expect(r.reliability).toBe("high");
-  });
-
-  it("score 70-89 → reliability 'medium'", () => {
-    const r = computeFinancialCompleteness(
-      buildInput({
-        incomes: [income()],
-        expenses: [
-          exp("housing"),
-          exp("food"),
-          exp("insurance"),
-          exp("transport"),
-          exp("utilities"),
-        ],
-      }),
-    );
-    // 15+15+10+15+10+10 = 75
-    expect(r.score).toBe(75);
-    expect(r.reliability).toBe("medium");
-  });
-
-  it("score just under 70 → 'low' (boundary is sharp)", () => {
-    const r = computeFinancialCompleteness(
-      buildInput({
-        incomes: [income()],
-        expenses: [
-          exp("housing"),
-          exp("food"),
-          exp("insurance"),
-          exp("transport"),
-        ],
-      }),
-    );
-    // 15+15+10+15+10 = 65
-    expect(r.score).toBe(65);
-    expect(r.reliability).toBe("low");
-  });
-
-  it("score exactly 70 → 'medium' (inclusive lower bound)", () => {
-    // income 15 + housing 15 + food 10 + transport 10
-    //  + telecom 10 + leisure 5 + goal 5 = 70
-    const r = computeFinancialCompleteness(
-      buildInput({
-        incomes: [income()],
-        expenses: [
-          exp("housing"),
-          exp("food"),
-          exp("transport"),
-          exp("utilities"),
-          exp("leisure"),
-        ],
-        goals: [goal()],
-      }),
-    );
-    expect(r.score).toBe(70);
-    expect(r.reliability).toBe("medium");
-  });
-});
+// Phase 3.1.6 — old single-score reliability thresholds removed.
+// Reliability is now anchored on structurelle (the 5 critical areas)
+// rather than on the optimale headline. See tests/unit/completeness
+// -v2.test.ts for the new behaviour.
 
 describe("computeFinancialCompleteness — missing severity", () => {
   it("marks insurance/income/housing missing as HIGH severity", () => {

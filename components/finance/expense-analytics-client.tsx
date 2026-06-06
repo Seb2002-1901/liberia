@@ -44,6 +44,11 @@ import {
   computeFinancialCompleteness,
   type CompletenessResult,
 } from "@/lib/calculations/completeness";
+import {
+  detectAnomalies,
+  type Anomaly,
+} from "@/lib/calculations/anomalies";
+import { frequencyMultiplier } from "@/lib/calculations/aggregate";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryId } from "@/lib/constants";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -70,6 +75,9 @@ interface Props {
   categoryBudgets: CategoryBudget[];
   incomes: Income[];
   goals: Goal[];
+  /** Snapshot fields the anomaly + opportunity engines need. */
+  currentSavings: number;
+  runwayMonths: number;
   currency: string;
 }
 
@@ -78,6 +86,8 @@ export function ExpenseAnalyticsClient({
   categoryBudgets: initialBudgets,
   incomes,
   goals,
+  currentSavings,
+  runwayMonths,
   currency,
 }: Props) {
   const t = useTranslations("app.finance.analytics");
@@ -172,6 +182,33 @@ export function ExpenseAnalyticsClient({
         categoryBudgets: budgets,
       }),
     [incomes, expenses, goals, budgets],
+  );
+
+  // Phase 3.1.6 — anomalies. The list is small (≤ 5) and the rules
+  // are deterministic; recompute on every input change.
+  const monthlyIncome = React.useMemo(
+    () =>
+      incomes.reduce(
+        (s, i) => s + i.amount * frequencyMultiplier(i.frequency),
+        0,
+      ),
+    [incomes],
+  );
+  const anomalies = React.useMemo(
+    () =>
+      detectAnomalies({
+        expenses,
+        expenseBuckets: {
+          fixed: monthTotals.fixed,
+          variable: monthTotals.variable,
+          total: monthTotals.total,
+          transactions: monthTotals.transactions,
+        },
+        monthlyIncome,
+        currentSavings,
+        runwayMonths,
+      }),
+    [expenses, monthTotals, monthlyIncome, currentSavings, runwayMonths],
   );
 
   const onBudgetSaved = (next: CategoryBudget) => {
@@ -348,12 +385,15 @@ export function ExpenseAnalyticsClient({
 
       <ReliabilityBanner completeness={completeness} />
 
+      <AnomaliesCard anomalies={anomalies} currency={currency} />
+
       <PerformanceTable budgetStatus={budgetStatus} currency={currency} />
 
       <PotentialSavingsCard
         savings={potentialSavings}
         opportunitiesCount={opportunities.length}
         currency={currency}
+        canEstimateSavings={completeness.canEstimateSavings}
       />
 
       <OpportunitiesCard opportunities={opportunities} currency={currency} />
@@ -746,6 +786,70 @@ function ReliabilityBanner({
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Phase 3.1.6 — anomaly signals (calm, non-judgemental)                       */
+/* -------------------------------------------------------------------------- */
+
+function AnomaliesCard({
+  anomalies,
+  currency,
+}: {
+  anomalies: Anomaly[];
+  currency: string;
+}) {
+  const t = useTranslations("app.finance.analytics.anomalies");
+  const tKind = useTranslations("app.finance.analytics.anomalies.kind");
+  const fmt = useFormatter();
+  if (anomalies.length === 0) return null;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-3">
+          {anomalies.map((a, i) => {
+            const payload: Record<string, string | number> = { ...a.payload };
+            for (const key of ["amount", "income", "median", "monthly"]) {
+              const v = payload[key];
+              if (typeof v === "number") {
+                payload[key] = fmt.number(v, {
+                  style: "currency",
+                  currency,
+                });
+              }
+            }
+            if (typeof payload.category === "string") {
+              const cat = EXPENSE_CATEGORIES.find(
+                (c) => c.id === payload.category,
+              );
+              if (cat) payload.category = cat.label;
+            }
+            return (
+              <li
+                key={`${a.kind}-${i}`}
+                className={cn(
+                  "rounded-xl border p-3 text-sm",
+                  a.severity === "warning"
+                    ? "border-rose-500/40 bg-rose-500/5"
+                    : "border-border/60 bg-card/40",
+                )}
+              >
+                <p className="font-medium">{tKind(`${a.kind}.title`, payload)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {tKind(`${a.kind}.body`, payload)}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-3 text-[11px] text-muted-foreground">{t("caveat")}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Phase 3.1.4 — potential savings (aggregate impact)                          */
 /* -------------------------------------------------------------------------- */
 
@@ -753,12 +857,29 @@ function PotentialSavingsCard({
   savings,
   opportunitiesCount,
   currency,
+  canEstimateSavings,
 }: {
   savings: PotentialSavings;
   opportunitiesCount: number;
   currency: string;
+  canEstimateSavings: boolean;
 }) {
   const t = useTranslations("app.finance.analytics.potentialSavings");
+  // Phase 3.1.6 — when data is too thin to credibly publish a savings
+  // figure (détaillée < 70%), we replace the headline with the
+  // explicit "Estimation indisponible" box. Same width, same
+  // position, just no number. Avoids the "8 CHF/month" false
+  // signal the brief flagged.
+  if (!canEstimateSavings) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("blocked.title")}</CardTitle>
+          <CardDescription>{t("blocked.body")}</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
   if (opportunitiesCount === 0 || savings.monthly <= 0) {
     return null;
   }

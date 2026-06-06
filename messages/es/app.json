@@ -910,6 +910,37 @@
           "high": "Alta",
           "medium": "Media",
           "low": "Baja"
+        },
+        "blocked": {
+          "title": "Estimación no disponible",
+          "body": "Completa primero tus datos (seguros, telecom, suscripciones…) para una proyección fiable. Si no, el número probablemente sería erróneo."
+        }
+      },
+      "anomalies": {
+        "title": "Datos por verificar",
+        "description": "Señales factuales, sin juicio. Verifica importes y frecuencias antes de sacar conclusiones.",
+        "caveat": "Puedes ignorar una señal que coincida con tu realidad. Ninguna señal es automáticamente un error.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Vivienda al {ratio}% de tus ingresos",
+            "body": "{amount} / mes en vivienda. Verifica el alquiler o la estimación de ingresos — por encima del 50% el margen es muy ajustado."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} representa el {share}% de tus gastos",
+            "body": "Una sola categoría absorbe casi todo. Probablemente señal de que otras categorías aún no están registradas."
+          },
+          "unusual_high_one_time": {
+            "title": "Transacción puntual inusualmente alta",
+            "body": "« {label} » a {amount} — mediana de las otras: {median}. Si es voluntario, ignora. Si no, verifica el importe."
+          },
+          "fixed_expense_outlier": {
+            "title": "Gasto fijo « {label} » a verificar",
+            "body": "{monthly} / mes ({ratio}% de los ingresos). Suele indicar una frecuencia mal introducida (mensual/semanal/anual)."
+          },
+          "high_income_low_emergency": {
+            "title": "Ingresos altos pero fondo de emergencia muy fino",
+            "body": "{income} / mes y solo {months} meses de cobertura. ¿Adónde va el excedente? ¿Ahorro? ¿Inversiones? ¿Gastos no registrados?"
+          }
         }
       },
       "history": {

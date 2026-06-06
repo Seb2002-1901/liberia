@@ -7,6 +7,9 @@ import type {
 
 /**
  * Phase 3.1.5 — financial completeness.
+ * Phase 3.1.6 — split into three scores so the coach can pick the
+ * right one for the right question (structural confidence vs.
+ * optimisation depth).
  *
  * The optimisation engine is only as good as the data the user has
  * actually entered. With Revenus 25 000, Logement 15 000 and
@@ -17,18 +20,35 @@ import type {
  * recommendation lands, so the coach and the UI know to be modest
  * about their conclusions.
  *
+ * Three scores (each 0–100, weights sum to exactly 100):
+ *
+ *   - Structurelle (V2) — the 5 areas that model the household:
+ *       income · housing · insurance · food · transport
+ *     The coach uses THIS one to gate confidence: "do I know enough
+ *     about the user's basic structure to talk numbers?". A high
+ *     structurelle means a reasonable scaffold; missing telecom or
+ *     leisure doesn't make the analysis "unreliable" structurally.
+ *
+ *   - Détaillée — structurelle + telecom + subscriptions + leisure.
+ *     The depth needed for credible OPTIMISATION analysis. When
+ *     this drops below 70 we hide potential-savings projections to
+ *     avoid the "tu peux économiser 8 CHF" failure mode the brief
+ *     called out — those numbers are technically true but
+ *     economically not credible.
+ *
+ *   - Optimale — détaillée + goal + per-category budget. The
+ *     "fully set up" score: structurelle + détaillée + behavioural
+ *     scaffolding (goals + budgets) the discipline / opportunity
+ *     engine needs to be at its best.
+ *
  * Two pure helpers:
- *   - computeFinancialCompleteness — score 0-100 with detected and
- *     missing areas + a reliability tier.
+ *   - computeFinancialCompleteness — all three scores + detected /
+ *     missing areas + reliability tier derived from the STRUCTURELLE
+ *     score (the headline the coach trusts).
  *   - detectMissingFinancialAreas — just the missing list with
  *     severity, suitable for the dashboard/coach context.
  *
  * Pure: no I/O, no clock. Easy to unit-test, deterministic.
- *
- * Vocabulary note: "telecom" maps to EXPENSE_CATEGORIES.utilities
- * (factures & énergie, includes phone/internet/cable). We surface
- * the canonical EXPENSE_CATEGORIES id everywhere so the UI can
- * reuse its existing label/i18n machinery without a new mapping.
  */
 
 /** Finance areas the completeness score evaluates. */
@@ -61,50 +81,126 @@ export interface CompletenessInput {
 }
 
 export interface CompletenessResult {
-  /** Integer 0-100. */
+  /** Integer 0-100 — the headline the coach uses by default. */
   score: number;
+  /**
+   * Phase 3.1.6 — three tiered scores so the coach can pick the
+   * right one for the right question.
+   */
+  structurelle: number;
+  detaillee: number;
+  optimale: number;
   /** Areas present in the user's data. */
   detected: readonly FinancialArea[];
   /** Areas absent, with severity classification. */
   missing: readonly MissingArea[];
   /**
-   * Reliability tier the analytics page / coach use to decide
-   * whether to surface a "your data may be incomplete" warning:
-   *   - high   when score >= 90
-   *   - medium when score 70-89
-   *   - low    when score <  70
-   *
-   * Locked to those thresholds because the UI palette + the coach
-   * rule both depend on them.
+   * Tier derived from STRUCTURELLE (not Optimale!) so we never tell
+   * the user their analysis is unreliable just because they haven't
+   * yet defined a "goal" — the structural model is what matters for
+   * trust:
+   *   - high   when structurelle >= 90
+   *   - medium when structurelle 70-89
+   *   - low    when structurelle <  70
    */
   reliability: ReliabilityTier;
+  /**
+   * Whether the user has enough DEPTH (détaillée >= 70) for the
+   * optimisation engine to credibly publish potential savings.
+   * Below that threshold the UI hides the projection and the coach
+   * pivots to "complete your data first".
+   */
+  canEstimateSavings: boolean;
 }
 
 /**
- * Weight + detection rule per area. The total of all weights is
- * exactly 100 — enforced by the test `weights sum to 100`.
+ * Per-area metadata. Weights per score tier; not every area
+ * contributes to every score:
+ *   - structurelle: income, housing, insurance, food, transport.
+ *   - détaillée:    + telecom, subscriptions, leisure.
+ *   - optimale:     + goal, category_budget.
+ *
+ * Within each tier the weights sum to EXACTLY 100, locked by tests.
  */
 interface AreaRule {
-  weight: number;
-  /** Maps to an EXPENSE_CATEGORIES id (or "income" / "goal" / "category_budget"). */
   category: string;
   severity: Severity;
+  /** 0 when the area doesn't contribute to the score in this tier. */
+  weightStructurelle: number;
+  weightDetaillee: number;
+  weightOptimale: number;
 }
 
 const RULES: Record<FinancialArea, AreaRule> = {
-  income: { weight: 15, category: "income", severity: "high" },
-  housing: { weight: 15, category: "housing", severity: "high" },
-  food: { weight: 10, category: "food", severity: "medium" },
-  insurance: { weight: 15, category: "insurance", severity: "high" },
-  transport: { weight: 10, category: "transport", severity: "medium" },
-  telecom: { weight: 10, category: "utilities", severity: "medium" },
-  subscriptions: { weight: 10, category: "subscriptions", severity: "medium" },
-  leisure: { weight: 5, category: "leisure", severity: "low" },
-  goal: { weight: 5, category: "goal", severity: "low" },
+  income: {
+    category: "income",
+    severity: "high",
+    weightStructurelle: 25,
+    weightDetaillee: 20,
+    weightOptimale: 15,
+  },
+  housing: {
+    category: "housing",
+    severity: "high",
+    weightStructurelle: 25,
+    weightDetaillee: 20,
+    weightOptimale: 15,
+  },
+  insurance: {
+    category: "insurance",
+    severity: "high",
+    weightStructurelle: 20,
+    weightDetaillee: 15,
+    weightOptimale: 15,
+  },
+  food: {
+    category: "food",
+    severity: "medium",
+    weightStructurelle: 15,
+    weightDetaillee: 10,
+    weightOptimale: 10,
+  },
+  transport: {
+    category: "transport",
+    severity: "medium",
+    weightStructurelle: 15,
+    weightDetaillee: 10,
+    weightOptimale: 10,
+  },
+  telecom: {
+    category: "utilities",
+    severity: "medium",
+    weightStructurelle: 0,
+    weightDetaillee: 10,
+    weightOptimale: 10,
+  },
+  subscriptions: {
+    category: "subscriptions",
+    severity: "medium",
+    weightStructurelle: 0,
+    weightDetaillee: 10,
+    weightOptimale: 10,
+  },
+  leisure: {
+    category: "leisure",
+    severity: "low",
+    weightStructurelle: 0,
+    weightDetaillee: 5,
+    weightOptimale: 5,
+  },
+  goal: {
+    category: "goal",
+    severity: "low",
+    weightStructurelle: 0,
+    weightDetaillee: 0,
+    weightOptimale: 5,
+  },
   category_budget: {
-    weight: 5,
     category: "category_budget",
     severity: "low",
+    weightStructurelle: 0,
+    weightDetaillee: 0,
+    weightOptimale: 5,
   },
 };
 
@@ -119,10 +215,6 @@ function isAreaPresent(area: FinancialArea, input: CompletenessInput): boolean {
     case "category_budget":
       return input.categoryBudgets.length > 0;
     default: {
-      // For every "expense" area we check whether at least one
-      // expense in that category exists (any frequency: a single
-      // recurring rent counts as housing present). We don't require
-      // the user to have logged a one-off in the current month.
       const id = RULES[area].category;
       return input.expenses.some((e) => e.category === id);
     }
@@ -140,21 +232,34 @@ export function computeFinancialCompleteness(
 ): CompletenessResult {
   const detected: FinancialArea[] = [];
   const missing: MissingArea[] = [];
-  let score = 0;
+  let structurelle = 0;
+  let detaillee = 0;
+  let optimale = 0;
   for (const area of AREAS) {
     const present = isAreaPresent(area, input);
     if (present) {
       detected.push(area);
-      score += RULES[area].weight;
+      structurelle += RULES[area].weightStructurelle;
+      detaillee += RULES[area].weightDetaillee;
+      optimale += RULES[area].weightOptimale;
     } else {
       missing.push({ area, severity: RULES[area].severity });
     }
   }
   return {
-    score,
+    // The headline score the dashboard's main card uses. We keep it
+    // pointed at OPTIMALE so users see the full picture of what's
+    // possible — but the trust gate (`reliability`) is anchored on
+    // STRUCTURELLE so the coach never tells them their analysis is
+    // unreliable just because they haven't formalised a goal yet.
+    score: optimale,
+    structurelle,
+    detaillee,
+    optimale,
     detected,
     missing,
-    reliability: reliabilityFor(score),
+    reliability: reliabilityFor(structurelle),
+    canEstimateSavings: detaillee >= 70,
   };
 }
 
@@ -173,8 +278,18 @@ export function detectMissingFinancialAreas(
   return out;
 }
 
-/** Sum of all weights — exported so the parity test can verify it. */
+/** Sum of all weights — exported so the parity tests can verify it. */
 export const COMPLETENESS_MAX_SCORE = AREAS.reduce(
-  (s, a) => s + RULES[a].weight,
+  (s, a) => s + RULES[a].weightOptimale,
+  0,
+);
+
+/** Exported so the parity tests can verify the per-tier sums. */
+export const STRUCTURELLE_MAX_SCORE = AREAS.reduce(
+  (s, a) => s + RULES[a].weightStructurelle,
+  0,
+);
+export const DETAILLEE_MAX_SCORE = AREAS.reduce(
+  (s, a) => s + RULES[a].weightDetaillee,
   0,
 );

@@ -99,13 +99,16 @@ export function CompletionAssistant({
 }: CompletionAssistantProps) {
   const t = useTranslations("dashboard.completeness.assistant");
   const tCandidate = useTranslations("dashboard.completeness.assistant.candidate");
+  // Phase 3.1.6 — UX simplified: every row now has an amount field
+  // ALWAYS visible with a sensible default value pre-filled. The
+  // toggle stays as a way to opt out of a row entirely (the user
+  // doesn't have a gym, for instance) but doesn't gate the amount
+  // input anymore. Result: faster completion, fewer clicks.
   const [rows, setRows] = React.useState<Record<CandidateId, RowState>>(
     () => initRows(),
   );
   const [submitting, setSubmitting] = React.useState(false);
 
-  // Reset when the modal re-opens so a user who cancelled doesn't
-  // see their previous toggles still on.
   React.useEffect(() => {
     if (open) setRows(initRows());
   }, [open]);
@@ -203,41 +206,47 @@ export function CompletionAssistant({
                   relevant && "bg-[hsl(var(--gold)/0.04)] -mx-6 px-6",
                 )}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="space-y-0.5 min-w-0">
+                {/*
+                  Phase 3.1.6 — one row, three columns: label / amount /
+                  toggle. The amount is always visible so the user can
+                  scan all defaults in one pass; toggling the switch
+                  opts the row in for submission.
+                */}
+                <div className="flex items-center gap-3">
+                  <div className="space-y-0.5 min-w-0 flex-1">
                     <Label
                       htmlFor={`assistant-${c.id}`}
                       className="text-sm cursor-pointer"
                     >
                       {tCandidate(`${c.id}.label`)}
                     </Label>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground line-clamp-1">
                       {tCandidate(`${c.id}.hint`)}
                     </p>
                   </div>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    inputMode="decimal"
+                    value={row.amount}
+                    onChange={(e) => setAmount(c.id, e.target.value)}
+                    placeholder={c.hint}
+                    className={cn(
+                      "w-24 text-right tabular-nums",
+                      !row.enabled && "opacity-50",
+                    )}
+                    aria-label={t("perMonth", { currency })}
+                  />
                   <Switch
                     id={`assistant-${c.id}`}
                     checked={row.enabled}
                     onCheckedChange={() => toggleRow(c.id)}
+                    aria-label={t("toggleAria", {
+                      name: tCandidate(`${c.id}.label`),
+                    })}
                   />
                 </div>
-                {row.enabled && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      inputMode="decimal"
-                      value={row.amount}
-                      onChange={(e) => setAmount(c.id, e.target.value)}
-                      placeholder={c.hint}
-                      className="w-32"
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {t("perMonth", { currency })}
-                    </span>
-                  </div>
-                )}
               </li>
             );
           })}
@@ -268,9 +277,14 @@ export function CompletionAssistant({
 }
 
 function initRows(): Record<CandidateId, RowState> {
+  // Phase 3.1.6 — pre-fill each row with its hint value so the user
+  // sees plausible defaults the moment the modal opens. They can
+  // tweak, clear, or toggle the row off. Rows stay disabled by
+  // default — we don't want to insert ten expenses the user didn't
+  // confirm.
   const o: Record<string, RowState> = {};
   for (const c of CANDIDATES) {
-    o[c.id] = { enabled: false, amount: "" };
+    o[c.id] = { enabled: false, amount: c.hint };
   }
   return o as Record<CandidateId, RowState>;
 }

@@ -39,6 +39,8 @@
     "potentialSavingsEmpty": "Tutto a posto",
     "potentialSavingsEmptyHint": "Nessuna opportunità prioritaria di risparmio questo mese.",
     "potentialSavingsHint": "≈ {yearly} all'anno — stima, non una garanzia",
+    "potentialSavingsBlocked": "Stima non disponibile",
+    "potentialSavingsBlockedHint": "Completa prima i tuoi dati per ottenere una proiezione affidabile.",
     "perMonthSuffix": " / mese"
   },
   "completeness": {
@@ -51,6 +53,11 @@
     "missingLabel": "Categorie mancanti:",
     "emptyState": "Profilo completo — ogni numero è affidabile.",
     "cta": "Completa i miei dati",
+    "scores": {
+      "structurelle": "Strutturale",
+      "detaillee": "Dettagliata",
+      "optimale": "Ottimale"
+    },
     "area": {
       "income": "Entrate",
       "housing": "Casa",
@@ -67,6 +74,7 @@
       "title": "Completa il mio profilo finanziario",
       "description": "Attiva le righe che ti riguardano e inserisci l'importo mensile. Potrai modificare tutto in seguito da /expenses.",
       "perMonth": "{currency} / mese",
+      "toggleAria": "Includi {name} nella lista da salvare",
       "save": "Salva tutto",
       "cancel": "Più tardi",
       "savedToast": "{count, plural, one {# spesa salvata} other {# spese salvate}}.",

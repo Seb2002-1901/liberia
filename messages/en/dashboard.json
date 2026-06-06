@@ -39,6 +39,8 @@
     "potentialSavingsEmpty": "All clean",
     "potentialSavingsEmptyHint": "No prioritised savings opportunity detected this month.",
     "potentialSavingsHint": "≈ {yearly} per year — estimate, not a guarantee",
+    "potentialSavingsBlocked": "Estimate unavailable",
+    "potentialSavingsBlockedHint": "Complete your data first for a reliable projection.",
     "perMonthSuffix": " / month"
   },
   "completeness": {
@@ -51,6 +53,11 @@
     "missingLabel": "Missing categories:",
     "emptyState": "Profile complete — every number on this page can be trusted.",
     "cta": "Complete my data",
+    "scores": {
+      "structurelle": "Structural",
+      "detaillee": "Detailed",
+      "optimale": "Optimal"
+    },
     "area": {
       "income": "Income",
       "housing": "Housing",
@@ -67,6 +74,7 @@
       "title": "Complete my financial profile",
       "description": "Toggle the rows that apply to you and enter the monthly amount. You can edit everything later under /expenses.",
       "perMonth": "{currency} / month",
+      "toggleAria": "Include {name} in the list to save",
       "save": "Save all",
       "cancel": "Later",
       "savedToast": "{count, plural, one {# expense saved} other {# expenses saved}}.",

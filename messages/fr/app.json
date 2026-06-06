@@ -910,6 +910,37 @@
           "high": "Haute",
           "medium": "Moyenne",
           "low": "Basse"
+        },
+        "blocked": {
+          "title": "Estimation indisponible",
+          "body": "Complète d'abord tes données (assurances, télécoms, abonnements…) pour obtenir une projection fiable. Sinon le chiffre serait probablement inexact."
+        }
+      },
+      "anomalies": {
+        "title": "Données à vérifier",
+        "description": "Signaux factuels, sans jugement. Vérifie les montants et les fréquences avant toute conclusion.",
+        "caveat": "Tu peux ignorer un signal s'il correspond à ta réalité. Aucun signal n'est une erreur en soi.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Logement à {ratio}% de ton revenu",
+            "body": "{amount} / mois en logement. Vérifie le montant du loyer ou l'estimation du revenu — au-delà de 50 % la marge devient très tendue."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} pèse {share}% de tes dépenses",
+            "body": "Une seule catégorie absorbe presque tout. Probablement signe que d'autres catégories ne sont pas encore renseignées."
+          },
+          "unusual_high_one_time": {
+            "title": "Transaction ponctuelle inhabituellement élevée",
+            "body": "« {label} » à {amount} — médiane des autres transactions : {median}. Si c'est volontaire, ignore. Sinon vérifie le montant."
+          },
+          "fixed_expense_outlier": {
+            "title": "Charge fixe « {label} » à vérifier",
+            "body": "{monthly} / mois ({ratio}% du revenu). Souvent symptomatique d'une fréquence saisie de travers (mensuel/hebdo/annuel)."
+          },
+          "high_income_low_emergency": {
+            "title": "Revenu élevé mais fonds d'urgence très fin",
+            "body": "{income} / mois et seulement {months} mois de couverture. Où va le surplus ? Épargne ? Investissement ? Dépenses non saisies ?"
+          }
         }
       },
       "history": {

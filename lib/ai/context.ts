@@ -31,6 +31,10 @@ import {
   computeFinancialCompleteness,
   type MissingArea,
 } from "@/lib/calculations/completeness";
+import {
+  detectAnomalies,
+  type Anomaly,
+} from "@/lib/calculations/anomalies";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -248,6 +252,14 @@ export function buildFinanceContext(
     data.expenses,
   );
   const achievement = computeGoalAchievementScore(budgetProgress);
+  // Phase 3.1.5 + 3.1.6 — completeness computed BEFORE savings so
+  // the savingsSection can gate on canEstimateSavings.
+  const completeness = computeFinancialCompleteness({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    categoryBudgets: data.categoryBudgets,
+  });
   const savings = computePotentialSavings(opportunities);
   const budgetProgressSection =
     budgetProgress.length === 0
@@ -275,8 +287,9 @@ export function buildFinanceContext(
       ? "Score budgétaire non applicable (aucun budget défini)."
       : `Objectifs respectés : ${achievement.respected} / ${achievement.total} — Score ${Math.round(achievement.score * 100)}%`;
 
-  const savingsSection =
-    savings.monthly <= 0
+  const savingsSection = !completeness.canEstimateSavings
+    ? "MASQUÉ — la complétude détaillée est en dessous du seuil de fiabilité (70%). Aucune projection d'économie ne peut être faite tant que le profil n'est pas plus rempli. Ne JAMAIS citer un montant ici, propose plutôt à l'utilisateur de compléter ses données via la carte « Complétude financière » du dashboard."
+    : savings.monthly <= 0
       ? "Aucune économie chiffrable détectée. (Certaines opportunités sont qualitatives — voir Opportunités d'optimisation.)"
       : `Total cumulé sur l'ensemble des opportunités : ${fmt(savings.monthly)} / mois (${fmt(savings.yearly)} / an).\nDont haute priorité : ${fmt(savings.byPriority.high.monthly)} / mois (${fmt(savings.byPriority.high.yearly)} / an).\nDont priorité moyenne : ${fmt(savings.byPriority.medium.monthly)} / mois.\nDont priorité basse : ${fmt(savings.byPriority.low.monthly)} / mois.`;
 
@@ -287,29 +300,40 @@ export function buildFinanceContext(
     monthlyTransactions: data.expenseBuckets.transactions,
   });
 
-  // Phase 3.1.5 — data completeness gate. The coach reads this
-  // section and adjusts the confidence of every estimate
-  // accordingly (the rule block at the bottom forbids aggressive
-  // economy claims when reliability is low). The user-facing
-  // analytics page does the same via the FiabilityWarning banner.
-  const completeness = computeFinancialCompleteness({
-    incomes: data.incomes,
-    expenses: data.expenses,
-    goals: data.goals,
-    categoryBudgets: data.categoryBudgets,
-  });
   const completenessSection =
     completeness.missing.length === 0
-      ? "Profil financier complet (100%)."
+      ? "Profil financier complet (100% sur tous les axes)."
       : [
-          `Score : ${completeness.score}% (${completeness.detected.length} catégories renseignées).`,
+          `Structurelle : ${completeness.structurelle}/100 (revenus, logement, assurances, alimentation, transport).`,
+          `Détaillée    : ${completeness.detaillee}/100 (+ télécoms, abonnements, loisirs).`,
+          `Optimale     : ${completeness.optimale}/100 (+ objectif défini, budgets par catégorie).`,
           "",
           "Catégories absentes :",
           ...completeness.missing.map(
             (m) => `- ${areaLabel(m.area)} (sévérité ${severityLabel(m.severity)})`,
           ),
         ].join("\n");
-  const reliabilitySection = `Niveau : ${reliabilityLabel(completeness.reliability)} (score ${completeness.score}/100).`;
+  const reliabilitySection = [
+    `Confiance globale (structurelle) : ${reliabilityLabel(completeness.reliability)}.`,
+    completeness.canEstimateSavings
+      ? "Projections d'économies : AUTORISÉES (détaillée ≥ 70%)."
+      : "Projections d'économies : MASQUÉES (détaillée < 70% — la donnée n'est pas assez profonde pour publier un chiffre crédible).",
+  ].join("\n");
+
+  // Phase 3.1.6 — anomaly detector. Pure signals; the coach is
+  // INSTRUCTED to ask the user to confirm a flagged number before
+  // drawing any conclusion from it. Never a judgement.
+  const anomalies = detectAnomalies({
+    expenses: data.expenses,
+    expenseBuckets: data.expenseBuckets,
+    monthlyIncome,
+    currentSavings,
+    runwayMonths: runway,
+  });
+  const anomaliesSection =
+    anomalies.length === 0
+      ? "Aucune anomalie de saisie détectée."
+      : anomalies.map((a) => renderAnomaly(a, fmt)).join("\n");
 
   return `# Contexte financier de l'utilisateur
 
@@ -365,11 +389,14 @@ ${savingsSection}
 Score : ${discipline.score}/100 — ${disciplineTierLabel(discipline.tier)}
 Détail : budgets ${discipline.breakdown.budget}/35 · épargne ${discipline.breakdown.savings}/30 · urgence ${discipline.breakdown.emergency}/25 · suivi ${discipline.breakdown.tracking}/10
 
-## Complétude financière
+## Complétude financière (V2)
 ${completenessSection}
 
 ## Fiabilité des analyses
 ${reliabilitySection}
+
+## Anomalies de saisie potentielles
+${anomaliesSection}
 
 ## Règles importantes
 - Si tu cites un montant, prends-le dans la liste ci-dessus. N'invente pas.
@@ -382,7 +409,23 @@ ${reliabilitySection}
 - "Objectifs budgétaires" est la liste complète des limites mensuelles que l'utilisateur s'est fixées par catégorie, avec leur statut OK / ATTENTION / DÉPASSÉ. Pour répondre à "quels objectifs ai-je dépassés ?", liste les statuts DÉPASSÉ en citant le couple dépensé / cible. Pour "quels budgets sont respectés ?", cite les OK. Ne réinvente jamais ces chiffres : ils viennent directement de la table category_budgets.
 - "Score budgétaire" exprime la proportion d'objectifs SUCCESS sur le total défini. Un score 4/5 = 80 % signifie que 4 budgets sur 5 sont sous 80 % de leur cible. Tu peux dire "tu respectes 4 budgets sur 5 ce mois — bien joué" sans paraphraser inutilement.
 - "Économies potentielles" agrège l'impact mensuel et annuel des opportunités ci-dessus. Pour "combien puis-je économiser sur une année ?", cite la ligne "Total cumulé sur l'ensemble des opportunités" en montrant l'annuel (la projection 12 × mensuel parle plus). Précise toujours qu'il s'agit d'une ESTIMATION basée sur les heuristiques (10-20 % de réduction sur les leviers identifiés), pas d'une garantie : "tu pourrais viser environ X par an si tu agis sur les leviers haute priorité — c'est un ordre de grandeur, pas une promesse".
-- "Complétude financière" et "Fiabilité des analyses" sont CRUCIAUX. Si la fiabilité est BASSE ou MOYENNE (score < 90), tu DOIS calmer toute projection d'économies et le dire explicitement : "Cette estimation est probablement incomplète car plusieurs catégories importantes ne sont pas encore renseignées (cite-les)". NE JAMAIS donner un chiffre agressif d'économies (>5% du revenu) sans d'abord rappeler que les données peuvent être lacunaires. Quand la fiabilité est HAUTE (≥ 90%), tu peux parler avec assurance. Si l'utilisateur demande "combien puis-je économiser ?" et que la fiabilité est faible, ta première phrase doit l'inviter à compléter son profil (carte Complétude financière sur le dashboard) avant de citer un chiffre.`;
+- "Complétude financière (V2)" et "Fiabilité des analyses" sont CRUCIAUX. Tu lis trois scores :
+   * Structurelle (revenus + logement + assurances + alimentation + transport) — c'est CE score qui décide si tu peux te montrer affirmatif sur des chiffres. Confiance globale : HAUTE ≥ 90, MOYENNE 70-89, BASSE < 70.
+   * Détaillée — gate les projections d'économies. Si "Projections d'économies : MASQUÉES", tu ne donnes AUCUN chiffre d'économies (ni en mensuel ni en annuel). Tu réponds : "L'estimation n'est pas disponible pour l'instant : complète d'abord tes données (assurances, télécoms, abonnements…) pour obtenir une projection fiable. Sinon le chiffre serait probablement inexact."
+   * Optimale — bonus.
+   Quand la confiance est BASSE, ta toute première phrase invite l'utilisateur à compléter son profil (carte Complétude financière sur le dashboard) avant tout chiffre.
+
+- INTERDICTION ABSOLUE : tu ne dis JAMAIS "il manque X CHF", "tu perds X CHF" ou "X CHF qui disparaissent". Ces formulations sont FAUSSES : la différence revenus − dépenses peut être épargnée, investie, en cash, ou simplement non encore catégorisée. Reformule en : "Une partie importante de tes flux financiers n'est pas encore catégorisée — peux-tu vérifier où va cette différence ? Épargne, investissement, dépenses non saisies ?". Cette règle est non-négociable.
+
+- Section "Anomalies de saisie potentielles" : ce sont des SIGNAUX, jamais des accusations. Ton script : "Un point à vérifier : [anomalie]. Est-ce le bon montant / la bonne catégorie / la bonne fréquence ?". Tu ne tires AUCUNE conclusion d'un chiffre flaggé tant que l'utilisateur n'a pas confirmé. Si l'utilisateur confirme, tu peux ensuite t'en servir comme contexte normal.
+
+- COACH ORIENTÉ SOLUTION : pour toute analyse, propose ENSUITE :
+   1. La meilleure prochaine action en 1 phrase ("Ta meilleure action maintenant : …").
+   2. Si pertinent, un plan en 3 étapes courtes.
+   3. L'impact potentiel chiffré SEULEMENT si "Projections d'économies : AUTORISÉES".
+   4. Le niveau de priorité (haute / moyenne / basse).
+   5. Ce qu'il faut compléter dans le profil pour aller plus loin.
+   Toujours rester un coach pédagogique : pas de conseil financier réglementé, pas de promesse de rendement, pas de recommandation d'un produit ou fournisseur précis. Quand l'utilisateur évoque investissement, idée business, achat immobilier, optimisation d'assurance : donne le CADRE général (questions à se poser, hiérarchie classique fonds d'urgence → dette coûteuse → épargne longue), JAMAIS un choix spécifique.`;
 }
 
 /**
@@ -491,4 +534,24 @@ function reliabilityLabel(r: "low" | "medium" | "high"): string {
     : r === "medium"
       ? "MOYENNE — certaines catégories majeures manquent, calme les projections"
       : "FAIBLE — données très incomplètes, n'avance aucun chiffre agressif d'économies sans inviter à compléter le profil";
+}
+
+function renderAnomaly(a: Anomaly, fmt: (n: number) => string): string {
+  const tag = a.severity === "warning" ? "À VÉRIFIER" : "SIGNAL";
+  switch (a.kind) {
+    case "housing_over_50pct_income":
+      return `- [${tag}] Logement à ${a.payload.ratio}% du revenu (${fmt(a.payload.amount as number)}/mois). Vérifie le montant ou l'estimation du revenu avant toute conclusion.`;
+    case "single_category_over_80pct":
+      return `- [${tag}] Une seule catégorie (${categoryLabel(a.payload.category as string)}) pèse ${a.payload.share}% du total. Probablement signe que d'autres catégories sont absentes.`;
+    case "unusual_high_one_time":
+      return `- [${tag}] Transaction ponctuelle inhabituellement élevée : "${a.payload.label}" à ${fmt(a.payload.amount as number)} (médiane des autres : ${fmt(a.payload.median as number)}).`;
+    case "fixed_expense_outlier":
+      return `- [${tag}] Charge fixe "${a.payload.label}" à ${fmt(a.payload.monthly as number)}/mois (${a.payload.ratio}% du revenu) — vérifie la fréquence saisie (mensuel/hebdo/annuel).`;
+    case "high_income_low_emergency":
+      return `- [${tag}] Revenu élevé (${fmt(a.payload.income as number)}/mois) mais seulement ${a.payload.months} mois de couverture d'urgence — la question "où va le surplus ?" mérite d'être posée à l'utilisateur (épargne ? investissement ? non catégorisé ?).`;
+    default: {
+      const _exhaust: never = a.kind;
+      return `- [${tag}] ${_exhaust as string}`;
+    }
+  }
 }

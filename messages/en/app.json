@@ -910,6 +910,37 @@
           "high": "High",
           "medium": "Medium",
           "low": "Low"
+        },
+        "blocked": {
+          "title": "Estimate unavailable",
+          "body": "Complete your data first (insurance, telecom, subscriptions…) for a reliable projection. The number would likely be wrong otherwise."
+        }
+      },
+      "anomalies": {
+        "title": "Data to double-check",
+        "description": "Factual signals, no judgement. Verify amounts and frequencies before drawing conclusions.",
+        "caveat": "You can ignore a signal that matches your reality. No signal is automatically an error.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Housing at {ratio}% of your income",
+            "body": "{amount} / month on housing. Check the rent amount or the income estimate — above 50% the margin gets very tight."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} weighs {share}% of your spending",
+            "body": "One category absorbs almost everything. Probably a sign that other categories aren't recorded yet."
+          },
+          "unusual_high_one_time": {
+            "title": "Unusually high one-off transaction",
+            "body": "\"{label}\" at {amount} — median of other transactions: {median}. If intentional, ignore. Otherwise check the amount."
+          },
+          "fixed_expense_outlier": {
+            "title": "Fixed expense \"{label}\" to check",
+            "body": "{monthly} / month ({ratio}% of income). Often a sign of a wrong frequency (monthly / weekly / yearly)."
+          },
+          "high_income_low_emergency": {
+            "title": "High income but very thin emergency fund",
+            "body": "{income} / month and only {months} months of coverage. Where does the surplus go? Savings? Investments? Unrecorded expenses?"
+          }
         }
       },
       "history": {

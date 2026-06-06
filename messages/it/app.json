@@ -910,6 +910,37 @@
           "high": "Alta",
           "medium": "Media",
           "low": "Bassa"
+        },
+        "blocked": {
+          "title": "Stima non disponibile",
+          "body": "Completa prima i tuoi dati (assicurazioni, telecom, abbonamenti…) per una proiezione affidabile. Altrimenti il numero sarebbe probabilmente sbagliato."
+        }
+      },
+      "anomalies": {
+        "title": "Dati da verificare",
+        "description": "Segnali fattuali, senza giudizio. Verifica importi e frequenze prima di trarre conclusioni.",
+        "caveat": "Puoi ignorare un segnale che corrisponde alla tua realtà. Nessun segnale è automaticamente un errore.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Casa al {ratio}% del tuo reddito",
+            "body": "{amount} / mese in casa. Verifica importo dell'affitto o stima del reddito — oltre il 50% il margine diventa molto stretto."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} pesa il {share}% delle tue spese",
+            "body": "Una sola categoria assorbe quasi tutto. Probabilmente segno che altre categorie non sono ancora inserite."
+          },
+          "unusual_high_one_time": {
+            "title": "Transazione occasionale insolitamente elevata",
+            "body": "« {label} » a {amount} — mediana delle altre: {median}. Se intenzionale, ignora. Altrimenti verifica l'importo."
+          },
+          "fixed_expense_outlier": {
+            "title": "Spesa fissa « {label} » da verificare",
+            "body": "{monthly} / mese ({ratio}% del reddito). Spesso indica una frequenza inserita male (mensile/settimanale/annuale)."
+          },
+          "high_income_low_emergency": {
+            "title": "Reddito elevato ma fondo di emergenza molto basso",
+            "body": "{income} / mese e solo {months} mesi di copertura. Dove va il surplus? Risparmio? Investimenti? Spese non registrate?"
+          }
         }
       },
       "history": {

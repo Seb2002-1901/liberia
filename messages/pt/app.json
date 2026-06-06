@@ -910,6 +910,37 @@
           "high": "Alta",
           "medium": "Média",
           "low": "Baixa"
+        },
+        "blocked": {
+          "title": "Estimativa indisponível",
+          "body": "Completa primeiro os teus dados (seguros, telecom, subscrições…) para uma projeção fiável. Caso contrário o valor seria provavelmente errado."
+        }
+      },
+      "anomalies": {
+        "title": "Dados a verificar",
+        "description": "Sinais factuais, sem julgamento. Verifica montantes e frequências antes de tirar conclusões.",
+        "caveat": "Podes ignorar um sinal que corresponda à tua realidade. Nenhum sinal é automaticamente um erro.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Habitação em {ratio}% do rendimento",
+            "body": "{amount} / mês em habitação. Verifica a renda ou a estimativa de rendimento — acima de 50% a margem fica muito apertada."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} representa {share}% das tuas despesas",
+            "body": "Uma única categoria absorve quase tudo. Provavelmente sinal de que outras categorias ainda não estão registadas."
+          },
+          "unusual_high_one_time": {
+            "title": "Transação pontual invulgarmente alta",
+            "body": "« {label} » em {amount} — mediana das outras: {median}. Se for intencional, ignora. Caso contrário verifica o montante."
+          },
+          "fixed_expense_outlier": {
+            "title": "Despesa fixa « {label} » a verificar",
+            "body": "{monthly} / mês ({ratio}% do rendimento). Frequentemente indica uma frequência mal introduzida (mensal/semanal/anual)."
+          },
+          "high_income_low_emergency": {
+            "title": "Rendimento alto mas fundo de emergência muito fino",
+            "body": "{income} / mês e apenas {months} meses de cobertura. Para onde vai o excedente? Poupança? Investimento? Despesas não registadas?"
+          }
         }
       },
       "history": {

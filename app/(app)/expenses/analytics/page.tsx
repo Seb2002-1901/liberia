@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseAnalyticsClient } from "@/components/finance/expense-analytics-client";
-import { getFinanceData } from "@/lib/services/finance";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { calculateRunway } from "@/lib/calculations/finance";
 import { ROUTES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +58,11 @@ export default async function ExpensesAnalyticsPage() {
           categoryBudgets={data.categoryBudgets}
           incomes={data.incomes}
           goals={data.goals}
+          currentSavings={data.financialProfile?.current_savings ?? 0}
+          runwayMonths={calculateRunway({
+            currentSavings: data.financialProfile?.current_savings ?? 0,
+            monthlyExpenses: data.expenseBuckets.fixed || totalMonthly(data.expenses),
+          })}
           currency={data.profile.currency}
         />
       )}

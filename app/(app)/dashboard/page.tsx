@@ -358,21 +358,31 @@ export default async function DashboardPage() {
         <StatCard
           label={t("stats.potentialSavings")}
           value={
-            potentialSavings.monthly > 0
-              ? `${formatUserCurrency(potentialSavings.monthly, data.profile)}${t("stats.perMonthSuffix")}`
-              : t("stats.potentialSavingsEmpty")
+            !completeness.canEstimateSavings
+              ? t("stats.potentialSavingsBlocked")
+              : potentialSavings.monthly > 0
+                ? `${formatUserCurrency(potentialSavings.monthly, data.profile)}${t("stats.perMonthSuffix")}`
+                : t("stats.potentialSavingsEmpty")
           }
           icon={<Sparkles className="h-4 w-4" />}
-          tone={potentialSavings.monthly > 0 ? "gold" : "neutral"}
+          tone={
+            !completeness.canEstimateSavings
+              ? "neutral"
+              : potentialSavings.monthly > 0
+                ? "gold"
+                : "neutral"
+          }
           hint={
-            potentialSavings.monthly > 0
-              ? t("stats.potentialSavingsHint", {
-                  yearly: formatUserCurrency(
-                    potentialSavings.yearly,
-                    data.profile,
-                  ),
-                })
-              : t("stats.potentialSavingsEmptyHint")
+            !completeness.canEstimateSavings
+              ? t("stats.potentialSavingsBlockedHint")
+              : potentialSavings.monthly > 0
+                ? t("stats.potentialSavingsHint", {
+                    yearly: formatUserCurrency(
+                      potentialSavings.yearly,
+                      data.profile,
+                    ),
+                  })
+                : t("stats.potentialSavingsEmptyHint")
           }
         />
       </div>

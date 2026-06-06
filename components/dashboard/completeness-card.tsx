@@ -63,18 +63,29 @@ export function CompletenessCard({
           )}
         />
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="flex-1 space-y-2">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {t("eyebrow")}
             </p>
             <div className="flex items-baseline gap-3">
               <p className="font-display text-4xl font-semibold tabular-nums">
-                {completeness.score}
+                {completeness.structurelle}
                 <span className="text-xl text-muted-foreground">%</span>
               </p>
               <p className={cn("text-sm font-medium", tone.label)}>
                 {t(`quality.${completeness.reliability}`)}
               </p>
+            </div>
+            {/*
+              Phase 3.1.6 — three tiered scores. Structurelle is the
+              headline (gates coach confidence). Détaillée gates the
+              potential-savings projection. Optimale is the
+              aspirational "everything filled in" score.
+            */}
+            <div className="grid grid-cols-3 gap-2 max-w-md">
+              <ScoreTile label={t("scores.structurelle")} value={completeness.structurelle} />
+              <ScoreTile label={t("scores.detaillee")} value={completeness.detaillee} />
+              <ScoreTile label={t("scores.optimale")} value={completeness.optimale} />
             </div>
             {topMissing.length === 0 ? (
               <p className="max-w-md text-sm text-muted-foreground">
@@ -82,7 +93,7 @@ export function CompletenessCard({
               </p>
             ) : (
               <>
-                <p className="text-sm text-muted-foreground">
+                <p className="pt-1 text-sm text-muted-foreground">
                   {t("missingLabel")}
                 </p>
                 <ul className="space-y-1 text-sm">
@@ -135,6 +146,17 @@ export function CompletenessCard({
         currency={currency}
       />
     </>
+  );
+}
+
+function ScoreTile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-border/40 bg-card/40 px-2 py-1.5 text-center">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">
+        {label}
+      </p>
+      <p className="text-base font-semibold tabular-nums">{value}%</p>
+    </div>
   );
 }
 

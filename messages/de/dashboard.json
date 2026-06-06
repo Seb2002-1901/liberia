@@ -39,6 +39,8 @@
     "potentialSavingsEmpty": "Alles sauber",
     "potentialSavingsEmptyHint": "Diesen Monat keine priorisierte Sparmöglichkeit erkannt.",
     "potentialSavingsHint": "≈ {yearly} pro Jahr — Schätzung, keine Garantie",
+    "potentialSavingsBlocked": "Schätzung nicht verfügbar",
+    "potentialSavingsBlockedHint": "Vervollständige zuerst deine Daten für eine verlässliche Projektion.",
     "perMonthSuffix": " / Monat"
   },
   "completeness": {
@@ -51,6 +53,11 @@
     "missingLabel": "Fehlende Kategorien:",
     "emptyState": "Profil vollständig — jeder Wert hier ist vertrauenswürdig.",
     "cta": "Daten ergänzen",
+    "scores": {
+      "structurelle": "Strukturell",
+      "detaillee": "Detailliert",
+      "optimale": "Optimal"
+    },
     "area": {
       "income": "Einkommen",
       "housing": "Wohnen",
@@ -67,6 +74,7 @@
       "title": "Mein Finanzprofil ergänzen",
       "description": "Aktiviere die zutreffenden Zeilen und gib den Monatsbetrag ein. Du kannst alles später unter /expenses anpassen.",
       "perMonth": "{currency} / Monat",
+      "toggleAria": "{name} in die Speicherliste aufnehmen",
       "save": "Alles speichern",
       "cancel": "Später",
       "savedToast": "{count, plural, one {# Ausgabe gespeichert} other {# Ausgaben gespeichert}}.",

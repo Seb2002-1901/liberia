@@ -910,6 +910,37 @@
           "high": "Hoch",
           "medium": "Mittel",
           "low": "Niedrig"
+        },
+        "blocked": {
+          "title": "Schätzung nicht verfügbar",
+          "body": "Vervollständige zuerst deine Daten (Versicherung, Telekom, Abos…) für eine verlässliche Projektion. Sonst wäre der Wert wahrscheinlich falsch."
+        }
+      },
+      "anomalies": {
+        "title": "Daten zum Überprüfen",
+        "description": "Faktische Signale, ohne Urteil. Prüfe Beträge und Frequenzen, bevor du Schlüsse ziehst.",
+        "caveat": "Ein Signal, das zu deiner Realität passt, kannst du ignorieren. Kein Signal ist automatisch ein Fehler.",
+        "kind": {
+          "housing_over_50pct_income": {
+            "title": "Wohnen bei {ratio}% deines Einkommens",
+            "body": "{amount} / Monat fürs Wohnen. Prüfe Miete oder Einkommensschätzung — über 50% wird die Marge sehr eng."
+          },
+          "single_category_over_80pct": {
+            "title": "{category} macht {share}% deiner Ausgaben aus",
+            "body": "Eine Kategorie nimmt fast alles auf. Wahrscheinlich Zeichen dafür, dass andere Kategorien noch fehlen."
+          },
+          "unusual_high_one_time": {
+            "title": "Ungewöhnlich hohe einmalige Transaktion",
+            "body": "„{label}\" bei {amount} — Median der anderen: {median}. Falls gewollt, ignorieren. Sonst Betrag prüfen."
+          },
+          "fixed_expense_outlier": {
+            "title": "Fixkosten „{label}\" prüfen",
+            "body": "{monthly} / Monat ({ratio}% des Einkommens). Oft Zeichen für eine falsche Frequenz (monatlich/wöchentlich/jährlich)."
+          },
+          "high_income_low_emergency": {
+            "title": "Hohes Einkommen aber sehr dünner Notgroschen",
+            "body": "{income} / Monat und nur {months} Monate Deckung. Wohin geht der Überschuss? Sparen? Investitionen? Nicht erfasste Ausgaben?"
+          }
         }
       },
       "history": {
