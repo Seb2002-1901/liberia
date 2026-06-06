@@ -200,6 +200,11 @@
       }
     }
   },
+  "resumeStrip": {
+    "discipline": "Disciplina",
+    "completeness": "Completude",
+    "openAnalytics": "Abrir análise"
+  },
   "discipline": {
     "eyebrow": "Disciplina orçamental",
     "tier": {

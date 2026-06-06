@@ -634,35 +634,28 @@ function OpportunitiesCard({
   currency: string;
 }) {
   const t = useTranslations("app.finance.analytics.opportunities");
-  if (opportunities.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("title")}</CardTitle>
-          <CardDescription>{t("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="rounded-xl border border-dashed border-border/50 bg-card/20 p-4 text-center text-sm text-muted-foreground">
-            {t("empty")}
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const hasHigh = opportunities.some((o) => o.priority === "high");
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <CollapsibleSection
+      title={t("title")}
+      subtitle={t("description")}
+      tone={hasHigh ? "warning" : "default"}
+      // Auto-open when there's at least one high-priority opportunity
+      // — the user should see it immediately. Otherwise calm.
+      defaultOpen={hasHigh}
+    >
+      {opportunities.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-border/50 bg-card/20 p-4 text-center text-sm text-muted-foreground">
+          {t("empty")}
+        </p>
+      ) : (
         <ul className="space-y-3">
           {opportunities.map((o, i) => (
             <OpportunityRow key={`${o.kind}-${i}`} opp={o} currency={currency} />
           ))}
         </ul>
-      </CardContent>
-    </Card>
+      )}
+    </CollapsibleSection>
   );
 }
 
@@ -855,52 +848,54 @@ function AnomaliesCard({
   const tKind = useTranslations("app.finance.analytics.anomalies.kind");
   const fmt = useFormatter();
   if (anomalies.length === 0) return null;
+  const hasWarning = anomalies.some((a) => a.severity === "warning");
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-3">
-          {anomalies.map((a, i) => {
-            const payload: Record<string, string | number> = { ...a.payload };
-            for (const key of ["amount", "income", "median", "monthly"]) {
-              const v = payload[key];
-              if (typeof v === "number") {
-                payload[key] = fmt.number(v, {
-                  style: "currency",
-                  currency,
-                });
-              }
+    <CollapsibleSection
+      title={t("title")}
+      subtitle={t("description")}
+      tone={hasWarning ? "danger" : "default"}
+      // Auto-open when there's at least one warning — calm by default
+      // otherwise so the page reads as advisory, not alarmist.
+      defaultOpen={hasWarning}
+    >
+      <ul className="space-y-3">
+        {anomalies.map((a, i) => {
+          const payload: Record<string, string | number> = { ...a.payload };
+          for (const key of ["amount", "income", "median", "monthly"]) {
+            const v = payload[key];
+            if (typeof v === "number") {
+              payload[key] = fmt.number(v, {
+                style: "currency",
+                currency,
+              });
             }
-            if (typeof payload.category === "string") {
-              const cat = EXPENSE_CATEGORIES.find(
-                (c) => c.id === payload.category,
-              );
-              if (cat) payload.category = cat.label;
-            }
-            return (
-              <li
-                key={`${a.kind}-${i}`}
-                className={cn(
-                  "rounded-xl border p-3 text-sm",
-                  a.severity === "warning"
-                    ? "border-rose-500/40 bg-rose-500/5"
-                    : "border-border/60 bg-card/40",
-                )}
-              >
-                <p className="font-medium">{tKind(`${a.kind}.title`, payload)}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {tKind(`${a.kind}.body`, payload)}
-                </p>
-              </li>
+          }
+          if (typeof payload.category === "string") {
+            const cat = EXPENSE_CATEGORIES.find(
+              (c) => c.id === payload.category,
             );
-          })}
-        </ul>
-        <p className="mt-3 text-[11px] text-muted-foreground">{t("caveat")}</p>
-      </CardContent>
-    </Card>
+            if (cat) payload.category = cat.label;
+          }
+          return (
+            <li
+              key={`${a.kind}-${i}`}
+              className={cn(
+                "rounded-xl border p-3 text-sm",
+                a.severity === "warning"
+                  ? "border-rose-500/40 bg-rose-500/5"
+                  : "border-border/60 bg-card/40",
+              )}
+            >
+              <p className="font-medium">{tKind(`${a.kind}.title`, payload)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {tKind(`${a.kind}.body`, payload)}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 text-[11px] text-muted-foreground">{t("caveat")}</p>
+    </CollapsibleSection>
   );
 }
 

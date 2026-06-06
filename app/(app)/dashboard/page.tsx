@@ -26,18 +26,17 @@ import {
 } from "@/lib/calculations/analytics";
 import { detectOpportunities } from "@/lib/calculations/opportunities";
 import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
+import { computeDisciplineScore } from "@/lib/calculations/discipline";
 import { computeNextAction } from "@/lib/calculations/next-action";
 import { computeAdviceConfidence } from "@/lib/calculations/advice-confidence";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { NextActionCard } from "@/components/dashboard/next-action-card";
+import { ResumeStrip } from "@/components/dashboard/resume-strip";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
-import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
 import { ProactiveCoachCard } from "@/components/dashboard/proactive-coach-card";
 import { getActivePlan } from "@/lib/services/plan";
-import { getMyUserMemory, resolveCoachingTone } from "@/lib/services/memory";
+import { getMyUserMemory } from "@/lib/services/memory";
 import { generateProactiveHint } from "@/lib/coach/proactive";
-import { isAnthropicConfigured } from "@/lib/env";
-import { isAdminConfigured } from "@/lib/supabase/admin";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("dashboard.metadata");
@@ -51,10 +50,6 @@ export default async function DashboardPage() {
     getActivePlan(),
     getMyUserMemory(),
   ]);
-  const coachingTone = resolveCoachingTone(
-    memory?.coaching_tone ?? null,
-    data.financialProfile?.behavior_traits ?? [],
-  );
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
   // Phase 3.1.1 — three distinct expense numbers, never confused:
@@ -88,7 +83,6 @@ export default async function DashboardPage() {
   // a single month of variable spending.
   const monthlyExpenses = fixedExpenses;
   const currentSavings = data.financialProfile?.current_savings ?? 0;
-  const monthlyDebt = data.financialProfile?.monthly_debt ?? 0;
 
   // The user's "Reste à vivre" KPI must reflect real-life spending
   // (including variable). Stability calcs below stay on the recurring
@@ -129,6 +123,17 @@ export default async function DashboardPage() {
     opportunities: dashboardOpportunities,
     runwayMonths: runway,
     goalCount: data.goals.length,
+  });
+
+  // Phase UX premium — ultra-compact resume strip beneath the 4 KPI.
+  // Two micro-scores (discipline + complétude structurelle) summarise
+  // "where do I stand" in a single line so the dashboard doesn't need
+  // a full card per axis. The detailed views live on /expenses/analytics.
+  const discipline = computeDisciplineScore({
+    budgetStatus: monthBudgetStatus,
+    savingsRate,
+    runwayMonths: runway,
+    monthlyTransactions: data.expenseBuckets.transactions,
   });
   // Phase 3.1.10 — coach confidence chip. We don't fetch memory
   // entries on the dashboard render path (the chat route does that
@@ -195,22 +200,6 @@ export default async function DashboardPage() {
         }
       />
 
-      <DailyInsightCard
-        monthlyIncome={monthlyIncome}
-        monthlyExpenses={monthlyExpenses}
-        currentSavings={currentSavings}
-        monthlyDebt={monthlyDebt}
-        hasEmergencyFund={data.financialProfile?.has_emergency_fund ?? false}
-        perceivedStress={data.financialProfile?.perceived_stress ?? 3}
-        situation={data.financialProfile?.situation ?? "tight"}
-        mainGoal={data.financialProfile?.main_goal ?? null}
-        behaviorTraits={data.financialProfile?.behavior_traits ?? []}
-        coachingTone={coachingTone}
-        currency={data.profile.currency}
-        locale={data.profile.locale}
-        aiReady={isAnthropicConfigured() && isAdminConfigured()}
-      />
-
       {proactiveHint && <ProactiveCoachCard hint={proactiveHint} />}
 
       {/*
@@ -261,6 +250,14 @@ export default async function DashboardPage() {
           hint={formatUserCurrency(currentSavings, data.profile)}
         />
       </div>
+
+      {/* Phase UX premium — ultra-compact "where do I stand" line. */}
+      <ResumeStrip
+        discipline={discipline.score}
+        completeness={completeness.structurelle}
+        reliability={completeness.reliability}
+        analyticsHref={ROUTES.expenseAnalytics}
+      />
 
       {/*
         Goals — compact when none, full summary when defined.

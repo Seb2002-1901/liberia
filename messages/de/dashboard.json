@@ -200,6 +200,11 @@
       }
     }
   },
+  "resumeStrip": {
+    "discipline": "Disziplin",
+    "completeness": "Vollständigkeit",
+    "openAnalytics": "Analyse öffnen"
+  },
   "discipline": {
     "eyebrow": "Budget-Disziplin",
     "tier": {
