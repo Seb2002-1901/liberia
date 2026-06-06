@@ -153,8 +153,7 @@
       "trigger_social": "Le uscite sociali possono farti spendere.",
       "trigger_late_night": "Gli acquisti notturni possono fregarti.",
       "trigger_payday": "Tendi a spendere di più intorno al giorno di paga.",
-      "trigger_weekends": "I weekend sono una zona da sorvegliare per te.",
-      "personality_note": "{text}"
+      "trigger_weekends": "I weekend sono una zona da sorvegliare per te."
     },
     "progress": {
       "new_expenses": "{count, plural, one {# nuova spesa registrata} other {# nuove spese registrate}}",
@@ -162,6 +161,10 @@
       "new_budgets": "{count, plural, one {# nuovo budget impostato} other {# nuovi budget impostati}}",
       "new_memory_entries": "{count, plural, one {# nota salvata dal coach} other {# note salvate dal coach}}"
     }
+  },
+  "coachButton": {
+    "title": "Parlare con il mio consulente",
+    "subtitle": "Fai una domanda, analizza la tua situazione, chiedi un consiglio."
   },
   "nextAction": {
     "eyebrow": "Prossima azione consigliata",

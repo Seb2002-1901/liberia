@@ -297,7 +297,7 @@ describe("buildAdvisorSummary — learned about you", () => {
       id: "m",
       user_id: "u",
       coaching_tone: "direct",
-      financial_personality: "Prudent",
+      financial_personality: null,
       recurring_challenges: ["impulse", "fear", "guilt", "overspend"],
       preferred_motivation_style: null,
       spending_triggers: ["stress", "boredom"],

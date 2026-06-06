@@ -48,7 +48,6 @@ export function buildCoachSystemContext(input: {
     fullName: input.finance.profile.full_name,
     financialProfile: input.finance.financialProfile,
     memory: input.memory,
-    compact: true,
   });
   const financeContext = buildFinanceContext(input.finance);
 

@@ -31,7 +31,15 @@ export function buildMemoryEntriesBlock(
 
   for (const e of entries) {
     const tag = KIND_TAG[e.kind] ?? e.kind;
-    const line = `- [${tag}] ${e.summary}`;
+    // Phase 3.1.12 — inject the rich detail field too. Truncate at
+    // 200 chars to keep the prompt budget under control. Detail
+    // captures the "why" / "context" the user mentioned; summary
+    // alone often loses the story.
+    const detail =
+      e.detail && e.detail.trim().length > 0
+        ? ` — ${e.detail.trim().slice(0, 200)}`
+        : "";
+    const line = `- [${tag}] ${e.summary}${detail}`;
     if (line.length + 1 > charsBudget) break;
     lines.push(line);
     charsBudget -= line.length + 1;

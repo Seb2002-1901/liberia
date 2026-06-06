@@ -40,10 +40,7 @@ import {
   computePotentialSavings,
   type PotentialSavings,
 } from "@/lib/calculations/budget-goals";
-import {
-  computeFinancialCompleteness,
-  type CompletenessResult,
-} from "@/lib/calculations/completeness";
+import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
 import {
   detectAnomalies,
   type Anomaly,
@@ -361,11 +358,7 @@ export function ExpenseAnalyticsClient({
         </CardContent>
       </Card>
 
-      <ReliabilityBanner completeness={completeness} />
-
       <AnomaliesCard anomalies={anomalies} currency={currency} />
-
-      <PerformanceTable budgetStatus={budgetStatus} currency={currency} />
 
       <PotentialSavingsCard
         savings={potentialSavings}
@@ -460,165 +453,6 @@ function BreakdownList({
         </div>
       )}
     </>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Phase 3.1.3 — performance budgétaire (tabular comparison)                  */
-/* -------------------------------------------------------------------------- */
-
-function PerformanceTable({
-  budgetStatus,
-  currency,
-}: {
-  budgetStatus: ReturnType<typeof buildBudgetStatus>;
-  currency: string;
-}) {
-  const t = useTranslations("app.finance.analytics.performance");
-  if (budgetStatus.length === 0) return null;
-
-  // Each row is a 5-field record (category / budget / réel / écart /
-  // statut). On mobile we render the same data as a stacked card —
-  // tables don't fit horizontally on a phone, and brutally
-  // overflowing them just hides the rightmost columns.
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {/* Mobile-stacked layout */}
-        <ul className="space-y-3 md:hidden">
-          {budgetStatus.map((b) => (
-            <PerformanceRowMobile key={b.category} row={b} currency={currency} />
-          ))}
-        </ul>
-        {/* Desktop table */}
-        <div className="hidden md:block">
-          <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-2 border-b border-border/40 pb-2 text-xs uppercase tracking-wider text-muted-foreground">
-            <span>{t("colCategory")}</span>
-            <span className="text-right">{t("colBudget")}</span>
-            <span className="text-right">{t("colReal")}</span>
-            <span className="text-right">{t("colDelta")}</span>
-            <span className="text-right">{t("colStatus")}</span>
-          </div>
-          <ul className="divide-y divide-border/40">
-            {budgetStatus.map((b) => (
-              <PerformanceRowDesktop
-                key={b.category}
-                row={b}
-                currency={currency}
-              />
-            ))}
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function PerformanceRowDesktop({
-  row,
-  currency,
-}: {
-  row: ReturnType<typeof buildBudgetStatus>[number];
-  currency: string;
-}) {
-  const t = useTranslations("app.finance.analytics.performance");
-  const label =
-    EXPENSE_CATEGORIES.find((c) => c.id === row.category)?.label ??
-    row.category;
-  return (
-    <li className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] items-center gap-2 py-2 text-sm">
-      <span className="truncate">{label}</span>
-      <span className="text-right tabular-nums text-muted-foreground">
-        {formatCurrency(row.limit, currency)}
-      </span>
-      <span className="text-right tabular-nums">
-        {formatCurrency(row.spent, currency)}
-      </span>
-      <span
-        className={cn(
-          "text-right tabular-nums",
-          row.remaining < 0 ? "text-destructive" : "text-emerald-500",
-        )}
-      >
-        {row.remaining >= 0 ? "+" : ""}
-        {formatCurrency(row.remaining, currency)}
-      </span>
-      <span className="text-right">
-        <StatusBadge status={row.status} t={t} />
-      </span>
-    </li>
-  );
-}
-
-function PerformanceRowMobile({
-  row,
-  currency,
-}: {
-  row: ReturnType<typeof buildBudgetStatus>[number];
-  currency: string;
-}) {
-  const t = useTranslations("app.finance.analytics.performance");
-  const label =
-    EXPENSE_CATEGORIES.find((c) => c.id === row.category)?.label ??
-    row.category;
-  return (
-    <li className="rounded-xl border border-border/60 bg-card/40 p-3 text-sm">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-medium">{label}</p>
-        <StatusBadge status={row.status} t={t} />
-      </div>
-      <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-        <div>
-          <p className="text-muted-foreground">{t("colBudget")}</p>
-          <p className="tabular-nums">{formatCurrency(row.limit, currency)}</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">{t("colReal")}</p>
-          <p className="tabular-nums">{formatCurrency(row.spent, currency)}</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">{t("colDelta")}</p>
-          <p
-            className={cn(
-              "tabular-nums",
-              row.remaining < 0 ? "text-destructive" : "text-emerald-500",
-            )}
-          >
-            {row.remaining >= 0 ? "+" : ""}
-            {formatCurrency(row.remaining, currency)}
-          </p>
-        </div>
-      </div>
-    </li>
-  );
-}
-
-function StatusBadge({
-  status,
-  t,
-}: {
-  status: "ok" | "warning" | "over";
-  t: ReturnType<typeof useTranslations>;
-}) {
-  const tone =
-    status === "over"
-      ? "bg-destructive/10 text-destructive"
-      : status === "warning"
-        ? "bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
-        : "bg-emerald-500/10 text-emerald-500";
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-        tone,
-      )}
-    >
-      {t(`status.${status}`)}
-    </span>
   );
 }
 
@@ -764,74 +598,6 @@ function priorityTone(priority: OpportunityPriority): string {
 /* -------------------------------------------------------------------------- */
 /*  Phase 3.1.3 — category history view                                         */
 /* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*  Phase 3.1.5 — reliability banner (when data is too thin to trust)           */
-/* -------------------------------------------------------------------------- */
-
-function ReliabilityBanner({
-  completeness,
-}: {
-  completeness: CompletenessResult;
-}) {
-  const t = useTranslations("app.finance.analytics.reliability");
-  const tArea = useTranslations("dashboard.completeness.area");
-  // High reliability = no banner. The page reads cleaner without
-  // a green "everything's fine" tile; the dashboard already shows
-  // the headline.
-  if (completeness.reliability === "high") return null;
-
-  const tone =
-    completeness.reliability === "low"
-      ? "border-rose-500/40 bg-rose-500/5 text-foreground"
-      : "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.05)] text-foreground";
-
-  // List the top 3 missing areas (high-severity first per
-  // detectMissingFinancialAreas() ordering).
-  const highlightMissing = completeness.missing
-    .filter((m) => m.severity !== "low")
-    .slice(0, 3);
-
-  return (
-    <Card className={cn("border", tone)}>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between text-base">
-          <span>{t("title")}</span>
-          <span className="text-sm tabular-nums">{completeness.score}%</span>
-        </CardTitle>
-        <CardDescription>
-          {t(`description.${completeness.reliability}`)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {highlightMissing.length > 0 && (
-          <>
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {t("missingLabel")}
-            </p>
-            <ul className="mt-2 space-y-1 text-sm">
-              {highlightMissing.map((m) => (
-                <li key={m.area} className="flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "inline-block h-1.5 w-1.5 rounded-full",
-                      m.severity === "high"
-                        ? "bg-rose-500"
-                        : "bg-[hsl(var(--gold))]",
-                    )}
-                  />
-                  {tArea(m.area)}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        <p className="mt-3 text-xs text-muted-foreground">{t("caveat")}</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Phase 3.1.6 — anomaly signals (calm, non-judgemental)                       */

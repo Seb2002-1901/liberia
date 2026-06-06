@@ -153,8 +153,7 @@
       "trigger_social": "Soziale Anlässe können Ausgaben auslösen.",
       "trigger_late_night": "Nächtliche Käufe können dich in die Falle locken.",
       "trigger_payday": "Du gibst tendenziell rund um den Zahltag mehr aus.",
-      "trigger_weekends": "Wochenenden sind für dich eine Risikozone.",
-      "personality_note": "{text}"
+      "trigger_weekends": "Wochenenden sind für dich eine Risikozone."
     },
     "progress": {
       "new_expenses": "{count, plural, one {# neue Ausgabe erfasst} other {# neue Ausgaben erfasst}}",
@@ -162,6 +161,10 @@
       "new_budgets": "{count, plural, one {# neues Budget eingerichtet} other {# neue Budgets eingerichtet}}",
       "new_memory_entries": "{count, plural, one {# Notiz vom Coach gespeichert} other {# Notizen vom Coach gespeichert}}"
     }
+  },
+  "coachButton": {
+    "title": "Mit meinem Berater sprechen",
+    "subtitle": "Stelle eine Frage, analysiere deine Lage, hol dir eine Empfehlung."
   },
   "nextAction": {
     "eyebrow": "Empfohlene nächste Aktion",

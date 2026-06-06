@@ -153,8 +153,7 @@
       "trigger_social": "Las salidas sociales pueden disparar el gasto.",
       "trigger_late_night": "Las compras nocturnas pueden pillarte.",
       "trigger_payday": "Sueles gastar más alrededor del día de cobro.",
-      "trigger_weekends": "Los fines de semana son una zona a vigilar para ti.",
-      "personality_note": "{text}"
+      "trigger_weekends": "Los fines de semana son una zona a vigilar para ti."
     },
     "progress": {
       "new_expenses": "{count, plural, one {# nuevo gasto registrado} other {# nuevos gastos registrados}}",
@@ -162,6 +161,10 @@
       "new_budgets": "{count, plural, one {# nuevo presupuesto definido} other {# nuevos presupuestos definidos}}",
       "new_memory_entries": "{count, plural, one {# nota guardada por el coach} other {# notas guardadas por el coach}}"
     }
+  },
+  "coachButton": {
+    "title": "Hablar con mi asesor",
+    "subtitle": "Haz una pregunta, analiza tu situación, pide consejo."
   },
   "nextAction": {
     "eyebrow": "Próxima acción recomendada",

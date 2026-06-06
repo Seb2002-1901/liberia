@@ -153,8 +153,7 @@
       "trigger_social": "Les sorties sociales peuvent déclencher des dépenses.",
       "trigger_late_night": "Les achats nocturnes peuvent te piéger.",
       "trigger_payday": "Tu as tendance à dépenser autour des jours de paie.",
-      "trigger_weekends": "Les week-ends sont une zone à surveiller pour toi.",
-      "personality_note": "{text}"
+      "trigger_weekends": "Les week-ends sont une zone à surveiller pour toi."
     },
     "progress": {
       "new_expenses": "{count, plural, one {# nouvelle dépense enregistrée} other {# nouvelles dépenses enregistrées}}",
@@ -162,6 +161,10 @@
       "new_budgets": "{count, plural, one {# nouveau budget configuré} other {# nouveaux budgets configurés}}",
       "new_memory_entries": "{count, plural, one {# information enregistrée par le coach} other {# informations enregistrées par le coach}}"
     }
+  },
+  "coachButton": {
+    "title": "Parler à mon conseiller",
+    "subtitle": "Pose une question, analyse ta situation, demande conseil."
   },
   "nextAction": {
     "eyebrow": "Prochaine action recommandée",

@@ -122,6 +122,22 @@ export function buildFinanceContext(
     })
     .join("\n");
 
+  // Phase 3.1.12 — inject the WHY behind expenses. Top 8 most recent
+  // expenses with a non-empty note. Notes carry the story the coach
+  // needs to be a real adviser ("cadeau anniversaire mère" vs just
+  // "200 CHF Loisirs"). Truncated for prompt budget.
+  const expenseNotes = [...data.expenses]
+    .filter((e) => e.notes && e.notes.trim().length > 0)
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+    .slice(0, 8)
+    .map((e) => {
+      const cat =
+        EXPENSE_CATEGORIES.find((c) => c.id === e.category)?.label ?? e.category;
+      const note = e.notes!.trim().slice(0, 120);
+      return `- ${e.label} (${cat}, ${fmt(e.amount)}) — ${note}`;
+    })
+    .join("\n");
+
   const goalsList = data.goals
     .slice(0, 6)
     .map((g) => {
@@ -382,6 +398,9 @@ ${expenseByCategory || "Aucune dépense enregistrée."}
 
 ## Revenus déclarés
 ${incomeByLabel || "Aucun revenu enregistré."}
+
+## Notes récentes sur les dépenses (contexte que l'utilisateur a écrit)
+${expenseNotes || "Aucune note ajoutée sur les dépenses récentes."}
 
 ## Objectifs actuels
 ${goalsSection}

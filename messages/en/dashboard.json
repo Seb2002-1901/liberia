@@ -153,8 +153,7 @@
       "trigger_social": "Social outings can trigger spending.",
       "trigger_late_night": "Late-night purchases can catch you out.",
       "trigger_payday": "Spending tends to peak around paydays.",
-      "trigger_weekends": "Weekends are a watch zone for you.",
-      "personality_note": "{text}"
+      "trigger_weekends": "Weekends are a watch zone for you."
     },
     "progress": {
       "new_expenses": "{count, plural, one {# new expense recorded} other {# new expenses recorded}}",
@@ -162,6 +161,10 @@
       "new_budgets": "{count, plural, one {# new budget set} other {# new budgets set}}",
       "new_memory_entries": "{count, plural, one {# new note saved by the coach} other {# new notes saved by the coach}}"
     }
+  },
+  "coachButton": {
+    "title": "Talk to my advisor",
+    "subtitle": "Ask a question, review your situation, get a recommendation."
   },
   "nextAction": {
     "eyebrow": "Recommended next action",

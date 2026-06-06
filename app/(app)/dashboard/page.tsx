@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowDownCircle,
   ArrowUpCircle,
   PiggyBank,
   Sparkles,
@@ -34,14 +33,10 @@ import { buildAdvisorSummary } from "@/lib/calculations/advisor-engine";
 import { AdvisorCard } from "@/components/dashboard/advisor-card";
 import { LearnedAboutYou } from "@/components/dashboard/learned-about-you";
 import { ProgressSinceLastVisit } from "@/components/dashboard/progress-since-last-visit";
+import { CoachButton } from "@/components/dashboard/coach-button";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
-import { ResumeStrip } from "@/components/dashboard/resume-strip";
-import { CoachTeaser } from "@/components/dashboard/coach-teaser";
-import { ProactiveCoachCard } from "@/components/dashboard/proactive-coach-card";
-import { getActivePlan } from "@/lib/services/plan";
 import { getMyUserMemory } from "@/lib/services/memory";
 import { listMyMemoryEntries } from "@/lib/services/memory-entries";
-import { generateProactiveHint } from "@/lib/coach/proactive";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("dashboard.metadata");
@@ -50,33 +45,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
-  const [data, activePlan, memory, memoryEntries] = await Promise.all([
+  const [data, memory, memoryEntries] = await Promise.all([
     getFinanceData(),
-    getActivePlan(),
     getMyUserMemory(),
     listMyMemoryEntries(),
   ]);
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
-  // Phase 3.1.1 — three distinct expense numbers, never confused:
-  //   - fixed     = recurring lines normalised to monthly (rent,
-  //                 subscriptions, insurance...). Drives long-term
-  //                 health metrics: stability score, runway, savings
-  //                 rate, expense ratio — none of those should jitter
-  //                 with one-off purchases.
-  //   - variable  = one_time transactions logged THIS calendar month
-  //                 (typically from the coach's propose_expense flow).
-  //   - total     = fixed + variable. Drives the "Leftover" KPI and
-  //                 the headline "Dépenses totales" card — what the
-  //                 user actually has left to live on this month.
-  // Fallback to the onboarding-time monthly_expenses on the legacy
-  // monthly-fixed path so empty new accounts still show non-zero KPIs.
   const fixedExpenses =
     data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
   const variableExpenses = data.expenseBuckets.variable;
   const totalExpenses = fixedExpenses + variableExpenses;
-  // Phase 3.1.7+ — Recompute budget + opportunities so the
-  // NextAction primitive can pick the right call to action.
   const monthBudgetStatus = buildBudgetStatus(
     data.expenses,
     data.categoryBudgets.map((b) => ({
@@ -84,15 +63,9 @@ export default async function DashboardPage() {
       monthly_limit: b.monthly_limit,
     })),
   );
-  // Long-term health metrics intentionally use FIXED, not TOTAL —
-  // stability is about your recurring burn rate vs income, not about
-  // a single month of variable spending.
   const monthlyExpenses = fixedExpenses;
   const currentSavings = data.financialProfile?.current_savings ?? 0;
 
-  // The user's "Reste à vivre" KPI must reflect real-life spending
-  // (including variable). Stability calcs below stay on the recurring
-  // base — different concepts, different formulas.
   const cashflow = calculateNetCashflow({
     monthlyIncome,
     monthlyExpenses: totalExpenses,
@@ -112,18 +85,12 @@ export default async function DashboardPage() {
     runwayMonths: runway,
     savingsRate,
   });
-  // Phase 3.1.5 — data completeness gate. The card surfaces the
-  // score + missing areas; the assistant modal lets the user
-  // back-fill in 30s.
   const completeness = computeFinancialCompleteness({
     incomes: data.incomes,
     expenses: data.expenses,
     goals: data.goals,
     categoryBudgets: data.categoryBudgets,
   });
-  // Phase 3.1.7 — single hero action card. Picks the best CTA
-  // from the same primitives the other cards use, so the dashboard
-  // never says one thing and the analytics page another.
   const nextAction = computeNextAction({
     completeness,
     opportunities: dashboardOpportunities,
@@ -131,26 +98,14 @@ export default async function DashboardPage() {
     goalCount: data.goals.length,
   });
 
-  // Phase UX premium — ultra-compact resume strip beneath the 4 KPI.
-  // Two micro-scores (discipline + complétude structurelle) summarise
-  // "where do I stand" in a single line so the dashboard doesn't need
-  // a full card per axis. The detailed views live on /expenses/analytics.
   const discipline = computeDisciplineScore({
     budgetStatus: monthBudgetStatus,
     savingsRate,
     runwayMonths: runway,
     monthlyTransactions: data.expenseBuckets.transactions,
   });
-  // Phase 3.1.10 — coach confidence chip. We don't fetch memory
-  // entries on the dashboard render path (the chat route does that
-  // server-side via the admin client); we rely on the static
-  // personality layer + budgets + goals as proxies. The chip
-  // intentionally skews towards LOW when the dashboard has thin
-  // data — same conservative gate as the coach itself.
   const hasPersonalityNotes = Boolean(
-    memory?.financial_personality ||
-      memory?.progress_notes ||
-      memory?.preferred_motivation_style ||
+    memory?.progress_notes ||
       (memory?.spending_triggers?.length ?? 0) > 0 ||
       (memory?.recurring_challenges?.length ?? 0) > 0,
   );
@@ -162,10 +117,6 @@ export default async function DashboardPage() {
     hasPersonalityNotes,
   });
 
-  // Phase 3.1.11 — AdvisorEngine consolidates every primitive
-  // already computed above into a single AdvisorSummary the new
-  // hero card + LearnedAboutYou + ProgressSinceLastVisit cards
-  // read directly. Zero duplicated math.
   const budgetProgress = computeBudgetProgress(
     data.categoryBudgets.map((b) => ({
       category: b.category,
@@ -194,25 +145,15 @@ export default async function DashboardPage() {
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
-  // Weekly recap + proactive hint — both are pure derivations over
-  // data already loaded above. No extra DB hop.
-  const proactiveHint = generateProactiveHint({
-    incomes: data.incomes,
-    expenses: data.expenses,
-    goals: data.goals,
-    planSteps: activePlan?.steps ?? [],
-    cashflow,
-    runway,
-    savingsRate,
-    hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
-    monthlyExpenses,
-    currency: data.profile.currency,
-    locale: data.profile.locale,
-    behaviorTraits: data.financialProfile?.behavior_traits ?? [],
-    coachingTone: memory?.coaching_tone ?? null,
-    memory,
-  });
-
+  // Phase 3.1.12 — dashboard final, 6 sections seulement :
+  //   1. PageHeader
+  //   2. AdvisorCard (hero, voix conseiller unique)
+  //   3. KPI strip 3 cards (Revenus · Reste · Runway)
+  //   4. LearnedAboutYou + ProgressSinceLastVisit
+  //   5. GoalsSummary (si objectifs définis)
+  //   6. CoachButton (CTA full-width "Parler à mon conseiller")
+  // Supprimés : CoachTeaser, ProactiveCoachCard, ResumeStrip, StatCard
+  // "Dépenses totales" — tout doublonnait l'AdvisorCard.
   return (
     <div className="space-y-6">
       <PageHeader
@@ -236,18 +177,6 @@ export default async function DashboardPage() {
         }
       />
 
-      {proactiveHint && <ProactiveCoachCard hint={proactiveHint} />}
-
-      {/*
-        Phase 3.1.11 — dashboard hierarchy:
-          1. AdvisorCard (hero) — single CTA + secondary priorities
-          2. 4 KPI (Revenus / Dépenses / Reste / Urgence)
-          3. LearnedAboutYou (hidden when nothing learned)
-          4. ProgressSinceLastVisit (hidden when nothing changed)
-          5. ResumeStrip (Discipline + Complétude one-liner)
-          6. GoalsSummary (conditional)
-          7. CoachTeaser
-      */}
       <AdvisorCard
         summary={advisor}
         missing={completeness.missing}
@@ -256,19 +185,12 @@ export default async function DashboardPage() {
         currency={data.profile.currency}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label={t("stats.income")}
           value={formatUserCurrency(monthlyIncome, data.profile)}
           icon={<ArrowUpCircle className="h-4 w-4" />}
           tone="gold"
-        />
-        <StatCard
-          label={t("stats.totalExpenses")}
-          value={formatUserCurrency(totalExpenses, data.profile)}
-          icon={<ArrowDownCircle className="h-4 w-4" />}
-          tone={totalExpenses > monthlyIncome ? "negative" : "neutral"}
-          hint={t("stats.totalExpensesHint")}
         />
         <StatCard
           label={t("stats.leftover")}
@@ -290,38 +212,16 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Phase 3.1.11 — two compact context cards. Both self-hide
-          when there's nothing to say so the dashboard stays calm
-          for brand-new accounts. */}
       <div className="grid gap-4 sm:grid-cols-2">
         <LearnedAboutYou summary={advisor} />
         <ProgressSinceLastVisit summary={advisor} />
       </div>
 
-      {/* Phase UX premium — ultra-compact "where do I stand" line. */}
-      <ResumeStrip
-        discipline={discipline.score}
-        completeness={completeness.structurelle}
-        reliability={completeness.reliability}
-        analyticsHref={ROUTES.expenseAnalytics}
-      />
-
-      {/*
-        Goals — compact when none, full summary when defined.
-      */}
       {data.goals.length > 0 && (
         <GoalsSummary goals={data.goals} currency={data.profile.currency} />
       )}
 
-      <CoachTeaser
-        data={data}
-        monthlyIncome={monthlyIncome}
-        monthlyExpenses={monthlyExpenses}
-        cashflow={cashflow}
-        savingsRate={savingsRate}
-        runwayMonths={runway}
-      />
+      <CoachButton />
     </div>
   );
 }
-

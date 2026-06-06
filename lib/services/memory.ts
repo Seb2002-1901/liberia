@@ -46,9 +46,8 @@ export function buildUserMemoryContext(input: {
   fullName?: string | null;
   financialProfile: FinancialProfile | null;
   memory: UserMemory | null;
-  compact?: boolean;
 }): string {
-  const { fullName, financialProfile, memory, compact = false } = input;
+  const { fullName, financialProfile, memory } = input;
 
   const toneId = resolveCoachingTone(
     memory?.coaching_tone ?? null,
@@ -79,16 +78,8 @@ export function buildUserMemoryContext(input: {
   if (tone) lines.push(`Style de coaching attendu : ${tone.label}`);
   if (challenges) lines.push(`Difficultés récurrentes : ${challenges}`);
   if (triggers) lines.push(`Déclencheurs de dépense : ${triggers}`);
-  if (memory?.preferred_motivation_style)
-    lines.push(
-      `Style de motivation préféré : ${memory.preferred_motivation_style}`,
-    );
-  if (memory?.financial_personality)
-    lines.push(`Personnalité financière : ${memory.financial_personality}`);
   if (memory?.progress_notes)
     lines.push(`Notes personnelles : ${memory.progress_notes}`);
-  if (memory?.last_coach_summary && !compact)
-    lines.push(`Dernier résumé du coach : ${memory.last_coach_summary}`);
 
   return lines.join("\n");
 }

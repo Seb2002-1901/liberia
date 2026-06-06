@@ -345,15 +345,6 @@ function buildLearnedAboutUser(
       kind: `trigger_${m!.spending_triggers[0]}`,
       payload: {},
     });
-    if (out.length >= MAX_LEARNED) return out;
-  }
-
-  // Free text "personnalité financière"
-  if (m?.financial_personality) {
-    out.push({
-      kind: "personality_note",
-      payload: { text: m.financial_personality },
-    });
   }
 
   return out.slice(0, MAX_LEARNED);
