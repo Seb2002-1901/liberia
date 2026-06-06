@@ -908,6 +908,8 @@
         "description": "Soma das oportunidades detetadas. Estimativa baseada em hipóteses prudentes (10-20% de redução nas alavancas identificadas), sem garantia.",
         "perMonth": "mês",
         "yearlyLine": "≈ {yearly} por ano",
+        "leversCount": "{count, plural, =0 {Nenhuma alavanca detetada} one {# alavanca detetada} other {# alavancas detetadas}}",
+        "estimateLine": "Estimativa: {monthly}/mês (≈ {yearly}/ano)",
         "disclaimer": "Esta projeção baseia-se nas oportunidades abaixo. O valor real depende das ações concretas que tomares.",
         "priority": {
           "high": "Alta",

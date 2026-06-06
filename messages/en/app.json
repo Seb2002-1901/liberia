@@ -908,6 +908,8 @@
         "description": "Aggregate of detected opportunities. Estimate based on conservative assumptions (10-20% cut on identified levers), not a guarantee.",
         "perMonth": "month",
         "yearlyLine": "≈ {yearly} per year",
+        "leversCount": "{count, plural, =0 {No lever detected} one {# lever detected} other {# levers detected}}",
+        "estimateLine": "Estimate: {monthly}/month (≈ {yearly}/year)",
         "disclaimer": "This projection is built from the opportunities below. The real amount depends on the concrete actions you take.",
         "priority": {
           "high": "High",

@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  Layers,
   PiggyBank,
   Sparkles,
   Wallet,
@@ -19,29 +18,22 @@ import {
   calculateNetCashflow,
   calculateRunway,
   calculateSavingsRate,
-  calculateStabilityScore,
 } from "@/lib/calculations/finance";
 import { formatPercent, formatUserCurrency } from "@/lib/utils";
 import {
   buildBudgetStatus,
   buildCategoryBreakdown,
 } from "@/lib/calculations/analytics";
-import { computeDisciplineScore } from "@/lib/calculations/discipline";
 import { detectOpportunities } from "@/lib/calculations/opportunities";
 import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
 import { computeNextAction } from "@/lib/calculations/next-action";
-import { CompletenessCard } from "@/components/dashboard/completeness-card";
-import { NextActionCard } from "@/components/dashboard/next-action-card";
-import { DisciplineCard } from "@/components/dashboard/discipline-card";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
+import { NextActionCard } from "@/components/dashboard/next-action-card";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { DailyInsightCard } from "@/components/dashboard/daily-insight-card";
-import { PlanTeaser } from "@/components/dashboard/plan-teaser";
 import { ProactiveCoachCard } from "@/components/dashboard/proactive-coach-card";
-import { WeeklyRecapCard } from "@/components/dashboard/weekly-recap-card";
 import { getActivePlan } from "@/lib/services/plan";
 import { getMyUserMemory, resolveCoachingTone } from "@/lib/services/memory";
-import { generateWeeklyRecap } from "@/lib/recap/weekly";
 import { generateProactiveHint } from "@/lib/coach/proactive";
 import { isAnthropicConfigured } from "@/lib/env";
 import { isAdminConfigured } from "@/lib/supabase/admin";
@@ -81,10 +73,8 @@ export default async function DashboardPage() {
     data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
   const variableExpenses = data.expenseBuckets.variable;
   const totalExpenses = fixedExpenses + variableExpenses;
-  const transactionsCount = data.expenseBuckets.transactions;
-  // Phase 3.1.3 — discipline score for the headline card. The
-  // analytics page reuses the same helper for its detailed breakdown
-  // so dashboard and /expenses/analytics never disagree.
+  // Phase 3.1.7+ — Recompute budget + opportunities so the
+  // NextAction primitive can pick the right call to action.
   const monthBudgetStatus = buildBudgetStatus(
     data.expenses,
     data.categoryBudgets.map((b) => ({
@@ -98,7 +88,6 @@ export default async function DashboardPage() {
   const monthlyExpenses = fixedExpenses;
   const currentSavings = data.financialProfile?.current_savings ?? 0;
   const monthlyDebt = data.financialProfile?.monthly_debt ?? 0;
-  const dti = monthlyIncome > 0 ? (monthlyDebt / monthlyIncome) * 100 : 0;
 
   // The user's "Reste à vivre" KPI must reflect real-life spending
   // (including variable). Stability calcs below stay on the recurring
@@ -109,21 +98,6 @@ export default async function DashboardPage() {
   });
   const savingsRate = calculateSavingsRate({ monthlyIncome, monthlyExpenses });
   const runway = calculateRunway({ currentSavings, monthlyExpenses });
-  const stability = calculateStabilityScore({
-    monthlyIncome,
-    monthlyExpenses,
-    currentSavings,
-    hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
-    debtToIncomeRatio: dti,
-  });
-  const discipline = computeDisciplineScore({
-    budgetStatus: monthBudgetStatus,
-    savingsRate,
-    runwayMonths: runway,
-    monthlyTransactions: transactionsCount,
-  });
-
-  // Phase 3.1.4 — goal achievement + potential savings for the
   const monthCategoryBreakdown = buildCategoryBreakdown(
     data.expenses,
     "month",
@@ -160,18 +134,6 @@ export default async function DashboardPage() {
 
   // Weekly recap + proactive hint — both are pure derivations over
   // data already loaded above. No extra DB hop.
-  const weeklyRecap = generateWeeklyRecap({
-    incomes: data.incomes,
-    expenses: data.expenses,
-    goals: data.goals,
-    planSteps: activePlan?.steps ?? [],
-    cashflow,
-    runway,
-    savingsRate,
-    stabilityScore: stability,
-    hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
-  });
-
   const proactiveHint = generateProactiveHint({
     incomes: data.incomes,
     expenses: data.expenses,
@@ -230,13 +192,13 @@ export default async function DashboardPage() {
 
       {proactiveHint && <ProactiveCoachCard hint={proactiveHint} />}
 
-      <WeeklyRecapCard recap={weeklyRecap} />
-
       {/*
-        Phase 3.1.7 — single hero: the next best action. Replaces
-        the StabilityCard / Stress row + the Discipline / Objectifs
-        / Économies row. Every other metric on the dashboard becomes
-        descriptive support for this card's recommendation.
+        Phase 3.1.8 — dashboard = pilotage centre. ONE hero card
+        (NextAction) + 4 KPI + Coach surfaces. Everything else
+        (Complétude, Discipline, WeeklyRecap, PlanTeaser, breakdowns,
+        analytics CTA) lives on /expenses/analytics or /coach. The
+        dashboard now reads as a 5-second pulse: "what should I do
+        next, and where do I stand?".
       */}
       <NextActionCard
         action={nextAction}
@@ -244,11 +206,6 @@ export default async function DashboardPage() {
         currency={data.profile.currency}
       />
 
-      {/*
-        4 KPI maximum (per the brief). Detailed breakdown
-        (fixed / variable / transactions / categories / history /
-        opportunities) lives on /expenses/analytics.
-      */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={t("stats.income")}
@@ -284,46 +241,11 @@ export default async function DashboardPage() {
       </div>
 
       {/*
-        Phase 3.1.7 — two compact qualité cards side by side:
-        Complétude (collapsed-by-default details) + Discipline.
-        Everything else (Économies potentielles, Objectifs respectés,
-        Cashflow chart, ExpenseBreakdown, alerts) moved to
-        /expenses/analytics or removed.
-      */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <CompletenessCard
-          completeness={completeness}
-          currency={data.profile.currency}
-        />
-        <DisciplineCard
-          score={discipline.score}
-          tier={discipline.tier}
-          weakest={discipline.weakest}
-        />
-      </div>
-
-      {/*
         Goals — compact when none, full summary when defined.
-        Removes the empty "no goal" block hogging space.
       */}
       {data.goals.length > 0 && (
         <GoalsSummary goals={data.goals} currency={data.profile.currency} />
       )}
-
-      <div className="flex justify-end">
-        <Button asChild variant="outline" size="sm">
-          <Link href={ROUTES.expenseAnalytics}>
-            <Layers className="h-4 w-4" />
-            {t("stats.analyticsCtaButton")}
-          </Link>
-        </Button>
-      </div>
-
-      <PlanTeaser
-        plan={activePlan?.plan ?? null}
-        steps={activePlan?.steps ?? []}
-        aiReady={isAnthropicConfigured() && isAdminConfigured()}
-      />
 
       <CoachTeaser
         data={data}

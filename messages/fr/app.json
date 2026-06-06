@@ -908,6 +908,8 @@
         "description": "Total cumulé des opportunités détectées. Estimation issue d'hypothèses prudentes (10-20 % de réduction sur les leviers identifiés), pas une garantie.",
         "perMonth": "mois",
         "yearlyLine": "Soit ≈ {yearly} sur l'année",
+        "leversCount": "{count, plural, =0 {Aucun levier détecté} one {# levier détecté} other {# leviers détectés}}",
+        "estimateLine": "Estimation : {monthly}/mois (≈ {yearly}/an)",
         "disclaimer": "Cette projection se base sur les opportunités ci-dessous. Le montant réel dépend des actions concrètes que tu mettras en place.",
         "priority": {
           "high": "Haute",

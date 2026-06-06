@@ -908,6 +908,8 @@
         "description": "Suma de las oportunidades detectadas. Estimación basada en hipótesis prudentes (10-20% de reducción en las palancas identificadas), no garantía.",
         "perMonth": "mes",
         "yearlyLine": "≈ {yearly} al año",
+        "leversCount": "{count, plural, =0 {Ninguna palanca detectada} one {# palanca detectada} other {# palancas detectadas}}",
+        "estimateLine": "Estimación: {monthly}/mes (≈ {yearly}/año)",
         "disclaimer": "Esta proyección se basa en las oportunidades de abajo. El importe real depende de las acciones concretas que tomes.",
         "priority": {
           "high": "Alta",

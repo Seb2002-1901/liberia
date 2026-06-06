@@ -49,6 +49,8 @@ import {
   type Anomaly,
 } from "@/lib/calculations/anomalies";
 import { frequencyMultiplier } from "@/lib/calculations/aggregate";
+import { CompletenessCard } from "@/components/dashboard/completeness-card";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryId } from "@/lib/constants";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -225,6 +227,14 @@ export function ExpenseAnalyticsClient({
 
   return (
     <div className="space-y-6">
+      {/* Phase 3.1.8 — completeness moved to analytics top so the
+          dashboard stays focused on action. The card stays compact
+          + dépliable: same UX as before, new placement. */}
+      <CompletenessCard
+        completeness={completeness}
+        currency={currency}
+      />
+
       {/* Period selector */}
       <Card>
         <CardHeader>
@@ -272,21 +282,14 @@ export function ExpenseAnalyticsClient({
         />
       </div>
 
-      {/* Category breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            {t("breakdown.title")}
-          </CardTitle>
-          <CardDescription>{t("breakdown.description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <BreakdownList
-            breakdown={breakdown}
-            currency={currency}
-          />
-        </CardContent>
-      </Card>
+      {/* Category breakdown — wrapped in CollapsibleSection so the
+          long list doesn't dominate the page by default. */}
+      <CollapsibleSection
+        title={t("breakdown.title")}
+        subtitle={t("breakdown.description")}
+      >
+        <BreakdownList breakdown={breakdown} currency={currency} />
+      </CollapsibleSection>
 
       {/* Budgets per category */}
       <Card>
@@ -947,13 +950,18 @@ function PotentialSavingsCard({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Phase 3.1.8 — lead with the COUNT of identified levers
+              rather than the raw monthly amount. Brief: "8 CHF/month"
+              is misleading; "2 leviers identifiés" is honest. The
+              detailed monthly + yearly figures live in the secondary
+              line beneath, still visible but no longer the headline. */}
           <div className="space-y-1">
             <p className="font-display text-3xl font-semibold tabular-nums text-[hsl(var(--gold))]">
-              {formatCurrency(savings.monthly, currency)}
-              <span className="text-base text-muted-foreground"> / {t("perMonth")}</span>
+              {t("leversCount", { count: opportunitiesCount })}
             </p>
             <p className="text-sm text-muted-foreground">
-              {t("yearlyLine", {
+              {t("estimateLine", {
+                monthly: formatCurrency(savings.monthly, currency),
                 yearly: formatCurrency(savings.yearly, currency),
               })}
             </p>
@@ -1004,42 +1012,39 @@ function CategoryHistoryCard({
   const t = useTranslations("app.finance.analytics.history");
   const rows = history.filter((r) => r.total > 0).slice(0, 6);
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <CardTitle className="text-base">{t("title")}</CardTitle>
-            <CardDescription>{t("description")}</CardDescription>
-          </div>
-          <div className="flex gap-1 rounded-lg border border-border/60 bg-card/40 p-0.5">
-            <button
-              type="button"
-              onClick={() => onMonthsChange(3)}
-              className={cn(
-                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                months === 3
-                  ? "bg-[hsl(var(--gold)/0.12)] text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t("3m")}
-            </button>
-            <button
-              type="button"
-              onClick={() => onMonthsChange(12)}
-              className={cn(
-                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                months === 12
-                  ? "bg-[hsl(var(--gold)/0.12)] text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t("12m")}
-            </button>
-          </div>
+    <CollapsibleSection
+      title={t("title")}
+      subtitle={t("description")}
+    >
+      <div className="mb-4 flex justify-end">
+        <div className="flex gap-1 rounded-lg border border-border/60 bg-card/40 p-0.5">
+          <button
+            type="button"
+            onClick={() => onMonthsChange(3)}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              months === 3
+                ? "bg-[hsl(var(--gold)/0.12)] text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t("3m")}
+          </button>
+          <button
+            type="button"
+            onClick={() => onMonthsChange(12)}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              months === 12
+                ? "bg-[hsl(var(--gold)/0.12)] text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t("12m")}
+          </button>
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div>
         {rows.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border/50 bg-card/20 p-4 text-center text-sm text-muted-foreground">
             {t("empty")}
@@ -1051,8 +1056,8 @@ function CategoryHistoryCard({
             ))}
           </ul>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </CollapsibleSection>
   );
 }
 

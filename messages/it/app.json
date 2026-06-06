@@ -908,6 +908,8 @@
         "description": "Somma delle opportunità rilevate. Stima basata su ipotesi prudenti (10-20% di riduzione sui leveraggi identificati), non una garanzia.",
         "perMonth": "mese",
         "yearlyLine": "≈ {yearly} all'anno",
+        "leversCount": "{count, plural, =0 {Nessuna leva rilevata} one {# leva rilevata} other {# leve rilevate}}",
+        "estimateLine": "Stima: {monthly}/mese (≈ {yearly}/anno)",
         "disclaimer": "Questa proiezione si basa sulle opportunità qui sotto. L'importo reale dipende dalle azioni concrete che farai.",
         "priority": {
           "high": "Alta",
