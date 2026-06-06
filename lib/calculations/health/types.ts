@@ -31,16 +31,31 @@ export type AxisId =
   | "comportement";
 
 /**
- * Phase 3.2 — 4 tiers.
+ * Phase 3.2 — Two confidence vocabularies, distinct on purpose :
  *
- * - HIGH : every axis has solid input, the number is a real read.
- * - MEDIUM : enough axes report HIGH for the synthesis to hold up.
- * - LOW : few axes are confident, take the number with a grain of salt.
- * - INSUFFICIENT_DATA : the score is computed and shown, but the user
- *   profile is too thin for it to mean anything. UI says "Données
- *   insuffisantes" (neutral, not accusatory) ; coach refuses to draw
- *   any conclusion and asks questions instead.
+ * AxisConfidence (per-axis output) — used by the composition step
+ * to decide whether an axis participates in the weighted sum :
+ *   - HIGH    : axis has solid input, contributes at full weight
+ *   - MEDIUM  : axis has partial input, still contributes
+ *   - LOW     : axis has thin input, still contributes
+ *   - UNKNOWN : axis cannot be computed at all, EXCLUDED from the
+ *               weighted sum (the renormaliser redistributes its
+ *               weight across the remaining axes)
+ *
+ * Confidence (global, on the final score) — surfaced to the UI and
+ * to the coach :
+ *   - HIGH    : majority of axes are HIGH, score is a real read
+ *   - MEDIUM  : enough HIGH axes for the synthesis to hold up
+ *   - LOW     : few axes confident, score has caveats
+ *   - INSUFFICIENT_DATA : short-circuit BEFORE the rollup. Triggered
+ *                         when the user profile is too thin for the
+ *                         score to mean anything (no income, < 40 %
+ *                         structurelle, no historical snapshot, …).
+ *                         UI says "Données insuffisantes" (neutral) ;
+ *                         coach refuses conclusions and asks instead.
  */
+export type AxisConfidence = "HIGH" | "MEDIUM" | "LOW" | "UNKNOWN";
+
 export type Confidence = "HIGH" | "MEDIUM" | "LOW" | "INSUFFICIENT_DATA";
 
 export type Band = "rose" | "ambre" | "or" | "emeraude";
@@ -54,13 +69,23 @@ export interface AxisResult {
   id: AxisId;
   /** 0-100 integer, post-clamp. */
   score: number;
-  confidence: Confidence;
+  confidence: AxisConfidence;
   /**
-   * Flat record of sub-component values. Shape is axis-specific but
-   * STABLE across versions for a given axis. The delta engine reads
-   * these to attribute each axis change to a precise reason.
+   * Flat record of NUMERIC sub-component values. Shape is axis-specific
+   * but STABLE across versions for a given axis. The delta engine
+   * reads these to attribute each axis change to a precise reason via
+   * straight numeric diffs.
    */
   components: Record<string, number>;
+  /**
+   * Optional non-numeric details the delta engine needs to produce a
+   * specific reason. Example : Couverture stores filled_majors as an
+   * array of area ids so the engine can set-diff and report "Logement
+   * renseigné" rather than the generic "Profil affiné". Stored as
+   * jsonb alongside components — no schema change required to add
+   * new entries.
+   */
+  details?: Record<string, string | string[]>;
 }
 
 /**
