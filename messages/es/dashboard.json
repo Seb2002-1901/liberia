@@ -132,6 +132,11 @@
       "medium": "Prioridad media",
       "low": "Prioridad baja"
     },
+    "confidence": {
+      "HIGH": "Alta confianza",
+      "MEDIUM": "Confianza media",
+      "LOW": "Baja confianza"
+    },
     "impactLine": "Impacto estimado: {monthly}/mes (≈ {yearly}/año)",
     "kind": {
       "complete_profile": {

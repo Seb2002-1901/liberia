@@ -15,7 +15,7 @@ import {
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
-import { getMyUserMemory } from "@/lib/services/memory";
+import { getMyUserMemory, buildUserMemoryContext } from "@/lib/services/memory";
 import {
   selectEntriesForPrompt,
   touchMemoryEntries,
@@ -272,6 +272,33 @@ export async function POST(request: Request) {
                 cache_control: { type: "ephemeral" },
               },
             ];
+
+            // Phase 3.1.10 — recâblage critique. The personal-memory
+            // block (coaching_tone, recurring_challenges, spending_
+            // triggers, financial_personality, motivation style,
+            // progress notes, last summary) is built by
+            // buildUserMemoryContext but was NEVER injected into the
+            // LLM prompt before this phase. The audit 3.1.9 flagged
+            // it as a UX lie: users were editing memory in Settings
+            // that the coach silently ignored. We now inject it as
+            // its own cached block.
+            const personalMemoryBlock = buildUserMemoryContext({
+              fullName: financeData.profile.full_name,
+              financialProfile: financeData.financialProfile,
+              memory,
+            });
+            // Skip when the block has no signal beyond the header
+            // ("# Mémoire utilisateur" + first name only is noise).
+            const personalMemoryHasSignal =
+              personalMemoryBlock.split("\n").length > 2;
+            if (memoryEnabled && personalMemoryHasSignal) {
+              systemBlocks.push({
+                type: "text",
+                text: personalMemoryBlock,
+                cache_control: { type: "ephemeral" },
+              });
+            }
+
             if (memoryBlock) {
               systemBlocks.push({
                 type: "text",

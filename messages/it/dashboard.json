@@ -132,6 +132,11 @@
       "medium": "Media priorità",
       "low": "Bassa priorità"
     },
+    "confidence": {
+      "HIGH": "Alta affidabilità",
+      "MEDIUM": "Affidabilità media",
+      "LOW": "Bassa affidabilità"
+    },
     "impactLine": "Impatto stimato: {monthly}/mese (≈ {yearly}/anno)",
     "kind": {
       "complete_profile": {

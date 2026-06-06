@@ -132,6 +132,11 @@
       "medium": "Mittlere Priorität",
       "low": "Niedrige Priorität"
     },
+    "confidence": {
+      "HIGH": "Hohe Sicherheit",
+      "MEDIUM": "Mittlere Sicherheit",
+      "LOW": "Geringe Sicherheit"
+    },
     "impactLine": "Geschätzter Effekt: {monthly}/Monat (≈ {yearly}/Jahr)",
     "kind": {
       "complete_profile": {

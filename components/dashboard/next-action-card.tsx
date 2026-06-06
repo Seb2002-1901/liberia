@@ -9,12 +9,20 @@ import { Button } from "@/components/ui/button";
 import { CompletionAssistant } from "@/components/dashboard/completion-assistant";
 import type { NextAction } from "@/lib/calculations/next-action";
 import type { MissingArea } from "@/lib/calculations/completeness";
+import type { AdviceConfidence } from "@/lib/calculations/advice-confidence";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface NextActionCardProps {
   action: NextAction;
   /** Pulled from completeness so the embedded modal can sort missing areas. */
   missing: readonly MissingArea[];
+  /**
+   * Phase 3.1.10 — coach confidence tier surfaced as a small chip
+   * beside the priority badge. Lets the user see "Confiance moyenne"
+   * before reading the action; coherent with how the coach itself
+   * adapts its tone (see lib/ai/context.ts rule block).
+   */
+  confidence?: AdviceConfidence;
   currency: string;
 }
 
@@ -38,6 +46,7 @@ interface NextActionCardProps {
 export function NextActionCard({
   action,
   missing,
+  confidence,
   currency,
 }: NextActionCardProps) {
   const t = useTranslations("dashboard.nextAction");
@@ -109,6 +118,20 @@ export function NextActionCard({
               >
                 {t(`priority.${action.priority}`)}
               </span>
+              {confidence && (
+                <span
+                  className={cn(
+                    "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                    confidence === "HIGH"
+                      ? "bg-emerald-500/10 text-emerald-600"
+                      : confidence === "MEDIUM"
+                        ? "bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
+                        : "bg-rose-500/10 text-rose-500",
+                  )}
+                >
+                  {t(`confidence.${confidence}`)}
+                </span>
+              )}
             </div>
             <p className="text-base font-semibold leading-snug">
               {tKind(action.titleKey, payload)}

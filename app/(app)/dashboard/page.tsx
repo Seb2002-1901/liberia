@@ -27,6 +27,7 @@ import {
 import { detectOpportunities } from "@/lib/calculations/opportunities";
 import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
 import { computeNextAction } from "@/lib/calculations/next-action";
+import { computeAdviceConfidence } from "@/lib/calculations/advice-confidence";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { NextActionCard } from "@/components/dashboard/next-action-card";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
@@ -129,6 +130,26 @@ export default async function DashboardPage() {
     runwayMonths: runway,
     goalCount: data.goals.length,
   });
+  // Phase 3.1.10 — coach confidence chip. We don't fetch memory
+  // entries on the dashboard render path (the chat route does that
+  // server-side via the admin client); we rely on the static
+  // personality layer + budgets + goals as proxies. The chip
+  // intentionally skews towards LOW when the dashboard has thin
+  // data — same conservative gate as the coach itself.
+  const hasPersonalityNotes = Boolean(
+    memory?.financial_personality ||
+      memory?.progress_notes ||
+      memory?.preferred_motivation_style ||
+      (memory?.spending_triggers?.length ?? 0) > 0 ||
+      (memory?.recurring_challenges?.length ?? 0) > 0,
+  );
+  const adviceConfidence = computeAdviceConfidence({
+    completeness,
+    hasBudgets: data.categoryBudgets.length > 0,
+    hasGoals: data.goals.length > 0,
+    memoryEntriesCount: 0,
+    hasPersonalityNotes,
+  });
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
@@ -203,6 +224,7 @@ export default async function DashboardPage() {
       <NextActionCard
         action={nextAction}
         missing={completeness.missing}
+        confidence={adviceConfidence.level}
         currency={data.profile.currency}
       />
 
