@@ -125,6 +125,44 @@
       }
     }
   },
+  "advisor": {
+    "greeting": "Hi {firstName}.",
+    "afterAnalysis": "After reviewing your situation",
+    "primaryLabel": "Priority #1",
+    "nextPriorities": "Then",
+    "impactLine": "Estimated impact: {monthly}/month (≈ {yearly}/year)",
+    "learnedTitle": "What I've learned about you",
+    "progressTitle": "Since your last visit",
+    "learned": {
+      "tone_calm": "You prefer calm, paced guidance.",
+      "tone_direct": "You prefer direct, no-fluff advice.",
+      "tone_structured": "You value structured, numbered plans.",
+      "tone_gentle": "You respond best to a gentle, encouraging tone.",
+      "memory_entry_goal": "You mentioned a goal: {summary}",
+      "memory_entry_preference": "You said you prefer: {summary}",
+      "memory_entry_event": "Noted event: {summary}",
+      "memory_entry_blocker": "Recurring blocker: {summary}",
+      "challenge_overspending": "You watch out for surprise spending.",
+      "challenge_impulse_buys": "You're working on impulse buys.",
+      "challenge_no_savings": "You want to build regular savings.",
+      "challenge_debt": "You want to regain control of your debts.",
+      "challenge_fixed_costs": "You keep an eye on fixed costs.",
+      "challenge_irregular_income": "You manage irregular income.",
+      "trigger_stress": "Stress can trigger spending for you.",
+      "trigger_boredom": "Boredom can trigger spending for you.",
+      "trigger_social": "Social outings can trigger spending.",
+      "trigger_late_night": "Late-night purchases can catch you out.",
+      "trigger_payday": "Spending tends to peak around paydays.",
+      "trigger_weekends": "Weekends are a watch zone for you.",
+      "personality_note": "{text}"
+    },
+    "progress": {
+      "new_expenses": "{count, plural, one {# new expense recorded} other {# new expenses recorded}}",
+      "new_goals": "{count, plural, one {# new goal added} other {# new goals added}}",
+      "new_budgets": "{count, plural, one {# new budget set} other {# new budgets set}}",
+      "new_memory_entries": "{count, plural, one {# new note saved by the coach} other {# new notes saved by the coach}}"
+    }
+  },
   "nextAction": {
     "eyebrow": "Recommended next action",
     "priority": {

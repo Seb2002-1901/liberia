@@ -29,13 +29,18 @@ import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
 import { computeDisciplineScore } from "@/lib/calculations/discipline";
 import { computeNextAction } from "@/lib/calculations/next-action";
 import { computeAdviceConfidence } from "@/lib/calculations/advice-confidence";
+import { computeBudgetProgress } from "@/lib/calculations/budget-goals";
+import { buildAdvisorSummary } from "@/lib/calculations/advisor-engine";
+import { AdvisorCard } from "@/components/dashboard/advisor-card";
+import { LearnedAboutYou } from "@/components/dashboard/learned-about-you";
+import { ProgressSinceLastVisit } from "@/components/dashboard/progress-since-last-visit";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
-import { NextActionCard } from "@/components/dashboard/next-action-card";
 import { ResumeStrip } from "@/components/dashboard/resume-strip";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
 import { ProactiveCoachCard } from "@/components/dashboard/proactive-coach-card";
 import { getActivePlan } from "@/lib/services/plan";
 import { getMyUserMemory } from "@/lib/services/memory";
+import { listMyMemoryEntries } from "@/lib/services/memory-entries";
 import { generateProactiveHint } from "@/lib/coach/proactive";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,10 +50,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
-  const [data, activePlan, memory] = await Promise.all([
+  const [data, activePlan, memory, memoryEntries] = await Promise.all([
     getFinanceData(),
     getActivePlan(),
     getMyUserMemory(),
+    listMyMemoryEntries(),
   ]);
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
@@ -152,8 +158,38 @@ export default async function DashboardPage() {
     completeness,
     hasBudgets: data.categoryBudgets.length > 0,
     hasGoals: data.goals.length > 0,
-    memoryEntriesCount: 0,
+    memoryEntriesCount: memoryEntries.length,
     hasPersonalityNotes,
+  });
+
+  // Phase 3.1.11 — AdvisorEngine consolidates every primitive
+  // already computed above into a single AdvisorSummary the new
+  // hero card + LearnedAboutYou + ProgressSinceLastVisit cards
+  // read directly. Zero duplicated math.
+  const budgetProgress = computeBudgetProgress(
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+    data.expenses,
+  );
+  const advisor = buildAdvisorSummary({
+    nextAction,
+    confidence: adviceConfidence,
+    completeness,
+    discipline,
+    opportunities: dashboardOpportunities,
+    budgetProgress,
+    goals: data.goals,
+    goalsRespectedCount: budgetProgress.filter(
+      (p) => p.status === "SUCCESS",
+    ).length,
+    expenses: data.expenses,
+    categoryBudgets: data.categoryBudgets,
+    memory,
+    memoryEntries,
+    runwayMonths: runway,
+    savingsRate,
   });
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
@@ -203,17 +239,20 @@ export default async function DashboardPage() {
       {proactiveHint && <ProactiveCoachCard hint={proactiveHint} />}
 
       {/*
-        Phase 3.1.8 — dashboard = pilotage centre. ONE hero card
-        (NextAction) + 4 KPI + Coach surfaces. Everything else
-        (Complétude, Discipline, WeeklyRecap, PlanTeaser, breakdowns,
-        analytics CTA) lives on /expenses/analytics or /coach. The
-        dashboard now reads as a 5-second pulse: "what should I do
-        next, and where do I stand?".
+        Phase 3.1.11 — dashboard hierarchy:
+          1. AdvisorCard (hero) — single CTA + secondary priorities
+          2. 4 KPI (Revenus / Dépenses / Reste / Urgence)
+          3. LearnedAboutYou (hidden when nothing learned)
+          4. ProgressSinceLastVisit (hidden when nothing changed)
+          5. ResumeStrip (Discipline + Complétude one-liner)
+          6. GoalsSummary (conditional)
+          7. CoachTeaser
       */}
-      <NextActionCard
-        action={nextAction}
+      <AdvisorCard
+        summary={advisor}
         missing={completeness.missing}
-        confidence={adviceConfidence.level}
+        cta={nextAction.cta}
+        firstName={firstName}
         currency={data.profile.currency}
       />
 
@@ -249,6 +288,14 @@ export default async function DashboardPage() {
           tone={runway >= 3 ? "positive" : "neutral"}
           hint={formatUserCurrency(currentSavings, data.profile)}
         />
+      </div>
+
+      {/* Phase 3.1.11 — two compact context cards. Both self-hide
+          when there's nothing to say so the dashboard stays calm
+          for brand-new accounts. */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <LearnedAboutYou summary={advisor} />
+        <ProgressSinceLastVisit summary={advisor} />
       </div>
 
       {/* Phase UX premium — ultra-compact "where do I stand" line. */}

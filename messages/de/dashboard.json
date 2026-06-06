@@ -125,6 +125,44 @@
       }
     }
   },
+  "advisor": {
+    "greeting": "Hallo {firstName}.",
+    "afterAnalysis": "Nach einer Analyse deiner Situation",
+    "primaryLabel": "Priorität #1",
+    "nextPriorities": "Danach",
+    "impactLine": "Geschätzte Wirkung: {monthly}/Monat (≈ {yearly}/Jahr)",
+    "learnedTitle": "Was ich über dich gelernt habe",
+    "progressTitle": "Seit deinem letzten Besuch",
+    "learned": {
+      "tone_calm": "Du bevorzugst eine ruhige, bedachte Begleitung.",
+      "tone_direct": "Du bevorzugst direkte Ratschläge ohne Umschweife.",
+      "tone_structured": "Du schätzt strukturierte, nummerierte Pläne.",
+      "tone_gentle": "Du reagierst am besten auf einen sanften, ermutigenden Ton.",
+      "memory_entry_goal": "Du hast mir ein Ziel genannt: {summary}",
+      "memory_entry_preference": "Du hast gesagt, du bevorzugst: {summary}",
+      "memory_entry_event": "Notiertes Ereignis: {summary}",
+      "memory_entry_blocker": "Identifizierte Blockade: {summary}",
+      "challenge_overspending": "Du achtest auf ungeplante Ausgaben.",
+      "challenge_impulse_buys": "Du arbeitest an Impulskäufen.",
+      "challenge_no_savings": "Du möchtest regelmäßiges Sparen aufbauen.",
+      "challenge_debt": "Du willst die Kontrolle über deine Kredite zurückgewinnen.",
+      "challenge_fixed_costs": "Du behältst deine Fixkosten im Blick.",
+      "challenge_irregular_income": "Du managst unregelmäßige Einkünfte.",
+      "trigger_stress": "Stress kann bei dir Ausgaben auslösen.",
+      "trigger_boredom": "Langeweile kann bei dir Ausgaben auslösen.",
+      "trigger_social": "Soziale Anlässe können Ausgaben auslösen.",
+      "trigger_late_night": "Nächtliche Käufe können dich in die Falle locken.",
+      "trigger_payday": "Du gibst tendenziell rund um den Zahltag mehr aus.",
+      "trigger_weekends": "Wochenenden sind für dich eine Risikozone.",
+      "personality_note": "{text}"
+    },
+    "progress": {
+      "new_expenses": "{count, plural, one {# neue Ausgabe erfasst} other {# neue Ausgaben erfasst}}",
+      "new_goals": "{count, plural, one {# neues Ziel hinzugefügt} other {# neue Ziele hinzugefügt}}",
+      "new_budgets": "{count, plural, one {# neues Budget eingerichtet} other {# neue Budgets eingerichtet}}",
+      "new_memory_entries": "{count, plural, one {# Notiz vom Coach gespeichert} other {# Notizen vom Coach gespeichert}}"
+    }
+  },
   "nextAction": {
     "eyebrow": "Empfohlene nächste Aktion",
     "priority": {

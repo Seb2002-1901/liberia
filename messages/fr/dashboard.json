@@ -125,6 +125,44 @@
       }
     }
   },
+  "advisor": {
+    "greeting": "Bonjour {firstName}.",
+    "afterAnalysis": "Après analyse de ta situation",
+    "primaryLabel": "Priorité #1",
+    "nextPriorities": "Ensuite",
+    "impactLine": "Impact estimé : {monthly}/mois (≈ {yearly}/an)",
+    "learnedTitle": "Ce que j'ai appris sur toi",
+    "progressTitle": "Depuis ta dernière visite",
+    "learned": {
+      "tone_calm": "Tu préfères un accompagnement calme et posé.",
+      "tone_direct": "Tu préfères les conseils directs et sans détour.",
+      "tone_structured": "Tu apprécies les plans structurés et numérotés.",
+      "tone_gentle": "Tu réponds mieux à un ton bienveillant et encourageant.",
+      "memory_entry_goal": "Tu m'as parlé d'un objectif : {summary}",
+      "memory_entry_preference": "Tu m'as dit préférer : {summary}",
+      "memory_entry_event": "Événement noté : {summary}",
+      "memory_entry_blocker": "Blocage identifié : {summary}",
+      "challenge_overspending": "Tu fais attention aux dépenses imprévues.",
+      "challenge_impulse_buys": "Tu travailles sur les achats impulsifs.",
+      "challenge_no_savings": "Tu cherches à mettre en place une épargne régulière.",
+      "challenge_debt": "Tu cherches à reprendre le contrôle de tes crédits.",
+      "challenge_fixed_costs": "Tu surveilles tes charges fixes.",
+      "challenge_irregular_income": "Tu gères des revenus irréguliers.",
+      "trigger_stress": "Le stress peut déclencher des dépenses chez toi.",
+      "trigger_boredom": "L'ennui peut déclencher des dépenses chez toi.",
+      "trigger_social": "Les sorties sociales peuvent déclencher des dépenses.",
+      "trigger_late_night": "Les achats nocturnes peuvent te piéger.",
+      "trigger_payday": "Tu as tendance à dépenser autour des jours de paie.",
+      "trigger_weekends": "Les week-ends sont une zone à surveiller pour toi.",
+      "personality_note": "{text}"
+    },
+    "progress": {
+      "new_expenses": "{count, plural, one {# nouvelle dépense enregistrée} other {# nouvelles dépenses enregistrées}}",
+      "new_goals": "{count, plural, one {# nouvel objectif ajouté} other {# nouveaux objectifs ajoutés}}",
+      "new_budgets": "{count, plural, one {# nouveau budget configuré} other {# nouveaux budgets configurés}}",
+      "new_memory_entries": "{count, plural, one {# information enregistrée par le coach} other {# informations enregistrées par le coach}}"
+    }
+  },
   "nextAction": {
     "eyebrow": "Prochaine action recommandée",
     "priority": {

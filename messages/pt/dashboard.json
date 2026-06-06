@@ -125,6 +125,44 @@
       }
     }
   },
+  "advisor": {
+    "greeting": "Olá {firstName}.",
+    "afterAnalysis": "Após analisar a tua situação",
+    "primaryLabel": "Prioridade #1",
+    "nextPriorities": "Depois",
+    "impactLine": "Impacto estimado: {monthly}/mês (≈ {yearly}/ano)",
+    "learnedTitle": "O que aprendi sobre ti",
+    "progressTitle": "Desde a tua última visita",
+    "learned": {
+      "tone_calm": "Preferes um acompanhamento calmo e pausado.",
+      "tone_direct": "Preferes conselhos diretos e sem rodeios.",
+      "tone_structured": "Valorizas planos estruturados e numerados.",
+      "tone_gentle": "Reages melhor a um tom gentil e encorajador.",
+      "memory_entry_goal": "Falaste-me de um objetivo: {summary}",
+      "memory_entry_preference": "Disseste-me que preferes: {summary}",
+      "memory_entry_event": "Evento anotado: {summary}",
+      "memory_entry_blocker": "Bloqueio identificado: {summary}",
+      "challenge_overspending": "Estás atento às despesas imprevistas.",
+      "challenge_impulse_buys": "Estás a trabalhar nas compras por impulso.",
+      "challenge_no_savings": "Queres construir uma poupança regular.",
+      "challenge_debt": "Queres retomar o controlo dos teus créditos.",
+      "challenge_fixed_costs": "Vigias as tuas despesas fixas.",
+      "challenge_irregular_income": "Geres rendimentos irregulares.",
+      "trigger_stress": "O stress pode disparar as tuas despesas.",
+      "trigger_boredom": "O tédio pode disparar as tuas despesas.",
+      "trigger_social": "As saídas sociais podem disparar despesas.",
+      "trigger_late_night": "As compras noturnas podem apanhar-te.",
+      "trigger_payday": "Tendes a gastar mais por volta do dia do salário.",
+      "trigger_weekends": "Os fins de semana são uma zona a vigiar para ti.",
+      "personality_note": "{text}"
+    },
+    "progress": {
+      "new_expenses": "{count, plural, one {# nova despesa registada} other {# novas despesas registadas}}",
+      "new_goals": "{count, plural, one {# novo objetivo adicionado} other {# novos objetivos adicionados}}",
+      "new_budgets": "{count, plural, one {# novo orçamento definido} other {# novos orçamentos definidos}}",
+      "new_memory_entries": "{count, plural, one {# nota guardada pelo coach} other {# notas guardadas pelo coach}}"
+    }
+  },
   "nextAction": {
     "eyebrow": "Próxima ação recomendada",
     "priority": {

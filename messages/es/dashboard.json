@@ -125,6 +125,44 @@
       }
     }
   },
+  "advisor": {
+    "greeting": "Hola {firstName}.",
+    "afterAnalysis": "Tras analizar tu situación",
+    "primaryLabel": "Prioridad #1",
+    "nextPriorities": "Después",
+    "impactLine": "Impacto estimado: {monthly}/mes (≈ {yearly}/año)",
+    "learnedTitle": "Lo que he aprendido sobre ti",
+    "progressTitle": "Desde tu última visita",
+    "learned": {
+      "tone_calm": "Prefieres un acompañamiento tranquilo y pausado.",
+      "tone_direct": "Prefieres consejos directos y sin rodeos.",
+      "tone_structured": "Valoras planes estructurados y numerados.",
+      "tone_gentle": "Respondes mejor a un tono amable y alentador.",
+      "memory_entry_goal": "Me hablaste de un objetivo: {summary}",
+      "memory_entry_preference": "Me dijiste que prefieres: {summary}",
+      "memory_entry_event": "Evento anotado: {summary}",
+      "memory_entry_blocker": "Bloqueo identificado: {summary}",
+      "challenge_overspending": "Cuidas los gastos imprevistos.",
+      "challenge_impulse_buys": "Estás trabajando en las compras impulsivas.",
+      "challenge_no_savings": "Quieres construir un ahorro regular.",
+      "challenge_debt": "Quieres recuperar el control de tus créditos.",
+      "challenge_fixed_costs": "Vigilas tus gastos fijos.",
+      "challenge_irregular_income": "Gestionas ingresos irregulares.",
+      "trigger_stress": "El estrés puede activarte el gasto.",
+      "trigger_boredom": "El aburrimiento puede activarte el gasto.",
+      "trigger_social": "Las salidas sociales pueden disparar el gasto.",
+      "trigger_late_night": "Las compras nocturnas pueden pillarte.",
+      "trigger_payday": "Sueles gastar más alrededor del día de cobro.",
+      "trigger_weekends": "Los fines de semana son una zona a vigilar para ti.",
+      "personality_note": "{text}"
+    },
+    "progress": {
+      "new_expenses": "{count, plural, one {# nuevo gasto registrado} other {# nuevos gastos registrados}}",
+      "new_goals": "{count, plural, one {# nuevo objetivo añadido} other {# nuevos objetivos añadidos}}",
+      "new_budgets": "{count, plural, one {# nuevo presupuesto definido} other {# nuevos presupuestos definidos}}",
+      "new_memory_entries": "{count, plural, one {# nota guardada por el coach} other {# notas guardadas por el coach}}"
+    }
+  },
   "nextAction": {
     "eyebrow": "Próxima acción recomendada",
     "priority": {
