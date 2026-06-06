@@ -58,6 +58,8 @@
       "detaillee": "Detailed",
       "optimale": "Optimal"
     },
+    "details": "Details",
+    "hideDetails": "Hide details",
     "area": {
       "income": "Income",
       "housing": "Housing",
@@ -120,6 +122,76 @@
           "label": "Other subscription",
           "hint": "iCloud, SaaS, magazine…"
         }
+      }
+    }
+  },
+  "nextAction": {
+    "eyebrow": "Recommended next action",
+    "priority": {
+      "high": "High priority",
+      "medium": "Medium priority",
+      "low": "Low priority"
+    },
+    "impactLine": "Estimated impact: {monthly}/month (≈ {yearly}/year)",
+    "kind": {
+      "complete_profile": {
+        "title": "Complete your financial data",
+        "bodyLow": "Analysis reliability is low ({score}%). Add insurance, subscriptions and telecom to get precise recommendations.",
+        "bodyMedium": "Profile almost complete ({score}%). A few major categories still missing before the coach can be fully precise.",
+        "cta": "Complete in 30 s"
+      },
+      "act_on_opportunity": {
+        "cta": "See the detail",
+        "budget_over": {
+          "title": "Cut your {category} spending",
+          "body": "You're over budget on {category} by {amount} this month (limit {limit}). The first lever to pull."
+        },
+        "high_variable_share": {
+          "title": "Rein in your one-off spending",
+          "body": "Your variable spending hits {share}% of income this month. A simple cap can free up real margin."
+        },
+        "low_emergency_fund": {
+          "title": "Build your emergency fund",
+          "body": "You only cover {months} months of expenses. A monthly auto-transfer is often the right starting point."
+        },
+        "high_fixed_ratio": {
+          "title": "Audit your fixed costs",
+          "body": "Your fixed costs are {share}% of income. Review insurance, subscriptions and telecom for possible cuts."
+        },
+        "high_insurance_share": {
+          "title": "Compare your insurance premiums",
+          "body": "You pay {amount}/month in insurance ({share}% of income). Useful to compare premiums and check your deductible."
+        },
+        "high_subscriptions_share": {
+          "title": "Clean up your subscriptions",
+          "body": "{amount}/month of subscriptions. A few minutes of audit often frees real monthly margin."
+        },
+        "audit_top_variable_category": {
+          "title": "Cap your \"{category}\" spending",
+          "body": "{transactions} transactions in this category this month. A small cap is often enough to regain control."
+        },
+        "dominant_category": {
+          "title": "Watch \"{category}\"",
+          "body": "{category} weighs {share}% of total spending. The structural item to keep an eye on."
+        },
+        "low_savings_rate": {
+          "title": "Set up automated savings",
+          "body": "Your savings rate is low ({rate}%). A small monthly transfer is often enough to start the engine."
+        }
+      },
+      "build_emergency_fund": {
+        "title": "Build your emergency fund",
+        "body": "You only cover {months} months of expenses. Aim for at least 1 month before any other goal.",
+        "cta": "Set a goal"
+      },
+      "set_first_goal": {
+        "title": "Set your first financial goal",
+        "body": "Everything's under control — the right moment to formalise a target (emergency fund, project, purchase).",
+        "cta": "Create a goal"
+      },
+      "continue": {
+        "title": "Keep going",
+        "body": "Your finances are balanced. Hold your habits — no action needed today."
       }
     }
   },

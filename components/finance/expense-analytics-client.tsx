@@ -91,7 +91,6 @@ export function ExpenseAnalyticsClient({
   currency,
 }: Props) {
   const t = useTranslations("app.finance.analytics");
-  const fmt = useFormatter();
   const [period, setPeriod] = React.useState<AnalyticsPeriod>("month");
   const [budgets, setBudgets] = React.useState<CategoryBudget[]>(initialBudgets);
 
@@ -282,34 +281,10 @@ export function ExpenseAnalyticsClient({
           <CardDescription>{t("breakdown.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-3">
-            {breakdown.map((row) => {
-              const label =
-                EXPENSE_CATEGORIES.find((c) => c.id === row.category)?.label ??
-                row.category;
-              return (
-                <li key={row.category} className="space-y-1.5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-sm">{label}</p>
-                    <p className="text-sm tabular-nums text-muted-foreground">
-                      {formatCurrency(row.total, currency)}{" "}
-                      <span className="text-xs">
-                        ({fmt.number(row.share, { style: "percent", maximumFractionDigits: 0 })}
-                        {row.transactions > 0
-                          ? ` · ${t("breakdown.transactions", { count: row.transactions })}`
-                          : ""}
-                        )
-                      </span>
-                    </p>
-                  </div>
-                  <Progress
-                    value={Math.round(row.share * 100)}
-                    indicatorClassName="bg-foreground/70"
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <BreakdownList
+            breakdown={breakdown}
+            currency={currency}
+          />
         </CardContent>
       </Card>
 
@@ -405,6 +380,83 @@ export function ExpenseAnalyticsClient({
         currency={currency}
       />
     </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Phase 3.1.7 — breakdown list with "show empty categories" toggle            */
+/* -------------------------------------------------------------------------- */
+
+function BreakdownList({
+  breakdown,
+  currency,
+}: {
+  breakdown: ReturnType<typeof buildCategoryBreakdown>;
+  currency: string;
+}) {
+  const t = useTranslations("app.finance.analytics.breakdown");
+  const fmt = useFormatter();
+  const [showEmpty, setShowEmpty] = React.useState(false);
+  // Hide 0-CHF categories by default — the brief flagged the dump of
+  // empty rows as visual noise. The toggle keeps them one click away.
+  const nonZero = breakdown.filter((r) => r.total > 0);
+  const empty = breakdown.filter((r) => r.total <= 0);
+  const visible = showEmpty ? breakdown : nonZero;
+  return (
+    <>
+      {visible.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-border/50 bg-card/20 p-4 text-center text-sm text-muted-foreground">
+          {t("emptyAll")}
+        </p>
+      ) : (
+        <ul className="space-y-3">
+          {visible.map((row) => {
+            const label =
+              EXPENSE_CATEGORIES.find((c) => c.id === row.category)?.label ??
+              row.category;
+            return (
+              <li key={row.category} className="space-y-1.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-sm">{label}</p>
+                  <p className="text-sm tabular-nums text-muted-foreground">
+                    {formatCurrency(row.total, currency)}{" "}
+                    <span className="text-xs">
+                      ({fmt.number(row.share, {
+                        style: "percent",
+                        maximumFractionDigits: 0,
+                      })}
+                      {row.transactions > 0
+                        ? ` · ${t("transactions", { count: row.transactions })}`
+                        : ""}
+                      )
+                    </span>
+                  </p>
+                </div>
+                <Progress
+                  value={Math.round(row.share * 100)}
+                  indicatorClassName="bg-foreground/70"
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {empty.length > 0 && (
+        <div className="mt-3 flex">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowEmpty((v) => !v)}
+            aria-expanded={showEmpty}
+          >
+            {showEmpty
+              ? t("hideEmpty", { count: empty.length })
+              : t("showEmpty", { count: empty.length })}
+          </Button>
+        </div>
+      )}
+    </>
   );
 }
 

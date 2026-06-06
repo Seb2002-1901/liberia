@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, ClipboardList, Sparkles } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp, ClipboardList, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CompletionAssistant } from "@/components/dashboard/completion-assistant";
@@ -19,16 +19,15 @@ interface CompletenessCardProps {
 }
 
 /**
- * Phase 3.1.5 — dashboard surface for the data-quality score.
+ * Phase 3.1.7 — compact dashboard surface.
  *
- * Two purposes:
- *   1. Show the user the freshness of their profile in one number.
- *   2. Drive them into the CompletionAssistant when categories are
- *      missing so the rest of the dashboard (Économies potentielles,
- *      coach, opportunities) becomes trustworthy.
+ * Defaults to a calm one-number summary ("80% · Données correctes")
+ * with a "Détails" disclosure. Inside the disclosure: the three
+ * tiered scores (structurelle / détaillée / optimale) and the top
+ * missing categories. The CTA still drives into the
+ * CompletionAssistant.
  *
- * Tone palette per spec: 90+ green · 70-89 gold · <70 orange-red.
- * Empty state (no missing): shows the cap with a celebratory tile.
+ * Tone palette: 90+ green · 70-89 gold · <70 orange-red.
  */
 export function CompletenessCard({
   completeness,
@@ -38,11 +37,12 @@ export function CompletenessCard({
   const t = useTranslations("dashboard.completeness");
   const tArea = useTranslations("dashboard.completeness.area");
   const [open, setOpen] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
 
   const tone = toneFor(completeness.reliability);
-  // Top 3 missing — keep the card calm rather than dumping a 10-line
-  // list on the dashboard. The full list lives in the modal.
-  const topMissing = completeness.missing.slice(0, 3);
+  // Limit the missing list inside the disclosure to keep the
+  // dashboard tidy. The full list lives in the modal.
+  const topMissing = completeness.missing.slice(0, 4);
 
   return (
     <>
@@ -51,7 +51,7 @@ export function CompletenessCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
         className={cn(
-          "relative overflow-hidden rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur-md",
+          "relative overflow-hidden rounded-2xl border border-border/60 bg-card/50 p-5 backdrop-blur-md",
           className,
         )}
       >
@@ -63,37 +63,81 @@ export function CompletenessCard({
           )}
         />
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-1.5 min-w-0">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {t("eyebrow")}
             </p>
-            <div className="flex items-baseline gap-3">
-              <p className="font-display text-4xl font-semibold tabular-nums">
+            <div className="flex items-baseline gap-2">
+              <p className="font-display text-3xl font-semibold tabular-nums">
                 {completeness.structurelle}
-                <span className="text-xl text-muted-foreground">%</span>
+                <span className="text-base text-muted-foreground">%</span>
               </p>
-              <p className={cn("text-sm font-medium", tone.label)}>
+              <p className={cn("text-sm font-medium truncate", tone.label)}>
                 {t(`quality.${completeness.reliability}`)}
               </p>
             </div>
-            {/*
-              Phase 3.1.6 — three tiered scores. Structurelle is the
-              headline (gates coach confidence). Détaillée gates the
-              potential-savings projection. Optimale is the
-              aspirational "everything filled in" score.
-            */}
-            <div className="grid grid-cols-3 gap-2 max-w-md">
-              <ScoreTile label={t("scores.structurelle")} value={completeness.structurelle} />
-              <ScoreTile label={t("scores.detaillee")} value={completeness.detaillee} />
-              <ScoreTile label={t("scores.optimale")} value={completeness.optimale} />
+          </div>
+          <div
+            aria-hidden
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-card/60 text-foreground/80"
+          >
+            {completeness.missing.length === 0 ? (
+              <CheckCircle2 className="h-5 w-5" />
+            ) : (
+              <ClipboardList className="h-5 w-5" />
+            )}
+          </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {completeness.missing.length > 0 && (
+            <Button
+              type="button"
+              variant="gold"
+              size="sm"
+              onClick={() => setOpen(true)}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              {t("cta")}
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+          >
+            {expanded ? (
+              <ChevronUp className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5" />
+            )}
+            {expanded ? t("hideDetails") : t("details")}
+          </Button>
+        </div>
+
+        {expanded && (
+          <div className="mt-3 space-y-3 border-t border-border/40 pt-3">
+            <div className="grid grid-cols-3 gap-2">
+              <ScoreTile
+                label={t("scores.structurelle")}
+                value={completeness.structurelle}
+              />
+              <ScoreTile
+                label={t("scores.detaillee")}
+                value={completeness.detaillee}
+              />
+              <ScoreTile
+                label={t("scores.optimale")}
+                value={completeness.optimale}
+              />
             </div>
             {topMissing.length === 0 ? (
-              <p className="max-w-md text-sm text-muted-foreground">
-                {t("emptyState")}
-              </p>
+              <p className="text-sm text-muted-foreground">{t("emptyState")}</p>
             ) : (
-              <>
-                <p className="pt-1 text-sm text-muted-foreground">
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground">
                   {t("missingLabel")}
                 </p>
                 <ul className="space-y-1 text-sm">
@@ -110,31 +154,8 @@ export function CompletenessCard({
                     </li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
-          </div>
-          <div
-            aria-hidden
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card/60 text-foreground/80"
-          >
-            {completeness.missing.length === 0 ? (
-              <CheckCircle2 className="h-6 w-6" />
-            ) : (
-              <ClipboardList className="h-6 w-6" />
-            )}
-          </div>
-        </div>
-        {completeness.missing.length > 0 && (
-          <div className="mt-4 flex">
-            <Button
-              type="button"
-              variant="gold"
-              size="sm"
-              onClick={() => setOpen(true)}
-            >
-              <Sparkles className="h-4 w-4" />
-              {t("cta")}
-            </Button>
           </div>
         )}
       </motion.div>
@@ -142,7 +163,11 @@ export function CompletenessCard({
       <CompletionAssistant
         open={open}
         onOpenChange={setOpen}
-        missing={completeness.missing as FinancialArea[] | readonly { area: FinancialArea; severity: "low" | "medium" | "high" }[]}
+        missing={
+          completeness.missing as
+            | FinancialArea[]
+            | readonly { area: FinancialArea; severity: "low" | "medium" | "high" }[]
+        }
         currency={currency}
       />
     </>

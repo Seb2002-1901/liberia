@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Breakdown by category",
-        "description": "Sorted by amount over the selected period.",
-        "transactions": "{count, plural, one {# tx} other {# tx}}"
+        "description": "Sorted by amount. Empty categories are hidden by default.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}",
+        "emptyAll": "No expenses recorded for this period.",
+        "showEmpty": "Show {count} empty categories",
+        "hideEmpty": "Hide empty categories"
       },
       "budgets": {
         "title": "Monthly budgets per category",

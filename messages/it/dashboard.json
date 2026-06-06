@@ -58,6 +58,8 @@
       "detaillee": "Dettagliata",
       "optimale": "Ottimale"
     },
+    "details": "Dettagli",
+    "hideDetails": "Nascondi dettagli",
     "area": {
       "income": "Entrate",
       "housing": "Casa",
@@ -120,6 +122,76 @@
           "label": "Altro abbonamento",
           "hint": "iCloud, SaaS, rivista…"
         }
+      }
+    }
+  },
+  "nextAction": {
+    "eyebrow": "Prossima azione consigliata",
+    "priority": {
+      "high": "Alta priorità",
+      "medium": "Media priorità",
+      "low": "Bassa priorità"
+    },
+    "impactLine": "Impatto stimato: {monthly}/mese (≈ {yearly}/anno)",
+    "kind": {
+      "complete_profile": {
+        "title": "Completa i tuoi dati finanziari",
+        "bodyLow": "L'affidabilità delle analisi è bassa ({score}%). Aggiungi assicurazioni, abbonamenti e telecom per ricevere raccomandazioni precise.",
+        "bodyMedium": "Profilo quasi completo ({score}%). Mancano ancora alcune categorie importanti prima che il coach sia pienamente preciso.",
+        "cta": "Completa in 30 s"
+      },
+      "act_on_opportunity": {
+        "cta": "Vedi il dettaglio",
+        "budget_over": {
+          "title": "Riduci le spese di {category}",
+          "body": "Hai sforato il budget {category} di {amount} questo mese (limite {limit}). La prima leva su cui agire."
+        },
+        "high_variable_share": {
+          "title": "Controlla le tue spese occasionali",
+          "body": "Le tue spese variabili raggiungono il {share}% del reddito. Un tetto semplice può liberare margine reale."
+        },
+        "low_emergency_fund": {
+          "title": "Costruisci il tuo fondo di emergenza",
+          "body": "Copri solo {months} mesi di spese. Un bonifico automatico mensile è spesso il punto giusto da cui partire."
+        },
+        "high_fixed_ratio": {
+          "title": "Auditare le spese fisse",
+          "body": "Le tue spese fisse sono il {share}% del reddito. Rivedi assicurazioni, abbonamenti e telecom per individuare ottimizzazioni."
+        },
+        "high_insurance_share": {
+          "title": "Confronta le assicurazioni",
+          "body": "Paghi {amount}/mese in assicurazioni ({share}% del reddito). Utile confrontare i premi e verificare la franchigia."
+        },
+        "high_subscriptions_share": {
+          "title": "Fai pulizia tra gli abbonamenti",
+          "body": "{amount}/mese in abbonamenti. Pochi minuti di audit liberano spesso margine mensile reale."
+        },
+        "audit_top_variable_category": {
+          "title": "Limita le spese di « {category} »",
+          "body": "{transactions} transazioni in questa categoria questo mese. Un piccolo tetto basta spesso a riprendere il controllo."
+        },
+        "dominant_category": {
+          "title": "Sorveglia « {category} »",
+          "body": "{category} pesa il {share}% del totale speso. Voce strutturale da tenere d'occhio."
+        },
+        "low_savings_rate": {
+          "title": "Imposta un risparmio automatico",
+          "body": "Il tuo tasso di risparmio è basso ({rate}%). Un piccolo bonifico mensile basta spesso ad avviare la macchina."
+        }
+      },
+      "build_emergency_fund": {
+        "title": "Costruisci il tuo fondo di emergenza",
+        "body": "Copri solo {months} mesi di spese. Punta ad almeno 1 mese prima di altri obiettivi.",
+        "cta": "Definisci un obiettivo"
+      },
+      "set_first_goal": {
+        "title": "Definisci il tuo primo obiettivo finanziario",
+        "body": "Tutto sotto controllo — il momento giusto per formalizzare una meta (fondo di emergenza, progetto, acquisto).",
+        "cta": "Crea un obiettivo"
+      },
+      "continue": {
+        "title": "Continua così",
+        "body": "Le tue finanze sono in equilibrio. Mantieni le abitudini — niente azione necessaria oggi."
       }
     }
   },

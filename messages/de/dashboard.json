@@ -58,6 +58,8 @@
       "detaillee": "Detailliert",
       "optimale": "Optimal"
     },
+    "details": "Details",
+    "hideDetails": "Details ausblenden",
     "area": {
       "income": "Einkommen",
       "housing": "Wohnen",
@@ -120,6 +122,76 @@
           "label": "Anderes Abo",
           "hint": "iCloud, SaaS, Magazin…"
         }
+      }
+    }
+  },
+  "nextAction": {
+    "eyebrow": "Empfohlene nächste Aktion",
+    "priority": {
+      "high": "Hohe Priorität",
+      "medium": "Mittlere Priorität",
+      "low": "Niedrige Priorität"
+    },
+    "impactLine": "Geschätzter Effekt: {monthly}/Monat (≈ {yearly}/Jahr)",
+    "kind": {
+      "complete_profile": {
+        "title": "Ergänze deine Finanzdaten",
+        "bodyLow": "Die Zuverlässigkeit der Analyse ist niedrig ({score}%). Ergänze Versicherungen, Abonnements und Telekom, um präzise Empfehlungen zu erhalten.",
+        "bodyMedium": "Profil fast vollständig ({score}%). Einige wichtige Kategorien fehlen noch, bevor der Coach voll präzise sein kann.",
+        "cta": "In 30 s ergänzen"
+      },
+      "act_on_opportunity": {
+        "cta": "Details ansehen",
+        "budget_over": {
+          "title": "Reduziere deine {category}-Ausgaben",
+          "body": "Du hast dein {category}-Budget diesen Monat um {amount} überschritten (Limit {limit}). Der erste Hebel zum Anpacken."
+        },
+        "high_variable_share": {
+          "title": "Halte deine Einmal-Ausgaben im Zaum",
+          "body": "Deine variablen Ausgaben erreichen {share}% des Einkommens diesen Monat. Ein einfaches Limit kann echte Marge freisetzen."
+        },
+        "low_emergency_fund": {
+          "title": "Baue deinen Notgroschen auf",
+          "body": "Du deckst nur {months} Monate Ausgaben. Ein monatlicher Dauerauftrag ist oft der richtige Startpunkt."
+        },
+        "high_fixed_ratio": {
+          "title": "Prüfe deine Fixkosten",
+          "body": "Deine Fixkosten sind {share}% des Einkommens. Versicherungen, Abos und Telekom überprüfen, um mögliche Einsparungen zu finden."
+        },
+        "high_insurance_share": {
+          "title": "Vergleiche deine Versicherungsprämien",
+          "body": "Du zahlst {amount}/Monat an Versicherungen ({share}% des Einkommens). Es kann sich lohnen, Prämien zu vergleichen und die Franchise zu prüfen."
+        },
+        "high_subscriptions_share": {
+          "title": "Räume deine Abonnements auf",
+          "body": "{amount}/Monat an Abonnements. Ein paar Minuten Audit reichen oft, um echte Monatsmarge freizusetzen."
+        },
+        "audit_top_variable_category": {
+          "title": "Setze ein Limit für „{category}\"",
+          "body": "{transactions} Transaktionen in dieser Kategorie diesen Monat. Ein kleines Limit reicht oft, um die Kontrolle zurückzugewinnen."
+        },
+        "dominant_category": {
+          "title": "Beobachte „{category}\"",
+          "body": "{category} wiegt {share}% deiner Gesamtausgaben. Der strukturelle Posten zum Beobachten."
+        },
+        "low_savings_rate": {
+          "title": "Richte automatisches Sparen ein",
+          "body": "Deine Sparquote ist niedrig ({rate}%). Ein kleiner monatlicher Dauerauftrag reicht oft, um die Maschine zu starten."
+        }
+      },
+      "build_emergency_fund": {
+        "title": "Baue deinen Notgroschen auf",
+        "body": "Du deckst nur {months} Monate Ausgaben. Ziele auf mindestens 1 Monat vor jedem anderen Ziel.",
+        "cta": "Ziel setzen"
+      },
+      "set_first_goal": {
+        "title": "Setze dein erstes Finanzziel",
+        "body": "Alles unter Kontrolle — der richtige Moment, ein Ziel zu formulieren (Notgroschen, Projekt, Kauf).",
+        "cta": "Ziel erstellen"
+      },
+      "continue": {
+        "title": "Mach weiter so",
+        "body": "Deine Finanzen sind im Gleichgewicht. Halte deine Gewohnheiten — heute ist keine Aktion nötig."
       }
     }
   },

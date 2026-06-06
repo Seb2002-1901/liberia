@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Repartição por categoria",
-        "description": "Ordenada por montante no período selecionado.",
-        "transactions": "{count, plural, one {# tx} other {# tx}}"
+        "description": "Ordenada por montante. As categorias vazias estão escondidas por defeito.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}",
+        "emptyAll": "Sem despesas no período.",
+        "showEmpty": "Ver {count} categorias vazias",
+        "hideEmpty": "Esconder categorias vazias"
       },
       "budgets": {
         "title": "Orçamentos mensais por categoria",

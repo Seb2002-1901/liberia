@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Aufschlüsselung nach Kategorie",
-        "description": "Nach Betrag sortiert über den gewählten Zeitraum.",
-        "transactions": "{count, plural, one {# Tx} other {# Tx}}"
+        "description": "Nach Betrag sortiert. Leere Kategorien sind standardmäßig ausgeblendet.",
+        "transactions": "{count, plural, one {# Tx} other {# Tx}}",
+        "emptyAll": "Keine Ausgaben in diesem Zeitraum.",
+        "showEmpty": "{count} leere Kategorien anzeigen",
+        "hideEmpty": "Leere Kategorien ausblenden"
       },
       "budgets": {
         "title": "Monatliche Budgets pro Kategorie",

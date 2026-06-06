@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Ripartizione per categoria",
-        "description": "Ordinata per importo sul periodo selezionato.",
-        "transactions": "{count, plural, one {# tx} other {# tx}}"
+        "description": "Ordinata per importo. Le categorie vuote sono nascoste di default.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}",
+        "emptyAll": "Nessuna spesa registrata nel periodo.",
+        "showEmpty": "Mostra {count} categorie vuote",
+        "hideEmpty": "Nascondi categorie vuote"
       },
       "budgets": {
         "title": "Budget mensili per categoria",

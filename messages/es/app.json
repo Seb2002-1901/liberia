@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Desglose por categoría",
-        "description": "Ordenado por importe sobre el periodo seleccionado.",
-        "transactions": "{count, plural, one {# tx} other {# tx}}"
+        "description": "Ordenado por importe. Las categorías vacías están ocultas por defecto.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}",
+        "emptyAll": "Sin gastos en el periodo.",
+        "showEmpty": "Ver {count} categorías vacías",
+        "hideEmpty": "Ocultar categorías vacías"
       },
       "budgets": {
         "title": "Presupuestos mensuales por categoría",

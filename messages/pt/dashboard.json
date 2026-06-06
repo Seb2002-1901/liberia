@@ -58,6 +58,8 @@
       "detaillee": "Detalhada",
       "optimale": "Ótima"
     },
+    "details": "Detalhes",
+    "hideDetails": "Esconder detalhes",
     "area": {
       "income": "Rendimentos",
       "housing": "Habitação",
@@ -120,6 +122,76 @@
           "label": "Outra subscrição",
           "hint": "iCloud, SaaS, revista…"
         }
+      }
+    }
+  },
+  "nextAction": {
+    "eyebrow": "Próxima ação recomendada",
+    "priority": {
+      "high": "Prioridade alta",
+      "medium": "Prioridade média",
+      "low": "Prioridade baixa"
+    },
+    "impactLine": "Impacto estimado: {monthly}/mês (≈ {yearly}/ano)",
+    "kind": {
+      "complete_profile": {
+        "title": "Completa os teus dados financeiros",
+        "bodyLow": "A fiabilidade das análises é baixa ({score}%). Adiciona seguros, subscrições e telecom para obter recomendações precisas.",
+        "bodyMedium": "Perfil quase completo ({score}%). Ainda faltam algumas categorias importantes antes do coach poder ser plenamente preciso.",
+        "cta": "Completar em 30 s"
+      },
+      "act_on_opportunity": {
+        "cta": "Ver detalhe",
+        "budget_over": {
+          "title": "Reduz as despesas de {category}",
+          "body": "Ultrapassaste o orçamento {category} em {amount} este mês (limite {limit}). A primeira alavanca a ativar."
+        },
+        "high_variable_share": {
+          "title": "Controla as tuas despesas pontuais",
+          "body": "As tuas despesas variáveis atingem {share}% do rendimento. Um tecto simples liberta margem real."
+        },
+        "low_emergency_fund": {
+          "title": "Constrói o teu fundo de emergência",
+          "body": "Apenas cobres {months} meses de despesas. Uma transferência automática mensal é frequentemente o ponto de partida certo."
+        },
+        "high_fixed_ratio": {
+          "title": "Audita os teus encargos fixos",
+          "body": "Os teus encargos fixos são {share}% do rendimento. Revê seguros, subscrições e telecom para identificar otimizações."
+        },
+        "high_insurance_share": {
+          "title": "Compara os teus seguros",
+          "body": "Pagas {amount}/mês em seguros ({share}% do rendimento). Útil comparar prémios e verificar a franquia."
+        },
+        "high_subscriptions_share": {
+          "title": "Faz limpeza nas subscrições",
+          "body": "{amount}/mês em subscrições. Uns minutos de auditoria libertam frequentemente margem mensal real."
+        },
+        "audit_top_variable_category": {
+          "title": "Limita as despesas « {category} »",
+          "body": "{transactions} transações nesta categoria este mês. Um pequeno tecto basta frequentemente para retomar o controlo."
+        },
+        "dominant_category": {
+          "title": "Vigia « {category} »",
+          "body": "{category} representa {share}% do total. É o item estrutural a vigiar."
+        },
+        "low_savings_rate": {
+          "title": "Configura uma poupança automática",
+          "body": "A tua taxa de poupança é baixa ({rate}%). Uma pequena transferência mensal costuma chegar para arrancar."
+        }
+      },
+      "build_emergency_fund": {
+        "title": "Constrói o teu fundo de emergência",
+        "body": "Apenas cobres {months} meses de despesas. Aponta a pelo menos 1 mês antes de qualquer outro objetivo.",
+        "cta": "Definir um objetivo"
+      },
+      "set_first_goal": {
+        "title": "Define o teu primeiro objetivo financeiro",
+        "body": "Tudo sob controlo — o bom momento para formalizar uma meta (fundo de emergência, projeto, compra).",
+        "cta": "Criar um objetivo"
+      },
+      "continue": {
+        "title": "Continua assim",
+        "body": "As tuas finanças estão equilibradas. Mantém os teus hábitos — hoje não é preciso agir."
       }
     }
   },

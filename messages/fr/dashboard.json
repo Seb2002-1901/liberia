@@ -58,6 +58,8 @@
       "detaillee": "Détaillée",
       "optimale": "Optimale"
     },
+    "details": "Détails",
+    "hideDetails": "Masquer les détails",
     "area": {
       "income": "Revenus",
       "housing": "Logement",
@@ -120,6 +122,76 @@
           "label": "Autre abonnement",
           "hint": "iCloud, SaaS, magazine, club…"
         }
+      }
+    }
+  },
+  "nextAction": {
+    "eyebrow": "Prochaine action recommandée",
+    "priority": {
+      "high": "Priorité haute",
+      "medium": "Priorité moyenne",
+      "low": "Priorité basse"
+    },
+    "impactLine": "Impact estimé : {monthly}/mois (≈ {yearly}/an)",
+    "kind": {
+      "complete_profile": {
+        "title": "Complète tes données financières",
+        "bodyLow": "La fiabilité de tes analyses est faible ({score}%). Ajoute tes assurances, abonnements et télécoms pour obtenir des recommandations précises.",
+        "bodyMedium": "Profil presque complet ({score}%). Il manque encore quelques catégories majeures avant que le coach puisse être pleinement précis.",
+        "cta": "Compléter en 30 s"
+      },
+      "act_on_opportunity": {
+        "cta": "Voir le détail",
+        "budget_over": {
+          "title": "Réduis tes dépenses de {category}",
+          "body": "Tu as dépassé ton budget {category} de {amount} ce mois (limite {limit}). C'est le premier levier à activer."
+        },
+        "high_variable_share": {
+          "title": "Maîtrise tes dépenses ponctuelles",
+          "body": "Tes dépenses ponctuelles atteignent {share}% de tes revenus ce mois. Fixer un plafond simple peut libérer une marge significative."
+        },
+        "low_emergency_fund": {
+          "title": "Construis ton fonds d'urgence",
+          "body": "Tu ne couvres que {months} mois de dépenses. Programmer un virement automatique mensuel est souvent le point de départ."
+        },
+        "high_fixed_ratio": {
+          "title": "Audite tes charges fixes",
+          "body": "Tes charges fixes représentent {share}% de ton revenu. Examine assurances, abonnements et télécoms pour identifier les optimisations possibles."
+        },
+        "high_insurance_share": {
+          "title": "Compare tes assurances",
+          "body": "Tu paies {amount}/mois en assurances ({share}% du revenu). Il peut être utile de comparer les primes et de vérifier ta franchise."
+        },
+        "high_subscriptions_share": {
+          "title": "Fais le tri dans tes abonnements",
+          "body": "{amount}/mois d'abonnements. Quelques minutes d'audit suffisent souvent à dégager une marge mensuelle."
+        },
+        "audit_top_variable_category": {
+          "title": "Limite tes dépenses « {category} »",
+          "body": "{transactions} transactions dans cette catégorie ce mois. Un petit plafond suffit souvent à reprendre la main."
+        },
+        "dominant_category": {
+          "title": "Surveille « {category} »",
+          "body": "{category} représente {share}% de tes dépenses totales. C'est le poste structurel à garder à l'œil."
+        },
+        "low_savings_rate": {
+          "title": "Mets en place une épargne automatique",
+          "body": "Ton taux d'épargne est faible ({rate}%). Un petit virement mensuel suffit souvent à enclencher la machine."
+        }
+      },
+      "build_emergency_fund": {
+        "title": "Construis ton fonds d'urgence",
+        "body": "Tu ne couvres que {months} mois de dépenses. Vise au moins 1 mois avant tout autre objectif.",
+        "cta": "Définir un objectif"
+      },
+      "set_first_goal": {
+        "title": "Définis ton premier objectif financier",
+        "body": "Tout est sous contrôle — c'est le bon moment pour formaliser un cap (fonds d'urgence, projet, achat).",
+        "cta": "Créer un objectif"
+      },
+      "continue": {
+        "title": "Continue sur ta lancée",
+        "body": "Tes finances sont équilibrées. Garde tes habitudes — pas besoin d'agir aujourd'hui."
       }
     }
   },

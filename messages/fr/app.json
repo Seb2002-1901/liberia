@@ -805,8 +805,11 @@
       },
       "breakdown": {
         "title": "Répartition par catégorie",
-        "description": "Triées par montant décroissant sur la période sélectionnée.",
-        "transactions": "{count, plural, one {# tx} other {# tx}}"
+        "description": "Triées par montant décroissant. Les catégories sans dépense sont masquées par défaut.",
+        "transactions": "{count, plural, one {# tx} other {# tx}}",
+        "emptyAll": "Aucune dépense enregistrée sur la période.",
+        "showEmpty": "Voir les {count} catégories vides",
+        "hideEmpty": "Masquer les catégories vides"
       },
       "budgets": {
         "title": "Budgets mensuels par catégorie",

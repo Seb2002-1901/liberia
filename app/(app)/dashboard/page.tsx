@@ -3,47 +3,35 @@ import Link from "next/link";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  HeartPulse,
   Layers,
   PiggyBank,
   Sparkles,
-  Target,
   Wallet,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StabilityCard } from "@/components/dashboard/stability-card";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { CashflowChart } from "@/components/dashboard/cashflow-chart";
-import { ExpenseBreakdown } from "@/components/dashboard/expense-breakdown";
 import { GoalsSummary } from "@/components/dashboard/goals-summary";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import {
-  calculateExpenseRatio,
-  calculateFinancialStress,
   calculateNetCashflow,
   calculateRunway,
   calculateSavingsRate,
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
 import { formatPercent, formatUserCurrency } from "@/lib/utils";
-import { aggregateMonthlyByCategory } from "@/lib/calculations/aggregate";
 import {
   buildBudgetStatus,
   buildCategoryBreakdown,
 } from "@/lib/calculations/analytics";
 import { computeDisciplineScore } from "@/lib/calculations/discipline";
 import { detectOpportunities } from "@/lib/calculations/opportunities";
-import {
-  computeBudgetProgress,
-  computeGoalAchievementScore,
-  computePotentialSavings,
-} from "@/lib/calculations/budget-goals";
 import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
+import { computeNextAction } from "@/lib/calculations/next-action";
 import { CompletenessCard } from "@/components/dashboard/completeness-card";
+import { NextActionCard } from "@/components/dashboard/next-action-card";
 import { DisciplineCard } from "@/components/dashboard/discipline-card";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { CoachTeaser } from "@/components/dashboard/coach-teaser";
@@ -121,19 +109,12 @@ export default async function DashboardPage() {
   });
   const savingsRate = calculateSavingsRate({ monthlyIncome, monthlyExpenses });
   const runway = calculateRunway({ currentSavings, monthlyExpenses });
-  const expenseRatio = calculateExpenseRatio({ monthlyIncome, monthlyExpenses });
   const stability = calculateStabilityScore({
     monthlyIncome,
     monthlyExpenses,
     currentSavings,
     hasEmergencyFund: data.financialProfile?.has_emergency_fund ?? false,
     debtToIncomeRatio: dti,
-  });
-  const stress = calculateFinancialStress({
-    perceivedStress: data.financialProfile?.perceived_stress ?? 3,
-    expenseRatio,
-    runwayMonths: runway,
-    cashflow,
   });
   const discipline = computeDisciplineScore({
     budgetStatus: monthBudgetStatus,
@@ -143,17 +124,6 @@ export default async function DashboardPage() {
   });
 
   // Phase 3.1.4 — goal achievement + potential savings for the
-  // dashboard's optimisation row. Reusing the existing analytics
-  // primitives + the same monthBudgetStatus we computed for
-  // discipline so the numbers stay consistent across cards.
-  const budgetProgress = computeBudgetProgress(
-    data.categoryBudgets.map((b) => ({
-      category: b.category,
-      monthly_limit: b.monthly_limit,
-    })),
-    data.expenses,
-  );
-  const goalAchievement = computeGoalAchievementScore(budgetProgress);
   const monthCategoryBreakdown = buildCategoryBreakdown(
     data.expenses,
     "month",
@@ -167,8 +137,6 @@ export default async function DashboardPage() {
     runwayMonths: runway,
     savingsRate,
   });
-  const potentialSavings = computePotentialSavings(dashboardOpportunities);
-
   // Phase 3.1.5 — data completeness gate. The card surfaces the
   // score + missing areas; the assistant modal lets the user
   // back-fill in 30s.
@@ -178,8 +146,15 @@ export default async function DashboardPage() {
     goals: data.goals,
     categoryBudgets: data.categoryBudgets,
   });
-
-  const expenseByCategory = aggregateMonthlyByCategory(data.expenses);
+  // Phase 3.1.7 — single hero action card. Picks the best CTA
+  // from the same primitives the other cards use, so the dashboard
+  // never says one thing and the analytics page another.
+  const nextAction = computeNextAction({
+    completeness,
+    opportunities: dashboardOpportunities,
+    runwayMonths: runway,
+    goalCount: data.goals.length,
+  });
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
@@ -257,24 +232,22 @@ export default async function DashboardPage() {
 
       <WeeklyRecapCard recap={weeklyRecap} />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <StabilityCard score={stability} className="lg:col-span-2" />
-        <StatCard
-          label={t("stats.stressLabel")}
-          value={`${stress}/100`}
-          icon={<HeartPulse className="h-4 w-4" />}
-          tone={stress >= 60 ? "negative" : "neutral"}
-          hint={stress >= 60 ? t("stats.stressHintHigh") : t("stats.stressHintLow")}
-        />
-      </div>
+      {/*
+        Phase 3.1.7 — single hero: the next best action. Replaces
+        the StabilityCard / Stress row + the Discipline / Objectifs
+        / Économies row. Every other metric on the dashboard becomes
+        descriptive support for this card's recommendation.
+      */}
+      <NextActionCard
+        action={nextAction}
+        missing={completeness.missing}
+        currency={data.profile.currency}
+      />
 
       {/*
-        Phase 3.1.3 — dashboard simplified. Top 4 KPIs only: Revenus
-        · Dépenses totales · Reste à vivre · Fonds d'urgence. The
-        detailed expense breakdown (fixed / variable / transactions /
-        category history / opportunities) lives on /expenses/analytics
-        so the dashboard reads as a 5-second pulse, not a metrics
-        wall.
+        4 KPI maximum (per the brief). Detailed breakdown
+        (fixed / variable / transactions / categories / history /
+        opportunities) lives on /expenses/analytics.
       */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -310,82 +283,32 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Phase 3.1.5 — completeness card. Lives ABOVE the
-          optimisation row because it gates the trust the user
-          should place in the metrics below. When the score is low
-          we want them to act on this card first. */}
-      <CompletenessCard
-        completeness={completeness}
-        currency={data.profile.currency}
-      />
-
-      {/* Phase 3.1.4 — optimisation row. Discipline + Objectifs +
-          Économies potentielles, side by side. Each is a stat card
-          the user can scan in one second; the analytics CTA moves
-          below as a less prominent button so the headline metrics
-          dominate. */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/*
+        Phase 3.1.7 — two compact qualité cards side by side:
+        Complétude (collapsed-by-default details) + Discipline.
+        Everything else (Économies potentielles, Objectifs respectés,
+        Cashflow chart, ExpenseBreakdown, alerts) moved to
+        /expenses/analytics or removed.
+      */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <CompletenessCard
+          completeness={completeness}
+          currency={data.profile.currency}
+        />
         <DisciplineCard
           score={discipline.score}
           tier={discipline.tier}
           weakest={discipline.weakest}
         />
-        <StatCard
-          label={t("stats.goalsRespected")}
-          value={
-            goalAchievement.total === 0
-              ? t("stats.goalsEmpty")
-              : `${goalAchievement.respected} / ${goalAchievement.total}`
-          }
-          icon={<Target className="h-4 w-4" />}
-          tone={
-            goalAchievement.total === 0
-              ? "neutral"
-              : goalAchievement.score >= 0.8
-                ? "positive"
-                : goalAchievement.score >= 0.5
-                  ? "neutral"
-                  : "negative"
-          }
-          hint={
-            goalAchievement.total === 0
-              ? t("stats.goalsEmptyHint")
-              : t("stats.goalsHint", {
-                  pct: Math.round(goalAchievement.score * 100),
-                })
-          }
-        />
-        <StatCard
-          label={t("stats.potentialSavings")}
-          value={
-            !completeness.canEstimateSavings
-              ? t("stats.potentialSavingsBlocked")
-              : potentialSavings.monthly > 0
-                ? `${formatUserCurrency(potentialSavings.monthly, data.profile)}${t("stats.perMonthSuffix")}`
-                : t("stats.potentialSavingsEmpty")
-          }
-          icon={<Sparkles className="h-4 w-4" />}
-          tone={
-            !completeness.canEstimateSavings
-              ? "neutral"
-              : potentialSavings.monthly > 0
-                ? "gold"
-                : "neutral"
-          }
-          hint={
-            !completeness.canEstimateSavings
-              ? t("stats.potentialSavingsBlockedHint")
-              : potentialSavings.monthly > 0
-                ? t("stats.potentialSavingsHint", {
-                    yearly: formatUserCurrency(
-                      potentialSavings.yearly,
-                      data.profile,
-                    ),
-                  })
-                : t("stats.potentialSavingsEmptyHint")
-          }
-        />
       </div>
+
+      {/*
+        Goals — compact when none, full summary when defined.
+        Removes the empty "no goal" block hogging space.
+      */}
+      {data.goals.length > 0 && (
+        <GoalsSummary goals={data.goals} currency={data.profile.currency} />
+      )}
 
       <div className="flex justify-end">
         <Button asChild variant="outline" size="sm">
@@ -394,63 +317,6 @@ export default async function DashboardPage() {
             {t("stats.analyticsCtaButton")}
           </Link>
         </Button>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <CashflowChart
-            income={monthlyIncome}
-            expenses={monthlyExpenses}
-            currency={data.profile.currency}
-          />
-        </div>
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>{t("alerts.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            {monthlyIncome === 0 && monthlyExpenses === 0 ? (
-              // No data yet — don't display misleading "solide" alerts
-              // computed from zeros (runway becomes Infinity, cashflow=0
-              // shows as "positive"). Surface a calm onboarding cue.
-              <Alert
-                tone="neutral"
-                title={t("alerts.emptyTitle")}
-                text={t("alerts.emptyText")}
-              />
-            ) : (
-              <>
-                <Alert
-                  tone={cashflow < 0 ? "danger" : "neutral"}
-                  title={cashflow < 0 ? t("alerts.cashflowNegativeTitle") : t("alerts.cashflowPositiveTitle")}
-                  text={cashflow < 0 ? t("alerts.cashflowNegativeText") : t("alerts.cashflowPositiveText")}
-                />
-                <Alert
-                  tone={runway < 1 ? "warning" : runway >= 3 ? "success" : "neutral"}
-                  title={
-                    runway < 1
-                      ? t("alerts.runwayLowTitle")
-                      : runway >= 3
-                        ? t("alerts.runwaySolidTitle")
-                        : t("alerts.runwayBuildingTitle")
-                  }
-                  text={
-                    runway < 1
-                      ? t("alerts.runwayLowText")
-                      : runway >= 3
-                        ? t("alerts.runwaySolidText")
-                        : t("alerts.runwayBuildingText")
-                  }
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ExpenseBreakdown data={expenseByCategory} currency={data.profile.currency} />
-        <GoalsSummary goals={data.goals} currency={data.profile.currency} />
       </div>
 
       <PlanTeaser
@@ -471,25 +337,3 @@ export default async function DashboardPage() {
   );
 }
 
-function Alert({
-  tone,
-  title,
-  text,
-}: {
-  tone: "neutral" | "success" | "warning" | "danger";
-  title: string;
-  text: string;
-}) {
-  const styles = {
-    neutral: "border-border/60 bg-secondary/30",
-    success: "border-[hsl(var(--success)/0.25)] bg-[hsl(var(--success)/0.08)]",
-    warning: "border-[hsl(var(--warning)/0.25)] bg-[hsl(var(--warning)/0.08)]",
-    danger: "border-[hsl(var(--destructive)/0.25)] bg-[hsl(var(--destructive)/0.08)]",
-  }[tone];
-  return (
-    <div className={`rounded-xl border p-3 ${styles}`}>
-      <p className="font-medium">{title}</p>
-      <p className="text-xs text-muted-foreground">{text}</p>
-    </div>
-  );
-}
