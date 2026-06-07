@@ -219,6 +219,18 @@
     "welcomeBody": "Habla de tus finanzas. El coach LIBERIA usa tus ingresos, gastos y metas para proponerte acciones concretas — con calma, sin jerga, sin promesas.",
     "newConversation": "Iniciar una conversación",
     "createAccount": "Crear mi cuenta",
+    "firstMessage": {
+      "greeting": "Hola {firstName}.",
+      "reflection": "He mirado tu situación.",
+      "priorityLine": {
+        "no_goal": "Tu prioridad actual: fijar una primera meta concreta.",
+        "low_resilience": "Tu prioridad actual: construir un primer colchón de seguridad.",
+        "incomplete_expenses": "Tu prioridad actual: completar tus gastos principales.",
+        "fhs_recommendation": "Tu prioridad actual: seguir la recomendación de tu asesor.",
+        "none": "Tu prioridad actual: afinar para alcanzar el siguiente nivel."
+      },
+      "invitation": "Podemos empezar por ahí si quieres."
+    },
     "chat": {
       "thinking": "El coach está pensando…",
       "placeholder": "Hazle una pregunta a tu coach…",

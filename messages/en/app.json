@@ -219,6 +219,18 @@
     "welcomeBody": "Talk about your finances. The LIBERIA coach uses your income, expenses and goals to suggest concrete actions — calmly, without jargon, without promise.",
     "newConversation": "Start a conversation",
     "createAccount": "Create my account",
+    "firstMessage": {
+      "greeting": "Hi {firstName}.",
+      "reflection": "I've looked at your situation.",
+      "priorityLine": {
+        "no_goal": "Your current priority: set a first concrete goal.",
+        "low_resilience": "Your current priority: build a first safety cushion.",
+        "incomplete_expenses": "Your current priority: complete your main expenses.",
+        "fhs_recommendation": "Your current priority: follow your advisor's recommendation.",
+        "none": "Your current priority: fine-tune to reach the next level."
+      },
+      "invitation": "We can start there if you want."
+    },
     "chat": {
       "thinking": "The coach is thinking…",
       "placeholder": "Ask your coach a question…",

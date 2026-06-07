@@ -7,6 +7,7 @@ import {
   conversationTitleSchema,
 } from "@/lib/ai/safety";
 import { getActionErrors } from "@/lib/i18n/action-errors";
+import { maybeInjectFirstCoachMessage } from "@/lib/services/first-coach-message";
 
 type ActionResult<T = void> =
   | (T extends void ? { ok: true } : { ok: true; data: T })
@@ -35,6 +36,18 @@ export async function createConversation(): Promise<
     .select("id")
     .single();
   if (error) return { ok: false, error: error.message };
+
+  // Phase 4.0 J5 — premier message coach déterministe. Idempotent
+  // (un seul welcome message par user, à vie). Best-effort : un
+  // échec ici ne doit jamais bloquer la création de conversation.
+  try {
+    await maybeInjectFirstCoachMessage({
+      userId,
+      conversationId: data.id,
+    });
+  } catch (err) {
+    console.error("[createConversation] welcome message injection failed", err);
+  }
 
   revalidatePath("/coach");
   return { ok: true, data: { id: data.id } };
