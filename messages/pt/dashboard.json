@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Painel"
   },
+  "firstMission": {
+    "label": "Missão do momento",
+    "whyLabel": "Porquê:",
+    "impactLabel": "Impacto esperado:",
+    "no_goal": {
+      "title": "Define um primeiro objetivo concreto.",
+      "why": "Sem um rumo claro, a tua poupança não sabe para onde ir — e tu também não.",
+      "impact": "Um objetivo dá-te um fio condutor e desbloqueia a projeção \"em quanto tempo lá chego\".",
+      "cta": "Definir o meu objetivo"
+    },
+    "low_resilience": {
+      "title": "Constrói um primeiro colchão de segurança.",
+      "why": "Tens atualmente {runwayMonths} meses de reserva. O objetivo mínimo é 1 mês — é o que te protege de imprevistos.",
+      "impact": "Ter 1 mês de colchão torna a tua Resiliência legível e desbloqueia os próximos conselhos.",
+      "cta": "Falar com o meu conselheiro"
+    },
+    "incomplete_expenses": {
+      "title": "Completa as tuas despesas principais.",
+      "why": "Preencheste {filledCount} categoria(s) de 5. Falta pelo menos {missingArea}.",
+      "impact": "Com um perfil completo a tua pontuação ganha fiabilidade e o conselheiro pode ajudar-te com precisão.",
+      "cta": "Completar as minhas despesas"
+    },
+    "fhs_recommendation": {
+      "title": "O teu conselheiro tem uma ideia para ti.",
+      "why": "O teu eixo mais fraco é {targetAxis}. É aí que podes ganhar mais rapidamente.",
+      "impact": "Uma ação concreta para esta semana — falamos sobre isso?",
+      "impactWithGain": "≈ +{estimatedGain} pontos de pontuação a prazo se agires esta semana.",
+      "cta": "Ver o detalhe com o meu conselheiro"
+    },
+    "none": {
+      "title": "Continua assim.",
+      "why": "As tuas fundações estão sólidas. Agora trata-se de afinar e antecipar.",
+      "impact": "O conselheiro pode ajudar-te a chegar ao próximo nível (investimento, otimização, projetos a longo prazo).",
+      "cta": "Ir mais longe com o meu conselheiro"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Pontuação de saúde financeira {score} em 100",

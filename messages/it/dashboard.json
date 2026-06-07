@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "firstMission": {
+    "label": "Missione del momento",
+    "whyLabel": "Perché:",
+    "impactLabel": "Impatto atteso:",
+    "no_goal": {
+      "title": "Imposta un primo obiettivo concreto.",
+      "why": "Senza un traguardo chiaro, il tuo risparmio non sa dove andare — e nemmeno tu.",
+      "impact": "Un obiettivo ti dà un filo conduttore e sblocca la proiezione \"tra quanto ci arrivo\".",
+      "cta": "Definisci il mio obiettivo"
+    },
+    "low_resilience": {
+      "title": "Costruisci un primo cuscinetto di sicurezza.",
+      "why": "Hai attualmente {runwayMonths} mesi di riserva. L'obiettivo minimo è 1 mese — è ciò che ti protegge dagli imprevisti.",
+      "impact": "Avere 1 mese di cuscinetto rende leggibile la tua Resilienza e sblocca i consigli successivi.",
+      "cta": "Parlane con il mio consulente"
+    },
+    "incomplete_expenses": {
+      "title": "Completa le tue spese principali.",
+      "why": "Hai inserito {filledCount} categoria(e) su 5. Manca almeno {missingArea}.",
+      "impact": "Con un profilo completo il tuo punteggio guadagna affidabilità e il consulente può aiutarti con precisione.",
+      "cta": "Completare le mie spese"
+    },
+    "fhs_recommendation": {
+      "title": "Il tuo consulente ha un'idea per te.",
+      "why": "Il tuo asse più debole è {targetAxis}. È lì che puoi guadagnare più velocemente.",
+      "impact": "Un'azione concreta da mettere in atto questa settimana — ne parliamo?",
+      "impactWithGain": "≈ +{estimatedGain} punti di punteggio nel tempo se agisci questa settimana.",
+      "cta": "Vedi il dettaglio con il mio consulente"
+    },
+    "none": {
+      "title": "Continua così.",
+      "why": "Le tue fondamenta sono solide. Ora si tratta di affinare e anticipare.",
+      "impact": "Il consulente può aiutarti a passare al livello successivo (investimenti, ottimizzazione, progetti a lungo termine).",
+      "cta": "Andare oltre con il mio consulente"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Punteggio di salute finanziaria {score} su 100",

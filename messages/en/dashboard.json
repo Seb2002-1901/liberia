@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "firstMission": {
+    "label": "Mission of the moment",
+    "whyLabel": "Why:",
+    "impactLabel": "Expected impact:",
+    "no_goal": {
+      "title": "Set a first concrete goal.",
+      "why": "Without a clear target, your savings have no direction — and neither do you.",
+      "impact": "A goal gives you a thread to follow, and unlocks the \"how long until I get there\" projection.",
+      "cta": "Define my goal"
+    },
+    "low_resilience": {
+      "title": "Build a first safety cushion.",
+      "why": "You currently have {runwayMonths} months of buffer. The minimum target is 1 month — that's what protects you from the unexpected.",
+      "impact": "Reaching 1 month of buffer makes your Resilience axis readable and unlocks the next advice.",
+      "cta": "Talk to my advisor about it"
+    },
+    "incomplete_expenses": {
+      "title": "Complete your main expenses.",
+      "why": "You've filled in {filledCount} category(ies) out of 5. At least {missingArea} is missing.",
+      "impact": "With a complete profile, your score gains reliability and the advisor can help you precisely.",
+      "cta": "Complete my expenses"
+    },
+    "fhs_recommendation": {
+      "title": "Your advisor has an idea ready for you.",
+      "why": "Your weakest axis is {targetAxis}. That's where you can gain the most quickly.",
+      "impact": "A concrete action to set up this week — shall we talk about it?",
+      "impactWithGain": "≈ +{estimatedGain} score points over time if you act this week.",
+      "cta": "See the detail with my advisor"
+    },
+    "none": {
+      "title": "Keep doing what you're doing well.",
+      "why": "Your foundations are in place. Now it's about refining and anticipating.",
+      "impact": "The advisor can help you reach the next level (investing, optimisation, long-term projects).",
+      "cta": "Go further with my advisor"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Financial health score {score} out of 100",

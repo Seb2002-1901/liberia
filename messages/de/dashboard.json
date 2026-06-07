@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "firstMission": {
+    "label": "Mission des Moments",
+    "whyLabel": "Warum:",
+    "impactLabel": "Erwartete Wirkung:",
+    "no_goal": {
+      "title": "Setze ein erstes konkretes Ziel.",
+      "why": "Ohne klares Ziel weiss dein Erspartes nicht, wohin — und du auch nicht.",
+      "impact": "Ein Ziel gibt dir einen Leitfaden und schaltet die Prognose \"wann erreiche ich es\" frei.",
+      "cta": "Mein Ziel festlegen"
+    },
+    "low_resilience": {
+      "title": "Baue einen ersten Notgroschen auf.",
+      "why": "Du hast aktuell {runwayMonths} Monate Reserve. Mindestziel ist 1 Monat — das schützt dich vor Unvorhergesehenem.",
+      "impact": "1 Monat Reserve macht deine Resilienz-Achse lesbar und schaltet die nächsten Empfehlungen frei.",
+      "cta": "Mit meinem Berater sprechen"
+    },
+    "incomplete_expenses": {
+      "title": "Vervollständige deine Hauptausgaben.",
+      "why": "Du hast {filledCount} Kategorie(n) von 5 erfasst. Mindestens {missingArea} fehlt.",
+      "impact": "Mit vollständigem Profil wird dein Score zuverlässiger und der Berater kann präzise helfen.",
+      "cta": "Ausgaben vervollständigen"
+    },
+    "fhs_recommendation": {
+      "title": "Dein Berater hat eine Idee für dich.",
+      "why": "Deine schwächste Achse ist {targetAxis}. Dort gewinnst du am schnellsten.",
+      "impact": "Eine konkrete Aktion diese Woche — sollen wir darüber sprechen?",
+      "impactWithGain": "≈ +{estimatedGain} Score-Punkte mittelfristig, wenn du diese Woche handelst.",
+      "cta": "Details mit meinem Berater"
+    },
+    "none": {
+      "title": "Mach weiter so.",
+      "why": "Deine Grundlagen stehen. Jetzt geht es ums Verfeinern und Vorausschauen.",
+      "impact": "Der Berater hilft dir auf die nächste Stufe (Investitionen, Optimierung, Langfristprojekte).",
+      "cta": "Weitergehen mit meinem Berater"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Finanzgesundheits-Score {score} von 100",

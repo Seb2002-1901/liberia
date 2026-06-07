@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Panel"
   },
+  "firstMission": {
+    "label": "Misión del momento",
+    "whyLabel": "Por qué:",
+    "impactLabel": "Impacto esperado:",
+    "no_goal": {
+      "title": "Define un primer objetivo concreto.",
+      "why": "Sin un rumbo claro, tu ahorro no sabe a dónde ir — y tú tampoco.",
+      "impact": "Un objetivo te da un hilo conductor y desbloquea la proyección \"en cuánto lo alcanzo\".",
+      "cta": "Definir mi objetivo"
+    },
+    "low_resilience": {
+      "title": "Construye un primer colchón de seguridad.",
+      "why": "Tienes actualmente {runwayMonths} meses de reserva. El objetivo mínimo es 1 mes — eso te protege de imprevistos.",
+      "impact": "Tener 1 mes de colchón hace legible tu Resiliencia y desbloquea los siguientes consejos.",
+      "cta": "Hablar con mi asesor"
+    },
+    "incomplete_expenses": {
+      "title": "Completa tus gastos principales.",
+      "why": "Has rellenado {filledCount} categoría(s) de 5. Falta al menos {missingArea}.",
+      "impact": "Con un perfil completo tu puntuación gana fiabilidad y el asesor puede ayudarte con precisión.",
+      "cta": "Completar mis gastos"
+    },
+    "fhs_recommendation": {
+      "title": "Tu asesor tiene una idea para ti.",
+      "why": "Tu eje más débil es {targetAxis}. Es donde puedes ganar más rápidamente.",
+      "impact": "Una acción concreta para esta semana — ¿lo hablamos?",
+      "impactWithGain": "≈ +{estimatedGain} puntos de puntuación a plazo si actúas esta semana.",
+      "cta": "Ver el detalle con mi asesor"
+    },
+    "none": {
+      "title": "Sigue haciéndolo así.",
+      "why": "Tus bases están sólidas. Ahora se trata de afinar y anticipar.",
+      "impact": "El asesor puede ayudarte al siguiente nivel (inversión, optimización, proyectos a largo plazo).",
+      "cta": "Ir más allá con mi asesor"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Puntuación de salud financiera {score} sobre 100",

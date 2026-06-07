@@ -44,6 +44,8 @@ import {
 } from "@/lib/services/health-writer";
 import { HealthScoreSection } from "@/components/dashboard/health-score-section";
 import { HealthTimeline } from "@/components/dashboard/health-timeline";
+import { FirstSessionMissionCard } from "@/components/dashboard/first-session-mission-card";
+import { buildFirstMission } from "@/lib/calculations/first-mission";
 import type { DrawerData } from "@/lib/calculations/health/types";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -197,6 +199,27 @@ export default async function DashboardPage() {
     }
   }
 
+  // Phase 4.0 J4 — Mission du moment. Calculée à partir de
+  // primitives déjà calculées plus haut (goals, runway,
+  // currentSavings, completeness, drawerData). Aucun recalcul de
+  // formule FHS. Le composant est toujours rendu (anti-vide).
+  const MAJOR_AREAS = ["income", "housing", "insurance", "food", "transport"] as const;
+  const filledMajorSet = new Set<string>(completeness.detected);
+  const filledMajorAreasCount = MAJOR_AREAS.filter((a) =>
+    filledMajorSet.has(a),
+  ).length;
+  const firstMissingMajor =
+    MAJOR_AREAS.find((a) => !filledMajorSet.has(a)) ?? null;
+  const activeGoalsCount = data.goals.filter((g) => !g.is_completed).length;
+  const firstMission = buildFirstMission({
+    goalsCount: activeGoalsCount,
+    runwayMonths: Number.isFinite(runway) ? runway : 999,
+    hasCurrentSavings: currentSavings > 0,
+    filledMajorAreasCount,
+    missingMajorArea: firstMissingMajor,
+    recommendation: drawerData?.recommendation ?? null,
+  });
+
   // Phase 3.1.12 — dashboard final, 6 sections seulement :
   //   1. PageHeader
   //   2. AdvisorCard (hero, voix conseiller unique)
@@ -253,6 +276,8 @@ export default async function DashboardPage() {
           />
         </div>
       </div>
+
+      <FirstSessionMissionCard mission={firstMission} />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard

@@ -2,6 +2,42 @@
   "metadata": {
     "title": "Tableau de bord"
   },
+  "firstMission": {
+    "label": "Mission du moment",
+    "whyLabel": "Pourquoi :",
+    "impactLabel": "Impact attendu :",
+    "no_goal": {
+      "title": "Pose un premier objectif chiffré.",
+      "why": "Sans cap clair, ton épargne ne sait pas où aller — et toi non plus.",
+      "impact": "Un objectif te donne un fil rouge, et il débloque la projection \"dans combien de temps j'y arrive\".",
+      "cta": "Définir mon objectif"
+    },
+    "low_resilience": {
+      "title": "Constitue un premier coussin de sécurité.",
+      "why": "Tu as actuellement {runwayMonths} mois de réserve. La cible minimale est 1 mois — c'est ce qui te protège d'un imprévu.",
+      "impact": "Avoir 1 mois de coussin fait passer ton axe Résilience à un état lisible et débloque les conseils suivants.",
+      "cta": "En parler à mon conseiller"
+    },
+    "incomplete_expenses": {
+      "title": "Complète tes charges principales.",
+      "why": "Tu as renseigné {filledCount} catégorie(s) sur 5. Il manque au moins {missingArea}.",
+      "impact": "Avec un profil complet, ton score gagne en fiabilité et le conseiller peut t'aider de façon précise.",
+      "cta": "Compléter mes dépenses"
+    },
+    "fhs_recommendation": {
+      "title": "Ton conseiller a une idée prête pour toi.",
+      "why": "Ton axe le plus faible est {targetAxis}. C'est là que tu peux gagner le plus rapidement.",
+      "impact": "Une action concrète à mettre en place cette semaine — on en parle ?",
+      "impactWithGain": "≈ +{estimatedGain} points de score à terme si tu agis cette semaine.",
+      "cta": "Voir le détail avec mon conseiller"
+    },
+    "none": {
+      "title": "Continue ce que tu fais bien.",
+      "why": "Tes fondations sont en place. Reste à affiner et anticiper.",
+      "impact": "Le conseiller peut t'aider à passer au palier suivant (investissement, optimisation, projets long terme).",
+      "cta": "Aller plus loin avec mon conseiller"
+    }
+  },
   "health": {
     "ring": {
       "aria": "Score de santé financière {score} sur 100",
