@@ -93,6 +93,14 @@ export function ExpenseAnalyticsClient({
   const [period, setPeriod] = React.useState<AnalyticsPeriod>("month");
   const [budgets, setBudgets] = React.useState<CategoryBudget[]>(initialBudgets);
 
+  // Phase 4.0 J7 — masquage UX des sections lourdes (breakdown détaillé,
+  // économies potentielles, historique 3m/12m). Toute la logique reste
+  // calculée (useMemo + sous-composants conservés) ; seul l'affichage
+  // est désactivé. Pour rouvrir ces sections (ex. futur écran
+  // "Analytics avancé" ou pricing supérieur), passer ce flag à true.
+  // Pas de refactor : retour à l'état précédent en flippant un booléen.
+  const SHOW_DETAILED_SECTIONS = false;
+
   // Memoise the derived numbers — the user may flip the period
   // selector multiple times and the helper sweeps the whole expense
   // list each call. Memo by (expenses, period) keeps the UI snappy
@@ -222,73 +230,32 @@ export function ExpenseAnalyticsClient({
     setBudgets((prev) => prev.filter((b) => b.category !== category));
   };
 
+  // Phase 4.0 J7 — page Analytics épurée. Ordre d'affichage figé
+  // selon la priorité produit :
+  //   1. Complétude / fiabilité  (CompletenessCard)
+  //   2. Opportunités principales (OpportunitiesCard)
+  //   3. Budgets / performance   (Card budgets)
+  //   4. Répartition simple      (sélecteur de période + 3 SummaryCards)
+  //   + Anomalies (conditionnel — auto-masqué si rien à signaler)
+  //
+  // Sections gardées en code MAIS masquées pour réduire le bruit :
+  //   - BreakdownList (liste détaillée par catégorie)
+  //   - PotentialSavingsCard (souvent redondant avec Opportunités)
+  //   - CategoryHistoryCard (historique 3m/12m, trop dense pour J0)
+  // Flippées via SHOW_DETAILED_SECTIONS — retour instantané possible.
   return (
     <div className="space-y-6">
-      {/* Phase 3.1.8 — completeness moved to analytics top so the
-          dashboard stays focused on action. The card stays compact
-          + dépliable: same UX as before, new placement. */}
+      {/* 1. Complétude / fiabilité (priorité 1). */}
       <CompletenessCard
         completeness={completeness}
         currency={currency}
       />
 
-      {/* Period selector */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("period.title")}</CardTitle>
-          <CardDescription>{t("period.description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {(["week", "month", "year", "twelve_months"] as const).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPeriod(p)}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-sm transition-colors",
-                  period === p
-                    ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.08)] text-foreground"
-                    : "border-border/60 bg-card/40 text-muted-foreground hover:border-border hover:bg-card/60",
-                )}
-              >
-                {t(`period.${p}`)}
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* 2. Opportunités principales (priorité 2). Promu en seconde
+            position pour mettre l'action en avant. */}
+      <OpportunitiesCard opportunities={opportunities} currency={currency} />
 
-      {/* Fixed vs Variable summary */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <SummaryCard
-          label={t("totals.fixed")}
-          value={formatCurrency(totals.fixed, currency)}
-          hint={t("totals.fixedHint")}
-        />
-        <SummaryCard
-          label={t("totals.variable")}
-          value={formatCurrency(totals.variable, currency)}
-          hint={t("totals.variableHint")}
-        />
-        <SummaryCard
-          label={t("totals.total")}
-          value={formatCurrency(totals.total, currency)}
-          hint={t("totals.totalHint", { transactions: totals.transactions })}
-          accent
-        />
-      </div>
-
-      {/* Category breakdown — wrapped in CollapsibleSection so the
-          long list doesn't dominate the page by default. */}
-      <CollapsibleSection
-        title={t("breakdown.title")}
-        subtitle={t("breakdown.description")}
-      >
-        <BreakdownList breakdown={breakdown} currency={currency} />
-      </CollapsibleSection>
-
-      {/* Budgets per category */}
+      {/* 3. Budgets / performance (priorité 3). */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("budgets.title")}</CardTitle>
@@ -358,23 +325,85 @@ export function ExpenseAnalyticsClient({
         </CardContent>
       </Card>
 
+      {/* 4. Répartition simple (priorité 4). Sélecteur de période +
+            3 totaux Fixe / Variable / Total. La liste détaillée par
+            catégorie reste en code (BreakdownList) mais masquée. */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("period.title")}</CardTitle>
+          <CardDescription>{t("period.description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {(["week", "month", "year", "twelve_months"] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPeriod(p)}
+                className={cn(
+                  "rounded-xl border px-3 py-2 text-sm transition-colors",
+                  period === p
+                    ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.08)] text-foreground"
+                    : "border-border/60 bg-card/40 text-muted-foreground hover:border-border hover:bg-card/60",
+                )}
+              >
+                {t(`period.${p}`)}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <SummaryCard
+          label={t("totals.fixed")}
+          value={formatCurrency(totals.fixed, currency)}
+          hint={t("totals.fixedHint")}
+        />
+        <SummaryCard
+          label={t("totals.variable")}
+          value={formatCurrency(totals.variable, currency)}
+          hint={t("totals.variableHint")}
+        />
+        <SummaryCard
+          label={t("totals.total")}
+          value={formatCurrency(totals.total, currency)}
+          hint={t("totals.totalHint", { transactions: totals.transactions })}
+          accent
+        />
+      </div>
+
+      {/* Anomalies : la carte est conditionnelle (ne s'affiche que si
+          au moins une anomalie est détectée). Pas un bloc principal. */}
       <AnomaliesCard anomalies={anomalies} currency={currency} />
 
-      <PotentialSavingsCard
-        savings={potentialSavings}
-        opportunitiesCount={opportunities.length}
-        currency={currency}
-        canEstimateSavings={completeness.canEstimateSavings}
-      />
+      {/* Sections masquées Phase 4.0 J7 — flag à false. Le code reste
+          calculé et les composants conservés pour réactivation
+          rapide (futur écran "Analytics avancé" ou pricing supérieur). */}
+      {SHOW_DETAILED_SECTIONS && (
+        <>
+          <CollapsibleSection
+            title={t("breakdown.title")}
+            subtitle={t("breakdown.description")}
+          >
+            <BreakdownList breakdown={breakdown} currency={currency} />
+          </CollapsibleSection>
 
-      <OpportunitiesCard opportunities={opportunities} currency={currency} />
+          <PotentialSavingsCard
+            savings={potentialSavings}
+            opportunitiesCount={opportunities.length}
+            currency={currency}
+            canEstimateSavings={completeness.canEstimateSavings}
+          />
 
-      <CategoryHistoryCard
-        history={history}
-        months={historyMonths}
-        onMonthsChange={setHistoryMonths}
-        currency={currency}
-      />
+          <CategoryHistoryCard
+            history={history}
+            months={historyMonths}
+            onMonthsChange={setHistoryMonths}
+            currency={currency}
+          />
+        </>
+      )}
     </div>
   );
 }
