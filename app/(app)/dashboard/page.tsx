@@ -31,8 +31,6 @@ import { computeAdviceConfidence } from "@/lib/calculations/advice-confidence";
 import { computeBudgetProgress } from "@/lib/calculations/budget-goals";
 import { buildAdvisorSummary } from "@/lib/calculations/advisor-engine";
 import { AdvisorCard } from "@/components/dashboard/advisor-card";
-import { LearnedAboutYou } from "@/components/dashboard/learned-about-you";
-import { ProgressSinceLastVisit } from "@/components/dashboard/progress-since-last-visit";
 import { CoachButton } from "@/components/dashboard/coach-button";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { getMyUserMemory } from "@/lib/services/memory";
@@ -220,15 +218,18 @@ export default async function DashboardPage() {
     recommendation: drawerData?.recommendation ?? null,
   });
 
-  // Phase 3.1.12 — dashboard final, 6 sections seulement :
+  // Phase 4.0 J6 — dashboard épuré, 7 sections :
   //   1. PageHeader
-  //   2. AdvisorCard (hero, voix conseiller unique)
-  //   3. KPI strip 3 cards (Revenus · Reste · Runway)
-  //   4. LearnedAboutYou + ProgressSinceLastVisit
-  //   5. GoalsSummary (si objectifs définis)
-  //   6. CoachButton (CTA full-width "Parler à mon conseiller")
-  // Supprimés : CoachTeaser, ProactiveCoachCard, ResumeStrip, StatCard
-  // "Dépenses totales" — tout doublonnait l'AdvisorCard.
+  //   2. Ring (FHS) + AdvisorCard côte à côte
+  //   3. FirstSessionMissionCard (mission du moment, J4)
+  //   4. KPI strip 3 cards (Revenus · Reste · Runway)
+  //   5. HealthTimeline
+  //   6. GoalsSummary (si objectifs définis)
+  //   7. CoachButton (CTA full-width "Parler à mon conseiller")
+  // Retirés J6 : LearnedAboutYou + ProgressSinceLastVisit (logique
+  // conservée dans advisor-engine pour le coach context et un futur
+  // écran "Profil financier"). Retirés antérieurement : CoachTeaser,
+  // ProactiveCoachCard, ResumeStrip, StatCard "Dépenses totales".
   return (
     <div className="space-y-6">
       <PageHeader
@@ -311,10 +312,11 @@ export default async function DashboardPage() {
           handles its own empty state with a pedagogical hint. */}
       {drawerData && <HealthTimeline data={drawerData} />}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <LearnedAboutYou summary={advisor} />
-        <ProgressSinceLastVisit summary={advisor} />
-      </div>
+      {/* Phase 4.0 J6 — LearnedAboutYou + ProgressSinceLastVisit
+          retirés du dashboard. Le moteur advisor-engine continue à
+          calculer ces deux blocs (utilisés par le coach context et
+          réservés pour un futur écran "Profil financier"). Voir
+          components/dashboard/{learned-about-you,progress-since-last-visit}.tsx. */}
 
       {data.goals.length > 0 && (
         <GoalsSummary goals={data.goals} currency={data.profile.currency} />
