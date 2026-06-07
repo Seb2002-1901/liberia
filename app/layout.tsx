@@ -67,8 +67,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0c",
-  colorScheme: "dark",
+  // Phase 5.0 — passage en light premium. themeColor = couleur du fond
+  // app (#F6F8FC) pour que la barre d'adresse mobile l'adopte.
+  themeColor: "#F6F8FC",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   // Enables env(safe-area-inset-*) on iOS so the bottom nav clears the
@@ -86,7 +88,10 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${outfit.variable} dark`}
+      // Phase 5.0 — light-first. La classe `dark` est retirée ; le
+      // darkMode Tailwind a aussi été désactivé (tailwind.config.ts)
+      // pour interdire la réactivation accidentelle d'un thème sombre.
+      className={`${inter.variable} ${outfit.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans antialiased">
@@ -94,13 +99,13 @@ export default async function RootLayout({
           {children}
           <Toaster
             position="top-right"
-            theme="dark"
+            theme="light"
             richColors
             closeButton
             toastOptions={{
               classNames: {
                 toast:
-                  "rounded-xl border border-border/60 bg-card/95 backdrop-blur-md",
+                  "rounded-xl border border-border bg-card shadow-[0_4px_16px_-4px_hsl(222_47%_11%/0.08)]",
               },
             }}
           />

@@ -1,7 +1,11 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
+  // Phase 5.0 — light premium. On retire darkMode pour éviter qu'un
+  // `<html className="dark">` résiduel ne réactive un thème sombre.
+  // Si on doit un jour réintroduire un mode dark, il faudra refondre
+  // tous les tokens HSL (voir globals.css) — ce n'est pas un simple
+  // toggle.
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -48,6 +52,15 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Brand navy (#0F3D9E). Réservé carte Score (S3) + wordmark.
+        navy: {
+          DEFAULT: "hsl(var(--navy))",
+          foreground: "hsl(var(--navy-foreground))",
+        },
+        // Legacy `gold` remappé vers primary pour compat. Les 152
+        // références existantes (bg-gold, text-gold, border-gold)
+        // rendent désormais en bleu accent. Renommage sémantique
+        // gold → primary/navy programmé S3.
         gold: {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
@@ -96,8 +109,13 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        // Renommage de `gold-gradient` → `accent-gradient` pour la
+        // sémantique Phase 5.0. L'ancien nom est conservé en alias
+        // pour ne pas casser les consommateurs marketing/hero.
+        "accent-gradient":
+          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--navy)) 100%)",
         "gold-gradient":
-          "linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-muted)) 100%)",
+          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--navy)) 100%)",
       },
     },
   },

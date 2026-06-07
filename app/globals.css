@@ -2,68 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+/* -------------------------------------------------------------------------- */
+/*  Phase 5.0 — design system "Conseiller IA" : light premium                  */
+/*                                                                            */
+/*  Palette source de vérité (validée maquette) :                              */
+/*    background  #F6F8FC     primary CTA  #2563EB  (bleu accent)             */
+/*    card        #FFFFFF     brand navy   #0F3D9E  (carte Score, marque)     */
+/*    foreground  #0F172A     success      #16A34A                            */
+/*    muted-fg    #64748B     warning      #F59E0B                            */
+/*    border      #E2E8F0     danger       #DC2626                            */
+/*                                                                            */
+/*  Inspiration : Apple, Stripe, Linear, Notion, Mercury, Arc, Perplexity.    */
+/*  Interdits formels : glassmorphism agressif, néon, gradients criards,      */
+/*  ombres profondes — tout doit respirer la clarté et la lisibilité.         */
+/*                                                                            */
+/*  Backward compat : le token `--gold` est CONSERVÉ (152 références dans la  */
+/*  base) mais sa valeur HSL est remappée vers le bleu accent. Les écrans     */
+/*  pas encore migrés (S2/S3+) rendent automatiquement en bleu sans crash.    */
+/*  Renommage sémantique gold → accent/navy programmé S3 (refonte dashboard). */
+/* -------------------------------------------------------------------------- */
+
 @layer base {
   :root {
-    /* Light fallback (we ship dark-first) */
-    --background: 240 10% 98%;
-    --foreground: 240 10% 6%;
+    --background: 220 33% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 6%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 6%;
-    --primary: 240 10% 6%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 6%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 10% 6%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 240 10% 6%;
-    --radius: 0.75rem;
-    --gold: 40 50% 62%;
-    --gold-foreground: 240 10% 6%;
-    --gold-muted: 35 35% 50%;
-    --success: 152 60% 48%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 56%;
-    --warning-foreground: 240 10% 6%;
-  }
+    --popover-foreground: 222 47% 11%;
 
-  .dark,
-  :root {
-    /* Liberia premium dark — noir profond, anthracite, accent or */
-    --background: 240 8% 5%;
-    --foreground: 40 12% 95%;
-    --card: 240 8% 7%;
-    --card-foreground: 40 12% 95%;
-    --popover: 240 8% 7%;
-    --popover-foreground: 40 12% 95%;
-    --primary: 40 30% 88%;
-    --primary-foreground: 240 10% 6%;
-    --secondary: 240 6% 12%;
-    --secondary-foreground: 40 12% 95%;
-    --muted: 240 6% 12%;
-    --muted-foreground: 240 5% 60%;
-    --accent: 40 40% 60%;
-    --accent-foreground: 240 10% 6%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 14%;
-    --input: 240 6% 14%;
-    --ring: 40 40% 60%;
-    --radius: 0.875rem;
-    --gold: 40 50% 65%;
-    --gold-foreground: 240 10% 6%;
-    --gold-muted: 35 30% 45%;
-    --success: 152 55% 50%;
-    --success-foreground: 240 10% 6%;
-    --warning: 38 90% 60%;
-    --warning-foreground: 240 10% 6%;
+    /* Primary = bleu accent #2563EB. Utilisé pour les CTAs, focus
+       rings, liens actifs, états sélectionnés. Le bleu navy plus sombre
+       (#0F3D9E, carte Score) est exposé séparément via `--navy`. */
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+
+    --radius: 1rem;
+
+    /* Bleu marine de marque (#0F3D9E). Utilisé pour la carte Score
+       de santé financière (S3) et la wordmark de la sidebar. Token
+       autonome pour rester contrôlable indépendamment du primary. */
+    --navy: 221 83% 34%;
+    --navy-foreground: 0 0% 100%;
+
+    /* Legacy `--gold` remappé vers primary. 152 références existantes
+       continuent de fonctionner et rendent en bleu accent jusqu'au
+       renommage sémantique S3. Ne pas supprimer ce token avant la
+       fin de S3 sans audit complet des consommateurs. */
+    --gold: 221 83% 53%;
+    --gold-foreground: 0 0% 100%;
+    --gold-muted: 221 83% 38%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
   }
 }
 
@@ -81,51 +90,58 @@
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
   }
   ::selection {
-    background: hsl(var(--gold) / 0.25);
+    background: hsl(var(--primary) / 0.2);
     color: hsl(var(--foreground));
   }
 }
 
 @layer components {
+  /* `.glass` : surface élevée, blanche, hairline border. Le nom est
+     conservé pour compat ; le rendu n'est plus "glassmorphism" — on
+     est passé en SaaS plat épuré. */
   .glass {
-    background: linear-gradient(
-      180deg,
-      hsl(var(--card) / 0.7) 0%,
-      hsl(var(--card) / 0.4) 100%
-    );
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid hsl(var(--border) / 0.6);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px 0 hsl(222 47% 11% / 0.04);
   }
 
+  /* `.premium-card` : carte premium claire avec léger halo accent
+     positionné via --mx/--my pour le hover suit-souris. Halo bleu
+     très discret (4% d'opacité). */
   .premium-card {
-    @apply rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm;
+    @apply rounded-2xl border border-border bg-card;
     background-image: radial-gradient(
       1200px circle at var(--mx, 50%) var(--my, 0%),
-      hsl(var(--gold) / 0.04),
+      hsl(var(--primary) / 0.04),
       transparent 40%
     );
+    box-shadow: 0 1px 2px 0 hsl(222 47% 11% / 0.04);
   }
 
+  /* `.gold-text` : conservé pour compat, rendu en gradient bleu
+     (primary → navy). Renommage en `.accent-text` programmé S3. */
   .gold-text {
     background: linear-gradient(
       135deg,
-      hsl(var(--gold)) 0%,
-      hsl(var(--gold-muted)) 100%
+      hsl(var(--primary)) 0%,
+      hsl(var(--navy)) 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
+  /* `.hairline` : fine bordure neutre, claire. */
   .hairline {
-    @apply border border-white/[0.06];
+    @apply border border-border;
   }
 
+  /* `.grid-bg` : grille subtile sur fond clair. Masquée en haut pour
+     ne pas dominer le contenu. Utilisé sur hero marketing + admin. */
   .grid-bg {
     background-image:
-      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+      linear-gradient(to right, hsl(var(--border) / 0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.6) 1px, transparent 1px);
     background-size: 48px 48px;
     mask-image: radial-gradient(
       ellipse at top,
