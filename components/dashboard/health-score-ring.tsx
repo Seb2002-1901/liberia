@@ -1,0 +1,161 @@
+"use client";
+
+import * as React from "react";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import {
+  bandTheme,
+  classifyDelta,
+  confidencePillTone,
+  formatDelta,
+  ringArcOffset,
+} from "@/lib/calculations/health/ui-helpers";
+import type {
+  Band,
+  Confidence,
+} from "@/lib/calculations/health/types";
+import { cn } from "@/lib/utils";
+
+interface HealthScoreRingProps {
+  /** Display score 0-100. */
+  score: number;
+  /** Signed delta vs previous sealed snapshot. null on first ever. */
+  delta: number | null;
+  confidence: Confidence;
+  band: Band;
+  isDemo: boolean;
+  onOpen: () => void;
+}
+
+/**
+ * Phase 3.2 — Ring the user sees first on the dashboard.
+ *
+ * 80×80 SVG : track + arc filled to the score, band-colored. Center
+ * shows the integer score in tabular-nums semibold ; a delta chip
+ * sits underneath. Badges decorate the corners (DEMO + confidence).
+ *
+ * Animation : arc grows from 0 to its target value on FIRST mount of
+ * the session only (sessionStorage flag). Subsequent renders snap to
+ * the value — no jitter on re-hydration.
+ *
+ * Click anywhere → opens the drawer via onOpen().
+ */
+export function HealthScoreRing({
+  score,
+  delta,
+  confidence,
+  band,
+  isDemo,
+  onOpen,
+}: HealthScoreRingProps) {
+  const t = useTranslations("dashboard.health.ring");
+
+  const theme = bandTheme(band, confidence);
+  const RADIUS = 36;
+  const STROKE = 8;
+  const { circumference, offset } = ringArcOffset(score, RADIUS);
+
+  const animateOnMount = useFirstSessionMount("health-ring-mounted");
+  const deltaSign = classifyDelta(delta);
+  const deltaText = formatDelta(delta);
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={t("aria", { score })}
+      className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold))] focus:ring-offset-2 focus:ring-offset-background"
+    >
+      <svg
+        viewBox="0 0 100 100"
+        className="h-20 w-20 -rotate-90"
+        aria-hidden="true"
+      >
+        <circle
+          cx="50"
+          cy="50"
+          r={RADIUS}
+          fill="none"
+          strokeWidth={STROKE}
+          className="stroke-border/40"
+        />
+        <motion.circle
+          cx="50"
+          cy="50"
+          r={RADIUS}
+          fill="none"
+          strokeWidth={STROKE}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={
+            animateOnMount ? { strokeDashoffset: circumference } : undefined
+          }
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: animateOnMount ? 0.6 : 0, ease: "easeOut" }}
+          className={cn(theme.arc, "transition-colors")}
+        />
+      </svg>
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span
+          className={cn(
+            "text-2xl font-semibold tabular-nums leading-none",
+            theme.neutral && "text-muted-foreground",
+          )}
+        >
+          {score}
+        </span>
+        {deltaText && (
+          <span
+            className={cn(
+              "mt-0.5 text-[10px] tabular-nums",
+              deltaSign === "POSITIVE" && "text-emerald-500",
+              deltaSign === "NEGATIVE" && "text-rose-500",
+              deltaSign === "STABLE" && "text-muted-foreground",
+            )}
+          >
+            {deltaText}
+          </span>
+        )}
+      </div>
+
+      {isDemo && (
+        <span className="absolute -right-1 -top-1 rounded bg-[hsl(var(--gold))] px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-background">
+          {t("demoBadge")}
+        </span>
+      )}
+
+      {confidence !== "HIGH" && (
+        <span
+          className={cn(
+            "absolute -bottom-1 -right-1 rounded px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider",
+            confidencePillTone(confidence),
+          )}
+        >
+          {t(`confidence.${confidence}`)}
+        </span>
+      )}
+    </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Session-bound mount flag                                                   */
+/* -------------------------------------------------------------------------- */
+
+function useFirstSessionMount(key: string): boolean {
+  const [first, setFirst] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const flag = window.sessionStorage.getItem(key);
+      if (!flag) {
+        window.sessionStorage.setItem(key, "1");
+        setFirst(true);
+      }
+    } catch {
+      // Storage unavailable (private mode etc.) — fall back to no animation
+    }
+  }, [key]);
+  return first;
+}

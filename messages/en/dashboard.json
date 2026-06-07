@@ -2,6 +2,126 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "health": {
+    "ring": {
+      "aria": "Financial health score {score} out of 100",
+      "demoBadge": "DEMO",
+      "confidence": {
+        "MEDIUM": "Med.",
+        "LOW": "Low",
+        "INSUFFICIENT_DATA": "Insuf."
+      }
+    },
+    "drawer": {
+      "title": "My financial health score",
+      "demoBadge": "DEMO",
+      "insufficientHint": "Your profile is still being set up. Add your income, fixed expenses and at least two major categories to unlock a full read.",
+      "confidence": {
+        "HIGH": "High confidence",
+        "MEDIUM": "Medium confidence",
+        "LOW": "Low confidence",
+        "INSUFFICIENT_DATA": "Insufficient data"
+      },
+      "deltaBlock": {
+        "title": "Why my score moved",
+        "netGain": "Net gain: +{value}",
+        "netLoss": "Net loss: {value}",
+        "netStable": "Score stable this week.",
+        "firstSnapshot": "Welcome to your score. Come back on Sunday for your first delta."
+      },
+      "axes": {
+        "title": "Breakdown",
+        "labels": {
+          "discipline": "Discipline",
+          "resilience": "Resilience",
+          "trajectoire": "Trajectory",
+          "couverture": "Coverage",
+          "objectifs": "Goals",
+          "comportement": "Behaviour"
+        }
+      },
+      "momentum": {
+        "label": "{direction} {strength} over {weeks} wks",
+        "directionUP": "Up",
+        "directionDOWN": "Down",
+        "directionFLAT": "Flat",
+        "strengthWEAK": "lightly",
+        "strengthMEDIUM": "noticeably",
+        "strengthSTRONG": "strongly"
+      },
+      "recommendation": {
+        "title": "Next step up",
+        "estimatedGain": "≈ +{value} points if you act this week",
+        "ctaCoach": "Talk to my advisor"
+      }
+    },
+    "bands": {
+      "rose": "Needs attention",
+      "ambre": "Building",
+      "or": "Solid",
+      "emeraude": "Mastered"
+    },
+    "areas": {
+      "income": "Income",
+      "housing": "Housing",
+      "insurance": "Insurance",
+      "food": "Food",
+      "transport": "Transport"
+    },
+    "reason": {
+      "discipline_budget_streak_improved": "Budgets respected ({successCount} of {total}).",
+      "discipline_budget_breach": "{failingCount, plural, one {# budget overran} other {# budgets overran}} this week.",
+      "discipline_savings_more_regular": "Savings more consistent than before.",
+      "discipline_savings_less_regular": "Savings more volatile than before.",
+      "resilience_runway_improved": "Emergency fund: from {from} to {to} months.",
+      "resilience_runway_declined": "Emergency fund: from {from} to {to} months.",
+      "resilience_savings_grew": "Savings increased.",
+      "resilience_burn_rose": "Fixed expenses increased.",
+      "trajectoire_savings_rate_improved": "Savings rate: {fromPct}% → {toPct}%.",
+      "trajectoire_savings_rate_declined": "Savings rate: {fromPct}% → {toPct}%.",
+      "couverture_area_added": "{area} added.",
+      "couverture_area_removed": "{area} removed from profile.",
+      "couverture_refined": "Profile refined.",
+      "objectifs_goal_completed": "A goal completed — well done.",
+      "objectifs_new_goal_set": "A new goal set.",
+      "objectifs_no_goals_anymore": "No active goal right now.",
+      "objectifs_progress_made": "Goals progressing ({pct}% average).",
+      "objectifs_progress_stalled": "Goal progress on pause.",
+      "comportement_more_active": "More consistent tracking than before.",
+      "comportement_less_active": "Less activity than usual.",
+      "stable_period": "Stable period — nothing meaningful moved."
+    },
+    "recommendation": {
+      "recommend_build_runway": {
+        "title": "Strengthen your emergency fund",
+        "desc": "Setting {addAmount} aside adds {gainMonths} months of runway."
+      },
+      "recommend_increase_savings_rate": {
+        "title": "Lift your savings rate",
+        "desc": "Move from {fromPct}% to {toPct}%, e.g. via a monthly auto-transfer."
+      },
+      "recommend_close_one_budget": {
+        "title": "Hit one more budget this month",
+        "desc": "You meet {successCount} of {total}. Aim for {newSuccessCount}."
+      },
+      "recommend_set_first_budgets": {
+        "title": "Set up your first budgets",
+        "desc": "Three clear caps (food, leisure, transport) unlock your Discipline score."
+      },
+      "recommend_complete_profile": {
+        "title": "Complete your profile",
+        "desc": "Adding {area} sharpens the read of your score."
+      },
+      "recommend_set_first_goal": {
+        "title": "Set a first goal",
+        "desc": "A 6- or 12-month target is enough to anchor your savings."
+      },
+      "recommend_advance_goal": {
+        "title": "Move your goal forward",
+        "desc": "From {fromPct}% to {toPct}% by the next milestone."
+      }
+    }
+  },
   "header": {
     "eyebrow": "Overview",
     "title": "Hi, {firstName}",

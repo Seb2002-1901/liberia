@@ -2,6 +2,126 @@
   "metadata": {
     "title": "Panel"
   },
+  "health": {
+    "ring": {
+      "aria": "Puntuación de salud financiera {score} sobre 100",
+      "demoBadge": "DEMO",
+      "confidence": {
+        "MEDIUM": "Media",
+        "LOW": "Baja",
+        "INSUFFICIENT_DATA": "Insuf."
+      }
+    },
+    "drawer": {
+      "title": "Mi puntuación de salud financiera",
+      "demoBadge": "DEMO",
+      "insufficientHint": "Tu perfil aún se está construyendo. Añade ingresos, gastos fijos y al menos dos categorías principales para desbloquear una lectura completa.",
+      "confidence": {
+        "HIGH": "Confianza alta",
+        "MEDIUM": "Confianza media",
+        "LOW": "Confianza baja",
+        "INSUFFICIENT_DATA": "Datos insuficientes"
+      },
+      "deltaBlock": {
+        "title": "Por qué cambió mi puntuación",
+        "netGain": "Ganancia neta: +{value}",
+        "netLoss": "Pérdida neta: {value}",
+        "netStable": "Puntuación estable esta semana.",
+        "firstSnapshot": "Bienvenido a tu puntuación. Vuelve el domingo para tu primer delta."
+      },
+      "axes": {
+        "title": "Desglose",
+        "labels": {
+          "discipline": "Disciplina",
+          "resilience": "Resiliencia",
+          "trajectoire": "Trayectoria",
+          "couverture": "Cobertura",
+          "objectifs": "Objetivos",
+          "comportement": "Comportamiento"
+        }
+      },
+      "momentum": {
+        "label": "{direction} {strength} en {weeks} sem.",
+        "directionUP": "Subida",
+        "directionDOWN": "Bajada",
+        "directionFLAT": "Estable",
+        "strengthWEAK": "ligero",
+        "strengthMEDIUM": "marcado",
+        "strengthSTRONG": "fuerte"
+      },
+      "recommendation": {
+        "title": "Para subir un peldaño",
+        "estimatedGain": "≈ +{value} puntos si actúas esta semana",
+        "ctaCoach": "Hablar con mi asesor"
+      }
+    },
+    "bands": {
+      "rose": "Requiere atención",
+      "ambre": "En construcción",
+      "or": "Sólido",
+      "emeraude": "Dominado"
+    },
+    "areas": {
+      "income": "Ingresos",
+      "housing": "Vivienda",
+      "insurance": "Seguros",
+      "food": "Alimentación",
+      "transport": "Transporte"
+    },
+    "reason": {
+      "discipline_budget_streak_improved": "Presupuestos respetados ({successCount} de {total}).",
+      "discipline_budget_breach": "{failingCount, plural, one {# presupuesto superado} other {# presupuestos superados}} esta semana.",
+      "discipline_savings_more_regular": "Ahorro más regular que antes.",
+      "discipline_savings_less_regular": "Ahorro más volátil que antes.",
+      "resilience_runway_improved": "Fondo de emergencia: de {from} a {to} meses.",
+      "resilience_runway_declined": "Fondo de emergencia: de {from} a {to} meses.",
+      "resilience_savings_grew": "Ahorros al alza.",
+      "resilience_burn_rose": "Gastos fijos al alza.",
+      "trajectoire_savings_rate_improved": "Tasa de ahorro: {fromPct}% → {toPct}%.",
+      "trajectoire_savings_rate_declined": "Tasa de ahorro: {fromPct}% → {toPct}%.",
+      "couverture_area_added": "{area} añadido.",
+      "couverture_area_removed": "{area} retirado del perfil.",
+      "couverture_refined": "Perfil afinado.",
+      "objectifs_goal_completed": "Un objetivo completado — bien hecho.",
+      "objectifs_new_goal_set": "Un nuevo objetivo definido.",
+      "objectifs_no_goals_anymore": "Sin objetivo activo por ahora.",
+      "objectifs_progress_made": "Tus objetivos avanzan ({pct}% de media).",
+      "objectifs_progress_stalled": "Avance de objetivos en pausa.",
+      "comportement_more_active": "Seguimiento más regular que antes.",
+      "comportement_less_active": "Menos actividad de lo habitual.",
+      "stable_period": "Periodo estable — nada significativo se movió."
+    },
+    "recommendation": {
+      "recommend_build_runway": {
+        "title": "Refuerza tu fondo de emergencia",
+        "desc": "Apartar {addAmount} suma {gainMonths} meses de cobertura."
+      },
+      "recommend_increase_savings_rate": {
+        "title": "Sube tu tasa de ahorro",
+        "desc": "Pasar de {fromPct}% a {toPct}%, por ejemplo con una transferencia automática mensual."
+      },
+      "recommend_close_one_budget": {
+        "title": "Cumple un presupuesto más este mes",
+        "desc": "Cumples {successCount} de {total}. Apunta a {newSuccessCount}."
+      },
+      "recommend_set_first_budgets": {
+        "title": "Define tus primeros presupuestos",
+        "desc": "Tres topes claros (alimentación, ocio, transporte) desbloquean tu puntuación de Disciplina."
+      },
+      "recommend_complete_profile": {
+        "title": "Completa tu perfil",
+        "desc": "Añadir {area} afina la lectura de tu puntuación."
+      },
+      "recommend_set_first_goal": {
+        "title": "Define un primer objetivo",
+        "desc": "Una meta a 6 o 12 meses basta para orientar tu ahorro."
+      },
+      "recommend_advance_goal": {
+        "title": "Avanza tu objetivo",
+        "desc": "De {fromPct}% a {toPct}% para el próximo hito."
+      }
+    }
+  },
   "header": {
     "eyebrow": "Resumen",
     "title": "Hola, {firstName}",
