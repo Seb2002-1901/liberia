@@ -18,6 +18,7 @@ import {
 import { explainDelta } from "@/lib/calculations/health/delta";
 import { computeMomentum } from "@/lib/calculations/health/momentum";
 import { buildHealthRecommendation } from "@/lib/calculations/health/recommendation";
+import { buildTimeline } from "@/lib/calculations/health/timeline";
 import {
   latestSealableWeek,
   toUserTimezone,
@@ -32,6 +33,7 @@ import {
 } from "@/lib/services/health-snapshots";
 import {
   getDeltaByUserIdAndWeek,
+  listRecentDeltasByUserId,
   writeDelta,
 } from "@/lib/services/health-deltas";
 import type {
@@ -169,11 +171,16 @@ export async function getOrSealDrawerData(
     await writeDelta({ userId, explanation });
   }
 
-  // --- Step 8 : momentum over recent snapshots ---
+  // --- Step 8 : recent snapshots window. Sized to cover BOTH momentum
+  //   (needs 4) AND timeline (Phase 3.3 — caps at 10 events but the
+  //   underlying window benefits from a few extra so consecutive
+  //   inactive weeks don't starve the engine).
+  const TIMELINE_WINDOW = 12;
   const recent = isAdminConfigured()
-    ? await listRecentSnapshotsByUserId(userId, MOMENTUM_RULES.WINDOW_SIZE)
+    ? await listRecentSnapshotsByUserId(userId, TIMELINE_WINDOW)
     : [];
-  const momentum = computeMomentum(recent.map((s) => s.result));
+  const momentumSlice = recent.slice(0, MOMENTUM_RULES.WINDOW_SIZE);
+  const momentum = computeMomentum(momentumSlice.map((s) => s.result));
 
   // --- Step 9 : the persisted delta for the displayed week ---
   // We always look at the latest sealed week's delta (the one row that
@@ -182,6 +189,14 @@ export async function getOrSealDrawerData(
   let delta = null;
   if (sealed && isAdminConfigured()) {
     delta = await getDeltaByUserIdAndWeek(userId, sealed.week);
+  }
+
+  // --- Step 9.5 : load all deltas anchoring the timeline window in a
+  //   single round-trip and feed buildTimeline.
+  let timeline = null;
+  if (isAdminConfigured() && recent.length > 0) {
+    const deltas = await listRecentDeltasByUserId(userId, TIMELINE_WINDOW);
+    timeline = buildTimeline({ snapshots: recent, deltas });
   }
 
   // --- Step 10 : recommendation off the displayed score ---
@@ -194,6 +209,7 @@ export async function getOrSealDrawerData(
     delta,
     momentum,
     recommendation,
+    timeline,
   };
 }
 

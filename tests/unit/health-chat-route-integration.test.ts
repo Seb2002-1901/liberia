@@ -137,6 +137,7 @@ function runFullPipeline(
     delta: null,
     momentum: null,
     recommendation,
+    timeline: null,
   };
 }
 

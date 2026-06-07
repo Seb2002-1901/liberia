@@ -5,6 +5,7 @@ import type {
   Confidence,
   DrawerData,
   HealthRecommendation,
+  TimelineEvent,
 } from "@/lib/calculations/health/types";
 import { AXIS_ORDER } from "@/lib/calculations/health/constants";
 
@@ -85,6 +86,18 @@ export function renderHealthSection(drawer: DrawerData): string {
     lines.push(
       `- ${axisLabel(id)} : ${a.score}/100 (confiance ${axisConfidenceLabel(a.confidence)})`,
     );
+  }
+
+  // Phase 3.3 — Timeline récente. Lue directement depuis le timeline
+  // engine (déterministe) — pas de recalcul. Le coach peut citer
+  // "Tu as gagné 4 points ces 3 dernières semaines" ou "Tu viens de
+  // passer dans la bande Solide" en s'appuyant sur ces lignes.
+  if (drawer.timeline && drawer.timeline.events.length > 0) {
+    lines.push("");
+    lines.push("Timeline récente :");
+    for (const ev of drawer.timeline.events.slice(0, 6)) {
+      lines.push(`- ${ev.week} · ${timelineEventLabel(ev)}`);
+    }
   }
 
   return lines.join("\n");
@@ -240,6 +253,53 @@ function renderRecommendation(r: HealthRecommendation): string {
     default:
       return r.titleKey;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Timeline event FR labels                                                   */
+/* -------------------------------------------------------------------------- */
+
+function timelineEventLabel(ev: TimelineEvent): string {
+  switch (ev.type) {
+    case "score_up":
+      return `+${ev.impact} points cette semaine`;
+    case "score_down":
+      return `${ev.impact} points cette semaine`;
+    case "band_changed":
+      // titleKey format : "band_changed_to_<band>_<direction>"
+      return `Passage en bande ${humanBandFromTitleKey(ev.titleKey)}`;
+    case "runway_improved":
+      return ev.impact !== null
+        ? `Fonds d'urgence renforcé (+${ev.impact} mois)`
+        : "Fonds d'urgence renforcé";
+    case "major_area_added":
+      return `${humanAreaFromTitleKey(ev.titleKey)} renseigné dans le profil`;
+    case "goal_created":
+      return "Nouvel objectif défini";
+    case "goal_completed":
+      return "Objectif atteint";
+    case "recommendation_followed":
+      return "Recommandation suivie";
+  }
+}
+
+function humanBandFromTitleKey(key: string): string {
+  if (key.includes("emeraude")) return "Maîtrisé";
+  if (key.includes("_or_")) return "Solide";
+  if (key.includes("ambre")) return "En construction";
+  if (key.includes("rose")) return "À reprendre";
+  return key;
+}
+
+function humanAreaFromTitleKey(key: string): string {
+  const suffix = key.replace(/^major_area_added_/, "");
+  return ({
+    income: "Revenus",
+    housing: "Logement",
+    insurance: "Assurances",
+    food: "Alimentation",
+    transport: "Transport",
+  } as Record<string, string>)[suffix] ?? suffix;
 }
 
 /* -------------------------------------------------------------------------- */

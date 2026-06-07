@@ -181,19 +181,6 @@ export interface HealthRecommendation {
 }
 
 /**
- * Composite object consumed by the dashboard drawer. The drawer
- * receives ONE input, not four — guarantees no inconsistency between
- * what the ring shows, what the drawer explains and what the coach
- * cites in chat.
- */
-export interface DrawerData {
-  score: HealthScoreResult;
-  delta: DeltaExplanation | null;
-  momentum: MomentumResult | null;
-  recommendation: HealthRecommendation | null;
-}
-
-/**
  * Phase 3.2 — wrapper around HealthScoreResult that adds the ISO week
  * label. Used wherever the persistence layer surfaces a snapshot to
  * the writer or to a downstream consumer that needs to know WHICH week
@@ -204,4 +191,65 @@ export interface DrawerData {
 export interface SealedSnapshot {
   week: string;
   result: HealthScoreResult;
+}
+
+/**
+ * Phase 3.3 — Timeline event types. Closed union locked by the spec.
+ * Adding a 9th type is a deliberate product decision, not a code-side
+ * shortcut.
+ */
+export type TimelineEventType =
+  | "score_up"
+  | "score_down"
+  | "band_changed"
+  | "goal_created"
+  | "goal_completed"
+  | "major_area_added"
+  | "runway_improved"
+  | "recommendation_followed";
+
+/**
+ * One materialised event in the user's financial timeline. Pure data,
+ * rendered by the UI through i18n keys (no preformatted text).
+ */
+export interface TimelineEvent {
+  /** ISO week label this event belongs to ("2026-W23"). */
+  week: string;
+  type: TimelineEventType;
+  /**
+   * Stable i18n key under dashboard.health.timeline.event.<key>.title.
+   * For type-specific variants (e.g. band_changed_to_emeraude,
+   * major_area_added_income) the suffix carries the variant — keeps
+   * the TimelineEvent shape free of a payload field per spec.
+   */
+  titleKey: string;
+  /** Same convention under dashboard.health.timeline.event.<key>.description. */
+  descriptionKey: string;
+  /**
+   * Numeric impact when meaningful (+points, runway months gained,
+   * etc.). null when the event has no scalar impact (e.g. goal_created).
+   */
+  impact: number | null;
+}
+
+export interface TimelineResult {
+  events: TimelineEvent[];
+}
+
+/**
+ * Composite object consumed by the dashboard drawer. The drawer
+ * receives ONE input, not four — guarantees no inconsistency between
+ * what the ring shows, what the drawer explains and what the coach
+ * cites in chat.
+ */
+export interface DrawerData {
+  score: HealthScoreResult;
+  delta: DeltaExplanation | null;
+  momentum: MomentumResult | null;
+  recommendation: HealthRecommendation | null;
+  /**
+   * Phase 3.3 — materialised timeline of recent events. null when
+   * the user has no history yet (first snapshot).
+   */
+  timeline: TimelineResult | null;
 }

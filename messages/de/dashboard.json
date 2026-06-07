@@ -72,6 +72,98 @@
       "food": "Lebensmittel",
       "transport": "Transport"
     },
+    "timeline": {
+      "title": "Deine Entwicklung",
+      "ariaLabel": "Verlauf deines Finanzscores",
+      "weekLabel": "Woche {week}",
+      "momentumChip": "{direction} {strength} über 4 Wo.",
+      "momentum": {
+        "directionUP": "Aufwärts",
+        "directionDOWN": "Abwärts",
+        "directionFLAT": "Stabil",
+        "strengthWEAK": "leicht",
+        "strengthMEDIUM": "deutlich",
+        "strengthSTRONG": "stark"
+      },
+      "event": {
+        "score_up": {
+          "title": "+{impact} Punkte diese Woche",
+          "description": "Dein Score steigt."
+        },
+        "score_down": {
+          "title": "{impact} Punkte diese Woche",
+          "description": "Ein kleiner Rückgang — wir schauen es gemeinsam an."
+        },
+        "band_changed_to_emeraude_up": {
+          "title": "Aufstieg in Gemeistert",
+          "description": "Deine Lage ist nun voll stabil."
+        },
+        "band_changed_to_or_up": {
+          "title": "Aufstieg in Solide",
+          "description": "Deine Finanzen werden robuster."
+        },
+        "band_changed_to_ambre_up": {
+          "title": "Aufstieg in Im Aufbau",
+          "description": "Die Grundlagen halten."
+        },
+        "band_changed_to_rose_up": {
+          "title": "Wechsel in Braucht Aufmerksamkeit",
+          "description": "Schritt für Schritt wieder aufbauen."
+        },
+        "band_changed_to_emeraude_down": {
+          "title": "Zurück in Gemeistert",
+          "description": "Weiterhin oben — konsolidieren."
+        },
+        "band_changed_to_or_down": {
+          "title": "Zurück in Solide",
+          "description": "Leichter Rückgang, Basis bleibt gesund."
+        },
+        "band_changed_to_ambre_down": {
+          "title": "Zurück in Im Aufbau",
+          "description": "Wir schauen ruhig, was sich verschoben hat."
+        },
+        "band_changed_to_rose_down": {
+          "title": "Zurück in Braucht Aufmerksamkeit",
+          "description": "Schritt für Schritt stabilisieren."
+        },
+        "runway_improved": {
+          "title": "Notfallfonds gestärkt",
+          "description": "Dein Polster wird grösser."
+        },
+        "major_area_added_income": {
+          "title": "Einkommen erfasst",
+          "description": "Profil vollständiger, Auswertung zuverlässiger."
+        },
+        "major_area_added_housing": {
+          "title": "Wohnen erfasst",
+          "description": "Profil vollständiger, Auswertung zuverlässiger."
+        },
+        "major_area_added_insurance": {
+          "title": "Versicherungen erfasst",
+          "description": "Profil vollständiger, Auswertung zuverlässiger."
+        },
+        "major_area_added_food": {
+          "title": "Lebensmittel erfasst",
+          "description": "Profil vollständiger, Auswertung zuverlässiger."
+        },
+        "major_area_added_transport": {
+          "title": "Transport erfasst",
+          "description": "Profil vollständiger, Auswertung zuverlässiger."
+        },
+        "goal_created": {
+          "title": "Neues Ziel gesetzt",
+          "description": "Du gibst dir eine Richtung."
+        },
+        "goal_completed": {
+          "title": "Ziel erreicht",
+          "description": "Sehr gut. Setze das nächste, um in Bewegung zu bleiben."
+        },
+        "recommendation_followed": {
+          "title": "Empfehlung umgesetzt",
+          "description": "Dein Einsatz zeigt sich bereits im Score."
+        }
+      }
+    },
     "reason": {
       "discipline_budget_streak_improved": "Budgets eingehalten ({successCount} von {total}).",
       "discipline_budget_breach": "{failingCount, plural, one {# Budget überschritten} other {# Budgets überschritten}} diese Woche.",

@@ -127,6 +127,33 @@ export const getMyLatestDelta = cache(
 /*  Admin-side                                                                 */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Phase 3.3 — list the N most recent deltas for the timeline window.
+ * Ordered most-recent-first (by week_to desc). Empty array on
+ * misconfigured admin client or on DB error so the timeline degrades
+ * gracefully rather than failing the whole drawer render.
+ */
+export async function listRecentDeltasByUserId(
+  userId: string,
+  limit: number,
+): Promise<DeltaExplanation[]> {
+  if (!isAdminConfigured() || limit <= 0) return [];
+  const admin = getAdminClient();
+  const { data, error } = await admin
+    .from("health_score_deltas")
+    .select("*")
+    .eq("user_id", userId)
+    .order("week_to", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error(
+      `[health] listRecentDeltasByUserId failed user=${userId.slice(0, 8)}: ${error.code ?? "?"} ${error.message}`,
+    );
+    return [];
+  }
+  return ((data as DeltaRow[] | null) ?? []).map(deltaExplanationFromRow);
+}
+
 export async function getDeltaByUserIdAndWeek(
   userId: string,
   weekTo: string,

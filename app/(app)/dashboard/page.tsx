@@ -43,6 +43,7 @@ import {
   getOrSealDrawerData,
 } from "@/lib/services/health-writer";
 import { HealthScoreSection } from "@/components/dashboard/health-score-section";
+import { HealthTimeline } from "@/components/dashboard/health-timeline";
 import type { DrawerData } from "@/lib/calculations/health/types";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -278,6 +279,10 @@ export default async function DashboardPage() {
           hint={formatUserCurrency(currentSavings, data.profile)}
         />
       </div>
+
+      {drawerData?.timeline && drawerData.timeline.events.length > 0 && (
+        <HealthTimeline data={drawerData} />
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <LearnedAboutYou summary={advisor} />

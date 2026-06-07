@@ -31,6 +31,7 @@ vi.mock("@/lib/services/health-snapshots", () => ({
 
 vi.mock("@/lib/services/health-deltas", () => ({
   getDeltaByUserIdAndWeek: vi.fn(),
+  listRecentDeltasByUserId: vi.fn(),
   writeDelta: vi.fn(),
 }));
 
@@ -43,6 +44,7 @@ import {
 } from "@/lib/services/health-snapshots";
 import {
   getDeltaByUserIdAndWeek,
+  listRecentDeltasByUserId,
   writeDelta,
 } from "@/lib/services/health-deltas";
 
@@ -52,6 +54,7 @@ const mockedGetForWeek = vi.mocked(getSnapshotForWeek);
 const mockedListRecent = vi.mocked(listRecentSnapshotsByUserId);
 const mockedWriteSnap = vi.mocked(writeSnapshot);
 const mockedGetDelta = vi.mocked(getDeltaByUserIdAndWeek);
+const mockedListDeltas = vi.mocked(listRecentDeltasByUserId);
 const mockedWriteDelta = vi.mocked(writeDelta);
 
 /* -------------------------------------------------------------------------- */
@@ -197,6 +200,7 @@ beforeEach(() => {
     result,
   }));
   mockedGetDelta.mockResolvedValue(null);
+  mockedListDeltas.mockResolvedValue([]);
   mockedWriteDelta.mockResolvedValue(null);
 });
 

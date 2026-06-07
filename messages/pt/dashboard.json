@@ -72,6 +72,98 @@
       "food": "Alimentação",
       "transport": "Transportes"
     },
+    "timeline": {
+      "title": "A tua evolução",
+      "ariaLabel": "Cronologia da tua pontuação financeira",
+      "weekLabel": "Semana {week}",
+      "momentumChip": "{direction} {strength} em 4 sem.",
+      "momentum": {
+        "directionUP": "Em subida",
+        "directionDOWN": "Em queda",
+        "directionFLAT": "Estável",
+        "strengthWEAK": "ligeira",
+        "strengthMEDIUM": "marcada",
+        "strengthSTRONG": "forte"
+      },
+      "event": {
+        "score_up": {
+          "title": "+{impact} pontos esta semana",
+          "description": "A tua pontuação sobe."
+        },
+        "score_down": {
+          "title": "{impact} pontos esta semana",
+          "description": "Pequena queda — vemos juntos."
+        },
+        "band_changed_to_emeraude_up": {
+          "title": "Promovido a Dominado",
+          "description": "A tua situação está agora plenamente sólida."
+        },
+        "band_changed_to_or_up": {
+          "title": "Promovido a Sólido",
+          "description": "As tuas finanças tornam-se mais robustas."
+        },
+        "band_changed_to_ambre_up": {
+          "title": "Promovido a Em construção",
+          "description": "As bases começam a sustentar."
+        },
+        "band_changed_to_rose_up": {
+          "title": "Passou a Requer atenção",
+          "description": "Reconstruímos passo a passo."
+        },
+        "band_changed_to_emeraude_down": {
+          "title": "De volta a Dominado",
+          "description": "Ainda no topo — consolidamos."
+        },
+        "band_changed_to_or_down": {
+          "title": "De volta a Sólido",
+          "description": "Ligeira queda, base continua saudável."
+        },
+        "band_changed_to_ambre_down": {
+          "title": "De volta a Em construção",
+          "description": "Olhamos com calma o que mudou."
+        },
+        "band_changed_to_rose_down": {
+          "title": "De volta a Requer atenção",
+          "description": "Passo a passo, estabilizamos."
+        },
+        "runway_improved": {
+          "title": "Fundo de emergência reforçado",
+          "description": "A tua margem amplia-se."
+        },
+        "major_area_added_income": {
+          "title": "Rendimentos adicionados",
+          "description": "Perfil mais completo, leitura mais fiável."
+        },
+        "major_area_added_housing": {
+          "title": "Habitação adicionada",
+          "description": "Perfil mais completo, leitura mais fiável."
+        },
+        "major_area_added_insurance": {
+          "title": "Seguros adicionados",
+          "description": "Perfil mais completo, leitura mais fiável."
+        },
+        "major_area_added_food": {
+          "title": "Alimentação adicionada",
+          "description": "Perfil mais completo, leitura mais fiável."
+        },
+        "major_area_added_transport": {
+          "title": "Transportes adicionados",
+          "description": "Perfil mais completo, leitura mais fiável."
+        },
+        "goal_created": {
+          "title": "Novo objetivo definido",
+          "description": "Dás-te um rumo."
+        },
+        "goal_completed": {
+          "title": "Objetivo atingido",
+          "description": "Boa. Define o próximo para continuar em movimento."
+        },
+        "recommendation_followed": {
+          "title": "Recomendação seguida",
+          "description": "O teu esforço já se vê na pontuação."
+        }
+      }
+    },
     "reason": {
       "discipline_budget_streak_improved": "Orçamentos respeitados ({successCount} de {total}).",
       "discipline_budget_breach": "{failingCount, plural, one {# orçamento ultrapassado} other {# orçamentos ultrapassados}} esta semana.",

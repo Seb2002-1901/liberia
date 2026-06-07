@@ -72,6 +72,98 @@
       "food": "Alimentation",
       "transport": "Transport"
     },
+    "timeline": {
+      "title": "Ton évolution",
+      "ariaLabel": "Timeline de ton score financier",
+      "weekLabel": "Semaine {week}",
+      "momentumChip": "{direction} {strength} sur 4 sem.",
+      "momentum": {
+        "directionUP": "Progression",
+        "directionDOWN": "Recul",
+        "directionFLAT": "Stable",
+        "strengthWEAK": "légère",
+        "strengthMEDIUM": "marquée",
+        "strengthSTRONG": "forte"
+      },
+      "event": {
+        "score_up": {
+          "title": "+{impact} points cette semaine",
+          "description": "Ton score progresse."
+        },
+        "score_down": {
+          "title": "{impact} points cette semaine",
+          "description": "Quelques points de moins, on regarde pourquoi ensemble."
+        },
+        "band_changed_to_emeraude_up": {
+          "title": "Passage en bande Maîtrisé",
+          "description": "Ta situation devient pleinement solide."
+        },
+        "band_changed_to_or_up": {
+          "title": "Passage en bande Solide",
+          "description": "Ta situation financière devient plus robuste."
+        },
+        "band_changed_to_ambre_up": {
+          "title": "Passage en bande En construction",
+          "description": "Les fondations commencent à tenir."
+        },
+        "band_changed_to_rose_up": {
+          "title": "Passage en bande À reprendre",
+          "description": "On va reprendre étape par étape."
+        },
+        "band_changed_to_emeraude_down": {
+          "title": "Retour en bande Maîtrisé",
+          "description": "Toujours dans le haut du spectre — on consolide."
+        },
+        "band_changed_to_or_down": {
+          "title": "Retour en bande Solide",
+          "description": "Léger recul mais la base reste saine."
+        },
+        "band_changed_to_ambre_down": {
+          "title": "Retour en bande En construction",
+          "description": "On regarde calmement ce qui a bougé."
+        },
+        "band_changed_to_rose_down": {
+          "title": "Retour en bande À reprendre",
+          "description": "Étape par étape, on stabilise."
+        },
+        "runway_improved": {
+          "title": "Fonds d'urgence renforcé",
+          "description": "Ta marge de manœuvre s'élargit."
+        },
+        "major_area_added_income": {
+          "title": "Revenus renseignés",
+          "description": "Profil plus complet, lecture plus fiable."
+        },
+        "major_area_added_housing": {
+          "title": "Logement renseigné",
+          "description": "Profil plus complet, lecture plus fiable."
+        },
+        "major_area_added_insurance": {
+          "title": "Assurances renseignées",
+          "description": "Profil plus complet, lecture plus fiable."
+        },
+        "major_area_added_food": {
+          "title": "Alimentation renseignée",
+          "description": "Profil plus complet, lecture plus fiable."
+        },
+        "major_area_added_transport": {
+          "title": "Transport renseigné",
+          "description": "Profil plus complet, lecture plus fiable."
+        },
+        "goal_created": {
+          "title": "Nouvel objectif défini",
+          "description": "Tu te donnes un cap."
+        },
+        "goal_completed": {
+          "title": "Objectif atteint",
+          "description": "Bravo. Définis le suivant pour rester en mouvement."
+        },
+        "recommendation_followed": {
+          "title": "Recommandation suivie",
+          "description": "Ton effort se voit déjà sur le score."
+        }
+      }
+    },
     "reason": {
       "discipline_budget_streak_improved": "Budgets respectés ({successCount} sur {total}).",
       "discipline_budget_breach": "{failingCount, plural, one {# budget dépassé} other {# budgets dépassés}} cette semaine.",

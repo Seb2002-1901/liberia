@@ -83,6 +83,7 @@ function buildDrawer(overrides: Partial<DrawerData> = {}): DrawerData {
       payload: { addAmount: 3000, gainMonths: 1 },
       estimatedGain: 4,
     },
+    timeline: overrides.timeline ?? null,
   };
 }
 
