@@ -19,12 +19,14 @@
       "title": "Mon score de santé financière",
       "ariaDescription": "Score actuel {score} sur 100, bande {band}, confiance {confidence}",
       "demoBadge": "DÉMO",
+      "bandProvisional": "Lecture provisoire",
+      "insufficientExplain": "Score calculé avec un historique encore limité.",
       "insufficientHint": "Ton profil est encore en construction. Complète tes revenus, dépenses fixes et au moins deux catégories majeures pour débloquer une lecture complète.",
       "confidence": {
         "HIGH": "Confiance élevée",
         "MEDIUM": "Confiance moyenne",
         "LOW": "Confiance faible",
-        "INSUFFICIENT_DATA": "Données insuffisantes"
+        "INSUFFICIENT_DATA": "Confiance en cours de construction"
       },
       "deltaBlock": {
         "title": "Pourquoi mon score a changé",
@@ -76,6 +78,12 @@
       "title": "Ton évolution",
       "ariaLabel": "Timeline de ton score financier",
       "weekLabel": "Semaine {week}",
+      "emptyTitle": "Pas encore d'historique",
+      "emptyDescription": "Les premières tendances apparaîtront après quelques semaines de suivi.",
+      "emptyHintsTitle": "Ce qui sera analysé",
+      "emptyHint1": "Évolution du score semaine après semaine",
+      "emptyHint2": "Changements de bande",
+      "emptyHint3": "Renforcement du fonds d'urgence et progression des objectifs",
       "momentumChip": "{direction} {strength} sur 4 sem.",
       "momentum": {
         "directionUP": "Progression",

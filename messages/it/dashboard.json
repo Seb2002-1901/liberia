@@ -19,12 +19,14 @@
       "title": "Il mio punteggio di salute finanziaria",
       "ariaDescription": "Punteggio attuale {score} su 100, fascia {band}, confidenza {confidence}",
       "demoBadge": "DEMO",
+      "bandProvisional": "Lettura provvisoria",
+      "insufficientExplain": "Punteggio calcolato con uno storico ancora limitato.",
       "insufficientHint": "Il tuo profilo è ancora in costruzione. Inserisci redditi, spese fisse e almeno due categorie principali per sbloccare una lettura completa.",
       "confidence": {
         "HIGH": "Confidenza alta",
         "MEDIUM": "Confidenza media",
         "LOW": "Confidenza bassa",
-        "INSUFFICIENT_DATA": "Dati insufficienti"
+        "INSUFFICIENT_DATA": "Confidenza in costruzione"
       },
       "deltaBlock": {
         "title": "Perché il mio punteggio è cambiato",
@@ -76,6 +78,12 @@
       "title": "La tua evoluzione",
       "ariaLabel": "Cronologia del tuo punteggio finanziario",
       "weekLabel": "Settimana {week}",
+      "emptyTitle": "Ancora nessuno storico",
+      "emptyDescription": "Le prime tendenze appariranno dopo qualche settimana di tracciamento.",
+      "emptyHintsTitle": "Cosa verrà analizzato",
+      "emptyHint1": "Evoluzione del punteggio settimana dopo settimana",
+      "emptyHint2": "Cambi di fascia",
+      "emptyHint3": "Rafforzamento del fondo di emergenza e avanzamento degli obiettivi",
       "momentumChip": "{direction} {strength} su 4 sett.",
       "momentum": {
         "directionUP": "In salita",

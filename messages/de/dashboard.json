@@ -19,12 +19,14 @@
       "title": "Mein Finanzgesundheits-Score",
       "ariaDescription": "Aktueller Score {score} von 100, Stufe {band}, Konfidenz {confidence}",
       "demoBadge": "DEMO",
+      "bandProvisional": "Vorläufige Anzeige",
+      "insufficientExplain": "Score berechnet mit noch begrenzter Historie.",
       "insufficientHint": "Dein Profil ist noch im Aufbau. Trage Einkommen, Fixkosten und mindestens zwei Hauptkategorien ein, um eine vollständige Auswertung zu erhalten.",
       "confidence": {
         "HIGH": "Hohe Konfidenz",
         "MEDIUM": "Mittlere Konfidenz",
         "LOW": "Niedrige Konfidenz",
-        "INSUFFICIENT_DATA": "Daten unzureichend"
+        "INSUFFICIENT_DATA": "Konfidenz im Aufbau"
       },
       "deltaBlock": {
         "title": "Warum sich mein Score bewegt hat",
@@ -76,6 +78,12 @@
       "title": "Deine Entwicklung",
       "ariaLabel": "Verlauf deines Finanzscores",
       "weekLabel": "Woche {week}",
+      "emptyTitle": "Noch keine Historie",
+      "emptyDescription": "Erste Trends erscheinen nach einigen Wochen Tracking.",
+      "emptyHintsTitle": "Was verfolgt wird",
+      "emptyHint1": "Score-Entwicklung Woche für Woche",
+      "emptyHint2": "Stufenwechsel",
+      "emptyHint3": "Wachstum des Notfallfonds und Zielfortschritte",
       "momentumChip": "{direction} {strength} über 4 Wo.",
       "momentum": {
         "directionUP": "Aufwärts",

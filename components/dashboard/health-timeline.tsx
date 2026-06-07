@@ -34,8 +34,6 @@ export function HealthTimeline({
   const tEvents = useTranslations("dashboard.health.timeline.event");
 
   const events = data.timeline?.events.slice(0, maxEvents) ?? [];
-  if (events.length === 0) return null;
-
   const chip = momentumChip(data.momentum);
 
   return (
@@ -61,17 +59,62 @@ export function HealthTimeline({
         )}
       </header>
 
-      <ol className="relative space-y-4 border-l border-border/40 pl-4">
-        {events.map((ev, i) => (
-          <TimelineRow
-            key={`${ev.week}-${ev.type}-${i}`}
-            event={ev}
-            tEvents={tEvents}
-            t={t}
-          />
-        ))}
-      </ol>
+      {events.length === 0 ? (
+        <TimelineEmptyState />
+      ) : (
+        <ol className="relative space-y-4 border-l border-border/40 pl-4">
+          {events.map((ev, i) => (
+            <TimelineRow
+              key={`${ev.week}-${ev.type}-${i}`}
+              event={ev}
+              tEvents={tEvents}
+              t={t}
+            />
+          ))}
+        </ol>
+      )}
     </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Empty state — premium, pedagogical, never accusatory                       */
+/* -------------------------------------------------------------------------- */
+
+function TimelineEmptyState() {
+  const t = useTranslations("dashboard.health.timeline");
+  return (
+    <div className="relative border-l border-dashed border-border/40 pl-4">
+      <span
+        aria-hidden="true"
+        className="absolute -left-[0.4rem] top-0 inline-block h-2.5 w-2.5 rounded-full border border-border/60 bg-background"
+      />
+      <p className="text-sm font-medium">{t("emptyTitle")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {t("emptyDescription")}
+      </p>
+      <p className="mt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {t("emptyHintsTitle")}
+      </p>
+      <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+        <li className="flex items-start gap-2">
+          <span aria-hidden="true" className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
+          <span>{t("emptyHint1")}</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span aria-hidden="true" className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
+          <span>{t("emptyHint2")}</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span aria-hidden="true" className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
+          <span>{t("emptyHint3")}</span>
+        </li>
+      </ul>
+      <span
+        aria-hidden="true"
+        className="absolute -left-[0.4rem] bottom-0 inline-block h-2.5 w-2.5 rounded-full border border-border/60 bg-background"
+      />
+    </div>
   );
 }
 

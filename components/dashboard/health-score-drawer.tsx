@@ -20,6 +20,7 @@ import {
   classifyDelta,
   confidencePillTone,
   formatDelta,
+  isProvisional,
   momentumChip,
 } from "@/lib/calculations/health/ui-helpers";
 import type { AxisId } from "@/lib/calculations/health/types";
@@ -100,9 +101,20 @@ export function HealthScoreDrawer({
                 theme.badge,
               )}
             >
-              {tBands(score.band)}
+              {isProvisional(score.confidence)
+                ? t("bandProvisional")
+                : tBands(score.band)}
             </span>
           </div>
+          {/* Phase 3.3.1 — micro-explanation under the score when the
+              read is provisional. Different angle from the
+              completeness hint at the bottom : this one is about
+              HISTORY DEPTH, not data coverage. */}
+          {isProvisional(score.confidence) && (
+            <p className="text-xs text-muted-foreground">
+              {t("insufficientExplain")}
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span
               className={cn(

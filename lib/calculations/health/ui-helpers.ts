@@ -80,6 +80,19 @@ export function bandFromScore(score: number): Band {
   return "emeraude";
 }
 
+/**
+ * Phase 3.3.1 — single source of truth for "the band is not
+ * significant right now". Returns true when the global confidence is
+ * INSUFFICIENT_DATA — at that point, the calibrated band label
+ * ("En construction", "Solide"…) becomes misleading because we don't
+ * yet trust the score enough to qualify it. Callers render
+ * "Lecture provisoire" instead of the band name, in every surface :
+ * ring badge, drawer header, coach context.
+ */
+export function isProvisional(confidence: Confidence): boolean {
+  return confidence === "INSUFFICIENT_DATA";
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Ring SVG geometry                                                          */
 /* -------------------------------------------------------------------------- */

@@ -120,8 +120,34 @@ describe("renderHealthSection", () => {
       },
     });
     const md = renderHealthSection(drawer);
-    expect(md).toContain("Données insuffisantes");
     expect(md).toMatch(/Lecture provisoire/);
+  });
+
+  it("Phase 3.3.1 — INSUFFICIENT_DATA hides the band name and forbids quoting it", () => {
+    const drawer = buildDrawer({
+      score: {
+        ...buildDrawer().score,
+        confidence: "INSUFFICIENT_DATA",
+        band: "ambre",
+      },
+    });
+    const md = renderHealthSection(drawer);
+    // The score line MUST NOT cite "En construction" (ambre label)
+    // when confidence is insufficient.
+    expect(md).not.toMatch(/bande : En construction/);
+    expect(md).toContain("bande non significative");
+    expect(md).toContain("ne pas citer le nom de bande");
+  });
+
+  it("Phase 3.3.1 — empty timeline triggers a pedagogical explanation block", () => {
+    const drawer = buildDrawer({ momentum: null });
+    // buildDrawer() leaves timeline as default (null). The empty
+    // timeline case must inject the educational block, not silently
+    // skip it.
+    const md = renderHealthSection(drawer);
+    expect(md).toContain("Timeline récente : pas encore d'historique");
+    expect(md).toContain("Explication à donner");
+    expect(md).toContain("évolution du score");
   });
 
   it("renders the weekly delta line with from → to weeks", () => {

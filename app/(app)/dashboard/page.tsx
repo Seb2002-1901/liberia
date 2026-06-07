@@ -280,9 +280,10 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {drawerData?.timeline && drawerData.timeline.events.length > 0 && (
-        <HealthTimeline data={drawerData} />
-      )}
+      {/* Phase 3.3.1 — timeline always mounted (even when empty) so
+          the user discovers the feature on day 1. The component
+          handles its own empty state with a pedagogical hint. */}
+      {drawerData && <HealthTimeline data={drawerData} />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <LearnedAboutYou summary={advisor} />

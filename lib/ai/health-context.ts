@@ -27,13 +27,24 @@ export function renderHealthSection(drawer: DrawerData): string {
   const lines: string[] = [];
 
   lines.push("# Financial Health Score");
-  lines.push(
-    `Score affiché : ${score.display}/100 (bande : ${bandLabel(score.band)})`,
-  );
+  // Phase 3.3.1 — when confidence is INSUFFICIENT_DATA the band label
+  // ("En construction", "Solide"…) is not significant : the score
+  // exists but the qualitative tier doesn't yet. We replace it with
+  // "bande non significative — lecture provisoire" to avoid feeding
+  // the coach a label it might quote as if it were a stable verdict.
+  if (score.confidence === "INSUFFICIENT_DATA") {
+    lines.push(
+      `Score affiché : ${score.display}/100 (bande non significative — lecture provisoire, ne pas citer le nom de bande)`,
+    );
+  } else {
+    lines.push(
+      `Score affiché : ${score.display}/100 (bande : ${bandLabel(score.band)})`,
+    );
+  }
   lines.push(`Confiance : ${confidenceLabel(score.confidence)}`);
   if (score.confidence === "INSUFFICIENT_DATA") {
     lines.push(
-      "Lecture provisoire : ne pas tirer de conclusion forte sur ce score, demander d'abord les informations manquantes.",
+      "Lecture provisoire : ne pas tirer de conclusion forte sur ce score, ne pas citer la bande par son nom, demander d'abord les informations manquantes.",
     );
   }
 
@@ -92,12 +103,34 @@ export function renderHealthSection(drawer: DrawerData): string {
   // engine (déterministe) — pas de recalcul. Le coach peut citer
   // "Tu as gagné 4 points ces 3 dernières semaines" ou "Tu viens de
   // passer dans la bande Solide" en s'appuyant sur ces lignes.
+  //
+  // Phase 3.3.1 — quand la timeline est vide (premier snapshot, pas
+  // encore d'historique scellé), on injecte un bloc PÉDAGOGIQUE pour
+  // que le coach explique le fonctionnement au lieu de fermer la
+  // conversation par "reviens dans quelques jours".
+  lines.push("");
   if (drawer.timeline && drawer.timeline.events.length > 0) {
-    lines.push("");
     lines.push("Timeline récente :");
     for (const ev of drawer.timeline.events.slice(0, 6)) {
       lines.push(`- ${ev.week} · ${timelineEventLabel(ev)}`);
     }
+  } else {
+    lines.push("Timeline récente : pas encore d'historique.");
+    lines.push(
+      "Explication à donner si l'utilisateur demande son évolution :",
+    );
+    lines.push(
+      "- Le score est calculé maintenant — il existe et est visible sur le dashboard.",
+    );
+    lines.push(
+      "- Le suivi se construit semaine après semaine via des snapshots scellés chaque dimanche 23h locale.",
+    );
+    lines.push(
+      "- Les premières tendances apparaîtront à partir du 2-3e snapshot scellé.",
+    );
+    lines.push(
+      "- Ce qui sera analysé : évolution du score, changements de bande, renforcement du fonds d'urgence, objectifs créés et atteints, axes qui s'améliorent.",
+    );
   }
 
   return lines.join("\n");

@@ -7,6 +7,7 @@ import {
   classifyDelta,
   confidencePillTone,
   formatDelta,
+  isProvisional,
   momentumChip,
   previousScoreFor,
   ringArcOffset,
@@ -210,6 +211,18 @@ describe("axisBarTone", () => {
 /* -------------------------------------------------------------------------- */
 /*  previousScoreFor                                                           */
 /* -------------------------------------------------------------------------- */
+
+describe("isProvisional", () => {
+  it("returns true ONLY for INSUFFICIENT_DATA", () => {
+    expect(isProvisional("INSUFFICIENT_DATA")).toBe(true);
+  });
+
+  it("returns false for HIGH / MEDIUM / LOW (any computed confidence is non-provisional)", () => {
+    expect(isProvisional("HIGH")).toBe(false);
+    expect(isProvisional("MEDIUM")).toBe(false);
+    expect(isProvisional("LOW")).toBe(false);
+  });
+});
 
 describe("previousScoreFor", () => {
   it("forwards previousScore from the snapshot, null on first", () => {

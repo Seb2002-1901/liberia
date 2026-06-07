@@ -19,12 +19,14 @@
       "title": "My financial health score",
       "ariaDescription": "Current score {score} out of 100, band {band}, confidence {confidence}",
       "demoBadge": "DEMO",
+      "bandProvisional": "Provisional reading",
+      "insufficientExplain": "Score calculated with limited history so far.",
       "insufficientHint": "Your profile is still being set up. Add your income, fixed expenses and at least two major categories to unlock a full read.",
       "confidence": {
         "HIGH": "High confidence",
         "MEDIUM": "Medium confidence",
         "LOW": "Low confidence",
-        "INSUFFICIENT_DATA": "Insufficient data"
+        "INSUFFICIENT_DATA": "Confidence still building"
       },
       "deltaBlock": {
         "title": "Why my score moved",
@@ -76,6 +78,12 @@
       "title": "Your progress",
       "ariaLabel": "Timeline of your financial score",
       "weekLabel": "Week {week}",
+      "emptyTitle": "No history yet",
+      "emptyDescription": "First trends will appear after a few weeks of tracking.",
+      "emptyHintsTitle": "What will be tracked",
+      "emptyHint1": "Score evolution week after week",
+      "emptyHint2": "Band changes",
+      "emptyHint3": "Emergency fund growth and goal progress",
       "momentumChip": "{direction} {strength} over 4 wks",
       "momentum": {
         "directionUP": "Up",

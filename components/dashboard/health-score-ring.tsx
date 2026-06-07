@@ -28,11 +28,15 @@ interface HealthScoreRingProps {
 }
 
 /**
- * Phase 3.2 — Ring the user sees first on the dashboard.
+ * Phase 3.2 / 3.3.1 — Ring the user sees first on the dashboard.
  *
- * 80×80 SVG : track + arc filled to the score, band-colored. Center
+ * 112×112 SVG : track + arc filled to the score, band-colored. Center
  * shows the integer score in tabular-nums semibold ; a delta chip
  * sits underneath. Badges decorate the corners (DEMO + confidence).
+ *
+ * Sized up in 3.3.1 from 80 to 112 so the headline KPI dominates the
+ * dashboard like WHOOP / Apple Health rings. Still fits on a 320px
+ * mobile viewport with breathing room.
  *
  * Animation : arc grows from 0 to its target value on FIRST mount of
  * the session only (sessionStorage flag). Subsequent renders snap to
@@ -53,8 +57,10 @@ export function HealthScoreRing({
   const tConfidence = useTranslations("dashboard.health.drawer.confidence");
 
   const theme = bandTheme(band, confidence);
-  const RADIUS = 36;
-  const STROKE = 8;
+  // Phase 3.3.1 — bigger ring. Stroke widened in proportion ; radius
+  // tuned so the arc thickness stays visually balanced.
+  const RADIUS = 44;
+  const STROKE = 10;
   const { circumference, offset } = ringArcOffset(score, RADIUS);
 
   const animateOnMount = useFirstSessionMount("health-ring-mounted");
@@ -82,11 +88,11 @@ export function HealthScoreRing({
       type="button"
       onClick={onOpen}
       aria-label={ariaLabel}
-      className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group relative inline-flex h-28 w-28 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <svg
         viewBox="0 0 100 100"
-        className="h-20 w-20 -rotate-90"
+        className="h-28 w-28 -rotate-90"
         aria-hidden="true"
       >
         <circle
@@ -117,7 +123,7 @@ export function HealthScoreRing({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className={cn(
-            "text-2xl font-semibold tabular-nums leading-none",
+            "text-4xl font-semibold tabular-nums leading-none",
             theme.neutral && "text-muted-foreground",
           )}
         >
@@ -127,7 +133,7 @@ export function HealthScoreRing({
           <span
             aria-hidden="true"
             className={cn(
-              "mt-0.5 text-[10px] tabular-nums",
+              "mt-1 text-xs tabular-nums",
               deltaSign === "POSITIVE" && "text-emerald-500",
               deltaSign === "NEGATIVE" && "text-rose-500",
               deltaSign === "STABLE" && "text-muted-foreground",
