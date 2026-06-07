@@ -37,18 +37,45 @@ import { CoachButton } from "@/components/dashboard/coach-button";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { getMyUserMemory } from "@/lib/services/memory";
 import { listMyMemoryEntries } from "@/lib/services/memory-entries";
+import { createClient } from "@/lib/supabase/server";
+import {
+  gatherExtraSignals,
+  getOrSealDrawerData,
+} from "@/lib/services/health-writer";
+import { HealthScoreSection } from "@/components/dashboard/health-score-section";
+import type { DrawerData } from "@/lib/calculations/health/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("dashboard.metadata");
   return { title: t("title") };
 }
 
+/** Small wrapper for parallelisable auth lookup. Returns null in
+ *  unauthenticated / degraded paths so the rest of the dashboard
+ *  keeps rendering without the FHS ring. */
+async function getCurrentAuthUser(): Promise<{
+  id: string;
+  created_at: string | null;
+} | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    return { id: user.id, created_at: user.created_at ?? null };
+  } catch {
+    return null;
+  }
+}
+
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
-  const [data, memory, memoryEntries] = await Promise.all([
+  const [data, memory, memoryEntries, authedUser] = await Promise.all([
     getFinanceData(),
     getMyUserMemory(),
     listMyMemoryEntries(),
+    getCurrentAuthUser(),
   ]);
 
   const monthlyIncome = totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
@@ -145,6 +172,30 @@ export default async function DashboardPage() {
 
   const firstName = data.profile.full_name?.split(" ")[0] ?? "toi";
 
+  // Phase 3.2 — Financial Health Score. Single source of truth for
+  // the dashboard ring, the drawer, and the coach context. The writer
+  // is idempotent on (user_id, week) ; subsequent calls within the
+  // same week are no-ops. When the auth path fails (degraded mode),
+  // we skip the ring entirely rather than render a half-broken state.
+  let drawerData: DrawerData | null = null;
+  if (authedUser?.id) {
+    try {
+      const extras = await gatherExtraSignals({
+        userId: authedUser.id,
+        financeData: data,
+        accountCreatedAt: authedUser.created_at ?? null,
+      });
+      drawerData = await getOrSealDrawerData({
+        userId: authedUser.id,
+        financeData: data,
+        extras,
+      });
+    } catch (err) {
+      console.error("[dashboard] failed to compute health drawer data", err);
+      drawerData = null;
+    }
+  }
+
   // Phase 3.1.12 — dashboard final, 6 sections seulement :
   //   1. PageHeader
   //   2. AdvisorCard (hero, voix conseiller unique)
@@ -177,13 +228,29 @@ export default async function DashboardPage() {
         }
       />
 
-      <AdvisorCard
-        summary={advisor}
-        missing={completeness.missing}
-        cta={nextAction.cta}
-        firstName={firstName}
-        currency={data.profile.currency}
-      />
+      {/* Phase 3.2 — Ring (état) + AdvisorCard (action) côte à côte.
+          Sur mobile : Ring au-dessus, AdvisorCard prend la largeur.
+          Sur desktop : Ring à gauche, AdvisorCard à droite. */}
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-stretch">
+        {drawerData && (
+          <div className="flex shrink-0 items-center justify-center sm:items-start">
+            <HealthScoreSection
+              data={drawerData}
+              currency={data.profile.currency}
+              isDemo={data.isDemo}
+            />
+          </div>
+        )}
+        <div className="w-full flex-1">
+          <AdvisorCard
+            summary={advisor}
+            missing={completeness.missing}
+            cta={nextAction.cta}
+            firstName={firstName}
+            currency={data.profile.currency}
+          />
+        </div>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard

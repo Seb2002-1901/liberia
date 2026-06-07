@@ -32,14 +32,11 @@ import type {
  * tested in isolation from the network layer.
  */
 
-const AXIS_ORDER: readonly AxisId[] = [
-  "discipline",
-  "resilience",
-  "trajectoire",
-  "couverture",
-  "objectifs",
-  "comportement",
-];
+// AXIS_ORDER moved to constants.ts so client components can import
+// it without pulling the server-only persistence service. We re-
+// export it here for backwards compat with any caller that already
+// reads it from this module.
+import { AXIS_ORDER } from "@/lib/calculations/health/constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Row shapes — mirror the migration 20260606_health_snapshots.sql            */

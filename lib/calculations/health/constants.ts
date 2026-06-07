@@ -33,6 +33,21 @@ export const AXIS_WEIGHTS: Record<AxisId, number> = {
 };
 
 /**
+ * Canonical axis order — Discipline first, Comportement last. Drives
+ * every list (drawer breakdown, delta tiebreaker, coach context).
+ * Lives in constants so client components can import it without
+ * pulling the server-only persistence service.
+ */
+export const AXIS_ORDER: readonly AxisId[] = [
+  "discipline",
+  "resilience",
+  "trajectoire",
+  "couverture",
+  "objectifs",
+  "comportement",
+];
+
+/**
  * EMA factor on the smoothed score.
  *   smoothed_t = SMOOTHING_ALPHA * raw_t + (1 - SMOOTHING_ALPHA) * smoothed_{t-1}
  * 0.6 absorbs one-week shocks without masking real trends — a sustained

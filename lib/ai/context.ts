@@ -36,6 +36,8 @@ import {
   type Anomaly,
 } from "@/lib/calculations/anomalies";
 import { computeAdviceConfidence } from "@/lib/calculations/advice-confidence";
+import { renderHealthSection } from "@/lib/ai/health-context";
+import type { DrawerData } from "@/lib/calculations/health/types";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemoryEntry } from "@/types/database";
 
@@ -49,6 +51,18 @@ export interface FinanceContextOptions {
    * user_memory_entries) — see Phase 2.5 fix.
    */
   memoryGoals?: readonly UserMemoryEntry[];
+  /**
+   * Phase 3.2 — Financial Health Score snapshot. When provided, a
+   * dedicated section is rendered between the existing analytics and
+   * the per-axis breakdown. When omitted, the section is silently
+   * skipped (backward compatible with callers that don't compute the
+   * FHS, e.g. /plans action).
+   *
+   * The coach is instructed to cite EXACTLY the score that appears
+   * here — which is the same one the dashboard ring shows. Single
+   * source of truth across UI and conversation.
+   */
+  drawerData?: DrawerData | null;
 }
 
 /**
@@ -373,6 +387,13 @@ export function buildFinanceContext(
       ? "Aucune anomalie de saisie détectée."
       : anomalies.map((a) => renderAnomaly(a, fmt)).join("\n");
 
+  // Phase 3.2 — Financial Health Score block. Only rendered when the
+  // caller passes a drawerData ; same numbers the dashboard ring
+  // shows so the coach never speaks a different score than the UI.
+  const healthSection = options.drawerData
+    ? "\n\n" + renderHealthSection(options.drawerData)
+    : "";
+
   return `# Contexte financier de l'utilisateur
 
 Devise : ${currency}
@@ -391,7 +412,7 @@ Mode : ${data.isDemo ? "démo (données fictives)" : "réel"}
 - Fonds d'urgence : ${Number.isFinite(runway) ? `${runway.toFixed(1)} mois de dépenses` : "couvert au-delà de 12 mois"}
 - Remboursement crédit mensuel : ${fmt(monthlyDebt)} (DTI ${formatPercent(dti)})
 - Score de stabilité : ${stability}/100 — ${tierLabel}
-- Stress financier perçu : ${stress}/100
+- Stress financier perçu : ${stress}/100${healthSection}
 
 ## Top dépenses mensuelles
 ${expenseByCategory || "Aucune dépense enregistrée."}

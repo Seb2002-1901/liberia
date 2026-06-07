@@ -3,6 +3,10 @@ import { after } from "next/server";
 import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
+import {
+  gatherExtraSignals,
+  getOrSealDrawerData,
+} from "@/lib/services/health-writer";
 import { generateLocalCoachReply } from "@/lib/coach/local";
 import { getTranslations } from "next-intl/server";
 import { normalizeCoachReply } from "@/lib/ai/normalize";
@@ -184,7 +188,31 @@ export async function POST(request: Request) {
   console.log(
     `[memory] pre-prompt: enabled=${memoryEnabled} entriesSelected=${memoryEntries.length} goalEntries=${memoryGoals.length} nonGoalEntries=${nonGoalMemoryEntries.length} blockChars=${memoryBlock?.length ?? 0}`,
   );
-  const financeContext = buildFinanceContext(financeData, { memoryGoals });
+  // Phase 3.2 — Financial Health Score. Idempotent : if today's
+  // sealable week is already sealed, no DB write happens. If sealing
+  // fails for any reason, the writer returns a live-only DrawerData
+  // and we still inject the section — the coach simply omits delta
+  // and momentum from its reasoning.
+  let drawerData = null;
+  try {
+    const extras = await gatherExtraSignals({
+      userId: user.id,
+      financeData,
+      accountCreatedAt: user.created_at ?? null,
+    });
+    drawerData = await getOrSealDrawerData({
+      userId: user.id,
+      financeData,
+      extras,
+    });
+  } catch (err) {
+    console.error("[health] chat route failed to compute drawerData", err);
+  }
+
+  const financeContext = buildFinanceContext(financeData, {
+    memoryGoals,
+    drawerData,
+  });
   const useLLM = isAnthropicConfigured();
 
   // If this is the first user message, derive a short title for the

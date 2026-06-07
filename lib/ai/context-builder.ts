@@ -3,6 +3,7 @@ import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
 import { buildUserMemoryContext } from "@/lib/services/memory";
 import { estimateTokens, SOFT_INPUT_BUDGET_TOKENS } from "@/lib/ai/budget";
+import type { DrawerData } from "@/lib/calculations/health/types";
 import type { FinanceData } from "@/lib/services/finance";
 import type { UserMemory } from "@/types/database";
 
@@ -42,6 +43,9 @@ export type CoachSystemContext = {
 export function buildCoachSystemContext(input: {
   finance: FinanceData;
   memory: UserMemory | null;
+  /** Phase 3.2 — health score snapshot. Forwarded to buildFinanceContext
+   *  which renders the dedicated "Financial Health Score" section. */
+  drawerData?: DrawerData | null;
 }): CoachSystemContext {
   const systemPrompt = COACH_SYSTEM_PROMPT;
   const memoryContext = buildUserMemoryContext({
@@ -49,7 +53,9 @@ export function buildCoachSystemContext(input: {
     financialProfile: input.finance.financialProfile,
     memory: input.memory,
   });
-  const financeContext = buildFinanceContext(input.finance);
+  const financeContext = buildFinanceContext(input.finance, {
+    drawerData: input.drawerData ?? null,
+  });
 
   const estimatedTokens =
     estimateTokens(systemPrompt) +

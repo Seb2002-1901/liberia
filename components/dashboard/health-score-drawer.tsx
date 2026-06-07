@@ -21,7 +21,7 @@ import {
   momentumChip,
 } from "@/lib/calculations/health/ui-helpers";
 import type { AxisId } from "@/lib/calculations/health/types";
-import { AXIS_ORDER } from "@/lib/services/health-snapshots";
+import { AXIS_ORDER } from "@/lib/calculations/health/constants";
 import type { DrawerData } from "@/lib/calculations/health/types";
 import { cn, formatCurrency } from "@/lib/utils";
 
