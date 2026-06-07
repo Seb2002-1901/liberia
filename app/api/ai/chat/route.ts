@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
+import { createHash } from "node:crypto";
 import { COACH_MAX_TOKENS, COACH_MODEL, getAnthropic } from "@/lib/ai/client";
 import { COACH_SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import { buildFinanceContext } from "@/lib/ai/context";
@@ -46,6 +47,22 @@ export const maxDuration = 60;
 
 const HISTORY_LIMIT = MAX_CONVERSATION_TURNS; // last N turns kept in context
 
+// Phase 3.2 J9 post-mortem — audit constants computed at module load.
+// They make it possible to verify in production logs that the deployed
+// bundle actually contains the anti-apology rule and the same prompt
+// content we see on disk. If a Vercel deploy somehow serves an old
+// bundle, the hash will differ from what `tsc` reports locally.
+const SYSTEM_PROMPT_HASH = createHash("sha256")
+  .update(COACH_SYSTEM_PROMPT)
+  .digest("hex")
+  .slice(0, 12);
+const ANTI_APOLOGY_RULE_LOADED = COACH_SYSTEM_PROMPT.includes(
+  "N'écris JAMAIS de phrases comme",
+);
+const ANTI_HISTORY_MIMICRY_RULE_LOADED = COACH_SYSTEM_PROMPT.includes(
+  "MÊME si tu en as utilisé une dans un tour précédent",
+);
+
 export async function POST(request: Request) {
   const tErr = await getActionErrors();
   // Admin client is required either path — assistant messages can only
@@ -85,6 +102,9 @@ export async function POST(request: Request) {
   // identifiable at a glance.
   console.log(
     `[version] commit=${process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local"} health-j9-enabled=true`,
+  );
+  console.log(
+    `[FHS-AUDIT] systemPromptHash=${SYSTEM_PROMPT_HASH} antiApologyRuleLoaded=${ANTI_APOLOGY_RULE_LOADED} antiHistoryMimicryRuleLoaded=${ANTI_HISTORY_MIMICRY_RULE_LOADED} promptChars=${COACH_SYSTEM_PROMPT.length}`,
   );
 
   const supabase = await createClient();
