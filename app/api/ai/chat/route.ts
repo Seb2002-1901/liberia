@@ -213,6 +213,27 @@ export async function POST(request: Request) {
     memoryGoals,
     drawerData,
   });
+
+  // Phase 3.2 J9 post-mortem — explicit log so ops can verify the
+  // FHS section actually lands in the prompt. Without this we have
+  // no way to distinguish "writer returned null" from "buildFinance
+  // Context silently stripped the section" from "deployment isn't
+  // running latest code" when a user reports the coach can't see
+  // their score.
+  const fhsHeaderPresent = financeContext.includes("# Financial Health Score");
+  console.log(
+    `[health] chat-route fhs: drawerData=${drawerData ? "present" : "null"} score=${drawerData?.score.display ?? "?"} band=${drawerData?.score.band ?? "?"} confidence=${drawerData?.score.confidence ?? "?"} sectionInContext=${fhsHeaderPresent} contextChars=${financeContext.length}`,
+  );
+  if (drawerData && !fhsHeaderPresent) {
+    console.error(
+      "[health] CRITICAL : drawerData was non-null but the FHS section was NOT inserted in financeContext. Inspect buildFinanceContext.",
+    );
+  }
+  if (!drawerData) {
+    console.warn(
+      "[health] drawerData is null — coach will not see the FHS section. Check whether gatherExtraSignals or getOrSealDrawerData threw above.",
+    );
+  }
   const useLLM = isAnthropicConfigured();
 
   // If this is the first user message, derive a short title for the
