@@ -9,6 +9,7 @@ import type {
   Band,
   Confidence,
   HealthScoreResult,
+  SealedSnapshot,
 } from "@/lib/calculations/health/types";
 
 /**
@@ -142,6 +143,18 @@ export function healthScoreResultFromRow(row: SnapshotRow): HealthScoreResult {
   };
 }
 
+/**
+ * Wrap a row into the SealedSnapshot shape — the canonical reading
+ * format that surfaces both the week label (for delta/timeline
+ * consumers) and the full HealthScoreResult (for renderers).
+ */
+export function sealedSnapshotFromRow(row: SnapshotRow): SealedSnapshot {
+  return {
+    week: row.week,
+    result: healthScoreResultFromRow(row),
+  };
+}
+
 function validateAxis(blob: unknown, expectedId: AxisId): AxisResult {
   if (!blob || typeof blob !== "object") {
     throw new Error(`health_snapshots : axis ${expectedId} jsonb is empty`);
@@ -165,7 +178,7 @@ function validateAxis(blob: unknown, expectedId: AxisId): AxisResult {
 /* -------------------------------------------------------------------------- */
 
 export const getMyLatestSnapshot = cache(
-  async (): Promise<HealthScoreResult | null> => {
+  async (): Promise<SealedSnapshot | null> => {
     if (!isSupabaseConfigured()) return null;
     const supabase = await createClient();
     const {
@@ -185,12 +198,12 @@ export const getMyLatestSnapshot = cache(
       );
       return null;
     }
-    return data ? healthScoreResultFromRow(data as SnapshotRow) : null;
+    return data ? sealedSnapshotFromRow(data as SnapshotRow) : null;
   },
 );
 
 export const listMyRecentSnapshots = cache(
-  async (limit: number): Promise<HealthScoreResult[]> => {
+  async (limit: number): Promise<SealedSnapshot[]> => {
     if (!isSupabaseConfigured() || limit <= 0) return [];
     const supabase = await createClient();
     const {
@@ -209,7 +222,7 @@ export const listMyRecentSnapshots = cache(
       );
       return [];
     }
-    return ((data as SnapshotRow[] | null) ?? []).map(healthScoreResultFromRow);
+    return ((data as SnapshotRow[] | null) ?? []).map(sealedSnapshotFromRow);
   },
 );
 
@@ -219,7 +232,7 @@ export const listMyRecentSnapshots = cache(
 
 export async function getLatestSnapshotByUserId(
   userId: string,
-): Promise<HealthScoreResult | null> {
+): Promise<SealedSnapshot | null> {
   if (!isAdminConfigured()) return null;
   const admin = getAdminClient();
   const { data, error } = await admin
@@ -235,13 +248,13 @@ export async function getLatestSnapshotByUserId(
     );
     return null;
   }
-  return data ? healthScoreResultFromRow(data as SnapshotRow) : null;
+  return data ? sealedSnapshotFromRow(data as SnapshotRow) : null;
 }
 
 export async function getSnapshotForWeek(
   userId: string,
   week: string,
-): Promise<HealthScoreResult | null> {
+): Promise<SealedSnapshot | null> {
   if (!isAdminConfigured()) return null;
   const admin = getAdminClient();
   const { data, error } = await admin
@@ -256,7 +269,7 @@ export async function getSnapshotForWeek(
     );
     return null;
   }
-  return data ? healthScoreResultFromRow(data as SnapshotRow) : null;
+  return data ? sealedSnapshotFromRow(data as SnapshotRow) : null;
 }
 
 /**
@@ -267,7 +280,7 @@ export async function getSnapshotForWeek(
 export async function listRecentSnapshotsByUserId(
   userId: string,
   limit: number,
-): Promise<HealthScoreResult[]> {
+): Promise<SealedSnapshot[]> {
   if (!isAdminConfigured() || limit <= 0) return [];
   const admin = getAdminClient();
   const { data, error } = await admin
@@ -282,7 +295,7 @@ export async function listRecentSnapshotsByUserId(
     );
     return [];
   }
-  return ((data as SnapshotRow[] | null) ?? []).map(healthScoreResultFromRow);
+  return ((data as SnapshotRow[] | null) ?? []).map(sealedSnapshotFromRow);
 }
 
 /**
@@ -321,7 +334,7 @@ export async function countSnapshotsByUserId(userId: string): Promise<number> {
  */
 export async function writeSnapshot(
   input: WriteSnapshotInput,
-): Promise<HealthScoreResult | null> {
+): Promise<SealedSnapshot | null> {
   if (!isAdminConfigured()) {
     console.error(
       "[health] writeSnapshot: admin client not configured (SUPABASE_SERVICE_ROLE_KEY missing)",
@@ -362,7 +375,7 @@ export async function writeSnapshot(
     );
     return null;
   }
-  return data ? healthScoreResultFromRow(data as SnapshotRow) : null;
+  return data ? sealedSnapshotFromRow(data as SnapshotRow) : null;
 }
 
 /**

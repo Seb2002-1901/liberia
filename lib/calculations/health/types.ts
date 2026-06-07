@@ -192,3 +192,16 @@ export interface DrawerData {
   momentum: MomentumResult | null;
   recommendation: HealthRecommendation | null;
 }
+
+/**
+ * Phase 3.2 — wrapper around HealthScoreResult that adds the ISO week
+ * label. Used wherever the persistence layer surfaces a snapshot to
+ * the writer or to a downstream consumer that needs to know WHICH week
+ * the result belongs to (delta engine, timeline events, momentum). The
+ * domain type HealthScoreResult itself stays week-agnostic because the
+ * composition function does not know about persistence.
+ */
+export interface SealedSnapshot {
+  week: string;
+  result: HealthScoreResult;
+}
