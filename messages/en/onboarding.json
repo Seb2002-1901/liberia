@@ -14,6 +14,35 @@
     "invalidPayload": "Invalid data"
   },
   "steps": {
+    "you": {
+      "eyebrow": "You",
+      "title": "Tell me about your situation.",
+      "subtitle": "Two questions to start.",
+      "incomeLabel": "Net monthly income",
+      "incomePlaceholder": "5,500",
+      "incomeHelper": "Salary and regular extras. You can refine later."
+    },
+    "fixed_costs": {
+      "eyebrow": "Your costs",
+      "title": "Your 4 main expenses.",
+      "subtitle": "A ballpark is enough. No need for precision.",
+      "housingLabel": "Housing (rent or mortgage)",
+      "insuranceLabel": "Insurance (health, liability, contents)",
+      "foodLabel": "Food (groceries + restaurants)",
+      "transportLabel": "Transport (fuel, train pass, taxi)",
+      "housingPlaceholder": "1,500",
+      "insurancePlaceholder": "400",
+      "foodPlaceholder": "600",
+      "transportPlaceholder": "200",
+      "unknown": "I don't know",
+      "helper": "A rough number is fine. The coach will refine with you over time."
+    },
+    "main_goal": {
+      "eyebrow": "Your goal",
+      "title": "What do you want to work on first?",
+      "subtitle": "You can add more later.",
+      "skip": "No specific goal for now"
+    },
     "situation": {
       "title": "How are you doing financially?",
       "subtitle": "No judgement, just to calibrate."
@@ -91,6 +120,7 @@
     "savings": "Savings",
     "purchase": "Big purchase",
     "travel": "Travel",
+    "increase_income": "Grow my income",
     "other": "Other"
   },
   "traits": {

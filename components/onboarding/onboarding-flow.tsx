@@ -7,21 +7,14 @@ import {
   ArrowLeft,
   ArrowRight,
   Banknote,
-  CheckCircle2,
-  Compass,
-  EyeOff,
-  Flame,
-  HeartPulse,
-  ListChecks,
   Loader2,
   MoreHorizontal,
   PiggyBank,
   Plane,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
   Target,
-  Zap,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -34,38 +27,33 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { BrandMark } from "@/components/layout/brand-mark";
 import {
-  BEHAVIOR_TRAITS,
   FINANCIAL_SITUATIONS,
   GOAL_TYPES,
   ROUTES,
-  STRESS_LEVELS,
-  type BehaviorTraitId,
+  type GoalTypeId,
 } from "@/lib/constants";
 import { onboardingSchema } from "@/lib/validations/finance";
 import { completeOnboarding, skipOnboarding } from "@/app/actions/onboarding";
-import { generateLocalInsight } from "@/lib/insights/local";
 import { cn } from "@/lib/utils";
 
-type StepKey =
-  | "situation"
-  | "income"
-  | "expenses"
-  | "savings"
-  | "goal"
-  | "behavior"
-  | "stress"
-  | "insight";
+/**
+ * Phase 4.0 — Onboarding réduit de 8 étapes à 3.
+ *
+ * Étape 1 — "Toi" : situation + revenu mensuel.
+ * Étape 2 — "Tes 4 charges principales" : logement / assurances /
+ *           alimentation / transport, chaque catégorie pouvant être
+ *           marquée "je ne sais pas" (= null, honnête, le coach
+ *           demandera plus tard).
+ * Étape 3 — "Ton objectif principal" : 7 cards visuelles, skippable.
+ *
+ * Les anciens champs (savings, debt, behavior, stress, insight) ne
+ * sont plus demandés à l'onboarding. Defaults au submit, le coach
+ * récupère les informations manquantes au fil des conversations.
+ */
 
-const STEP_KEYS: readonly StepKey[] = [
-  "situation",
-  "income",
-  "expenses",
-  "savings",
-  "goal",
-  "behavior",
-  "stress",
-  "insight",
-] as const;
+type StepKey = "you" | "fixed_costs" | "main_goal";
+
+const STEP_KEYS: readonly StepKey[] = ["you", "fixed_costs", "main_goal"];
 
 const GOAL_ICONS: Record<string, LucideIcon> = {
   ShieldCheck,
@@ -73,31 +61,31 @@ const GOAL_ICONS: Record<string, LucideIcon> = {
   PiggyBank,
   ShoppingBag,
   Plane,
+  TrendingUp,
   Target,
   MoreHorizontal,
 };
 
-const BEHAVIOR_ICONS: Record<string, LucideIcon> = {
-  Zap,
-  EyeOff,
-  ListChecks,
-  HeartPulse,
-  Flame,
-  Compass,
-  ShieldCheck,
-  Sparkles,
+/**
+ * Phase 4.0 — 4 catégories majeures saisies à l'onboarding. Chaque
+ * champ accepte un nombre OU null ("je ne sais pas").
+ * null → pas d'expense entry créée → FHS Couverture honnête (le
+ * coach demandera). 0 et null sont distincts : 0 = "je n'en ai pas"
+ * (entry créée à 0), null = "je ne sais pas" (pas d'entry).
+ */
+type ExpenseBreakdown = {
+  housing: number | null;
+  insurance: number | null;
+  food: number | null;
+  transport: number | null;
 };
 
 type FormState = {
   situation: "struggling" | "tight" | "stable" | "comfortable";
   monthlyIncome: number | "";
-  monthlyExpenses: number | "";
-  currentSavings: number | "";
-  monthlyDebt: number | "";
-  hasEmergencyFund: boolean;
-  mainGoal: (typeof GOAL_TYPES)[number]["id"];
-  behaviorTraits: BehaviorTraitId[];
-  perceivedStress: number;
+  expenseBreakdown: ExpenseBreakdown;
+  /** null = user a choisi "Passer cette étape" — le coach proposera J3. */
+  mainGoal: GoalTypeId | null;
 };
 
 export function OnboardingFlow() {
@@ -108,13 +96,13 @@ export function OnboardingFlow() {
   const [form, setForm] = React.useState<FormState>({
     situation: "tight",
     monthlyIncome: "",
-    monthlyExpenses: "",
-    currentSavings: "",
-    monthlyDebt: "",
-    hasEmergencyFund: false,
-    mainGoal: "emergency_fund",
-    behaviorTraits: [],
-    perceivedStress: 3,
+    expenseBreakdown: {
+      housing: null,
+      insurance: null,
+      food: null,
+      transport: null,
+    },
+    mainGoal: null,
   });
 
   const currentKey = STEP_KEYS[step];
@@ -123,12 +111,13 @@ export function OnboardingFlow() {
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const toggleTrait = (id: BehaviorTraitId) =>
+  const updateExpense = (
+    cat: keyof ExpenseBreakdown,
+    value: number | null,
+  ) =>
     setForm((prev) => ({
       ...prev,
-      behaviorTraits: prev.behaviorTraits.includes(id)
-        ? prev.behaviorTraits.filter((tr) => tr !== id)
-        : [...prev.behaviorTraits, id],
+      expenseBreakdown: { ...prev.expenseBreakdown, [cat]: value },
     }));
 
   const next = () => setStep((s) => Math.min(STEP_KEYS.length - 1, s + 1));
@@ -136,36 +125,50 @@ export function OnboardingFlow() {
 
   const canContinue = (): boolean => {
     switch (currentKey) {
-      case "situation":
-        return Boolean(form.situation);
-      case "income":
-        return form.monthlyIncome !== "" && Number(form.monthlyIncome) >= 0;
-      case "expenses":
-        return form.monthlyExpenses !== "" && Number(form.monthlyExpenses) >= 0;
-      case "savings":
-        return form.currentSavings !== "" && Number(form.currentSavings) >= 0;
-      case "goal":
-        return Boolean(form.mainGoal);
-      case "behavior":
-        return true; // multi-select facultatif
-      case "stress":
-        return form.perceivedStress >= 1 && form.perceivedStress <= 5;
-      case "insight":
-        return true;
+      case "you":
+        return (
+          Boolean(form.situation) &&
+          form.monthlyIncome !== "" &&
+          Number(form.monthlyIncome) >= 0
+        );
+      case "fixed_costs": {
+        // Au moins UNE catégorie renseignée avec un montant ≥ 0
+        // (un montant = 0 est valide, "je ne sais pas" = null ne l'est pas).
+        const vals = Object.values(form.expenseBreakdown);
+        return vals.some((v) => v !== null && v >= 0);
+      }
+      case "main_goal":
+        return true; // skippable
     }
   };
 
   const submit = async () => {
+    const { housing, insurance, food, transport } = form.expenseBreakdown;
+    const knownExpenses = [housing, insurance, food, transport].filter(
+      (v): v is number => v !== null,
+    );
+    const monthlyExpenses = knownExpenses.reduce((sum, v) => sum + v, 0);
+
     const payload = {
       situation: form.situation,
       monthlyIncome: Number(form.monthlyIncome) || 0,
-      monthlyExpenses: Number(form.monthlyExpenses) || 0,
-      currentSavings: Number(form.currentSavings) || 0,
-      monthlyDebt: Number(form.monthlyDebt) || 0,
-      hasEmergencyFund: form.hasEmergencyFund,
-      mainGoal: form.mainGoal,
-      perceivedStress: form.perceivedStress,
-      behaviorTraits: form.behaviorTraits,
+      monthlyExpenses,
+      // Defaults pour les champs différés (coach demandera J3-J7).
+      currentSavings: 0,
+      monthlyDebt: 0,
+      hasEmergencyFund: false,
+      mainGoal: form.mainGoal ?? "emergency_fund",
+      perceivedStress: 3,
+      behaviorTraits: [],
+      // Phase 4.0 — breakdown détaillé : la server action crée 4
+      // expense entries dans la table `expenses` (1 par catégorie
+      // non-null), ce qui peuple immédiatement la Couverture FHS.
+      expenseBreakdown: {
+        housing,
+        insurance,
+        food,
+        transport,
+      },
     };
     const parsed = onboardingSchema.safeParse(payload);
     if (!parsed.success) {
@@ -228,9 +231,7 @@ export function OnboardingFlow() {
           >
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-                {currentKey === "insight"
-                  ? t("eyebrowFirstInsight")
-                  : t("eyebrowOnboarding")}
+                {t(`steps.${currentKey}.eyebrow`)}
               </p>
               <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                 {t(`steps.${currentKey}.title`)}
@@ -239,21 +240,20 @@ export function OnboardingFlow() {
                 {t(`steps.${currentKey}.subtitle`)}
               </p>
             </div>
-
             <StepContent
               step={currentKey}
               form={form}
               update={update}
-              toggleTrait={toggleTrait}
+              updateExpense={updateExpense}
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-6">
         <Button
+          type="button"
           variant="ghost"
-          size="lg"
           onClick={back}
           disabled={step === 0 || submitting}
         >
@@ -261,22 +261,27 @@ export function OnboardingFlow() {
         </Button>
         {step < STEP_KEYS.length - 1 ? (
           <Button
+            type="button"
             variant="gold"
-            size="lg"
+            disabled={!canContinue() || submitting}
             onClick={next}
-            disabled={!canContinue()}
           >
             {t("actions.continue")} <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
           <Button
+            type="button"
             variant="gold"
-            size="lg"
+            disabled={submitting}
             onClick={submit}
-            disabled={!canContinue() || submitting}
           >
-            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t("actions.finish")}
+            {submitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                {t("actions.finish")} <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         )}
       </div>
@@ -284,339 +289,185 @@ export function OnboardingFlow() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Steps                                                                      */
+/* -------------------------------------------------------------------------- */
+
 function StepContent({
   step,
   form,
   update,
-  toggleTrait,
+  updateExpense,
 }: {
   step: StepKey;
   form: FormState;
   update: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
-  toggleTrait: (id: BehaviorTraitId) => void;
+  updateExpense: (cat: keyof ExpenseBreakdown, value: number | null) => void;
 }) {
   const t = useTranslations("onboarding");
   switch (step) {
-    case "situation":
+    case "you":
       return (
-        <RadioGroup
-          value={form.situation}
-          onValueChange={(v) => update("situation", v as FormState["situation"])}
-          className="space-y-2"
-        >
-          {FINANCIAL_SITUATIONS.map((opt) => (
-            <label
-              key={opt.id}
-              htmlFor={opt.id}
-              className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors",
-                form.situation === opt.id
-                  ? "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.04)]"
-                  : "border-border/60 hover:bg-card/60",
-              )}
-            >
-              <RadioGroupItem value={opt.id} id={opt.id} className="mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">
-                  {t(`situations.${opt.id}.label`)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {t(`situations.${opt.id}.description`)}
-                </p>
-              </div>
-            </label>
-          ))}
-        </RadioGroup>
-      );
-    case "income":
-      return (
-        <div className="space-y-3">
-          <Label htmlFor="income">{t("steps.income.label")}</Label>
-          <Input
-            id="income"
-            type="number"
-            min={0}
-            step="0.01"
-            placeholder={t("steps.income.placeholder")}
-            value={form.monthlyIncome}
-            onChange={(e) =>
-              update(
-                "monthlyIncome",
-                e.target.value === "" ? "" : Number(e.target.value),
-              )
-            }
-          />
-          <p className="text-xs text-muted-foreground">
-            {t("steps.income.helper")}
-          </p>
-        </div>
-      );
-    case "expenses":
-      return (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="expenses">{t("steps.expenses.expensesLabel")}</Label>
-            <Input
-              id="expenses"
-              type="number"
-              min={0}
-              step="0.01"
-              placeholder={t("steps.expenses.expensesPlaceholder")}
-              value={form.monthlyExpenses}
-              onChange={(e) =>
-                update(
-                  "monthlyExpenses",
-                  e.target.value === "" ? "" : Number(e.target.value),
-                )
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="debt">{t("steps.expenses.debtLabel")}</Label>
-            <Input
-              id="debt"
-              type="number"
-              min={0}
-              step="0.01"
-              placeholder={t("steps.expenses.debtPlaceholder")}
-              value={form.monthlyDebt}
-              onChange={(e) =>
-                update(
-                  "monthlyDebt",
-                  e.target.value === "" ? "" : Number(e.target.value),
-                )
-              }
-            />
-          </div>
-        </div>
-      );
-    case "savings":
-      return (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="savings">{t("steps.savings.label")}</Label>
-            <Input
-              id="savings"
-              type="number"
-              min={0}
-              step="0.01"
-              placeholder={t("steps.savings.placeholder")}
-              value={form.currentSavings}
-              onChange={(e) =>
-                update(
-                  "currentSavings",
-                  e.target.value === "" ? "" : Number(e.target.value),
-                )
-              }
-            />
-          </div>
-          <label className="flex items-start gap-3 rounded-2xl border border-border/60 p-4">
-            <Checkbox
-              checked={form.hasEmergencyFund}
-              onCheckedChange={(v) => update("hasEmergencyFund", v === true)}
-            />
-            <div>
-              <p className="text-sm font-medium">
-                {t("steps.savings.emergencyFundTitle")}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {t("steps.savings.emergencyFundHelper")}
-              </p>
-            </div>
-          </label>
-        </div>
-      );
-    case "goal":
-      return (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {GOAL_TYPES.map((g) => {
-            const Icon = GOAL_ICONS[g.icon] ?? Target;
-            const active = form.mainGoal === g.id;
-            return (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => update("mainGoal", g.id)}
+        <div className="space-y-6">
+          <RadioGroup
+            value={form.situation}
+            onValueChange={(v) => update("situation", v as FormState["situation"])}
+            className="space-y-2"
+          >
+            {FINANCIAL_SITUATIONS.map((opt) => (
+              <label
+                key={opt.id}
+                htmlFor={opt.id}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
-                  active
-                    ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
-                    : "border-border/60 hover:border-border hover:bg-card/60",
+                  "flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors",
+                  form.situation === opt.id
+                    ? "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.04)]"
+                    : "border-border/60 hover:bg-card/60",
                 )}
               >
-                <span
-                  className={cn(
-                    "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-                    active
-                      ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
-                      : "bg-secondary text-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="text-sm font-medium">{t(`goals.${g.id}`)}</span>
-              </button>
-            );
-          })}
+                <RadioGroupItem value={opt.id} id={opt.id} className="mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium">
+                    {t(`situations.${opt.id}.label`)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t(`situations.${opt.id}.description`)}
+                  </p>
+                </div>
+              </label>
+            ))}
+          </RadioGroup>
+
+          <div className="space-y-2">
+            <Label htmlFor="income">{t("steps.you.incomeLabel")}</Label>
+            <Input
+              id="income"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.01"
+              placeholder={t("steps.you.incomePlaceholder")}
+              value={form.monthlyIncome}
+              onChange={(e) =>
+                update(
+                  "monthlyIncome",
+                  e.target.value === "" ? "" : Number(e.target.value),
+                )
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("steps.you.incomeHelper")}
+            </p>
+          </div>
         </div>
       );
-    case "behavior":
+
+    case "fixed_costs": {
+      const categories: Array<{
+        id: keyof ExpenseBreakdown;
+        placeholderKey: string;
+      }> = [
+        { id: "housing", placeholderKey: "housingPlaceholder" },
+        { id: "insurance", placeholderKey: "insurancePlaceholder" },
+        { id: "food", placeholderKey: "foodPlaceholder" },
+        { id: "transport", placeholderKey: "transportPlaceholder" },
+      ];
       return (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {BEHAVIOR_TRAITS.map((tr) => {
-            const Icon = BEHAVIOR_ICONS[tr.icon] ?? Sparkles;
-            const active = form.behaviorTraits.includes(tr.id);
+        <div className="space-y-4">
+          {categories.map((cat) => {
+            const value = form.expenseBreakdown[cat.id];
+            const unknown = value === null;
             return (
-              <button
-                key={tr.id}
-                type="button"
-                onClick={() => toggleTrait(tr.id)}
-                aria-pressed={active}
-                className={cn(
-                  "flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors",
-                  active
-                    ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
-                    : "border-border/60 hover:border-border hover:bg-card/60",
-                )}
-              >
-                <span
-                  className={cn(
-                    "mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                    active
-                      ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
-                      : "bg-secondary text-foreground",
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">
-                    {t(`traits.${tr.id}.label`)}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {t(`traits.${tr.id}.description`)}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      );
-    case "stress":
-      return (
-        <RadioGroup
-          value={String(form.perceivedStress)}
-          onValueChange={(v) => update("perceivedStress", Number(v))}
-          className="space-y-2"
-        >
-          {STRESS_LEVELS.map((s) => (
-            <label
-              key={s.value}
-              htmlFor={`stress-${s.value}`}
-              className={cn(
-                "flex cursor-pointer items-center justify-between rounded-2xl border p-4 transition-colors",
-                form.perceivedStress === s.value
-                  ? "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.04)]"
-                  : "border-border/60 hover:bg-card/60",
-              )}
-            >
-              <span className="flex items-center gap-3">
-                <RadioGroupItem
-                  value={String(s.value)}
-                  id={`stress-${s.value}`}
+              <div key={cat.id} className="space-y-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <Label htmlFor={`exp-${cat.id}`}>
+                    {t(`steps.fixed_costs.${cat.id}Label`)}
+                  </Label>
+                  <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+                    <Checkbox
+                      checked={unknown}
+                      onCheckedChange={(v) =>
+                        updateExpense(cat.id, v === true ? null : 0)
+                      }
+                    />
+                    {t("steps.fixed_costs.unknown")}
+                  </label>
+                </div>
+                <Input
+                  id={`exp-${cat.id}`}
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step="0.01"
+                  disabled={unknown}
+                  placeholder={t(`steps.fixed_costs.${cat.placeholderKey}`)}
+                  value={unknown ? "" : value ?? ""}
+                  onChange={(e) =>
+                    updateExpense(
+                      cat.id,
+                      e.target.value === "" ? null : Number(e.target.value),
+                    )
+                  }
                 />
-                <span className="text-sm font-medium">
-                  {t(`stressLevels.${s.value}`)}
-                </span>
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {s.value}/5
-              </span>
-            </label>
-          ))}
-        </RadioGroup>
-      );
-    case "insight":
-      return <InsightStep form={form} />;
-  }
-}
-
-function InsightStep({ form }: { form: FormState }) {
-  const t = useTranslations("onboarding.steps.insight");
-  const tParent = useTranslations("onboarding");
-  const tInsight = useTranslations("dashboard.insights");
-  const insight = React.useMemo(
-    () =>
-      generateLocalInsight({
-        monthlyIncome: Number(form.monthlyIncome) || 0,
-        monthlyExpenses: Number(form.monthlyExpenses) || 0,
-        currentSavings: Number(form.currentSavings) || 0,
-        monthlyDebt: Number(form.monthlyDebt) || 0,
-        hasEmergencyFund: form.hasEmergencyFund,
-        perceivedStress: form.perceivedStress,
-        situation: form.situation,
-        mainGoal: form.mainGoal,
-        behaviorTraits: form.behaviorTraits,
-      }),
-    [form],
-  );
-
-  const toneAccent =
-    insight.tone === "warning"
-      ? "from-[hsl(var(--warning)/0.12)]"
-      : insight.tone === "positive"
-        ? "from-[hsl(var(--success)/0.12)]"
-        : "from-[hsl(var(--gold)/0.12)]";
-
-  return (
-    <div className="space-y-4">
-      <div
-        className={cn(
-          "relative overflow-hidden rounded-2xl border border-[hsl(var(--gold)/0.25)] bg-gradient-to-br via-card/40 to-card/40 p-6 shadow-[0_30px_80px_-40px_hsl(var(--gold)/0.35)]",
-          toneAccent,
-        )}
-      >
-        <div className="flex items-center gap-2 text-[hsl(var(--gold))]">
-          <Sparkles className="h-4 w-4" />
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em]">
-            {tParent("eyebrowFirstInsight")}
+              </div>
+            );
+          })}
+          <p className="text-xs text-muted-foreground">
+            {t("steps.fixed_costs.helper")}
           </p>
         </div>
-        <h2 className="mt-3 font-display text-xl font-semibold leading-snug sm:text-2xl">
-          {tInsight(insight.headlineKey, insight.params)}
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {tInsight(insight.bodyKey, insight.params)}
-        </p>
-        {insight.metric && insight.metricLabelKey && (
-          <div className="mt-5 inline-flex flex-col rounded-xl border border-border/60 bg-background/60 px-4 py-3">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              {tInsight(insight.metricLabelKey)}
-            </span>
-            <span className="mt-0.5 font-display text-lg font-semibold text-[hsl(var(--gold))]">
-              {insight.metric}
-            </span>
-          </div>
-        )}
-      </div>
+      );
+    }
 
-      <div className="rounded-xl border border-border/60 bg-card/40 p-4">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-          </span>
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              {t("nextAction")}
-            </p>
-            <p className="mt-1 text-sm font-medium leading-relaxed">
-              {tInsight(insight.nextActionKey, insight.params)}
-            </p>
+    case "main_goal":
+      return (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {GOAL_TYPES.map((g) => {
+              const Icon = GOAL_ICONS[g.icon] ?? Target;
+              const active = form.mainGoal === g.id;
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => update("mainGoal", g.id)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
+                    active
+                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
+                      : "border-border/60 hover:border-border hover:bg-card/60",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                      active
+                        ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
+                        : "bg-secondary text-foreground",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="text-sm font-medium">
+                    {t(`goals.${g.id}`)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+          <button
+            type="button"
+            onClick={() => update("mainGoal", null)}
+            className={cn(
+              "w-full rounded-2xl border border-dashed p-3 text-xs transition-colors",
+              form.mainGoal === null
+                ? "border-[hsl(var(--gold)/0.4)] text-foreground"
+                : "border-border/60 text-muted-foreground hover:bg-card/40",
+            )}
+          >
+            {t("steps.main_goal.skip")}
+          </button>
         </div>
-      </div>
-
-      <p className="text-xs text-muted-foreground">{t("footnote")}</p>
-    </div>
-  );
+      );
+  }
 }

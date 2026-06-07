@@ -14,6 +14,35 @@
     "invalidPayload": "Dados inválidos"
   },
   "steps": {
+    "you": {
+      "eyebrow": "Tu",
+      "title": "Fala-me da tua situação.",
+      "subtitle": "Duas perguntas para começar.",
+      "incomeLabel": "Rendimento mensal líquido",
+      "incomePlaceholder": "5500",
+      "incomeHelper": "Salário e complementos regulares. Podes afinar mais tarde."
+    },
+    "fixed_costs": {
+      "eyebrow": "As tuas despesas",
+      "title": "As tuas 4 despesas principais.",
+      "subtitle": "Uma estimativa basta. Sem necessidade de precisão.",
+      "housingLabel": "Habitação (renda ou hipoteca)",
+      "insuranceLabel": "Seguros (saúde, RC, lar)",
+      "foodLabel": "Alimentação (compras + restaurantes)",
+      "transportLabel": "Transporte (combustível, comboio, passe)",
+      "housingPlaceholder": "1500",
+      "insurancePlaceholder": "400",
+      "foodPlaceholder": "600",
+      "transportPlaceholder": "200",
+      "unknown": "Não sei",
+      "helper": "Um número aproximado chega. O coach afinará contigo."
+    },
+    "main_goal": {
+      "eyebrow": "O teu objetivo",
+      "title": "Em que queres avançar primeiro?",
+      "subtitle": "Poderás adicionar mais objetivos depois.",
+      "skip": "Sem objetivo específico de momento"
+    },
     "situation": {
       "title": "Como estás financeiramente?",
       "subtitle": "Sem julgamento, só para calibrar."
@@ -91,6 +120,7 @@
     "savings": "Poupança",
     "purchase": "Compra importante",
     "travel": "Viagem",
+    "increase_income": "Aumentar os meus rendimentos",
     "other": "Outro"
   },
   "traits": {

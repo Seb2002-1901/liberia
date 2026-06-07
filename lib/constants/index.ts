@@ -117,6 +117,7 @@ export const GOAL_TYPES = [
   { id: "savings", label: "Épargne", icon: "PiggyBank" },
   { id: "purchase", label: "Achat important", icon: "ShoppingBag" },
   { id: "travel", label: "Voyage", icon: "Plane" },
+  { id: "increase_income", label: "Augmenter mes revenus", icon: "TrendingUp" },
   { id: "other", label: "Autre", icon: "Target" },
 ] as const;
 

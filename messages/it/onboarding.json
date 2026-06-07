@@ -14,6 +14,35 @@
     "invalidPayload": "Dati non validi"
   },
   "steps": {
+    "you": {
+      "eyebrow": "Tu",
+      "title": "Parlami della tua situazione.",
+      "subtitle": "Due domande per iniziare.",
+      "incomeLabel": "Reddito mensile netto",
+      "incomePlaceholder": "5.500",
+      "incomeHelper": "Stipendio e integrazioni regolari. Puoi affinare dopo."
+    },
+    "fixed_costs": {
+      "eyebrow": "Le tue spese",
+      "title": "Le tue 4 spese principali.",
+      "subtitle": "Una stima è sufficiente. Non serve precisione.",
+      "housingLabel": "Abitazione (affitto o mutuo)",
+      "insuranceLabel": "Assicurazioni (sanitaria, RC, casa)",
+      "foodLabel": "Alimentazione (spesa + ristoranti)",
+      "transportLabel": "Trasporti (benzina, treno, abbonamento)",
+      "housingPlaceholder": "1.500",
+      "insurancePlaceholder": "400",
+      "foodPlaceholder": "600",
+      "transportPlaceholder": "200",
+      "unknown": "Non lo so",
+      "helper": "Una cifra approssimativa basta. Il coach affinerà con te."
+    },
+    "main_goal": {
+      "eyebrow": "Il tuo obiettivo",
+      "title": "Su cosa vuoi lavorare per primo?",
+      "subtitle": "Potrai aggiungere altri obiettivi dopo.",
+      "skip": "Nessun obiettivo specifico per ora"
+    },
     "situation": {
       "title": "Come stai finanziariamente?",
       "subtitle": "Nessun giudizio, solo per calibrare."
@@ -91,6 +120,7 @@
     "savings": "Risparmio",
     "purchase": "Grande acquisto",
     "travel": "Viaggio",
+    "increase_income": "Aumentare i miei redditi",
     "other": "Altro"
   },
   "traits": {

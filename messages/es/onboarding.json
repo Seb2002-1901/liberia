@@ -14,6 +14,35 @@
     "invalidPayload": "Datos no válidos"
   },
   "steps": {
+    "you": {
+      "eyebrow": "Tú",
+      "title": "Cuéntame tu situación.",
+      "subtitle": "Dos preguntas para empezar.",
+      "incomeLabel": "Ingreso mensual neto",
+      "incomePlaceholder": "5.500",
+      "incomeHelper": "Salario y complementos regulares. Podrás afinar después."
+    },
+    "fixed_costs": {
+      "eyebrow": "Tus gastos",
+      "title": "Tus 4 gastos principales.",
+      "subtitle": "Una estimación es suficiente. Sin necesidad de ser preciso.",
+      "housingLabel": "Vivienda (alquiler o hipoteca)",
+      "insuranceLabel": "Seguros (salud, RC, hogar)",
+      "foodLabel": "Alimentación (compra + restaurantes)",
+      "transportLabel": "Transporte (gasolina, tren, abono)",
+      "housingPlaceholder": "1.500",
+      "insurancePlaceholder": "400",
+      "foodPlaceholder": "600",
+      "transportPlaceholder": "200",
+      "unknown": "No lo sé",
+      "helper": "Una cifra aproximada basta. El coach afinará contigo."
+    },
+    "main_goal": {
+      "eyebrow": "Tu objetivo",
+      "title": "¿En qué quieres avanzar primero?",
+      "subtitle": "Podrás añadir más objetivos después.",
+      "skip": "Sin objetivo específico por ahora"
+    },
     "situation": {
       "title": "¿Cómo estás financieramente?",
       "subtitle": "Sin juicio, solo para calibrar."
@@ -91,6 +120,7 @@
     "savings": "Ahorro",
     "purchase": "Gran compra",
     "travel": "Viaje",
+    "increase_income": "Aumentar mis ingresos",
     "other": "Otro"
   },
   "traits": {

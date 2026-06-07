@@ -14,6 +14,35 @@
     "invalidPayload": "Données invalides"
   },
   "steps": {
+    "you": {
+      "eyebrow": "Toi",
+      "title": "Parle-moi de ta situation.",
+      "subtitle": "Deux questions pour démarrer.",
+      "incomeLabel": "Revenu mensuel net",
+      "incomePlaceholder": "5 500",
+      "incomeHelper": "Salaire et compléments réguliers. Tu pourras affiner plus tard."
+    },
+    "fixed_costs": {
+      "eyebrow": "Tes charges",
+      "title": "Tes 4 charges principales.",
+      "subtitle": "Estimation suffisante. Pas besoin d'être précis.",
+      "housingLabel": "Logement (loyer ou hypothèque)",
+      "insuranceLabel": "Assurances (maladie, RC, ménage)",
+      "foodLabel": "Alimentation (courses + restaurants)",
+      "transportLabel": "Transport (essence, CFF, abonnement)",
+      "housingPlaceholder": "1 500",
+      "insurancePlaceholder": "400",
+      "foodPlaceholder": "600",
+      "transportPlaceholder": "200",
+      "unknown": "Je ne sais pas",
+      "helper": "Une fourchette suffit. Le coach affinera avec toi par la suite."
+    },
+    "main_goal": {
+      "eyebrow": "Ton objectif",
+      "title": "Sur quoi veux-tu avancer en premier ?",
+      "subtitle": "Tu pourras en ajouter d'autres plus tard.",
+      "skip": "Pas d'objectif précis pour l'instant"
+    },
     "situation": {
       "title": "Comment te sens-tu financièrement ?",
       "subtitle": "Aucun jugement, juste pour calibrer."
@@ -91,6 +120,7 @@
     "savings": "Épargne",
     "purchase": "Achat important",
     "travel": "Voyage",
+    "increase_income": "Augmenter mes revenus",
     "other": "Autre"
   },
   "traits": {
