@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -61,22 +63,34 @@ export function HealthScoreDrawer({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
-        {/* Header */}
+        {/* Header — DialogTitle and DialogDescription satisfy Radix
+            a11y contract ; screen readers announce title + summary
+            when the drawer opens. */}
         <header className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">{t("title")}</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2 pr-8">
+            <DialogTitle className="text-base font-semibold">
+              {t("title")}
+            </DialogTitle>
             {isDemo && (
               <span className="rounded bg-[hsl(var(--gold))] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background">
                 {t("demoBadge")}
               </span>
             )}
           </div>
-          <div className="flex items-baseline gap-3">
+          <DialogDescription className="sr-only">
+            {t("ariaDescription", {
+              score: score.display,
+              band: tBands(score.band),
+              confidence: t(`confidence.${score.confidence}`),
+            })}
+          </DialogDescription>
+          <div className="flex flex-wrap items-baseline gap-3">
             <span
               className={cn(
                 "text-5xl font-semibold tabular-nums leading-none",
                 theme.neutral && "text-muted-foreground",
               )}
+              aria-hidden="true"
             >
               {score.display}
             </span>
@@ -215,17 +229,20 @@ function AxesDecomposition({ data }: { data: DrawerData }) {
   const tConfidence = useTranslations("dashboard.health.drawer.confidence");
   const [open, setOpen] = React.useState(true);
   const { score } = data;
+  const panelId = React.useId();
 
   return (
     <section className="space-y-2">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+        className="flex w-full items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <span>{t("title")}</span>
         <ChevronDown
+          aria-hidden="true"
           className={cn(
             "h-3 w-3 transition-transform",
             open && "rotate-180",
@@ -233,7 +250,7 @@ function AxesDecomposition({ data }: { data: DrawerData }) {
         />
       </button>
       {open && (
-        <ul className="space-y-2">
+        <ul id={panelId} className="space-y-2">
           {AXIS_ORDER.map((id: AxisId) => {
             const axis = score.axes[id];
             const pct = axisBarPct(axis.score);

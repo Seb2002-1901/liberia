@@ -49,6 +49,8 @@ export function HealthScoreRing({
   onOpen,
 }: HealthScoreRingProps) {
   const t = useTranslations("dashboard.health.ring");
+  const tBands = useTranslations("dashboard.health.bands");
+  const tConfidence = useTranslations("dashboard.health.drawer.confidence");
 
   const theme = bandTheme(band, confidence);
   const RADIUS = 36;
@@ -59,12 +61,28 @@ export function HealthScoreRing({
   const deltaSign = classifyDelta(delta);
   const deltaText = formatDelta(delta);
 
+  // Compose a rich aria-label : screen readers announce score + band
+  // + delta + confidence in one sentence so the user gets the same
+  // synthesis the visual viewer gets.
+  const ariaParts = [
+    t("aria", { score }),
+    tBands(band),
+    delta !== null && delta !== 0
+      ? delta > 0
+        ? t("ariaDeltaUp", { n: delta })
+        : t("ariaDeltaDown", { n: Math.abs(delta) })
+      : null,
+    confidence !== "HIGH" ? tConfidence(confidence) : null,
+    isDemo ? t("ariaDemo") : null,
+  ].filter(Boolean) as string[];
+  const ariaLabel = ariaParts.join(". ");
+
   return (
     <button
       type="button"
       onClick={onOpen}
-      aria-label={t("aria", { score })}
-      className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold))] focus:ring-offset-2 focus:ring-offset-background"
+      aria-label={ariaLabel}
+      className="group relative inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <svg
         viewBox="0 0 100 100"
@@ -107,6 +125,7 @@ export function HealthScoreRing({
         </span>
         {deltaText && (
           <span
+            aria-hidden="true"
             className={cn(
               "mt-0.5 text-[10px] tabular-nums",
               deltaSign === "POSITIVE" && "text-emerald-500",
@@ -120,15 +139,19 @@ export function HealthScoreRing({
       </div>
 
       {isDemo && (
-        <span className="absolute -right-1 -top-1 rounded bg-[hsl(var(--gold))] px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-background">
+        <span
+          aria-hidden="true"
+          className="absolute -right-1 -top-1 rounded bg-[hsl(var(--gold))] px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-background"
+        >
           {t("demoBadge")}
         </span>
       )}
 
       {confidence !== "HIGH" && (
         <span
+          aria-hidden="true"
           className={cn(
-            "absolute -bottom-1 -right-1 rounded px-1 py-0.5 text-[8px] font-semibold uppercase tracking-wider",
+            "absolute -bottom-1 -right-1 rounded px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider",
             confidencePillTone(confidence),
           )}
         >

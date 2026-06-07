@@ -5,6 +5,9 @@
   "health": {
     "ring": {
       "aria": "Puntuación de salud financiera {score} sobre 100",
+      "ariaDeltaUp": "al alza de {n} {n, plural, one {punto} other {puntos}} esta semana",
+      "ariaDeltaDown": "a la baja de {n} {n, plural, one {punto} other {puntos}} esta semana",
+      "ariaDemo": "Cuenta de demostración",
       "demoBadge": "DEMO",
       "confidence": {
         "MEDIUM": "Media",
@@ -14,6 +17,7 @@
     },
     "drawer": {
       "title": "Mi puntuación de salud financiera",
+      "ariaDescription": "Puntuación actual {score} sobre 100, banda {band}, confianza {confidence}",
       "demoBadge": "DEMO",
       "insufficientHint": "Tu perfil aún se está construyendo. Añade ingresos, gastos fijos y al menos dos categorías principales para desbloquear una lectura completa.",
       "confidence": {

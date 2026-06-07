@@ -5,6 +5,9 @@
   "health": {
     "ring": {
       "aria": "Punteggio di salute finanziaria {score} su 100",
+      "ariaDeltaUp": "in aumento di {n} {n, plural, one {punto} other {punti}} questa settimana",
+      "ariaDeltaDown": "in calo di {n} {n, plural, one {punto} other {punti}} questa settimana",
+      "ariaDemo": "Account demo",
       "demoBadge": "DEMO",
       "confidence": {
         "MEDIUM": "Media",
@@ -14,6 +17,7 @@
     },
     "drawer": {
       "title": "Il mio punteggio di salute finanziaria",
+      "ariaDescription": "Punteggio attuale {score} su 100, fascia {band}, confidenza {confidence}",
       "demoBadge": "DEMO",
       "insufficientHint": "Il tuo profilo è ancora in costruzione. Inserisci redditi, spese fisse e almeno due categorie principali per sbloccare una lettura completa.",
       "confidence": {
