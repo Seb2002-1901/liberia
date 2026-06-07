@@ -8,11 +8,12 @@
       "ariaDeltaUp": "a subir {n} {n, plural, one {ponto} other {pontos}} esta semana",
       "ariaDeltaDown": "a descer {n} {n, plural, one {ponto} other {pontos}} esta semana",
       "ariaDemo": "Conta de demonstração",
+      "permanentLabel": "Pontuação de saúde financeira",
       "demoBadge": "DEMO",
       "confidence": {
         "MEDIUM": "Média",
         "LOW": "Baixa",
-        "INSUFFICIENT_DATA": "Insuf."
+        "INSUFFICIENT_DATA": "Em construção"
       }
     },
     "drawer": {
@@ -78,6 +79,14 @@
       "title": "A tua evolução",
       "ariaLabel": "Cronologia da tua pontuação financeira",
       "weekLabel": "Semana {week}",
+      "emptyTodayLabel": "Hoje",
+      "emptyTodayScore": "Pontuação inicial registada: {score}",
+      "emptyNextLabel": "Próxima análise",
+      "emptyNextValue": "Domingo 23h",
+      "emptyTrackedTitle": "O que será seguido",
+      "emptyTracked1": "evolução da pontuação",
+      "emptyTracked2": "crescimento do fundo de emergência",
+      "emptyTracked3": "progresso dos objetivos",
       "emptyTitle": "Ainda sem histórico",
       "emptyDescription": "As primeiras tendências aparecerão após algumas semanas de acompanhamento.",
       "emptyHintsTitle": "O que será analisado",

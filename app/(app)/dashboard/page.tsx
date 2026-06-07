@@ -249,6 +249,7 @@ export default async function DashboardPage() {
             cta={nextAction.cta}
             firstName={firstName}
             currency={data.profile.currency}
+            fhsConfidence={drawerData?.score.confidence ?? null}
           />
         </div>
       </div>

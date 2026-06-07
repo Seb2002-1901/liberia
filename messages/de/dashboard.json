@@ -8,11 +8,12 @@
       "ariaDeltaUp": "diese Woche um {n} {n, plural, one {Punkt} other {Punkte}} gestiegen",
       "ariaDeltaDown": "diese Woche um {n} {n, plural, one {Punkt} other {Punkte}} gefallen",
       "ariaDemo": "Demo-Konto",
+      "permanentLabel": "Finanzgesundheits-Score",
       "demoBadge": "DEMO",
       "confidence": {
         "MEDIUM": "Mittel",
         "LOW": "Niedrig",
-        "INSUFFICIENT_DATA": "Unzur."
+        "INSUFFICIENT_DATA": "Im Aufbau"
       }
     },
     "drawer": {
@@ -78,6 +79,14 @@
       "title": "Deine Entwicklung",
       "ariaLabel": "Verlauf deines Finanzscores",
       "weekLabel": "Woche {week}",
+      "emptyTodayLabel": "Heute",
+      "emptyTodayScore": "Anfangsscore erfasst: {score}",
+      "emptyNextLabel": "Nächste Auswertung",
+      "emptyNextValue": "Sonntag 23 Uhr",
+      "emptyTrackedTitle": "Was verfolgt wird",
+      "emptyTracked1": "Score-Entwicklung",
+      "emptyTracked2": "Wachstum des Notfallfonds",
+      "emptyTracked3": "Zielfortschritt",
       "emptyTitle": "Noch keine Historie",
       "emptyDescription": "Erste Trends erscheinen nach einigen Wochen Tracking.",
       "emptyHintsTitle": "Was verfolgt wird",

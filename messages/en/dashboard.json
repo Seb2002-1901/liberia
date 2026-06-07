@@ -8,11 +8,12 @@
       "ariaDeltaUp": "up by {n} {n, plural, one {point} other {points}} this week",
       "ariaDeltaDown": "down by {n} {n, plural, one {point} other {points}} this week",
       "ariaDemo": "Demo account",
+      "permanentLabel": "Financial Health Score",
       "demoBadge": "DEMO",
       "confidence": {
         "MEDIUM": "Med.",
         "LOW": "Low",
-        "INSUFFICIENT_DATA": "Insuf."
+        "INSUFFICIENT_DATA": "Building"
       }
     },
     "drawer": {
@@ -26,7 +27,7 @@
         "HIGH": "High confidence",
         "MEDIUM": "Medium confidence",
         "LOW": "Low confidence",
-        "INSUFFICIENT_DATA": "Confidence still building"
+        "INSUFFICIENT_DATA": "Confidence building"
       },
       "deltaBlock": {
         "title": "Why my score moved",
@@ -78,6 +79,14 @@
       "title": "Your progress",
       "ariaLabel": "Timeline of your financial score",
       "weekLabel": "Week {week}",
+      "emptyTodayLabel": "Today",
+      "emptyTodayScore": "Initial score recorded: {score}",
+      "emptyNextLabel": "Next analysis",
+      "emptyNextValue": "Sunday 11pm",
+      "emptyTrackedTitle": "What will be tracked",
+      "emptyTracked1": "score evolution",
+      "emptyTracked2": "emergency fund growth",
+      "emptyTracked3": "goal progress",
       "emptyTitle": "No history yet",
       "emptyDescription": "First trends will appear after a few weeks of tracking.",
       "emptyHintsTitle": "What will be tracked",

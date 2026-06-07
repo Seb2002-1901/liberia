@@ -10,6 +10,7 @@ import { CompletionAssistant } from "@/components/dashboard/completion-assistant
 import type { NextAction } from "@/lib/calculations/next-action";
 import type { AdvisorSummary } from "@/lib/calculations/advisor-engine";
 import type { MissingArea } from "@/lib/calculations/completeness";
+import type { Confidence } from "@/lib/calculations/health/types";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface AdvisorCardProps {
@@ -22,6 +23,14 @@ interface AdvisorCardProps {
   /** First name for the greeting. */
   firstName: string;
   currency: string;
+  /**
+   * Phase 3.3.1 — FHS confidence override. When provided AND equal
+   * to "INSUFFICIENT_DATA", the AdvisorCard chip displays
+   * "Confiance en construction" (sourced from the unified
+   * dashboard.health.drawer.confidence namespace) instead of the
+   * AdviceConfidence label. Single voice across surfaces.
+   */
+  fhsConfidence?: Confidence | null;
 }
 
 /**
@@ -42,11 +51,29 @@ export function AdvisorCard({
   cta,
   firstName,
   currency,
+  fhsConfidence = null,
 }: AdvisorCardProps) {
   const t = useTranslations("dashboard.advisor");
   const tAction = useTranslations("dashboard.nextAction.kind");
   const tConfidence = useTranslations("dashboard.nextAction.confidence");
+  const tDrawerConf = useTranslations("dashboard.health.drawer.confidence");
   const tPriority = useTranslations("dashboard.nextAction.priority");
+
+  // Phase 3.3.1 — when the FHS confidence is INSUFFICIENT_DATA the
+  // chip MUST align with the rest of the dashboard ("Confiance en
+  // construction"). Otherwise fall back to the AdviceConfidence
+  // calculation summary.confidence already provides.
+  const isFhsProvisional = fhsConfidence === "INSUFFICIENT_DATA";
+  const chipLabel = isFhsProvisional
+    ? tDrawerConf("INSUFFICIENT_DATA")
+    : tConfidence(summary.confidence);
+  const chipToneClass = isFhsProvisional
+    ? "bg-muted text-muted-foreground"
+    : summary.confidence === "HIGH"
+      ? "bg-emerald-500/10 text-emerald-600"
+      : summary.confidence === "MEDIUM"
+        ? "bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
+        : "bg-rose-500/10 text-rose-500";
 
   const [assistantOpen, setAssistantOpen] = React.useState(false);
 
@@ -125,14 +152,10 @@ export function AdvisorCard({
               <span
                 className={cn(
                   "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-                  summary.confidence === "HIGH"
-                    ? "bg-emerald-500/10 text-emerald-600"
-                    : summary.confidence === "MEDIUM"
-                      ? "bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
-                      : "bg-rose-500/10 text-rose-500",
+                  chipToneClass,
                 )}
               >
-                {tConfidence(summary.confidence)}
+                {chipLabel}
               </span>
             </div>
             <p className="text-base font-semibold leading-snug">

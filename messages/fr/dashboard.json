@@ -8,11 +8,12 @@
       "ariaDeltaUp": "en hausse de {n} {n, plural, one {point} other {points}} cette semaine",
       "ariaDeltaDown": "en baisse de {n} {n, plural, one {point} other {points}} cette semaine",
       "ariaDemo": "Compte de démonstration",
+      "permanentLabel": "Score de santé financière",
       "demoBadge": "DÉMO",
       "confidence": {
         "MEDIUM": "Moy.",
         "LOW": "Faible",
-        "INSUFFICIENT_DATA": "Insuf."
+        "INSUFFICIENT_DATA": "En construction"
       }
     },
     "drawer": {
@@ -26,7 +27,7 @@
         "HIGH": "Confiance élevée",
         "MEDIUM": "Confiance moyenne",
         "LOW": "Confiance faible",
-        "INSUFFICIENT_DATA": "Confiance en cours de construction"
+        "INSUFFICIENT_DATA": "Confiance en construction"
       },
       "deltaBlock": {
         "title": "Pourquoi mon score a changé",
@@ -78,6 +79,14 @@
       "title": "Ton évolution",
       "ariaLabel": "Timeline de ton score financier",
       "weekLabel": "Semaine {week}",
+      "emptyTodayLabel": "Aujourd'hui",
+      "emptyTodayScore": "Score initial enregistré : {score}",
+      "emptyNextLabel": "Prochaine analyse",
+      "emptyNextValue": "Dimanche 23h",
+      "emptyTrackedTitle": "Ce qui sera suivi",
+      "emptyTracked1": "évolution du score",
+      "emptyTracked2": "progression du fonds d'urgence",
+      "emptyTracked3": "progression des objectifs",
       "emptyTitle": "Pas encore d'historique",
       "emptyDescription": "Les premières tendances apparaîtront après quelques semaines de suivi.",
       "emptyHintsTitle": "Ce qui sera analysé",

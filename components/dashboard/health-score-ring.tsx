@@ -30,13 +30,15 @@ interface HealthScoreRingProps {
 /**
  * Phase 3.2 / 3.3.1 — Ring the user sees first on the dashboard.
  *
- * 112×112 SVG : track + arc filled to the score, band-colored. Center
+ * 140×140 SVG : track + arc filled to the score, band-colored. Center
  * shows the integer score in tabular-nums semibold ; a delta chip
  * sits underneath. Badges decorate the corners (DEMO + confidence).
+ * Permanent label "Financial Health Score" sits below the ring so
+ * the KPI identifies itself in under a second.
  *
- * Sized up in 3.3.1 from 80 to 112 so the headline KPI dominates the
- * dashboard like WHOOP / Apple Health rings. Still fits on a 320px
- * mobile viewport with breathing room.
+ * Sized up in 3.3.1 from 80 → 112 → 140 so the headline KPI dominates
+ * the dashboard like WHOOP / Apple Health rings. Still fits on a
+ * 320px mobile viewport with breathing room.
  *
  * Animation : arc grows from 0 to its target value on FIRST mount of
  * the session only (sessionStorage flag). Subsequent renders snap to
@@ -57,10 +59,10 @@ export function HealthScoreRing({
   const tConfidence = useTranslations("dashboard.health.drawer.confidence");
 
   const theme = bandTheme(band, confidence);
-  // Phase 3.3.1 — bigger ring. Stroke widened in proportion ; radius
-  // tuned so the arc thickness stays visually balanced.
-  const RADIUS = 44;
-  const STROKE = 10;
+  // Phase 3.3.1 iteration 2 — bump 112 → 140, stroke widened in
+  // proportion, radius tuned so the arc thickness stays balanced.
+  const RADIUS = 46;
+  const STROKE = 12;
   const { circumference, offset } = ringArcOffset(score, RADIUS);
 
   const animateOnMount = useFirstSessionMount("health-ring-mounted");
@@ -84,15 +86,16 @@ export function HealthScoreRing({
   const ariaLabel = ariaParts.join(". ");
 
   return (
+    <div className="flex flex-col items-center gap-2">
     <button
       type="button"
       onClick={onOpen}
       aria-label={ariaLabel}
-      className="group relative inline-flex h-28 w-28 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group relative inline-flex h-[140px] w-[140px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <svg
         viewBox="0 0 100 100"
-        className="h-28 w-28 -rotate-90"
+        className="h-[140px] w-[140px] -rotate-90"
         aria-hidden="true"
       >
         <circle
@@ -123,7 +126,7 @@ export function HealthScoreRing({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className={cn(
-            "text-4xl font-semibold tabular-nums leading-none",
+            "text-5xl font-semibold tabular-nums leading-none",
             theme.neutral && "text-muted-foreground",
           )}
         >
@@ -147,7 +150,7 @@ export function HealthScoreRing({
       {isDemo && (
         <span
           aria-hidden="true"
-          className="absolute -right-1 -top-1 rounded bg-[hsl(var(--gold))] px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-background"
+          className="absolute -right-1 -top-1 rounded bg-[hsl(var(--gold))] px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background"
         >
           {t("demoBadge")}
         </span>
@@ -157,7 +160,7 @@ export function HealthScoreRing({
         <span
           aria-hidden="true"
           className={cn(
-            "absolute -bottom-1 -right-1 rounded px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider",
+            "absolute -bottom-1 -right-1 rounded px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
             confidencePillTone(confidence),
           )}
         >
@@ -165,6 +168,10 @@ export function HealthScoreRing({
         </span>
       )}
     </button>
+    <p className="text-xs font-medium text-muted-foreground">
+      {t("permanentLabel")}
+    </p>
+    </div>
   );
 }
 
