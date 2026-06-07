@@ -77,6 +77,16 @@ export async function POST(request: Request) {
     );
   }
 
+  // Phase 3.2 J9 post-mortem — explicit deploy marker so ops can
+  // verify in Vercel logs which commit is actually serving requests.
+  // VERCEL_GIT_COMMIT_SHA is auto-injected on every deploy. The
+  // hardcoded "health-j9-enabled=true" flag is bumped any time the
+  // health pipeline is materially touched, so a stale bundle is
+  // identifiable at a glance.
+  console.log(
+    `[version] commit=${process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local"} health-j9-enabled=true`,
+  );
+
   const supabase = await createClient();
   const {
     data: { user },
