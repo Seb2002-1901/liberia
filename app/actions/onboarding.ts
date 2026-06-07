@@ -14,6 +14,11 @@ import {
   calculateRunway,
   calculateStabilityScore,
 } from "@/lib/calculations/finance";
+import {
+  buildExpenseEntriesFromBreakdown,
+  ONBOARDING_EXPENSE_TAG,
+  sumKnownExpenses,
+} from "@/lib/onboarding/expenses";
 import { track } from "@/lib/analytics/tracker";
 import { getActionErrors } from "@/lib/i18n/action-errors";
 
@@ -37,22 +42,33 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
   if (!user) return { ok: false, error: tErr("authRequired") };
 
   const v = parsed.data;
+
+  // Phase 4.0 J3 — quand l'onboarding fournit un breakdown détaillé,
+  // on s'appuie dessus pour le `monthly_expenses` legacy plutôt que
+  // sur la valeur envoyée par le client. Le client envoie déjà la
+  // somme, mais on recalcule ici par sécurité (single source of truth
+  // côté serveur). Backward compat : sans breakdown, on garde la
+  // valeur du payload.
+  const monthlyExpensesEffective = v.expenseBreakdown
+    ? sumKnownExpenses(v.expenseBreakdown)
+    : v.monthlyExpenses;
+
   const dti = v.monthlyIncome > 0 ? (v.monthlyDebt / v.monthlyIncome) * 100 : 0;
   const cashflow = calculateNetCashflow({
     monthlyIncome: v.monthlyIncome,
-    monthlyExpenses: v.monthlyExpenses,
+    monthlyExpenses: monthlyExpensesEffective,
   });
   const expenseRatio = calculateExpenseRatio({
     monthlyIncome: v.monthlyIncome,
-    monthlyExpenses: v.monthlyExpenses,
+    monthlyExpenses: monthlyExpensesEffective,
   });
   const runway = calculateRunway({
     currentSavings: v.currentSavings,
-    monthlyExpenses: v.monthlyExpenses,
+    monthlyExpenses: monthlyExpensesEffective,
   });
   const stability = calculateStabilityScore({
     monthlyIncome: v.monthlyIncome,
-    monthlyExpenses: v.monthlyExpenses,
+    monthlyExpenses: monthlyExpensesEffective,
     currentSavings: v.currentSavings,
     hasEmergencyFund: v.hasEmergencyFund,
     debtToIncomeRatio: dti,
@@ -69,7 +85,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
       user_id: user.id,
       situation: v.situation,
       monthly_income: v.monthlyIncome,
-      monthly_expenses: v.monthlyExpenses,
+      monthly_expenses: monthlyExpensesEffective,
       current_savings: v.currentSavings,
       monthly_debt: v.monthlyDebt,
       has_emergency_fund: v.hasEmergencyFund,
@@ -82,6 +98,43 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
     { onConflict: "user_id" },
   );
   if (fpRes.error) return { ok: false, error: fpRes.error.message };
+
+  // Phase 4.0 J3 — si l'utilisateur a fourni un breakdown détaillé,
+  // on crée les expense entries correspondantes pour peupler la
+  // table `expenses`. C'est ce qui fait que Couverture FHS, axes
+  // Résilience/Trajectoire et Categories breakdown sont déjà riches
+  // dès le J0.
+  //
+  // Idempotence : si l'action est re-jouée (rare mais possible si
+  // le client retry), on supprime d'abord les entries précédemment
+  // taggées comme onboarding. Le tag `[onboarding]` dans `notes`
+  // sert d'identifiant stable.
+  if (v.expenseBreakdown) {
+    const entries = buildExpenseEntriesFromBreakdown(
+      user.id,
+      v.expenseBreakdown,
+    );
+    if (entries.length > 0) {
+      const delRes = await supabase
+        .from("expenses")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("notes", ONBOARDING_EXPENSE_TAG);
+      if (delRes.error) {
+        // Non-bloquant : on log et on continue, l'insert ci-dessous
+        // peut juste créer un doublon visible côté UI (rare).
+        console.error(
+          `[onboarding] failed to clean previous entries: ${delRes.error.code ?? "?"} ${delRes.error.message}`,
+        );
+      }
+      const insRes = await supabase.from("expenses").insert(entries);
+      if (insRes.error) {
+        // Bloquant : sans ces entries, le wow J0 est cassé. On
+        // remonte l'erreur au composant pour qu'il avertisse.
+        return { ok: false, error: insRes.error.message };
+      }
+    }
+  }
 
   // Mark onboarding complete only after the financial profile is persisted —
   // otherwise the user can be flagged as onboarded with no underlying data.
@@ -113,7 +166,13 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Action
     { userId: user.id },
   );
 
+  // Revalidate les pages qui consomment expenses + financial_profile :
+  // dashboard (FHS + Ring + Mission), /expenses (liste), /budget
+  // (catégories). Coach n'a pas de cache route-level (route handler
+  // dynamique), pas besoin de le revalider.
   revalidatePath("/dashboard");
+  revalidatePath("/expenses");
+  revalidatePath("/budget");
   return { ok: true };
 }
 
