@@ -60,7 +60,7 @@ export async function OpportunityHighlightCard({
 
   if (!opportunity) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
         <div className="flex items-center gap-2.5">
           <span
             aria-hidden
@@ -72,7 +72,7 @@ export async function OpportunityHighlightCard({
             {t("eyebrow")}
           </p>
         </div>
-        <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-foreground">
+        <h3 className="mt-3 font-display text-base font-semibold leading-snug text-foreground">
           {t("emptyTitle")}
         </h3>
         <p className="mt-2 text-sm text-muted-foreground">{t("emptyBody")}</p>
@@ -107,7 +107,7 @@ export async function OpportunityHighlightCard({
   const estimatedPoints = POINTS_BY_PRIORITY[opportunity.priority];
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+    <article className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       {/* Phase 5.0 S3.1 v6 — feedback v5 : "flèche attire encore
           trop l'œil. Réduire encore son contraste. Ne pas
           concurrencer le titre". Couleur text-success/80 →
@@ -133,30 +133,29 @@ export async function OpportunityHighlightCard({
           </p>
         </div>
 
-        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/12 px-3 py-1 text-[11px] font-semibold text-success">
+        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-success/12 px-2.5 py-0.5 text-[11px] font-semibold text-success">
           <CheckCircle2 className="h-3 w-3" />
           {t("badgeImpact")}
         </p>
 
-        <h3 className="mt-4 max-w-[70%] font-display text-lg font-semibold leading-snug text-foreground sm:max-w-[65%] lg:text-xl">
+        <h3 className="mt-3 max-w-[70%] font-display text-base font-semibold leading-snug text-foreground sm:max-w-[65%] lg:text-lg">
           {tKind(`${opportunity.kind}.title`, payloadForI18n)}
         </h3>
-        <p className="mt-2 max-w-[70%] text-sm text-muted-foreground sm:max-w-[65%]">
+        <p className="mt-1.5 max-w-[70%] text-sm text-muted-foreground sm:max-w-[65%]">
           {tKind(`${opportunity.kind}.body`, payloadForI18n)}
         </p>
 
         {/* Bloc impact en encadré vert. Le chiffrage en points est
             une HEURISTIQUE ÉDITORIALE (high=12/medium=7/low=3),
-            PAS un calcul FHS réel. Ne PAS modifier sans repenser
-            la promesse produit (K2 audit S3.1). */}
-        <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-success/20 bg-success/5 px-3 py-2 text-xs font-medium text-foreground">
+            PAS un calcul FHS réel (voir K2 audit S3.1). */}
+        <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-success/20 bg-success/5 px-2.5 py-1.5 text-xs font-medium text-foreground">
           <span className="text-muted-foreground">{t("impactLabel")}</span>
           <span className="font-semibold text-success">
             {t("pointsLabel", { points: estimatedPoints })}
           </span>
         </div>
 
-        <Button asChild variant="default" size="default" className="mt-5">
+        <Button asChild variant="default" size="default" className="mt-3">
           <Link href={ROUTES.coach}>
             {t("cta")}
             <ArrowRight className="h-4 w-4" />

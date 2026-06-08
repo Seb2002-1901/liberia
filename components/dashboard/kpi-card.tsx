@@ -41,20 +41,20 @@ export function KpiCard({
   hint,
 }: KpiCardProps) {
   return (
-    // Phase 5.0 S3.1 v6 — densité KPI maximale (feedback v5 :
-    // "plus compacts verticalement"). p-5 → p-4, min-h 120 → 100,
-    // mt-3 → mt-2, mt-2 → mt-1.5.
-    <article className="flex min-h-[100px] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-in">
+    // Phase 5.0 S3.1 v7 — reconstruction densité : p-4 → p-3.5,
+    // min-h 100 → 88, marges internes resserrées. Chiffre
+    // conservé à text-2xl/[28px] pour lisibilité.
+    <article className="flex min-h-[88px] flex-col justify-between rounded-2xl border border-border bg-card p-3.5 shadow-card animate-fade-in">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>
       <div className="mt-2 flex items-baseline justify-between gap-2">
-        <p className="font-display text-2xl font-bold leading-none tabular-nums text-foreground lg:text-[28px]">
+        <p className="font-display text-xl font-bold leading-none tabular-nums text-foreground lg:text-[26px]">
           {value}
         </p>
         <DeltaBadge delta={delta ?? null} polarity={polarity} />
       </div>
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </article>
   );
 }

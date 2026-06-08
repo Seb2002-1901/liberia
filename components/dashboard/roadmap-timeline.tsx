@@ -55,8 +55,8 @@ export async function RoadmapTimeline({ milestones }: RoadmapTimelineProps) {
   )) as unknown as Translator;
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
-      <header className="mb-5 flex items-baseline justify-between gap-4">
+    <section className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
+      <header className="mb-4 flex items-baseline justify-between gap-4">
         <h2 className="font-display text-base font-semibold text-foreground">
           {t("title")}
         </h2>
@@ -115,36 +115,36 @@ function Milestone({
       : null;
 
   return (
-    // Phase 5.0 S3.1 v6 — densité maximale : p-4 → p-3.5 (-10-15%
-    // hauteur), border-border/50 conservé.
-    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-3.5 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
-      {/* Phase 5.0 S3.1 v6 — feedback v5 : "badges légèrement plus
-          petits". h-12 → h-10. Icône h-5 → h-4. Score today
-          text-lg → text-base font-bold. Ring today [3px] → [2.5px]. */}
+    // Phase 5.0 S3.1 v7 — densité reconstruction : p-3.5 → p-3.
+    // Cards moins hautes, contenu plus dense.
+    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-3 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
+      {/* Phase 5.0 S3.1 v7 — densité : badge h-10 → h-9, icon h-4
+          conservé. Score today text-base → text-sm font-bold.
+          Ring today [2.5px] → [2px] (cercle visible mais discret). */}
       <span
         aria-hidden
         className={cn(
-          "inline-flex h-10 w-10 items-center justify-center rounded-full",
+          "inline-flex h-9 w-9 items-center justify-center rounded-full",
           tone.bg,
           tone.fg,
-          isToday ? "ring-[2.5px] ring-navy/20" : tone.ring,
+          isToday ? "ring-2 ring-navy/20" : tone.ring,
         )}
       >
         {isToday && todayScore !== null ? (
-          <span className="font-display text-base font-bold tabular-nums">
+          <span className="font-display text-sm font-bold tabular-nums">
             {todayScore}
           </span>
         ) : (
           <Icon className="h-4 w-4" />
         )}
       </span>
-      <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {t(milestone.eyebrowKey)}
       </p>
-      <p className="mt-1 text-sm font-semibold leading-snug text-foreground">
+      <p className="mt-0.5 text-sm font-semibold leading-snug text-foreground">
         {t(milestone.titleKey, milestone.payload)}
       </p>
-      <p className="mt-0.5 text-xs leading-[1.5] text-muted-foreground">
+      <p className="mt-0.5 text-xs leading-[1.45] text-muted-foreground">
         {t(milestone.subtitleKey, milestone.payload)}
       </p>
     </li>

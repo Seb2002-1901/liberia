@@ -28,7 +28,7 @@ interface MissionCardProps {
 export async function MissionCard({ mission }: MissionCardProps) {
   const t = await getTranslations("dashboard.missionCard");
   return (
-    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <div className="flex items-center gap-2.5">
         <span
           aria-hidden
@@ -40,7 +40,7 @@ export async function MissionCard({ mission }: MissionCardProps) {
           {t("eyebrow")}
         </p>
       </div>
-      <h3 className="mt-5 font-display text-lg font-semibold leading-snug text-foreground">
+      <h3 className="mt-3 font-display text-base font-semibold leading-snug text-foreground">
         {t(`${mission.priority}.title`, mission.payload)}
       </h3>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -49,8 +49,8 @@ export async function MissionCard({ mission }: MissionCardProps) {
       <Button
         asChild
         variant="default"
-        size="lg"
-        className="mt-5 w-full text-sm font-medium sm:w-auto"
+        size="default"
+        className="mt-3 w-full text-sm font-medium sm:w-auto"
       >
         <Link href={mission.ctaHref}>
           {t("cta")}

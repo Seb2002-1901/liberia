@@ -42,15 +42,13 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
-  // Phase 5.0 S3.1 v6 — feedback v5 : "cercle légèrement plus
-  // grand, halo plus doux et plus diffus". Ring radius 42 → 43,
-  // thickness 8.5 → 9. Container repasse à 132. Halo blur-2xl
-  // → blur-3xl avec opacité 10 → 12% (plus diffus, plus doux).
+  // Phase 5.0 S3.1 v7 — densité maquette : ring 120 px (vs 132).
+  // Radius 42, thickness 8 (équilibre maquette).
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
-    radius: 43,
-    thickness: 9,
+    radius: 42,
+    thickness: 8,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -62,8 +60,8 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
         type="button"
         onClick={() => setDrawerOpen(true)}
         className={cn(
-          // Phase 5.0 S3.1 v5 — padding p-7 → p-6 (densité hero).
-          "group relative w-full overflow-hidden rounded-2xl p-6 text-left",
+          // Phase 5.0 S3.1 v7 — p-6 → p-5 (densité maquette).
+          "group relative w-full overflow-hidden rounded-2xl p-5 text-left",
           "bg-navy",
           "shadow-card-navy",
           "transition-all duration-200",
@@ -78,17 +76,17 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">
               {t("eyebrow")}
             </p>
-            <div className="mt-4 flex items-baseline gap-1.5">
-              {/* Phase 5.0 S3.1 v5 — score allégé [88px] → [76px]
-                  pour retrouver l'équilibre maquette. */}
-              <span className="font-display text-5xl font-bold leading-none tabular-nums text-white lg:text-[76px]">
+            <div className="mt-3 flex items-baseline gap-1.5">
+              {/* Phase 5.0 S3.1 v7 — score [76px] → [64px] lg pour
+                  densité hero. La maquette score est compact. */}
+              <span className="font-display text-5xl font-bold leading-none tabular-nums text-white lg:text-[64px]">
                 {score}
               </span>
               <span className="text-base font-medium text-white/55">
                 {t("outOf")}
               </span>
             </div>
-            <div className="mt-4 flex items-center">
+            <div className="mt-3 flex items-center">
               <DeltaBadge sign={deltaSign} />
             </div>
             <p className="mt-2 text-xs text-white/75">
@@ -102,16 +100,14 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             </p>
           </div>
 
-          {/* Ring + halo. Phase 5.0 S3.1 v6 — container 124 → 132
-              (cercle légèrement plus grand), halo opacité 10 → 12%,
-              blur-2xl → blur-3xl avec inset -3 → -5 (halo plus
-              doux et plus diffus). Drop-shadow glow conservé. */}
+          {/* Ring + halo. Phase 5.0 S3.1 v7 — container 132 → 120
+              (densité hero). Halo conservé opacité 12% blur-3xl. */}
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 132, height: 132 }}
+            style={{ width: 120, height: 120 }}
           >
-            <div className="absolute inset-[-5px] rounded-full bg-white/[0.12] blur-3xl" />
+            <div className="absolute inset-[-4px] rounded-full bg-white/[0.12] blur-3xl" />
             <svg viewBox="0 0 100 100" className="relative h-full w-full">
               <path
                 d={ring.trackD}
@@ -123,7 +119,7 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
                 <path
                   d={ring.arcD}
                   fill="white"
-                  style={{ filter: "drop-shadow(0 0 8px rgb(255 255 255 / 0.20))" }}
+                  style={{ filter: "drop-shadow(0 0 7px rgb(255 255 255 / 0.18))" }}
                 />
               )}
             </svg>
@@ -178,7 +174,7 @@ function EmptyScoreCard() {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl p-6 animate-fade-in",
+        "relative overflow-hidden rounded-2xl p-5 animate-fade-in",
         "bg-navy",
         "shadow-card-navy",
       )}

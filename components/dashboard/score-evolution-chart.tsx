@@ -32,8 +32,11 @@ interface ScoreEvolutionChartProps {
 }
 
 const CHART_WIDTH = 300;
-const CHART_HEIGHT = 140;
-const PAD = { top: 16, right: 40, bottom: 24, left: 8 };
+// Phase 5.0 S3.1 v7 — chart densifié 140 → 112 (-20%) pour gain
+// vertical conséquent. Le bloc bas du dashboard tient mieux dans
+// le premier viewport.
+const CHART_HEIGHT = 112;
+const PAD = { top: 12, right: 36, bottom: 20, left: 8 };
 
 export async function ScoreEvolutionChart({
   snapshots,
@@ -44,9 +47,9 @@ export async function ScoreEvolutionChart({
 
   if (chrono.length < 2) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
         <Eyebrow t={t} />
-        <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
+        <div className="mt-4 flex flex-col items-center gap-3 py-4 text-center">
           <span
             aria-hidden
             className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-muted-foreground"
@@ -83,13 +86,13 @@ export async function ScoreEvolutionChart({
   const innerH = CHART_HEIGHT - PAD.top - PAD.bottom;
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <Eyebrow t={t} />
 
-      <div className="mt-5">
+      <div className="mt-3">
         <svg
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-          className="h-36 w-full"
+          className="h-28 w-full"
           aria-label={t("ariaChart", { score: currentScore })}
         >
           <defs>
@@ -220,7 +223,7 @@ export async function ScoreEvolutionChart({
         </div>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-3">
         <Link
           href={ROUTES.plan}
           className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"

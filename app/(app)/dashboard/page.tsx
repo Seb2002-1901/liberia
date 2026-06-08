@@ -237,12 +237,13 @@ export default async function DashboardPage() {
     monthlyIncome > 0 ? (cashflow / monthlyIncome) * 100 : null;
 
   return (
-    // Phase 5.0 S3.1 v5 — densité maquette : space-y-8 → space-y-6
-    // pour voir Hero + Roadmap + KPI + début cards bas sans scroll
-    // sur 1440p (feedback "dashboard occupe trop de hauteur").
-    <div className="space-y-6">
+    // Phase 5.0 S3.1 v7 — reconstruction densité maquette.
+    // space-y-6 (24 px) → space-y-4 (16 px) entre les sections.
+    // Gain cumulé : 32-40 px sur les 4 gaps inter-blocs.
+    // Hero gap lg:gap-5 → lg:gap-4 (cohérence rythme).
+    <div className="space-y-4">
       {/* Bloc 1 — Score / Priorité / Mission */}
-      <div className="grid gap-4 lg:grid-cols-3 lg:gap-5">
+      <div className="grid gap-3 lg:grid-cols-3 lg:gap-4">
         <ScoreCard
           data={drawerData}
           currency={data.profile.currency}
@@ -261,9 +262,9 @@ export default async function DashboardPage() {
       {/* Bloc 2 — Roadmap horizontale */}
       <RoadmapTimeline milestones={roadmap} />
 
-      {/* Bloc 3 — 4 KPI. Phase 5.0 S3.1 v5 : mobile 2x2 (grid-cols-2)
-          au lieu de stack vertical. Maquette responsive iOS premium. */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      {/* Bloc 3 — 4 KPI. Mobile 2×2, desktop 4 colonnes. Gap-3
+          uniforme (cohérence rythme v7). */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard
           label={t("income.label")}
           value={
@@ -337,7 +338,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Bloc 4 — Opportunité / Répartition / Évolution */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3 lg:gap-4">
         <OpportunityHighlightCard
           opportunity={topOpportunity}
           currency={data.profile.currency}

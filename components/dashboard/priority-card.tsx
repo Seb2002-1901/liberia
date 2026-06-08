@@ -46,15 +46,15 @@ export function PriorityCard({
 
   return (
     <>
-      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {t("eyebrow")}
         </p>
-        <div className="mt-5 flex items-start gap-3.5">
+        <div className="mt-3 flex items-start gap-3">
           <span
             aria-hidden
             className={cn(
-              "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
+              "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
               iconBg,
               iconColor,
               iconRing,
@@ -62,16 +62,16 @@ export function PriorityCard({
           >
             <Icon className="h-5 w-5" />
           </span>
-          <h3 className="font-display text-lg font-semibold leading-snug text-foreground">
+          <h3 className="font-display text-base font-semibold leading-snug text-foreground">
             {t(`title.${mission.priority}`)}
           </h3>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">{subline}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{subline}</p>
         {drawerData && (
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none"
           >
             {t("whyLink")}
             <ArrowRight className="h-3.5 w-3.5" />

@@ -158,7 +158,7 @@ export function AppShell({
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar — 280 px, fond blanc cassé, hairline droite */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[280px] flex-col border-r border-border bg-card lg:flex">
-        <div className="flex h-[72px] items-center px-6">
+        <div className="flex h-16 items-center px-6">
           <BrandMark />
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3">
@@ -187,9 +187,9 @@ export function AppShell({
 
       {/* Topbar — fond clair, sans backdrop-blur. Greeting (lg+) à
           gauche, NotificationBell + avatar à droite. Phase 5.0
-          S3.1 v2 : hauteur passée 16 → 18 (72px) pour caler avec
-          la sidebar et donner plus d'air à la salutation. */}
-      <header className="fixed inset-x-0 top-0 z-20 flex h-[72px] items-center border-b border-border bg-card lg:left-[280px]">
+          S3.1 v7 : h-[72px] → h-16 (-8 px densité) pour matcher
+          la maquette + libérer de l'air pour le contenu. */}
+      <header className="fixed inset-x-0 top-0 z-20 flex h-16 items-center border-b border-border bg-card lg:left-[280px]">
         <div className="flex w-full items-center justify-between gap-3 px-4 lg:px-8">
           {/* Mobile : BrandMark compact. Desktop : Greeting injecté. */}
           <div className="flex min-w-0 items-center gap-3">
@@ -289,11 +289,14 @@ export function AppShell({
       </header>
 
       {/* Main content — padding gauche ajusté à 280 px (vs 256 avant).
-          Phase 5.0 S3.1 v6 : densité ultime. pt-6 → pt-5, pb-16 →
-          pb-12 (vs pb-10). Plus de scroll vertical sur 1440p
-          (feedback "tout visible sans scroll sur 1440p"). */}
-      <main className="pt-[72px] lg:pl-[280px]">
-        <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-5 sm:px-6 lg:px-10 lg:pb-8">
+          Phase 5.0 S3.1 v7 — reconstruction densité maquette :
+            topbar 72 → 64 (h-16)
+            pt-5 → pt-4 (-4 px)
+            pb-12 → pb-6 mobile, pb-8 → pb-6 desktop
+          Objectif : Hero + Roadmap + KPI + cards bas + CTA visibles
+          dans le premier viewport (laptop 1440×900 / MacBook 14"). */}
+      <main className="pt-16 lg:pl-[280px]">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-6 pt-4 sm:px-6 lg:px-10 lg:pb-6">
           {children}
         </div>
       </main>

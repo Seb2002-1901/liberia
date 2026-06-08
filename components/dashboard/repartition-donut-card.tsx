@@ -94,7 +94,7 @@ export async function RepartitionDonutCard({
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <Eyebrow t={t} />
-      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-4">
+      <div className="mt-3 flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:gap-4">
         {/* Donut — 120 × 120, shrink-0 */}
         <div
           aria-hidden
@@ -159,7 +159,7 @@ export async function RepartitionDonutCard({
           })}
         </ul>
       </div>
-      <div className="mt-5">
+      <div className="mt-3">
         <Link
           href={ROUTES.expenseAnalytics}
           className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
