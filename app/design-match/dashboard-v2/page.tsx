@@ -89,6 +89,27 @@ export default function DesignMatchDashboardV2() {
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
+      {/* DEBUG BANNER — confirmation visuelle que tu es bien sur
+          /design-match/dashboard-v2. À retirer après validation. */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          backgroundColor: "#DC2626",
+          color: "white",
+          padding: "10px 16px",
+          textAlign: "center",
+          fontSize: 14,
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+        }}
+      >
+        DESIGN MATCH V2 — commit bbbf185
+      </div>
       <Sidebar />
       <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column" }}>
         <Topbar />
