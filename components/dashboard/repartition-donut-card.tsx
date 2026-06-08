@@ -7,19 +7,28 @@ import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3.1 — RepartitionDonutCard pixel-perfect maquette
- * dashboard.png.
+ * Phase 5.0 S3.1 v7 — RepartitionDonutCard — fix bug overflow légende.
  *
- * Spec visuelle stricte :
- *   - Carte blanche `rounded-2xl shadow-card p-6`
- *   - Eyebrow "RÉPARTITION DES DÉPENSES" + sous "Ce mois-ci" muted
- *   - Donut SVG natif 160×160 (vs 140 avant)
- *   - Palette stricte maquette : Logement=navy, Alimentation=primary,
- *     Transport=success, Assurances=chart-coral, Loisirs=chart-violet
- *   - Total centre `text-lg font-bold` + caption muted
- *   - Légende droite : dot + label · % · montant (colonnes propres)
- *   - Lien "Voir le détail →" bleu primary
- *   - Animation fade-in au mount
+ * Bug v6 (carte plus étroite que la maquette → 3 cols dashboard) :
+ * la légende débordait, montants "5 500 CHF" / "3 193 CHF" coupés
+ * ou wrappés. La structure flex `justify-between` ne contraignait
+ * pas correctement le label vs montants.
+ *
+ * Fix v7 :
+ *   - Donut 144 → 120 px (libère ~24 px pour la légende)
+ *   - Donut centre : text-lg → text-sm (tient dans inner ring 68 px)
+ *   - Légende : flex `justify-between` → CSS grid 3 colonnes
+ *     `[minmax(0,1fr) auto auto]`
+ *     · col 1 : dot + label (truncate UNIQUEMENT le label)
+ *     · col 2 : percent (auto, ne wrap jamais)
+ *     · col 3 : montant CHF (auto, ne wrap jamais)
+ *   - `<ul>` parent : ajout `min-w-0` (autorise compression dans flex)
+ *   - Légende text-sm → text-xs (plus de densité, lisible)
+ *   - tabular-nums sur tous les chiffres (alignement vertical)
+ *
+ * Résultat : aucun overflow horizontal. Le label tronque
+ * proprement quand l'espace manque ; les montants restent
+ * toujours visibles intacts.
  */
 
 interface RepartitionDonutCardProps {
@@ -28,19 +37,6 @@ interface RepartitionDonutCardProps {
   currency: string;
 }
 
-/**
- * Palette qualitative stricte (maquette dashboard.png) :
- *   Logement       → navy            (#0F3D9E)
- *   Alimentation   → primary         (#2563EB)
- *   Transport      → success         (#16A34A)
- *   Assurances     → chart-coral     (#ED602F)
- *   Loisirs/Autres → chart-violet    (#9A5CD9)
- * + 3 fallbacks pour catégories supplémentaires éventuelles.
- *
- * L'ordre est appliqué par index (les slices arrivent triées par
- * total décroissant — le top 5 reçoit la palette signature, le
- * reste tombe sur les fallbacks).
- */
 const SLICE_COLORS = [
   "hsl(var(--navy))",
   "hsl(var(--primary))",
@@ -65,7 +61,7 @@ export async function RepartitionDonutCard({
 
   if (nonZero.length === 0 || totalExpenses === 0) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
         <Eyebrow t={t} />
         <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
           <span
@@ -90,8 +86,6 @@ export async function RepartitionDonutCard({
     );
   }
 
-  // Phase 5.0 S3.1 v6 — feedback v5 : "diamètre 5-8% de moins,
-  // épaisseur identique maquette". 152 → 144, thickness 17 → 16.
   const slices = buildDonutSlices(
     nonZero.map((r) => ({ id: r.category, value: r.total })),
     { thickness: 16 },
@@ -100,11 +94,12 @@ export async function RepartitionDonutCard({
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <Eyebrow t={t} />
-      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
+      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-4">
+        {/* Donut — 120 × 120, shrink-0 */}
         <div
           aria-hidden
           className="relative shrink-0"
-          style={{ width: 144, height: 144 }}
+          style={{ width: 120, height: 120 }}
         >
           <svg viewBox="0 0 100 100" className="h-full w-full">
             {slices.map((s, i) => (
@@ -115,36 +110,49 @@ export async function RepartitionDonutCard({
               />
             ))}
           </svg>
+          {/* Centre du donut — text-sm fit dans inner ring 68 px */}
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <p className="font-display text-lg font-bold tabular-nums text-foreground">
+            <p className="font-display text-sm font-bold tabular-nums text-foreground">
               {formatCurrency(totalExpenses, currency)}
             </p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="mt-0.5 text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
               {t("centerLabel")}
             </p>
           </div>
         </div>
-        <ul className="flex-1 space-y-2 text-sm">
+
+        {/*
+          Légende — CSS grid 3 colonnes anti-overflow :
+            col 1  [minmax(0,1fr)]  dot + label (truncate)
+            col 2  [auto]            percent (jamais wrap, tabular-nums)
+            col 3  [auto]            montant CHF (jamais wrap, tabular-nums)
+
+          `min-w-0` sur le <ul> autorise la compression dans le flex
+          parent. `truncate` est appliqué UNIQUEMENT au texte label.
+        */}
+        <ul className="w-full min-w-0 flex-1 space-y-1.5 text-xs">
           {slices.map((s, i) => {
             const label =
               EXPENSE_CATEGORIES.find((c) => c.id === s.id)?.label ?? s.id;
             return (
-              <li key={s.id} className="flex items-center justify-between gap-3">
+              <li
+                key={s.id}
+                className="grid items-baseline gap-x-2"
+                style={{ gridTemplateColumns: "minmax(0, 1fr) auto auto" }}
+              >
                 <span className="inline-flex min-w-0 items-center gap-2">
                   <span
                     aria-hidden
-                    className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
+                    className="inline-block h-2 w-2 shrink-0 rounded-sm"
                     style={{ background: SLICE_COLORS[i % SLICE_COLORS.length] }}
                   />
                   <span className="truncate text-foreground">{label}</span>
                 </span>
-                <span className="flex shrink-0 items-baseline gap-2 tabular-nums">
-                  <span className="text-foreground font-medium">
-                    {Math.round(s.percent)}%
-                  </span>
-                  <span className="text-muted-foreground">
-                    {formatCurrency(s.value, currency)}
-                  </span>
+                <span className="font-medium tabular-nums text-foreground">
+                  {Math.round(s.percent)}%
+                </span>
+                <span className="tabular-nums text-muted-foreground">
+                  {formatCurrency(s.value, currency)}
                 </span>
               </li>
             );
