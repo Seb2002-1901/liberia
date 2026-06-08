@@ -2,6 +2,229 @@
   "metadata": {
     "title": "Painel"
   },
+  "scoreCard": {
+    "eyebrow": "Pontuação de saúde financeira",
+    "outOf": "/100",
+    "ariaOpen": "Pontuação {score} de 100. Clica para ver os detalhes.",
+    "deltaUp": "+{points} pts desde a semana passada",
+    "deltaDown": "-{points} pts desde a semana passada",
+    "deltaStable": "Pontuação estável esta semana",
+    "deltaUnavailable": "Primeira leitura — volta domingo para o teu delta",
+    "emptyTitle": "Pontuação em construção",
+    "emptyBody": "Completa o teu perfil para desbloquear a pontuação.",
+    "delta": {
+      "up": "A melhorar",
+      "down": "Atenção",
+      "stable": "Estável"
+    }
+  },
+  "priorityCard": {
+    "eyebrow": "A tua prioridade atual",
+    "whyLink": "Ver porquê",
+    "title": {
+      "no_goal": "Define um primeiro objetivo concreto",
+      "low_resilience": "Constrói o teu fundo de emergência",
+      "incomplete_expenses": "Completa as tuas despesas principais",
+      "fhs_recommendation": "Segue a tua melhor pista",
+      "none": "Continua o que funciona"
+    },
+    "subline": {
+      "no_goal": "Sem um objetivo claro, a tua poupança não tem direção.",
+      "low_resilience": "{months} meses de segurança disponíveis. O mínimo é 1 mês.",
+      "incomplete_expenses": "O teu perfil está incompleto. Adiciona as despesas principais para uma análise fiável.",
+      "fhs_recommendation": "O teu conselheiro identificou uma ação de grande impacto.",
+      "none": "As tuas bases estão sólidas. Afina para passar ao próximo nível."
+    }
+  },
+  "missionCard": {
+    "eyebrow": "Missão do momento",
+    "cta": "Agir agora",
+    "no_goal": {
+      "title": "Define um primeiro objetivo concreto",
+      "subline": "Um objetivo dá sentido a cada CHF poupado."
+    },
+    "low_resilience": {
+      "title": "Constrói o teu primeiro fundo de emergência",
+      "subline": "Começa poupando uma pequena quantia este mês."
+    },
+    "incomplete_expenses": {
+      "title": "Completa as tuas despesas principais",
+      "subline": "Adiciona {missingArea} para tornar a pontuação fiável."
+    },
+    "fhs_recommendation": {
+      "title": "Segue a recomendação do conselheiro",
+      "subline": "Uma ação concreta para esta semana."
+    },
+    "none": {
+      "title": "Afina para passar ao próximo nível",
+      "subline": "As tuas bases são sólidas. Hora de otimizar."
+    }
+  },
+  "roadmap": {
+    "title": "O teu futuro, o nosso roteiro",
+    "seeAllLink": "Ver todas as projeções",
+    "eyebrow": {
+      "today": "Hoje",
+      "fourMonths": "Em 4 meses",
+      "twelveMonths": "Em 12 meses",
+      "threeYears": "Em 3 anos"
+    },
+    "today": {
+      "scoreLabel": "Pontuação {score}",
+      "gettingStartedTitle": "Põe as bases",
+      "gettingStartedSubtitle": "Completa o teu perfil para desbloquear a pontuação."
+    },
+    "steps": {
+      "no_goal": {
+        "today": { "subtitle": "Põe bases sólidas" },
+        "fourMonths": {
+          "title": "Primeiro objetivo definido",
+          "subtitle": "Sabes para onde vais"
+        },
+        "twelveMonths": {
+          "title": "Poupança em movimento",
+          "subtitle": "O teu objetivo toma forma"
+        }
+      },
+      "low_resilience": {
+        "today": { "subtitle": "Põe bases sólidas" },
+        "fourMonths": {
+          "title": "Fundo de emergência completo",
+          "subtitle": "3 meses de despesas cobertos"
+        },
+        "twelveMonths": {
+          "title": "Poupança acelerada",
+          "subtitle": "A tua poupança ganha embalo"
+        }
+      },
+      "incomplete_expenses": {
+        "today": { "subtitle": "Põe bases sólidas" },
+        "fourMonths": {
+          "title": "Perfil completo",
+          "subtitle": "A tua situação é clara e fiável"
+        },
+        "twelveMonths": {
+          "title": "Despesas otimizadas",
+          "subtitle": "Os teus custos estão sob controlo"
+        }
+      },
+      "fhs_recommendation": {
+        "today": { "subtitle": "Põe bases sólidas" },
+        "fourMonths": {
+          "title": "Ação iniciada",
+          "subtitle": "O teu ponto fraco está a ser tratado"
+        },
+        "twelveMonths": {
+          "title": "Pontuação reforçada",
+          "subtitle": "Os teus eixos estão equilibrados"
+        }
+      },
+      "none": {
+        "today": { "subtitle": "As tuas bases estão prontas" },
+        "fourMonths": {
+          "title": "Otimização contínua",
+          "subtitle": "Afinas com calma"
+        },
+        "twelveMonths": {
+          "title": "Margem confortável",
+          "subtitle": "A tua situação é sólida"
+        }
+      }
+    },
+    "threeYears": {
+      "emergency_fund": {
+        "title": "Cobertura reforçada",
+        "subtitle": "12 meses de segurança atingidos"
+      },
+      "debt_payoff": {
+        "title": "Dívida paga",
+        "subtitle": "A tua margem mensal está libertada"
+      },
+      "savings": {
+        "title": "Poupança consolidada",
+        "subtitle": "O teu património toma forma"
+      },
+      "purchase": {
+        "title": "Entrada pronta",
+        "subtitle": "O teu projeto de compra é financiável"
+      },
+      "travel": {
+        "title": "Viagem financiada",
+        "subtitle": "O teu projeto está ao alcance"
+      },
+      "increase_income": {
+        "title": "Receitas diversificadas",
+        "subtitle": "As tuas fontes de rendimento cresceram"
+      },
+      "other": {
+        "title": "Objetivo atingido",
+        "subtitle": "O teu projeto pessoal está concretizado"
+      },
+      "fallback": {
+        "title": "Horizonte de longo prazo",
+        "subtitle": "Define o teu projeto a 3 anos"
+      }
+    }
+  },
+  "kpi": {
+    "income": {
+      "label": "Receitas mensais",
+      "hint": "Depois de impostos",
+      "emptyHint": "Sem receita registada"
+    },
+    "expenses": {
+      "label": "Despesas mensais",
+      "hintShare": "{share}% das tuas receitas",
+      "emptyHint": "Sem despesa registada"
+    },
+    "remainder": {
+      "label": "Rendimento disponível",
+      "hintShare": "{share}% das tuas receitas",
+      "emptyHint": "Ainda não comparável"
+    },
+    "emergency": {
+      "label": "Fundo de emergência",
+      "monthsValue": "{months} meses",
+      "hintSavings": "{amount} disponíveis",
+      "emptyHint": "Constrói o teu primeiro colchão"
+    }
+  },
+  "opportunityHighlight": {
+    "eyebrow": "Oportunidade do momento",
+    "badgeImpact": "O maior impacto para ti",
+    "impactLabel": "Impacto potencial:",
+    "impactLevel": {
+      "high": "elevado",
+      "medium": "médio",
+      "low": "baixo"
+    },
+    "cta": "Explorar como",
+    "emptyTitle": "As tuas bases estão prontas",
+    "emptyBody": "Nenhuma oportunidade urgente detetada. Continua assim.",
+    "emptyCta": "Ver o meu plano"
+  },
+  "repartition": {
+    "eyebrow": "Repartição das despesas",
+    "period": "Este mês",
+    "centerLabel": "este mês",
+    "detailLink": "Ver detalhe",
+    "emptyTitle": "Sem despesa este mês",
+    "emptyBody": "Adiciona as tuas despesas para ver a repartição.",
+    "emptyCta": "Adicionar uma despesa"
+  },
+  "scoreEvolution": {
+    "eyebrow": "Evolução da pontuação",
+    "progression": "O teu progresso",
+    "historyLink": "Ver histórico",
+    "ariaChart": "Evolução da pontuação, valor atual {score} de 100",
+    "emptyTitle": "Sem curva ainda",
+    "emptyBody": "Volta na próxima semana para ver o teu primeiro progresso."
+  },
+  "talkToAdvisor": {
+    "title": "Falar com o meu conselheiro",
+    "body": "Faz uma pergunta, recebe conselhos personalizados.",
+    "cta": "Iniciar uma conversa"
+  },
   "firstMission": {
     "label": "Missão do momento",
     "whyLabel": "Porquê:",
