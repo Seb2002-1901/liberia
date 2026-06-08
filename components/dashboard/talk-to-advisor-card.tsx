@@ -21,7 +21,7 @@ import { ROUTES } from "@/lib/constants";
 export async function TalkToAdvisorCard() {
   const t = await getTranslations("dashboard.talkToAdvisor");
   return (
-    <section className="rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-in">
+    <section className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <span
@@ -37,7 +37,7 @@ export async function TalkToAdvisorCard() {
             <p className="mt-0.5 text-sm text-muted-foreground">{t("body")}</p>
           </div>
         </div>
-        <Button asChild variant="default" size="default" className="w-full sm:w-auto">
+        <Button asChild variant="default" size="lg" className="w-full sm:w-auto">
           <Link href={ROUTES.coach}>
             {t("cta")}
             <ArrowRight className="h-4 w-4" />

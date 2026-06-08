@@ -42,13 +42,13 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
-  // Phase 5.0 S3.1 v7 — densité maquette : ring 120 px (vs 132).
-  // Radius 42, thickness 8 (équilibre maquette).
+  // Phase 5.0 S3.1 v8 — score recalibré sur maquette : ring 128 px
+  // (vs 120), radius 43, thickness 9.
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
-    radius: 42,
-    thickness: 8,
+    radius: 43,
+    thickness: 9,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -77,9 +77,9 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
               {t("eyebrow")}
             </p>
             <div className="mt-3 flex items-baseline gap-1.5">
-              {/* Phase 5.0 S3.1 v7 — score [76px] → [64px] lg pour
-                  densité hero. La maquette score est compact. */}
-              <span className="font-display text-5xl font-bold leading-none tabular-nums text-white lg:text-[64px]">
+              {/* Phase 5.0 S3.1 v8 — score massif comme la maquette :
+                  lg:text-[80px] — le "46" doit dominer la carte. */}
+              <span className="font-display text-6xl font-bold leading-none tabular-nums text-white lg:text-[80px]">
                 {score}
               </span>
               <span className="text-base font-medium text-white/55">
@@ -100,12 +100,12 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             </p>
           </div>
 
-          {/* Ring + halo. Phase 5.0 S3.1 v7 — container 132 → 120
-              (densité hero). Halo conservé opacité 12% blur-3xl. */}
+          {/* Ring + halo. Phase 5.0 S3.1 v8 — container 128 px
+              (vs 120) pour matcher ring imposant maquette. */}
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 120, height: 120 }}
+            style={{ width: 128, height: 128 }}
           >
             <div className="absolute inset-[-4px] rounded-full bg-white/[0.12] blur-3xl" />
             <svg viewBox="0 0 100 100" className="relative h-full w-full">

@@ -3,24 +3,17 @@ import type { MonthlyDelta } from "@/lib/calculations/kpi-delta";
 import { cn } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3.1 — KpiCard pixel-perfect maquette dashboard.png.
+ * Phase 5.0 S3.1 v8 — KpiCard recalibré maquette.
  *
- * Spec visuelle stricte :
- *   - Carte blanche `rounded-2xl shadow-card p-6`
- *   - Caption uppercase `tracking-[0.2em] text-[10px]`
- *   - Chiffre `text-2xl lg:text-3xl font-bold tabular-nums`
- *   - Delta en pastille colorée à droite :
- *       `bg-success/10 rounded-md px-1.5 py-0.5 text-success`
- *       (ou destructive pour mauvaise nouvelle sémantique)
- *   - Sous-ligne `text-xs text-muted-foreground`
- *   - Animation fade-in au mount
+ * Changement structurel v8 : RETRAIT des pills colorées (bg-success/10
+ * etc.) — la maquette montre des deltas en **texte inline coloré**,
+ * pas dans des pastilles. Réduit le bruit visuel et matche le rendu
+ * léger de la maquette.
  *
- * Sémantique du delta (polarité) :
- *   - "income-like" : hausse = vert (bonne nouvelle)
- *   - "expense-like" : baisse = vert (bonne nouvelle)
- *   - "neutral" : pas de coloration sémantique
- *
- * Empty states : value="—", delta=null → pastille grise "—".
+ * Sémantique du delta (polarité) inchangée :
+ *   - "income-like" : hausse = vert
+ *   - "expense-like" : baisse = vert
+ *   - "neutral" : pas de coloration
  */
 
 export type KpiPolarity = "income-like" | "expense-like" | "neutral";
@@ -41,10 +34,7 @@ export function KpiCard({
   hint,
 }: KpiCardProps) {
   return (
-    // Phase 5.0 S3.1 v7 — reconstruction densité : p-4 → p-3.5,
-    // min-h 100 → 88, marges internes resserrées. Chiffre
-    // conservé à text-2xl/[28px] pour lisibilité.
-    <article className="flex min-h-[88px] flex-col justify-between rounded-2xl border border-border bg-card p-3.5 shadow-card animate-fade-in">
+    <article className="flex min-h-[88px] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-in">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>
@@ -52,14 +42,19 @@ export function KpiCard({
         <p className="font-display text-xl font-bold leading-none tabular-nums text-foreground lg:text-[26px]">
           {value}
         </p>
-        <DeltaBadge delta={delta ?? null} polarity={polarity} />
+        <DeltaInline delta={delta ?? null} polarity={polarity} />
       </div>
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
     </article>
   );
 }
 
-function DeltaBadge({
+/**
+ * Delta inline coloré — pas de pill, juste flèche + chiffre coloré.
+ * Maquette dashboard.png montre les deltas comme du texte simple
+ * coloré à côté du chiffre principal (pas dans une pastille bg).
+ */
+function DeltaInline({
   delta,
   polarity,
 }: {
@@ -68,19 +63,12 @@ function DeltaBadge({
 }) {
   if (!delta || delta.direction === "neutral" || delta.percent === null) {
     return (
-      <span className="inline-flex items-center gap-0.5 rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+      <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground">
         <Minus className="h-3 w-3" />
       </span>
     );
   }
   const sentiment = sentimentFor(delta.direction, polarity);
-  // Pastille colorée : fond /10, texte plein. Maquette dashboard.png.
-  const bg =
-    sentiment === "good"
-      ? "bg-success/10"
-      : sentiment === "bad"
-        ? "bg-destructive/10"
-        : "bg-muted";
   const fg =
     sentiment === "good"
       ? "text-success"
@@ -92,12 +80,11 @@ function DeltaBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-semibold",
-        bg,
+        "inline-flex items-center gap-0.5 text-sm font-semibold",
         fg,
       )}
     >
-      <Icon className="h-3 w-3" />
+      <Icon className="h-3.5 w-3.5" />
       <span className="tabular-nums">
         {sign}
         {delta.percent.toFixed(1)}%

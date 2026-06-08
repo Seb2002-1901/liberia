@@ -49,7 +49,7 @@ export async function MissionCard({ mission }: MissionCardProps) {
       <Button
         asChild
         variant="default"
-        size="default"
+        size="lg"
         className="mt-3 w-full text-sm font-medium sm:w-auto"
       >
         <Link href={mission.ctaHref}>

@@ -138,7 +138,9 @@ export async function OpportunityHighlightCard({
           {t("badgeImpact")}
         </p>
 
-        <h3 className="mt-3 max-w-[70%] font-display text-base font-semibold leading-snug text-foreground sm:max-w-[65%] lg:text-lg">
+        {/* Phase 5.0 S3.1 v8 — titre opportunité gros et gras
+            (maquette : titre dominant comme une accroche). */}
+        <h3 className="mt-3 max-w-[70%] font-display text-base font-bold leading-snug text-foreground sm:max-w-[65%] lg:text-xl">
           {tKind(`${opportunity.kind}.title`, payloadForI18n)}
         </h3>
         <p className="mt-1.5 max-w-[70%] text-sm text-muted-foreground sm:max-w-[65%]">

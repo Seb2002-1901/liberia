@@ -115,9 +115,11 @@ function Milestone({
       : null;
 
   return (
-    // Phase 5.0 S3.1 v7 — densité reconstruction : p-3.5 → p-3.
-    // Cards moins hautes, contenu plus dense.
-    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-3 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
+    // Phase 5.0 S3.1 v8 — retrait du shadow et border allégé.
+    // Maquette : les milestones sont des blocs intégrés à la carte
+    // parente, pas des sous-cartes ombrées. border-border/30 +
+    // pas d'ombre = look unifié "timeline" plutôt que "card-in-card".
+    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/30 bg-card p-3 lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
       {/* Phase 5.0 S3.1 v7 — densité : badge h-10 → h-9, icon h-4
           conservé. Score today text-base → text-sm font-bold.
           Ring today [2.5px] → [2px] (cercle visible mais discret). */}

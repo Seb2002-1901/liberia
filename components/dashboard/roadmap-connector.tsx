@@ -1,14 +1,17 @@
 /**
- * Phase 5.0 S3.1 v6 — connecteur SVG entre 2 jalons de la roadmap.
+ * Phase 5.0 S3.1 v8 — connecteur SVG entre 2 jalons de la roadmap.
  *
- * Feedback v5 : "connecteurs plus fins, ressembler à la maquette
- * et non à des CTA". Continue de réduire la présence visuelle.
+ * Re-calibration sur maquette stricte :
+ *   - Lignes DASHED bleues (pas solides, pas grises)
+ *   - Stroke 2 (présent mais élégant)
+ *   - Couleur primary/50 (bleu visible mais pas saturé)
+ *   - Tête de flèche assortie, légèrement épaisse
+ *   - Largeur 36 px (jalons proches mais avec une vraie séparation visuelle)
  *
- * Itération v6 :
- *   - Stroke 1.75 → 1.25 (lignes vraiment fines)
- *   - Couleur primary/35 → primary/30 (plus intégré, moins saturé)
- *   - Tête de flèche plus discrète
- *   - Largeur 40 → 32 px (jalons encore plus proches)
+ * Maquette dashboard.png montre clairement des lignes pointillées
+ * bleues + flèches qui RELIENT visuellement les milestones en une
+ * timeline. Mes itérations v3-v7 alternaient entre invisible et
+ * solide thick — v8 revient strictement à ce que la maquette montre.
  *
  * Pur SVG. Affiché uniquement `lg+`.
  */
@@ -18,28 +21,29 @@ export function RoadmapConnector() {
     <li
       aria-hidden
       className="hidden shrink-0 items-center justify-center self-center lg:flex"
-      style={{ width: 32, height: 20 }}
+      style={{ width: 36, height: 22 }}
     >
       <svg
-        viewBox="0 0 32 10"
-        className="h-2.5 w-full text-primary/30"
+        viewBox="0 0 36 12"
+        className="h-3 w-full text-primary/50"
         preserveAspectRatio="none"
       >
-        {/* Ligne fine continue */}
+        {/* Ligne pointillée bleue visible (signature maquette) */}
         <line
           x1="2"
-          y1="5"
-          x2="22"
-          y2="5"
+          y1="6"
+          x2="25"
+          y2="6"
           stroke="currentColor"
-          strokeWidth="1.25"
+          strokeWidth="2"
           strokeLinecap="round"
+          strokeDasharray="2 3"
         />
-        {/* Tête de flèche discrète */}
+        {/* Tête de flèche assortie */}
         <path
-          d="M 23 1.5 L 29 5 L 23 8.5"
+          d="M 26 1.5 L 33 6 L 26 10.5"
           stroke="currentColor"
-          strokeWidth="1.25"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
