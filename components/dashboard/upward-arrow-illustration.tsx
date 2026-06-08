@@ -32,19 +32,20 @@ export function UpwardArrowIllustration({
       </defs>
       <circle cx="56" cy="24" r="32" fill="url(#upward-arrow-glow)" />
 
-      {/* Courbe principale — arc montant fin et élégant */}
+      {/* Courbe principale — arc montant. Phase 5.0 S3.1 v4 :
+          stroke 2 → 2.75 pour matcher la présence maquette. */}
       <path
         d="M 10 64 Q 32 50 44 36 Q 56 22 68 14"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Tête de flèche affinée */}
+      {/* Tête de flèche */}
       <path
         d="M 62 12 L 70 12 L 70 20"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

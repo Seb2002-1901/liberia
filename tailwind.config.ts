@@ -98,16 +98,16 @@ const config: Config = {
       // par défaut, et `hover:shadow-card-hover` pour les cartes
       // interactives (ScoreCard, PriorityCard). Aucune ombre dépassant
       // 0.08 d'opacité — interdit produit premium.
-      // Phase 5.0 S3.1 v3 — ombres recalibrées Apple/Stripe style.
-      // Feedback v2 : "trop visibles". On retire de la profondeur,
-      // on laisse le border faire le travail de séparation. Shadow
-      // = supplément discret, pas la séparation principale.
+      // Phase 5.0 S3.1 v4 — ombres recalibrées. Feedback v3 : "trop
+       // plates, maquette montre une légère profondeur, détachement
+       // du fond, ombre douce mais visible". Entre v2 (trop) et v3
+       // (pas assez) → cible 0.05 + 0.10.
       boxShadow: {
-        card: "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 4px 16px -8px rgb(15 23 42 / 0.06)",
+        card: "0 1px 2px 0 rgb(15 23 42 / 0.05), 0 8px 24px -8px rgb(15 23 42 / 0.10)",
         "card-hover":
-          "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 8px 24px -8px rgb(15 23 42 / 0.10)",
+          "0 1px 3px 0 rgb(15 23 42 / 0.07), 0 12px 28px -8px rgb(15 23 42 / 0.14)",
         "card-navy":
-          "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 16px 40px -16px rgb(22 44 82 / 0.18)",
+          "0 1px 3px 0 rgb(15 23 42 / 0.07), 0 16px 40px -12px rgb(15 42 85 / 0.20)",
         "halo-primary":
           "0 0 0 1px rgb(37 99 235 / 0.10), 0 4px 16px -4px rgb(37 99 235 / 0.20)",
         "halo-coral":

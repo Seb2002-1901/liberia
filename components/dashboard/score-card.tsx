@@ -42,14 +42,13 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
-  // Phase 5.0 S3.1 v3 — ring repris à 7 (plus d'épaisseur que v2
-  // sans revenir à v1). Glow réorganisé : blur plus large, opacité
-  // contrôlée, plus diffus, plus premium.
+  // Phase 5.0 S3.1 v4 — ring épaisseur 7 → 9 (feedback v3 :
+  // "ring plus épais"). Radius 43 → 44 (ring plus proche du bord).
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
-    radius: 43,
-    thickness: 7,
+    radius: 44,
+    thickness: 9,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -105,16 +104,16 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             </p>
           </div>
 
-          {/* Ring partiel + halo blanc diffus derrière */}
+          {/* Ring partiel + halo blanc diffus derrière.
+              Phase 5.0 S3.1 v4 — taille 124 → 132 (+6%), halo
+              opacité 8 → 14% (plus visible, feedback v3). */}
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 124, height: 124 }}
+            style={{ width: 132, height: 132 }}
           >
-            {/* Phase 5.0 S3.1 v3 — halo plus large, plus diffus
-                (blur-3xl) — propre et premium, pas dur. */}
             <div
-              className="absolute inset-[-4px] rounded-full bg-white/[0.08] blur-3xl"
+              className="absolute inset-[-6px] rounded-full bg-white/[0.14] blur-3xl"
             />
             <svg viewBox="0 0 100 100" className="relative h-full w-full">
               {/* Track : anneau blanc translucide */}
@@ -122,15 +121,15 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
                 d={ring.trackD}
                 fill="white"
                 fillRule="evenodd"
-                opacity={0.16}
+                opacity={0.18}
               />
               {/* Arc de progression : blanc plein avec drop-shadow
-                  plus diffus (blur 3 → 8) à opacité modérée. */}
+                  diffus (glow plus marqué v4). */}
               {ring.arcD && (
                 <path
                   d={ring.arcD}
                   fill="white"
-                  style={{ filter: "drop-shadow(0 0 8px rgb(255 255 255 / 0.18))" }}
+                  style={{ filter: "drop-shadow(0 0 10px rgb(255 255 255 / 0.25))" }}
                 />
               )}
             </svg>

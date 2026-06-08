@@ -1,16 +1,17 @@
 /**
- * Phase 5.0 S3.1 v3 — connecteur SVG entre 2 jalons de la roadmap.
+ * Phase 5.0 S3.1 v4 — connecteur SVG entre 2 jalons de la roadmap.
  *
- * Feedback v2 : "Revenir à une ligne bleue plus proche de la maquette.
- * Les flèches doivent être légèrement plus épaisses."
+ * Feedback v3 : "connecteurs bleu foncé visibles, plus épais,
+ * continus" — ligne SOLIDE (plus de dashes), couleur primary
+ * marquée, stroke épais.
  *
- * Itération v3 :
- *   - Couleur passée de muted-foreground (gris) à primary/35 (bleu)
- *   - Stroke 1.25 → 1.75 (lignes + flèches plus présentes)
- *   - Largeur du composant 40px → 48px (plus de respiration)
- *   - Tête de flèche légèrement agrandie
+ * Itération v4 :
+ *   - Couleur primary/45 → primary/55 (plus saturé, plus visible)
+ *   - Stroke 1.75 → 2.5 (ligne + flèche bien marquées)
+ *   - Lignes solides (dasharray retiré — continues)
+ *   - Largeur 48 → 56 px
  *
- * Pur SVG, aucune dépendance. Affiché uniquement `lg+`.
+ * Pur SVG. Affiché uniquement `lg+`.
  */
 
 export function RoadmapConnector() {
@@ -18,29 +19,28 @@ export function RoadmapConnector() {
     <li
       aria-hidden
       className="hidden shrink-0 items-center justify-center self-center lg:flex"
-      style={{ width: 48, height: 28 }}
+      style={{ width: 56, height: 28 }}
     >
       <svg
-        viewBox="0 0 48 12"
-        className="h-3 w-full text-primary/40"
+        viewBox="0 0 56 12"
+        className="h-3 w-full text-primary/55"
         preserveAspectRatio="none"
       >
-        {/* Ligne pointillée bleue plus visible */}
+        {/* Ligne solide bleue (continues, plus épaisse) */}
         <line
           x1="2"
           y1="6"
-          x2="36"
+          x2="42"
           y2="6"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="2.5"
           strokeLinecap="round"
-          strokeDasharray="2 4"
         />
-        {/* Tête de flèche bleue, légèrement plus épaisse */}
+        {/* Tête de flèche bleue, épaisse pour matcher la ligne */}
         <path
-          d="M 37 1.5 L 45 6 L 37 10.5"
+          d="M 43 1 L 53 6 L 43 11"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"

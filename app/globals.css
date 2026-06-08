@@ -55,12 +55,12 @@
 
     --radius: 1rem;
 
-    /* Bleu marine de marque. Phase 5.0 S3.1 v2 — calibré sur la
-       maquette dashboard.png : plus profond et moins saturé que
-       #0F3D9E (S1). La carte Score paraissait "trop électrique" sur
-       fond blanc — nouvelle valeur ~#162C52, plus dense, plus
-       conseiller financier premium. */
-    --navy: 218 60% 19%;
+    /* Bleu marine de marque. Phase 5.0 S3.1 v4 — recalibré encore
+       plus profond + plus saturé pour le contraste maquette
+       (feedback v3 : "navy plus profond, contraste plus fort").
+       218 60% 19% → 218 65% 17% ≈ #0F2A55 (proche estimation
+       maquette #0F2851). */
+    --navy: 218 65% 17%;
     --navy-foreground: 0 0% 100%;
 
     /* Legacy `--gold` remappé vers primary. 152 références existantes

@@ -354,11 +354,11 @@ function SidebarSection({
   title: string;
   children: React.ReactNode;
 }) {
-  // Phase 5.0 S3.1 v3 — plus d'air entre sections (py-3 → py-4)
-  // + caption renforcée (text-[11px] → text-[11px] tracking serré).
+  // Phase 5.0 S3.1 v4 — feedback v3 : "menu légèrement plus
+  // compact". py-4 → py-3 (revient v2). Caption pb-2.5 → pb-2.
   return (
-    <div className="py-4">
-      <p className="px-3 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+    <div className="py-3">
+      <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {title}
       </p>
       <div className="space-y-0.5">{children}</div>
@@ -396,11 +396,13 @@ function SidebarLink({
     );
   }
   return (
+    // Phase 5.0 S3.1 v4 — feedback v3 : "menu plus compact, icônes
+    // légèrement plus petites". py-2.5 → py-2, icône box h-8 → h-7.
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
+        "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-150",
         active
           ? "bg-primary/10 text-foreground"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -408,7 +410,7 @@ function SidebarLink({
     >
       <span
         className={cn(
-          "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+          "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
           active
             ? "bg-primary text-primary-foreground"
             : "bg-secondary text-muted-foreground group-hover:text-foreground",

@@ -108,14 +108,14 @@ export async function OpportunityHighlightCard({
 
   return (
     <article className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
-      {/* Phase 5.0 S3.1 v3 — illustration moins dominante.
-          Taille réduite (96 → 80), opacité diminuée (0.85 → 0.55),
-          position légèrement remontée. Décorative, ne capture pas
-          les clics. */}
+      {/* Phase 5.0 S3.1 v4 — feedback v3 : "remettre la présence
+          visuelle de la maquette, plus visible, plus grande, plus
+          impactante". Retour à 100 × 100 + opacité 0.85 (proche v2),
+          décorative ne capture pas les clics. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-5 top-10 hidden text-success sm:block"
-        style={{ width: 80, height: 80, opacity: 0.55 }}
+        className="pointer-events-none absolute right-4 top-10 hidden text-success sm:block"
+        style={{ width: 100, height: 100, opacity: 0.85 }}
       >
         <UpwardArrowIllustration className="h-full w-full" />
       </div>
