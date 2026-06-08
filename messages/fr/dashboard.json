@@ -45,7 +45,7 @@
     },
     "low_resilience": {
       "title": "Constituez votre premier fonds d'urgence",
-      "subline": "Commencez par économiser un petit montant ce mois-ci."
+      "subline": "Commencez par économiser {suggestedAmount} CHF ce mois-ci."
     },
     "incomplete_expenses": {
       "title": "Complétez vos charges principales",
@@ -198,6 +198,7 @@
       "medium": "moyen",
       "low": "faible"
     },
+    "pointsLabel": "+{points} points sur votre score",
     "cta": "Explorer comment",
     "emptyTitle": "Vos fondations sont en place",
     "emptyBody": "Aucune opportunité urgente détectée. Continuez ce que vous faites bien.",
@@ -217,6 +218,7 @@
     "progression": "Votre progression",
     "historyLink": "Voir l'historique",
     "ariaChart": "Évolution du score, valeur actuelle {score} sur 100",
+    "calloutLabel": "Score actuel",
     "emptyTitle": "Pas encore de courbe",
     "emptyBody": "Revenez la semaine prochaine pour voir votre première progression."
   },

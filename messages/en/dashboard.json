@@ -45,7 +45,7 @@
     },
     "low_resilience": {
       "title": "Build your first emergency fund",
-      "subline": "Start by saving a small amount this month."
+      "subline": "Start by saving {suggestedAmount} CHF this month."
     },
     "incomplete_expenses": {
       "title": "Complete your main expenses",
@@ -198,6 +198,7 @@
       "medium": "medium",
       "low": "low"
     },
+    "pointsLabel": "+{points} points on your score",
     "cta": "Explore how",
     "emptyTitle": "Your foundations are in place",
     "emptyBody": "No urgent opportunity detected. Keep doing what works.",
@@ -217,6 +218,7 @@
     "progression": "Your progression",
     "historyLink": "See history",
     "ariaChart": "Score evolution, current value {score} out of 100",
+    "calloutLabel": "Current score",
     "emptyTitle": "No curve yet",
     "emptyBody": "Come back next week to see your first progression."
   },

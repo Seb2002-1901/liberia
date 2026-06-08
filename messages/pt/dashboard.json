@@ -45,7 +45,7 @@
     },
     "low_resilience": {
       "title": "Constrói o teu primeiro fundo de emergência",
-      "subline": "Começa poupando uma pequena quantia este mês."
+      "subline": "Começa a poupar {suggestedAmount} CHF este mês."
     },
     "incomplete_expenses": {
       "title": "Completa as tuas despesas principais",
@@ -198,6 +198,7 @@
       "medium": "médio",
       "low": "baixo"
     },
+    "pointsLabel": "+{points} pontos na tua pontuação",
     "cta": "Explorar como",
     "emptyTitle": "As tuas bases estão prontas",
     "emptyBody": "Nenhuma oportunidade urgente detetada. Continua assim.",
@@ -217,6 +218,7 @@
     "progression": "O teu progresso",
     "historyLink": "Ver histórico",
     "ariaChart": "Evolução da pontuação, valor atual {score} de 100",
+    "calloutLabel": "Pontuação atual",
     "emptyTitle": "Sem curva ainda",
     "emptyBody": "Volta na próxima semana para ver o teu primeiro progresso."
   },

@@ -9,24 +9,22 @@ import { buildProgressRing } from "@/lib/ui/svg-charts";
 import { cn } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3 — Carte hero du score (navy + ring partiel à droite).
+ * Phase 5.0 S3.1 — ScoreCard pixel-perfect maquette dashboard.png.
  *
- * Reproduit fidèlement le bloc gauche de la maquette dashboard.png :
- *   - Carte fond navy (token --navy)
- *   - "SCORE DE SANTÉ FINANCIÈRE" caption blanche tracking-wide
- *   - "46" grand + "/100" petit
- *   - Ring blanc partiel à droite (rempli au prorata du score)
- *   - "↗ EN PROGRESSION" green si delta > 0
- *   - "+6 pts depuis la semaine dernière" sous-ligne
+ * Spec visuelle stricte :
+ *   - Carte navy avec gradient subtil top-right (var(--navy) → 30%)
+ *   - Score `text-7xl font-bold` blanc
+ *   - "/100" `text-base text-white/50`
+ *   - Caption "SCORE DE SANTÉ FINANCIÈRE" `text-[10px] tracking-[0.2em] text-white/70`
+ *   - Ring partiel droite 112px, cap-end rond
+ *   - Halo blanc/10 blur derrière le ring
+ *   - Badge "EN PROGRESSION" en pastille `bg-success/15 rounded-full px-2.5 py-0.5 text-success`
+ *   - Padding `p-7`
+ *   - Ombre `shadow-card-navy`
+ *   - Hover lift `-translate-y-0.5` + transition
+ *   - Animation fade-in au mount
  *
- * Click n'importe où sur la carte → ouvre le Drawer FHS (D2 validé).
- * Le Drawer est le même composant qu'avant (Phase 3.2) — zéro
- * modification du moteur FHS.
- *
- * Empty state : si drawerData = null (INSUFFICIENT_DATA), on
- * affiche la carte navy quand même avec un ring grisé + "Score
- * en construction" + invitation à compléter le profil. Aucune
- * valeur fake.
+ * Click n'importe où → ouvre HealthScoreDrawer (Phase 3.2 intact).
  */
 
 interface ScoreCardProps {
@@ -60,30 +58,33 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
         type="button"
         onClick={() => setDrawerOpen(true)}
         className={cn(
-          "group relative w-full overflow-hidden rounded-2xl bg-navy p-6 text-left",
-          "transition-shadow duration-200",
-          "hover:shadow-[0_10px_30px_-12px_hsl(var(--navy)/0.5)]",
+          "group relative w-full overflow-hidden rounded-2xl p-7 text-left",
+          "bg-gradient-to-br from-navy via-navy to-[hsl(221_83%_30%)]",
+          "shadow-card-navy",
+          "transition-all duration-200",
+          "hover:-translate-y-0.5 hover:shadow-card-hover",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+          "animate-fade-in",
         )}
         aria-label={t("ariaOpen", { score })}
       >
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">
               {t("eyebrow")}
             </p>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="font-display text-5xl font-semibold text-white tabular-nums">
+            <div className="mt-5 flex items-baseline gap-1">
+              <span className="font-display text-6xl font-bold tabular-nums text-white lg:text-7xl">
                 {score}
               </span>
-              <span className="text-base font-medium text-white/60">
+              <span className="text-base font-medium text-white/50">
                 {t("outOf")}
               </span>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider">
+            <div className="mt-5 flex items-center">
               <DeltaBadge sign={deltaSign} />
             </div>
-            <p className="mt-1.5 text-xs text-white/70">
+            <p className="mt-2 text-xs text-white/70">
               {delta === null
                 ? t("deltaUnavailable")
                 : delta === 0
@@ -94,13 +95,22 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             </p>
           </div>
 
-          {/* Ring partiel — SVG natif, palette navy/white */}
+          {/* Ring partiel + halo blanc diffus derrière */}
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 96, height: 96 }}
+            style={{ width: 112, height: 112 }}
           >
-            <svg viewBox="0 0 100 100" className="h-full w-full">
+            {/* Halo blanc très diffus derrière le ring (signature maquette) */}
+            <div
+              className="absolute inset-0 rounded-full bg-white/10 blur-2xl"
+              style={{ width: 112, height: 112 }}
+            />
+            <svg
+              viewBox="0 0 100 100"
+              className="relative h-full w-full"
+              style={{ filter: "drop-shadow(0 4px 12px rgb(255 255 255 / 0.15))" }}
+            >
               {/* Track : anneau blanc translucide */}
               <path
                 d={ring.trackD}
@@ -108,9 +118,13 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
                 fillRule="evenodd"
                 opacity={0.12}
               />
-              {/* Arc de progression : blanc plein */}
+              {/* Arc de progression : blanc plein avec cap-end rond */}
               {ring.arcD && (
-                <path d={ring.arcD} fill="white" />
+                <path
+                  d={ring.arcD}
+                  fill="white"
+                  style={{ filter: "drop-shadow(0 0 4px rgb(255 255 255 / 0.3))" }}
+                />
               )}
             </svg>
           </div>
@@ -132,23 +146,23 @@ function DeltaBadge({ sign }: { sign: "up" | "down" | "flat" }) {
   const t = useTranslations("dashboard.scoreCard.delta");
   if (sign === "up") {
     return (
-      <span className="inline-flex items-center gap-1 text-success">
-        <TrendingUp className="h-3.5 w-3.5" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-success">
+        <TrendingUp className="h-3 w-3" />
         {t("up")}
       </span>
     );
   }
   if (sign === "down") {
     return (
-      <span className="inline-flex items-center gap-1 text-warning">
-        <ArrowUpRight className="h-3.5 w-3.5 rotate-90" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-warning/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-warning">
+        <ArrowUpRight className="h-3 w-3 rotate-90" />
         {t("down")}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-white/60">
-      <Minus className="h-3.5 w-3.5" />
+    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white/70">
+      <Minus className="h-3 w-3" />
       {t("stable")}
     </span>
   );
@@ -162,27 +176,33 @@ function DeltaBadge({ sign }: { sign: "up" | "down" | "flat" }) {
 function EmptyScoreCard() {
   const t = useTranslations("dashboard.scoreCard");
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-navy p-6">
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl p-7 animate-fade-in",
+        "bg-gradient-to-br from-navy via-navy to-[hsl(221_83%_30%)]",
+        "shadow-card-navy",
+      )}
+    >
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">
             {t("eyebrow")}
           </p>
-          <div className="mt-4 flex items-baseline gap-1">
-            <span className="font-display text-3xl font-semibold text-white/60 tabular-nums">
+          <div className="mt-5 flex items-baseline gap-1">
+            <span className="font-display text-5xl font-bold tabular-nums text-white/60">
               —
             </span>
           </div>
-          <p className="mt-4 text-sm font-medium text-white">
+          <p className="mt-5 text-sm font-medium text-white">
             {t("emptyTitle")}
           </p>
-          <p className="mt-1.5 text-xs text-white/70">{t("emptyBody")}</p>
+          <p className="mt-2 text-xs text-white/70">{t("emptyBody")}</p>
         </div>
 
         <div
           aria-hidden
           className="relative shrink-0 opacity-30"
-          style={{ width: 96, height: 96 }}
+          style={{ width: 112, height: 112 }}
         >
           <svg viewBox="0 0 100 100" className="h-full w-full">
             <path

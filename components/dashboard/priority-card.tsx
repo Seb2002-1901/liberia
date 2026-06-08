@@ -9,31 +9,24 @@ import type { DrawerData } from "@/lib/calculations/health/types";
 import { cn } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3 — Carte "Votre priorité actuelle".
+ * Phase 5.0 S3.1 — PriorityCard pixel-perfect maquette dashboard.png.
  *
- * Reproduit fidèlement la 2ème carte hero de la maquette :
- *   - Carte blanche, eyebrow uppercase
- *   - Icône colorée par priorité (bouclier / éclair / etc.)
- *   - Titre court + sous-ligne contextuelle
- *   - Lien "Voir pourquoi →" qui ouvre le Drawer FHS (D2 validé)
+ * Spec visuelle stricte :
+ *   - Carte blanche `rounded-2xl shadow-card`
+ *   - Caption uppercase tracking-[0.2em] muted
+ *   - Icône bouclier coral (chart-coral) dans pastille `bg-chart-coral/10 ring-1 ring-chart-coral/15`
+ *   - Titre `text-lg font-semibold leading-snug`
+ *   - Sous-ligne contextuelle muted
+ *   - Lien "Voir pourquoi →" bleu primary, underline on hover
+ *   - Padding `p-7`
+ *   - Animation fade-in au mount
  *
- * Le composant est CLIENT car le clic "Voir pourquoi" ouvre un
- * Drawer interactif. Le moteur de mission (buildFirstMission) reste
- * pur et server-side ; cette carte ne fait que rendre + ouvrir le
- * Drawer existant.
- *
- * Empty state : si firstMission.priority === "none", on rend quand
- * même la carte avec un message rassurant ("Continue ce que tu fais
- * bien"). Aucune fausse alerte.
+ * Clic "Voir pourquoi" → ouvre HealthScoreDrawer (Phase 3.2 intact).
  */
 
 interface PriorityCardProps {
   mission: FirstMissionResult;
-  /** Mois de fonds d'urgence disponibles. Utilisé pour la sous-ligne
-   *  contextuelle des priorités liées à la résilience. */
   runwayMonths: number;
-  /** Données FHS pour le Drawer "Voir pourquoi". null = pas de
-   *  Drawer, on cache le lien (rare — utilisateur sans FHS calculé). */
   drawerData: DrawerData | null;
   currency: string;
   isDemo?: boolean;
@@ -48,31 +41,28 @@ export function PriorityCard({
 }: PriorityCardProps) {
   const t = useTranslations("dashboard.priorityCard");
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const { Icon, iconBg, iconColor } = themeForPriority(mission.priority);
-
-  // Sous-ligne contextuelle adaptée à la priorité courante. Évite
-  // les "0 mois de sécurité" si la priorité ne porte pas sur la
-  // résilience.
+  const { Icon, iconBg, iconColor, iconRing } = themeForPriority(mission.priority);
   const subline = sublineFor(mission.priority, runwayMonths, t);
 
   return (
     <>
-      <article className="rounded-2xl border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <article className="rounded-2xl border border-border bg-card p-7 shadow-card animate-fade-in">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {t("eyebrow")}
         </p>
-        <div className="mt-4 flex items-start gap-3">
+        <div className="mt-5 flex items-start gap-3.5">
           <span
             aria-hidden
             className={cn(
-              "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+              "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
               iconBg,
               iconColor,
+              iconRing,
             )}
           >
             <Icon className="h-5 w-5" />
           </span>
-          <h3 className="font-display text-base font-semibold leading-snug text-foreground">
+          <h3 className="font-display text-lg font-semibold leading-snug text-foreground">
             {t(`title.${mission.priority}`)}
           </h3>
         </div>
@@ -81,7 +71,7 @@ export function PriorityCard({
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:underline"
+            className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none"
           >
             {t("whyLink")}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -103,15 +93,14 @@ export function PriorityCard({
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Theming par priorité                                                       */
+/*  Theming par priorité — palette stricte maquette                            */
 /* -------------------------------------------------------------------------- */
 
 interface PriorityTheme {
   Icon: React.ComponentType<{ className?: string }>;
-  /** Tailwind bg class for the icon badge. */
   iconBg: string;
-  /** Tailwind text color for the icon. */
   iconColor: string;
+  iconRing: string;
 }
 
 function themeForPriority(priority: FirstMissionResult["priority"]): PriorityTheme {
@@ -121,32 +110,38 @@ function themeForPriority(priority: FirstMissionResult["priority"]): PriorityThe
         Icon: Sparkles,
         iconBg: "bg-primary/10",
         iconColor: "text-primary",
+        iconRing: "ring-1 ring-primary/15",
       };
     case "low_resilience":
-      // Bouclier orange/amber — matche la maquette (priorité
-      // "Construire votre fonds d'urgence").
+      // Bouclier coral — maquette dashboard.png montre une teinte
+      // coral chaude (pas warning jaune) pour la priorité "fonds
+      // d'urgence". Token chart-coral ajouté S3.1 commit 1.
       return {
         Icon: Shield,
-        iconBg: "bg-warning/10",
-        iconColor: "text-warning",
+        iconBg: "bg-chart-coral/10",
+        iconColor: "text-chart-coral",
+        iconRing: "ring-1 ring-chart-coral/15",
       };
     case "incomplete_expenses":
       return {
         Icon: Wallet,
         iconBg: "bg-primary/10",
         iconColor: "text-primary",
+        iconRing: "ring-1 ring-primary/15",
       };
     case "fhs_recommendation":
       return {
         Icon: TrendingUp,
         iconBg: "bg-success/10",
         iconColor: "text-success",
+        iconRing: "ring-1 ring-success/15",
       };
     case "none":
       return {
         Icon: Sparkles,
         iconBg: "bg-secondary",
         iconColor: "text-muted-foreground",
+        iconRing: "",
       };
   }
 }

@@ -6,41 +6,45 @@ import { buildLineChart } from "@/lib/ui/svg-charts";
 import { ROUTES } from "@/lib/constants";
 
 /**
- * Phase 5.0 S3 — Carte "Évolution du score" (Bloc 4, droite).
+ * Phase 5.0 S3.1 — ScoreEvolutionChart pixel-perfect maquette
+ * dashboard.png.
  *
- * Reproduit la maquette : line chart SVG natif avec 5 points sur ~2
- * mois, callout "{score} Score actuel" sur le dernier point, axes
- * X (dates) / Y (0-100), lien "Voir l'historique →".
+ * Spec visuelle stricte :
+ *   - Carte blanche `rounded-2xl shadow-card p-6`
+ *   - Eyebrow "ÉVOLUTION DU SCORE" + sous "Votre progression"
+ *   - Grid lines horizontales fines (0/25/50/75/100)
+ *   - **Axe Y labels visibles à droite (100/75/50/25)**
+ *   - Courbe `strokeWidth=2.5` primary
+ *   - **Aire sous courbe avec gradient SVG vertical** primary/20 → 0
+ *   - Points `r=3` cerclés blanc
+ *   - **Callout dernier point : pill navy** rx=6 avec "{score}" gros
+ *     + "Score actuel" small dessous
+ *   - 5 dates axe X (1ère + 3 intermédiaires + dernière)
+ *   - Lien "Voir l'historique →" bleu primary
+ *   - Animation fade-in au mount
  *
- * Server Component — aucun état. Consomme une liste de snapshots
- * FHS hebdomadaires (déjà persistés Phase 3.2). SVG natif (Q5).
- *
- * Empty state (D7 validé) : strictement empty si < 2 snapshots.
- * Aucune interpolation, aucune courbe artificielle.
+ * Empty state (D7 validé) : < 2 snapshots → message pédagogique
+ * "Revenez la semaine prochaine".
  */
 
 interface ScoreEvolutionChartProps {
-  /** Snapshots récents, ordre quelconque — sera trié par semaine
-   *  croissante (chronologique gauche → droite). Idéalement 5-12
-   *  points pour matcher visuellement la maquette. */
   snapshots: SealedSnapshot[];
 }
+
+const CHART_WIDTH = 300;
+const CHART_HEIGHT = 140;
+const PAD = { top: 16, right: 40, bottom: 24, left: 8 };
 
 export async function ScoreEvolutionChart({
   snapshots,
 }: ScoreEvolutionChartProps) {
   const t = await getTranslations("dashboard.scoreEvolution");
 
-  // Tri chronologique strict (les snapshots arrivent souvent en
-  // ordre décroissant depuis la DB pour optimiser la dernière
-  // récupération).
-  const chrono = [...snapshots].sort((a, b) =>
-    a.week.localeCompare(b.week),
-  );
+  const chrono = [...snapshots].sort((a, b) => a.week.localeCompare(b.week));
 
   if (chrono.length < 2) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-5">
+      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
         <Eyebrow t={t} />
         <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
           <span
@@ -64,9 +68,9 @@ export async function ScoreEvolutionChart({
   }));
 
   const chart = buildLineChart(points, {
-    width: 300,
-    height: 120,
-    padding: { top: 16, right: 32, bottom: 24, left: 8 },
+    width: CHART_WIDTH,
+    height: CHART_HEIGHT,
+    padding: PAD,
     yMin: 0,
     yMax: 100,
   });
@@ -74,24 +78,36 @@ export async function ScoreEvolutionChart({
   const lastPoint = chart.points[chart.points.length - 1];
   const currentScore = points[points.length - 1].value;
 
+  // Sélection des labels X : 5 dates max espacées régulièrement.
+  const xLabels = pickXLabels(chrono.map((s) => s.week), 5);
+  const innerH = CHART_HEIGHT - PAD.top - PAD.bottom;
+
   return (
-    <article className="rounded-2xl border border-border bg-card p-5">
+    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
       <Eyebrow t={t} />
 
-      <div className="mt-4">
+      <div className="mt-5">
         <svg
-          viewBox="0 0 300 120"
-          className="h-32 w-full"
+          viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+          className="h-36 w-full"
           aria-label={t("ariaChart", { score: currentScore })}
         >
-          {/* Lignes de référence (25/50/75/100) — discrètes */}
+          <defs>
+            {/* Gradient vertical sous la courbe — signature maquette */}
+            <linearGradient id="score-curve-gradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.20" />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {/* Lignes de référence (0/25/50/75/100) */}
           {[0, 25, 50, 75, 100].map((v) => {
-            const y = 16 + ((100 - v) / 100) * (120 - 40);
+            const y = PAD.top + ((100 - v) / 100) * innerH;
             return (
               <line
                 key={v}
-                x1={8}
-                x2={268}
+                x1={PAD.left}
+                x2={CHART_WIDTH - PAD.right}
                 y1={y}
                 y2={y}
                 stroke="hsl(var(--border))"
@@ -100,13 +116,26 @@ export async function ScoreEvolutionChart({
             );
           })}
 
-          {/* Aire sous courbe (halo très léger) */}
+          {/* Labels axe Y à droite (100/75/50/25) — pas 0 pour éviter
+              chevauchement avec l'axe X. */}
+          {[25, 50, 75, 100].map((v) => {
+            const y = PAD.top + ((100 - v) / 100) * innerH;
+            return (
+              <text
+                key={`y-${v}`}
+                x={CHART_WIDTH - PAD.right + 6}
+                y={y + 3}
+                fontSize={9}
+                fill="hsl(var(--muted-foreground))"
+              >
+                {v}
+              </text>
+            );
+          })}
+
+          {/* Aire sous courbe avec gradient */}
           {chart.areaD && (
-            <path
-              d={chart.areaD}
-              fill="hsl(var(--primary))"
-              fillOpacity={0.08}
-            />
+            <path d={chart.areaD} fill="url(#score-curve-gradient)" />
           )}
 
           {/* Courbe */}
@@ -114,27 +143,27 @@ export async function ScoreEvolutionChart({
             <path
               d={chart.pathD}
               stroke="hsl(var(--primary))"
-              strokeWidth={2}
+              strokeWidth={2.5}
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           )}
 
-          {/* Points */}
-          {chart.points.map((p) => (
+          {/* Points (sauf le dernier — overlay callout) */}
+          {chart.points.slice(0, -1).map((p) => (
             <circle
               key={p.id}
               cx={p.x}
               cy={p.y}
-              r={2.5}
+              r={3}
               fill="hsl(var(--card))"
               stroke="hsl(var(--primary))"
               strokeWidth={1.5}
             />
           ))}
 
-          {/* Callout sur le dernier point */}
+          {/* Callout dernier point : pill navy avec score + "Score actuel" */}
           {lastPoint && (
             <g>
               <circle
@@ -144,38 +173,57 @@ export async function ScoreEvolutionChart({
                 fill="hsl(var(--primary))"
               />
               <rect
-                x={lastPoint.x + 6}
-                y={lastPoint.y - 14}
-                width={36}
-                height={20}
-                rx={4}
-                fill="hsl(var(--primary))"
+                x={lastPoint.x + 8}
+                y={lastPoint.y - 16}
+                width={40}
+                height={26}
+                rx={6}
+                fill="hsl(var(--navy))"
               />
               <text
-                x={lastPoint.x + 24}
-                y={lastPoint.y - 1}
+                x={lastPoint.x + 28}
+                y={lastPoint.y - 4}
                 textAnchor="middle"
-                fontSize={9}
-                fontWeight={600}
+                fontSize={11}
+                fontWeight={700}
                 fill="white"
               >
                 {currentScore}
+              </text>
+              <text
+                x={lastPoint.x + 28}
+                y={lastPoint.y + 6}
+                textAnchor="middle"
+                fontSize={6}
+                fill="white"
+                fillOpacity={0.85}
+              >
+                {t("calloutLabel")}
               </text>
             </g>
           )}
         </svg>
 
-        {/* Axe X : 1ère et dernière dates (lisibles, pas surchargé) */}
-        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
-          <span>{formatWeekShort(chrono[0].week)}</span>
-          <span>{formatWeekShort(chrono[chrono.length - 1].week)}</span>
+        {/* Axe X : labels 5 dates intermédiaires */}
+        <div
+          className="mt-1 flex text-[10px] text-muted-foreground"
+          style={{ paddingLeft: PAD.left, paddingRight: PAD.right }}
+        >
+          {xLabels.map((week, i) => (
+            <span
+              key={`x-${week}-${i}`}
+              className="flex-1 text-center first:text-left last:text-right"
+            >
+              {formatWeekShort(week)}
+            </span>
+          ))}
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-5">
         <Link
           href={ROUTES.plan}
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
         >
           {t("historyLink")}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -192,26 +240,34 @@ function Eyebrow({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {t("eyebrow")}
       </p>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        {t("progression")}
-      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground">{t("progression")}</p>
     </div>
   );
 }
 
-/** Formate une semaine ISO (ex. "2026-W22") en label court "22 mai". */
+/**
+ * Sélectionne `count` labels équirépartis sur la liste des semaines
+ * (avec garantie de la 1ère et de la dernière).
+ */
+function pickXLabels(weeks: string[], count: number): string[] {
+  if (weeks.length <= count) return weeks;
+  const labels: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const idx = Math.round((i / (count - 1)) * (weeks.length - 1));
+    labels.push(weeks[idx]);
+  }
+  return labels;
+}
+
+/** Formate "2026-W22" → "22 mai" (short FR). */
 function formatWeekShort(isoWeek: string): string {
-  // Format ISO 8601 week → trouve la date du lundi de cette semaine.
-  // Implémentation simple, sans dépendance : pas de date-fns ici.
   const m = isoWeek.match(/^(\d{4})-W(\d{2})$/);
   if (!m) return isoWeek;
   const year = Number(m[1]);
   const week = Number(m[2]);
-  // 4 janvier est toujours dans la semaine 1 ISO. On reconstruit
-  // depuis là pour éviter de gérer manuellement les années 53-week.
   const jan4 = new Date(Date.UTC(year, 0, 4));
   const jan4Day = jan4.getUTCDay() || 7;
   const week1Monday = new Date(jan4);

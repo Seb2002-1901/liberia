@@ -36,7 +36,12 @@ export type RoadmapIcon =
   | "Heart"
   | "Sparkles";
 
-export type RoadmapTone = "navy" | "success" | "warning" | "neutral";
+export type RoadmapTone =
+  | "navy"
+  | "success"
+  | "warning"
+  | "violet"
+  | "neutral";
 
 export interface RoadmapMilestone {
   kind: RoadmapMilestoneKind;
@@ -180,7 +185,10 @@ export function buildRoadmap(input: BuildRoadmapInput): RoadmapMilestone[] {
     subtitleKey: `steps.${priority}.twelveMonths.subtitle`,
     payload: {},
     icon: iconForTwelveMonths(priority),
-    tone: "warning",
+    // Phase 5.0 S3.1 — tone violet pour le jalon 12 mois (maquette
+    // dashboard.png montre un icône line-chart violet, pas orange).
+    // Token --chart-violet ajouté commit 1.
+    tone: "violet",
   };
 
   // Jalon 4 — 3 ans. Adapté au goalType principal.

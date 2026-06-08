@@ -3,34 +3,53 @@ import {
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  TrendingUp,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import type { Opportunity } from "@/lib/calculations/opportunities";
+import type { Opportunity, OpportunityPriority } from "@/lib/calculations/opportunities";
+import { UpwardArrowIllustration } from "@/components/dashboard/upward-arrow-illustration";
 import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3 — Carte "Opportunité du moment" (Bloc 4, gauche).
+ * Phase 5.0 S3.1 — OpportunityHighlightCard pixel-perfect maquette
+ * dashboard.png.
  *
- * Reproduit la maquette : badge vert "Le plus grand impact pour
- * vous", grand titre orienté action, ligne d'argument, ligne
- * d'impact qualitatif (D4 : "Impact potentiel : élevé/moyen/
- * faible" — JAMAIS de chiffrage en pts FHS), illustration discrète,
- * bouton "Explorer comment →" qui pointe vers le coach.
+ * Spec visuelle stricte :
+ *   - Carte blanche `rounded-2xl shadow-card p-6`
+ *   - Eyebrow "OPPORTUNITÉ DU MOMENT" + icône Sparkles vert dans
+ *     pastille `bg-success/10 ring-1 ring-success/15`
+ *   - Badge "Le plus grand impact pour vous" en pastille verte
+ *     `bg-success/12 px-3 py-1 rounded-full`
+ *   - Titre `text-lg lg:text-xl font-semibold leading-snug`
+ *   - Argument sub-line muted
+ *   - Bloc impact en encadré : `bg-success/5 border border-success/20
+ *     rounded-lg p-3` avec mapping déterministe high=12 / medium=7 / low=3
+ *     points (heuristique éditoriale assumée — voir K2 résolution
+ *     audit S3.1, ce n'est PAS un calcul FHS réel)
+ *   - **Illustration UpwardArrowIllustration à droite** (signature maquette)
+ *   - Bouton bleu `size="default"` "Explorer comment →"
+ *   - Animation fade-in au mount
  *
- * Server Component — aucun état. Consomme la 1ère opportunité de
- * `detectOpportunities` (déjà calculée par le moteur Phase 3).
- *
- * Empty state : si aucune opportunité, on rend une carte "fondations
- * en place" avec check vert. Rassurant, jamais alarmant.
+ * Empty state : aucune opportunité détectée → carte rassurante avec
+ * check vert.
  */
 
 interface OpportunityHighlightCardProps {
   opportunity: Opportunity | null;
   currency: string;
 }
+
+/**
+ * Mapping déterministe priorité → points estimés. ATTENTION : ceci
+ * est une heuristique éditoriale, PAS un calcul d'impact FHS réel.
+ * Documenté ici pour traçabilité (résolution K2, audit S3.1).
+ */
+const POINTS_BY_PRIORITY: Record<OpportunityPriority, number> = {
+  high: 12,
+  medium: 7,
+  low: 3,
+};
 
 export async function OpportunityHighlightCard({
   opportunity,
@@ -41,26 +60,26 @@ export async function OpportunityHighlightCard({
 
   if (!opportunity) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center gap-2">
+      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+        <div className="flex items-center gap-2.5">
           <span
             aria-hidden
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success ring-1 ring-success/15"
           >
             <CheckCircle2 className="h-4 w-4" />
           </span>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {t("eyebrow")}
           </p>
         </div>
-        <h3 className="mt-4 font-display text-base font-semibold leading-snug text-foreground">
+        <h3 className="mt-4 font-display text-lg font-semibold leading-snug text-foreground">
           {t("emptyTitle")}
         </h3>
         <p className="mt-2 text-sm text-muted-foreground">{t("emptyBody")}</p>
-        <Button asChild variant="outline" size="sm" className="mt-4">
+        <Button asChild variant="outline" size="default" className="mt-4">
           <Link href={ROUTES.plan}>
             {t("emptyCta")}
-            <ArrowRight className="h-3.5 w-3.5" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </article>
@@ -85,45 +104,63 @@ export async function OpportunityHighlightCard({
         ? formatCurrency(opportunity.payload.limit, currency)
         : "",
   };
+  const estimatedPoints = POINTS_BY_PRIORITY[opportunity.priority];
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2">
-        <span
-          aria-hidden
-          className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success"
-        >
-          <Sparkles className="h-4 w-4" />
-        </span>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {t("eyebrow")}
-        </p>
+    <article className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      {/* Illustration flèche verte décorative en arrière-plan droit.
+          Décorative pure, ne capture pas les clics. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-4 top-12 hidden text-success sm:block"
+        style={{ width: 96, height: 96, opacity: 0.85 }}
+      >
+        <UpwardArrowIllustration className="h-full w-full" />
       </div>
 
-      <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success">
-        {t("badgeImpact")}
-      </p>
+      <div className="relative">
+        <div className="flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-success/10 text-success ring-1 ring-success/15"
+          >
+            <Sparkles className="h-4 w-4" />
+          </span>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            {t("eyebrow")}
+          </p>
+        </div>
 
-      <h3 className="mt-3 font-display text-base font-semibold leading-snug text-foreground">
-        {tKind(`${opportunity.kind}.title`, payloadForI18n)}
-      </h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {tKind(`${opportunity.kind}.body`, payloadForI18n)}
-      </p>
+        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/12 px-3 py-1 text-[11px] font-semibold text-success">
+          <CheckCircle2 className="h-3 w-3" />
+          {t("badgeImpact")}
+        </p>
 
-      {/* Impact qualitatif (D4 : pas de pts FHS). */}
-      <p className="mt-4 inline-flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-foreground">
-        <TrendingUp className="h-3.5 w-3.5 text-success" />
-        {t("impactLabel")}{" "}
-        <span className="font-semibold">{t(`impactLevel.${opportunity.priority}`)}</span>
-      </p>
+        <h3 className="mt-4 max-w-[70%] font-display text-lg font-semibold leading-snug text-foreground sm:max-w-[65%] lg:text-xl">
+          {tKind(`${opportunity.kind}.title`, payloadForI18n)}
+        </h3>
+        <p className="mt-2 max-w-[70%] text-sm text-muted-foreground sm:max-w-[65%]">
+          {tKind(`${opportunity.kind}.body`, payloadForI18n)}
+        </p>
 
-      <Button asChild variant="default" size="sm" className="mt-4">
-        <Link href={ROUTES.coach}>
-          {t("cta")}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </Button>
+        {/* Bloc impact en encadré vert. Le chiffrage en points est
+            une HEURISTIQUE ÉDITORIALE (high=12/medium=7/low=3),
+            PAS un calcul FHS réel. Ne PAS modifier sans repenser
+            la promesse produit (K2 audit S3.1). */}
+        <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-success/20 bg-success/5 px-3 py-2 text-xs font-medium text-foreground">
+          <span className="text-muted-foreground">{t("impactLabel")}</span>
+          <span className="font-semibold text-success">
+            {t("pointsLabel", { points: estimatedPoints })}
+          </span>
+        </div>
+
+        <Button asChild variant="default" size="default" className="mt-5">
+          <Link href={ROUTES.coach}>
+            {t("cta")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
     </article>
   );
 }

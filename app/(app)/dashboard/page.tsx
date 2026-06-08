@@ -193,6 +193,9 @@ export default async function DashboardPage() {
     hasCurrentSavings: currentSavings > 0,
     filledMajorAreasCount,
     missingMajorArea: firstMissingMajor,
+    // Phase 5.0 S3.1 — passé pour calculer le montant suggéré
+    // d'épargne mensuelle dans le payload de la mission low_resilience.
+    monthlyIncome,
     recommendation: drawerData?.recommendation ?? null,
   });
 

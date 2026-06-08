@@ -7,18 +7,19 @@ import { EXPENSE_CATEGORIES, ROUTES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 
 /**
- * Phase 5.0 S3 — Carte "Répartition des dépenses" (Bloc 4, milieu).
+ * Phase 5.0 S3.1 — RepartitionDonutCard pixel-perfect maquette
+ * dashboard.png.
  *
- * Reproduit la maquette : donut SVG natif avec total au centre +
- * légende 5 lignes (Logement / Alimentation / Transport / Assurances /
- * Loisirs & divers) avec pourcentage et montant absolu. Lien
- * "Voir le détail →" vers /expenses/analytics.
- *
- * Server Component — aucun état. Consomme `monthCategoryBreakdown`
- * (déjà calculé). SVG fait-main (Q5 validée), pas de dépendance.
- *
- * Empty state : si toutes les catégories sont à 0 → donut grisé +
- * message "Aucune dépense ce mois-ci" + CTA vers /expenses.
+ * Spec visuelle stricte :
+ *   - Carte blanche `rounded-2xl shadow-card p-6`
+ *   - Eyebrow "RÉPARTITION DES DÉPENSES" + sous "Ce mois-ci" muted
+ *   - Donut SVG natif 160×160 (vs 140 avant)
+ *   - Palette stricte maquette : Logement=navy, Alimentation=primary,
+ *     Transport=success, Assurances=chart-coral, Loisirs=chart-violet
+ *   - Total centre `text-lg font-bold` + caption muted
+ *   - Légende droite : dot + label · % · montant (colonnes propres)
+ *   - Lien "Voir le détail →" bleu primary
+ *   - Animation fade-in au mount
  */
 
 interface RepartitionDonutCardProps {
@@ -27,17 +28,25 @@ interface RepartitionDonutCardProps {
   currency: string;
 }
 
-/** Palette qualitative pour les 5+ catégories (les couleurs de la
- *  maquette : navy, bleu accent, vert, ambre, violet doux). Ordre
- *  stable pour la lisibilité — la légende suit la même séquence. */
+/**
+ * Palette qualitative stricte (maquette dashboard.png) :
+ *   Logement       → navy            (#0F3D9E)
+ *   Alimentation   → primary         (#2563EB)
+ *   Transport      → success         (#16A34A)
+ *   Assurances     → chart-coral     (#ED602F)
+ *   Loisirs/Autres → chart-violet    (#9A5CD9)
+ * + 3 fallbacks pour catégories supplémentaires éventuelles.
+ *
+ * L'ordre est appliqué par index (les slices arrivent triées par
+ * total décroissant — le top 5 reçoit la palette signature, le
+ * reste tombe sur les fallbacks).
+ */
 const SLICE_COLORS = [
-  "hsl(var(--navy))",        // Logement (35%)
-  "hsl(var(--primary))",     // Alimentation (20%)
-  "hsl(var(--success))",     // Transport (15%)
-  "hsl(var(--warning))",     // Assurances (10%)
-  "hsl(265 70% 60%)",        // Loisirs & divers (violet doux) — token
-                              // ad-hoc, à promouvoir en --accent-violet
-                              // au prochain sprint si besoin.
+  "hsl(var(--navy))",
+  "hsl(var(--primary))",
+  "hsl(var(--success))",
+  "hsl(var(--chart-coral))",
+  "hsl(var(--chart-violet))",
   "hsl(215 30% 70%)",
   "hsl(180 50% 50%)",
   "hsl(45 90% 55%)",
@@ -56,7 +65,7 @@ export async function RepartitionDonutCard({
 
   if (nonZero.length === 0 || totalExpenses === 0) {
     return (
-      <article className="rounded-2xl border border-border bg-card p-5">
+      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
         <Eyebrow t={t} />
         <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
           <span
@@ -71,7 +80,7 @@ export async function RepartitionDonutCard({
           <p className="text-xs text-muted-foreground">{t("emptyBody")}</p>
           <Link
             href={ROUTES.expenses}
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
           >
             {t("emptyCta")}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -83,17 +92,17 @@ export async function RepartitionDonutCard({
 
   const slices = buildDonutSlices(
     nonZero.map((r) => ({ id: r.category, value: r.total })),
-    { thickness: 16 },
+    { thickness: 18 },
   );
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-5">
+    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
       <Eyebrow t={t} />
-      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+      <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
         <div
           aria-hidden
           className="relative shrink-0"
-          style={{ width: 140, height: 140 }}
+          style={{ width: 160, height: 160 }}
         >
           <svg viewBox="0 0 100 100" className="h-full w-full">
             {slices.map((s, i) => (
@@ -105,21 +114,21 @@ export async function RepartitionDonutCard({
             ))}
           </svg>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <p className="font-display text-base font-semibold text-foreground tabular-nums">
+            <p className="font-display text-lg font-bold tabular-nums text-foreground">
               {formatCurrency(totalExpenses, currency)}
             </p>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {t("centerLabel")}
             </p>
           </div>
         </div>
-        <ul className="flex-1 space-y-1.5 text-sm">
+        <ul className="flex-1 space-y-2 text-sm">
           {slices.map((s, i) => {
             const label =
               EXPENSE_CATEGORIES.find((c) => c.id === s.id)?.label ?? s.id;
             return (
               <li key={s.id} className="flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 truncate">
+                <span className="inline-flex min-w-0 items-center gap-2">
                   <span
                     aria-hidden
                     className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
@@ -127,10 +136,12 @@ export async function RepartitionDonutCard({
                   />
                   <span className="truncate text-foreground">{label}</span>
                 </span>
-                <span className="shrink-0 tabular-nums text-muted-foreground">
-                  {Math.round(s.percent)}%{" "}
-                  <span className="text-foreground/70">
-                    · {formatCurrency(s.value, currency)}
+                <span className="flex shrink-0 items-baseline gap-2 tabular-nums">
+                  <span className="text-foreground font-medium">
+                    {Math.round(s.percent)}%
+                  </span>
+                  <span className="text-muted-foreground">
+                    {formatCurrency(s.value, currency)}
                   </span>
                 </span>
               </li>
@@ -138,10 +149,10 @@ export async function RepartitionDonutCard({
           })}
         </ul>
       </div>
-      <div className="mt-4">
+      <div className="mt-5">
         <Link
           href={ROUTES.expenseAnalytics}
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
         >
           {t("detailLink")}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -158,7 +169,7 @@ function Eyebrow({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {t("eyebrow")}
       </p>
       <p className="mt-0.5 text-xs text-muted-foreground">{t("period")}</p>

@@ -5,38 +5,39 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
 
 /**
- * Phase 5.0 S3 — Carte CTA Coach (Bloc 5, pied de dashboard).
+ * Phase 5.0 S3.1 — TalkToAdvisorCard pixel-perfect maquette
+ * dashboard.png.
  *
- * Reproduit la maquette : carte large blanche, icône chat bleue
- * cerclée à gauche, titre + sous-ligne, bouton primary plein
- * "Démarrer une conversation →" à droite.
+ * Spec visuelle stricte :
+ *   - Carte blanche `rounded-2xl shadow-card p-7`
+ *   - Icône chat dans cercle bleu pâle 12×12 avec **halo bleu diffus**
+ *     `ring-2 ring-primary/15 shadow-halo-primary`
+ *   - Titre `text-lg lg:text-xl font-semibold`
+ *   - Sous-ligne muted
+ *   - Bouton bleu plein `size="lg"` "Démarrer une conversation →"
+ *   - Animation fade-in au mount
  *
- * Server Component — aucun état. Lien direct vers /coach.
- *
- * Cette carte ferme chaque page applicative — pattern transversal
- * Phase 5.0 (le coach n'est jamais à plus d'un clic, voir
- * docs/design-system/MOCKUPS_REFERENCE.md).
+ * Cette carte ferme le dashboard (Bloc 5). Pattern transversal
+ * Phase 5.0 : le coach jamais à plus d'un clic.
  */
 
 export async function TalkToAdvisorCard() {
   const t = await getTranslations("dashboard.talkToAdvisor");
   return (
-    <section className="rounded-2xl border border-border bg-card p-5">
+    <section className="rounded-2xl border border-border bg-card p-7 shadow-card animate-fade-in">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <span
             aria-hidden
-            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-2 ring-primary/15 shadow-halo-primary"
           >
             <MessageSquare className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="font-display text-base font-semibold text-foreground">
+            <h2 className="font-display text-lg font-semibold text-foreground lg:text-xl">
               {t("title")}
             </h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              {t("body")}
-            </p>
+            <p className="mt-0.5 text-sm text-muted-foreground">{t("body")}</p>
           </div>
         </div>
         <Button asChild variant="default" size="lg" className="w-full sm:w-auto">
