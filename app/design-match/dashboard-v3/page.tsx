@@ -63,16 +63,16 @@ const SHADOW = {
 };
 
 const H = {
-  topbar: 90,
-  scoreCard: 215,
-  roadmap: 161,
-  kpi: 128,
-  bottomRow: 260,
-  coachCta: 49,
-  gapHR: 22,
-  gapRK: 12,
-  gapKB: 16,
-  gapBC: 24,
+  topbar: 72,
+  scoreCard: 180,
+  roadmap: 140,
+  kpi: 100,
+  bottomRow: 200,
+  coachCta: 44,
+  gapHR: 16,
+  gapRK: 10,
+  gapKB: 12,
+  gapBC: 16,
 };
 
 export default function DesignMatchDashboardV3() {
@@ -85,30 +85,10 @@ export default function DesignMatchDashboardV3() {
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
-      {/* Debug banner — confirmation route */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          backgroundColor: "#16A34A",
-          color: "white",
-          padding: "10px 16px",
-          textAlign: "center",
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: "0.04em",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-        }}
-      >
-        DESIGN MATCH V3 — surfaces flottantes
-      </div>
       <Sidebar />
-      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", paddingTop: 40 }}>
+      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column" }}>
         <Topbar />
-        <main style={{ flex: 1, padding: "0 42px 32px 42px" }}>
+        <main style={{ flex: 1, padding: "0 42px 16px 42px" }}>
           <div style={{ maxWidth: 1176, margin: "0 auto" }}>
             <Hero />
             <div style={{ height: H.gapHR }} />
@@ -142,7 +122,6 @@ function Sidebar() {
         borderRight: `1px solid ${C.borderGhost}`,
         display: "flex",
         flexDirection: "column",
-        paddingTop: 40,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "20px 24px 20px 24px" }}>
@@ -422,7 +401,7 @@ function ScoreCard() {
         position: "relative",
         overflow: "hidden",
         height: H.scoreCard,
-        padding: 26,
+        padding: 20,
         backgroundColor: C.navy,
         borderRadius: 18,
         // Shadow plus forte pour LÉVITATION premium → hiérarchie
@@ -446,7 +425,7 @@ function ScoreCard() {
           <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
             <span
               style={{
-                fontSize: 92,
+                fontSize: 78,
                 fontWeight: 700,
                 color: "white",
                 lineHeight: 0.95,
@@ -456,7 +435,7 @@ function ScoreCard() {
             >
               46
             </span>
-            <span style={{ fontSize: 19, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
+            <span style={{ fontSize: 17, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
               /100
             </span>
           </div>
@@ -485,7 +464,7 @@ function ScoreCard() {
           </div>
         </div>
         {/* Ring RÉDUIT — 115 px (vs 130) pour rééquilibrer en faveur du "46" */}
-        <div style={{ position: "relative", flexShrink: 0, width: 115, height: 115, alignSelf: "center" }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100, alignSelf: "center" }}>
           <div
             style={{
               position: "absolute",
@@ -495,7 +474,7 @@ function ScoreCard() {
               filter: "blur(24px)",
             }}
           />
-          <svg viewBox="0 0 100 100" width={115} height={115} style={{ position: "relative" }}>
+          <svg viewBox="0 0 100 100" width={100} height={100} style={{ position: "relative" }}>
             <circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="7" />
             <circle
               cx="50"
@@ -522,7 +501,7 @@ function PriorityCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: 26,
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         // PAS DE BORDER — juste shadow soft
@@ -600,7 +579,7 @@ function MissionCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: 26,
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         // PAS DE BORDER
@@ -681,16 +660,17 @@ function Roadmap() {
     <div
       style={{
         height: H.roadmap,
-        padding: 24,
+        padding: "14px 18px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         // Pas de border, shadow soft
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: C.textDark, margin: 0, fontFamily: "Outfit, Inter, system-ui" }}>
           Votre avenir, notre feuille de route
         </h2>
@@ -770,15 +750,16 @@ function Milestone({
 }) {
   return (
     // RUBAN INTÉGRÉ : pas de border, pas de bg différent, pas d'ombre.
-    // Juste du contenu posé dans le parent. Le seul "container" est
-    // le padding et l'alignement.
+    // Compact pour tenir dans roadmap 140 px.
     <div
       style={{
         flex: 1,
-        padding: "8px 12px",
+        minWidth: 0,
+        padding: "4px 10px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <span
@@ -786,16 +767,17 @@ function Milestone({
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 36,
-          height: 36,
+          width: 30,
+          height: 30,
           backgroundColor: isToday ? "transparent" : bg,
           color: isToday ? C.primary : fg,
           borderRadius: 999,
           border: isToday ? `2px solid ${C.primary}` : "none",
+          flexShrink: 0,
         }}
       >
         {isToday ? (
-          <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, fontFamily: "Outfit, Inter, system-ui" }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: C.primary, fontFamily: "Outfit, Inter, system-ui" }}>
             {score}
           </span>
         ) : (
@@ -804,20 +786,50 @@ function Milestone({
       </span>
       <p
         style={{
-          marginTop: 12,
-          fontSize: 10,
+          marginTop: 8,
+          fontSize: 9,
           fontWeight: 600,
           color: C.textLight,
           letterSpacing: "0.16em",
           textTransform: "uppercase",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         }}
       >
         {eyebrow}
       </p>
-      <p style={{ marginTop: 4, fontSize: 13, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+      <p
+        style={{
+          marginTop: 3,
+          fontSize: 12,
+          fontWeight: 600,
+          color: C.textDark,
+          lineHeight: 1.25,
+          overflow: "hidden",
+          display: "-webkit-box",
+          WebkitLineClamp: 1,
+          WebkitBoxOrient: "vertical",
+          textOverflow: "ellipsis",
+        }}
+        title={title}
+      >
         {title}
       </p>
-      <p style={{ marginTop: 2, fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
+      <p
+        style={{
+          marginTop: 2,
+          fontSize: 10.5,
+          color: C.textMuted,
+          lineHeight: 1.3,
+          overflow: "hidden",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          textOverflow: "ellipsis",
+        }}
+        title={subtitle}
+      >
         {subtitle}
       </p>
     </div>
@@ -827,7 +839,7 @@ function Milestone({
 function MilestoneIcon({ name, color }: { name: "shield" | "trend" | "home"; color: string }) {
   if (name === "shield") {
     return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         <polyline points="9 12 11 14 15 10" />
       </svg>
@@ -835,7 +847,7 @@ function MilestoneIcon({ name, color }: { name: "shield" | "trend" | "home"; col
   }
   if (name === "trend") {
     return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
         <polyline points="17 6 23 6 23 12" />
       </svg>
@@ -935,7 +947,7 @@ function KpiCard({
     <div
       style={{
         height: H.kpi,
-        padding: 18,
+        padding: 14,
         backgroundColor: C.cardBg,
         borderRadius: 16,
         // PAS DE BORDER. Shadow ultra-light.
@@ -943,6 +955,7 @@ function KpiCard({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        overflow: "hidden",
       }}
     >
       <p
@@ -959,7 +972,7 @@ function KpiCard({
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
         <p
           style={{
-            fontSize: 24,
+            fontSize: 21,
             fontWeight: 700,
             color: C.textDark,
             lineHeight: 1,
@@ -1018,7 +1031,7 @@ function OpportunityCard() {
         position: "relative",
         overflow: "hidden",
         height: H.bottomRow,
-        padding: 22,
+        padding: 18,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
@@ -1028,11 +1041,11 @@ function OpportunityCard() {
         aria-hidden
         style={{
           position: "absolute",
-          right: 16,
-          top: 72,
-          width: 100,
-          height: 100,
-          opacity: 0.85,
+          right: 14,
+          top: 60,
+          width: 80,
+          height: 80,
+          opacity: 0.75,
           color: C.success,
         }}
       >
@@ -1067,34 +1080,34 @@ function OpportunityCard() {
       </p>
       <h3
         style={{
-          fontSize: 17,
+          fontSize: 15,
           fontWeight: 700,
           color: C.textDark,
-          lineHeight: 1.3,
+          lineHeight: 1.25,
           maxWidth: "65%",
-          margin: "12px 0 0 0",
+          margin: "8px 0 0 0",
           fontFamily: "Outfit, Inter, system-ui",
         }}
       >
         Augmentez vos revenus de 300 CHF/mois
       </h3>
-      <p style={{ marginTop: 8, fontSize: 12, color: C.textMuted, lineHeight: 1.5, maxWidth: "65%" }}>
+      <p style={{ marginTop: 6, fontSize: 11.5, color: C.textMuted, lineHeight: 1.4, maxWidth: "65%" }}>
         aurait plus d&apos;impact que réduire vos dépenses de 100 CHF/mois.
       </p>
-      <p style={{ marginTop: 16, fontSize: 12, color: C.textMuted }}>
+      <p style={{ marginTop: 10, fontSize: 11.5, color: C.textMuted }}>
         Impact potentiel :{" "}
         <span style={{ fontWeight: 700, color: C.success }}>+12 points sur votre score</span>
       </p>
       <button
         style={{
-          marginTop: 14,
-          padding: "8px 16px",
+          marginTop: 10,
+          padding: "7px 14px",
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
           backgroundColor: C.navy,
           color: "white",
-          fontSize: 12.5,
+          fontSize: 12,
           fontWeight: 600,
           borderRadius: 8,
           border: "none",
@@ -1139,19 +1152,20 @@ function RepartitionCard() {
     <div
       style={{
         height: H.bottomRow,
-        padding: 22,
+        padding: 18,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
+        overflow: "hidden",
       }}
     >
       <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Répartition des dépenses
       </p>
-      <p style={{ marginTop: 2, fontSize: 12, color: C.textLight }}>Ce mois-ci</p>
-      <div style={{ display: "flex", alignItems: "center", marginTop: 14, gap: 16 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 120, height: 120 }}>
-          <svg viewBox="0 0 100 100" width={120} height={120}>
+      <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Ce mois-ci</p>
+      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 12 }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100 }}>
+          <svg viewBox="0 0 100 100" width={100} height={100}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
@@ -1168,7 +1182,7 @@ function RepartitionCard() {
           >
             <p
               style={{
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight: 700,
                 color: C.textDark,
                 margin: 0,
@@ -1179,7 +1193,7 @@ function RepartitionCard() {
             </p>
             <p
               style={{
-                fontSize: 9,
+                fontSize: 8.5,
                 fontWeight: 600,
                 color: C.textMuted,
                 letterSpacing: "0.18em",
@@ -1199,8 +1213,8 @@ function RepartitionCard() {
                 display: "grid",
                 gridTemplateColumns: "minmax(0, 1fr) auto auto",
                 gap: 6,
-                padding: "2px 0",
-                fontSize: 12,
+                padding: "1px 0",
+                fontSize: 11,
                 alignItems: "baseline",
               }}
             >
@@ -1257,8 +1271,8 @@ function RepartitionCard() {
 function EvolutionCard() {
   const points = [22, 30, 38, 32, 42, 50, 54, 46];
   const W = 320;
-  const HH = 140;
-  const PAD = { top: 12, right: 38, bottom: 22, left: 8 };
+  const HH = 105;
+  const PAD = { top: 8, right: 36, bottom: 18, left: 6 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1277,17 +1291,18 @@ function EvolutionCard() {
     <div
       style={{
         height: H.bottomRow,
-        padding: 22,
+        padding: 18,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
+        overflow: "hidden",
       }}
     >
       <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Évolution du score
       </p>
-      <p style={{ marginTop: 2, fontSize: 12, color: C.textLight }}>Votre progression</p>
-      <div style={{ marginTop: 8 }}>
+      <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Votre progression</p>
+      <div style={{ marginTop: 6 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH}>
           <defs>
             <linearGradient id="evo-gradient-v3" x1="0" y1="0" x2="0" y2="1">
@@ -1341,11 +1356,11 @@ function EvolutionCard() {
       </div>
       <button
         style={{
-          marginTop: 8,
+          marginTop: 4,
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 500,
           color: C.primary,
           background: "none",
