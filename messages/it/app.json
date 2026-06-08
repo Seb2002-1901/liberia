@@ -1,4 +1,28 @@
 {
+  "savings": {
+    "metadata": { "title": "Risparmio" },
+    "eyebrow": "Crescita",
+    "title": "La tua vista risparmio arriva presto",
+    "description": "Uno spazio dedicato per visualizzare, proiettare e pianificare il tuo risparmio — senza alcuna raccomandazione di prodotto.",
+    "teaser": "Troverai il tuo tasso di risparmio, il tuo fondo di emergenza, i tuoi obiettivi personali e un simulatore chiaro che mostra l'impatto di ogni CHF messo da parte.",
+    "coachCta": "Parlare con il mio consulente"
+  },
+  "investments": {
+    "metadata": { "title": "Investimenti" },
+    "eyebrow": "Crescita",
+    "title": "La tua vista investimenti arriva presto",
+    "description": "Uno spazio educativo per capire, confrontare e simulare — senza nomi di prodotto né raccomandazioni d'acquisto.",
+    "teaser": "Troverai risorse per capire gli ETF, confrontare scenari di investimento e simulare la crescita di un importo investito su 5, 10 o 20 anni. LIBERIA informa e simula, non raccomanda mai un prodotto specifico.",
+    "coachCta": "Parlare con il mio consulente"
+  },
+  "opportunities": {
+    "metadata": { "title": "Opportunità" },
+    "eyebrow": "Crescita",
+    "title": "Il tuo catalogo di opportunità arriva presto",
+    "description": "Opportunità classificate per impegno, rischio e tempistica per aumentare le tue entrate e raggiungere prima i tuoi obiettivi.",
+    "teaser": "Troverai opportunità concrete: entrate rapide, entrate complementari ed entrate a lungo termine. Ogni opportunità mostra impegno, tempo, impatto stimato e guadagno potenziale — senza promesse irrealistiche.",
+    "coachCta": "Parlare con il mio consulente"
+  },
   "profile": {
     "metadata": {
       "title": "Profilo"

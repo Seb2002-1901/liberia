@@ -1,4 +1,28 @@
 {
+  "savings": {
+    "metadata": { "title": "Savings" },
+    "eyebrow": "Growth",
+    "title": "Your savings view is coming soon",
+    "description": "A dedicated space to visualize, project and plan your savings — without any product recommendation.",
+    "teaser": "You'll find your saving rate, emergency fund, personal goals and a clear simulator showing the impact of every CHF set aside.",
+    "coachCta": "Talk to my advisor"
+  },
+  "investments": {
+    "metadata": { "title": "Investments" },
+    "eyebrow": "Growth",
+    "title": "Your investments view is coming soon",
+    "description": "An educational space to understand, compare and simulate — without product names or buy recommendations.",
+    "teaser": "You'll find resources to understand ETFs, compare investment scenarios and simulate the growth of a given amount over 5, 10 or 20 years. LIBERIA informs and simulates, never recommends a specific product.",
+    "coachCta": "Talk to my advisor"
+  },
+  "opportunities": {
+    "metadata": { "title": "Opportunities" },
+    "eyebrow": "Growth",
+    "title": "Your opportunities catalog is coming soon",
+    "description": "Opportunities ranked by effort, risk and timeline to grow your income and reach your goals faster.",
+    "teaser": "You'll find concrete opportunities: quick income, secondary income and long-term income. Each opportunity shows its effort, time, estimated impact and potential gain — no unrealistic promises.",
+    "coachCta": "Talk to my advisor"
+  },
   "profile": {
     "metadata": {
       "title": "Profile"

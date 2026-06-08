@@ -25,18 +25,33 @@
     "submit": "Valider"
   },
   "shell": {
+    "sectionPrincipal": "Principal",
+    "sectionFinances": "Finances",
+    "sectionCroissance": "Croissance",
+    "sectionPlus": "Plus",
     "sectionPilotage": "Pilotage",
     "sectionAccount": "Compte",
     "demoBadge": "Mode démo",
     "demoBottomNote": "Mode démo · lecture seule",
+    "greeting": {
+      "hello": "Bonjour {firstName}",
+      "subline": "Voici votre situation mise à jour aujourd'hui.",
+      "fallbackName": "à toi"
+    },
+    "notifications": {
+      "ariaLabel": "Notifications (bientôt disponibles)"
+    },
     "nav": {
       "dashboard": "Tableau de bord",
       "coach": "Coach IA",
-      "plan": "Plan",
+      "plan": "Plan d'action",
       "budget": "Budget",
       "incomes": "Revenus",
       "expenses": "Dépenses",
       "goals": "Objectifs",
+      "savings": "Épargne",
+      "investments": "Investissements",
+      "opportunities": "Opportunités",
       "profile": "Profil",
       "settings": "Paramètres",
       "subscription": "Abonnement"

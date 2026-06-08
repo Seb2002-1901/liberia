@@ -25,18 +25,33 @@
     "submit": "Senden"
   },
   "shell": {
+    "sectionPrincipal": "Hauptmenü",
+    "sectionFinances": "Finanzen",
+    "sectionCroissance": "Wachstum",
+    "sectionPlus": "Mehr",
     "sectionPilotage": "Steuerung",
     "sectionAccount": "Konto",
     "demoBadge": "Demo-Modus",
     "demoBottomNote": "Demo-Modus · nur Ansicht",
+    "greeting": {
+      "hello": "Hallo {firstName}",
+      "subline": "Hier ist deine heute aktualisierte Situation.",
+      "fallbackName": "du"
+    },
+    "notifications": {
+      "ariaLabel": "Benachrichtigungen (bald verfügbar)"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "coach": "KI-Coach",
-      "plan": "Plan",
+      "plan": "Aktionsplan",
       "budget": "Budget",
       "incomes": "Einkommen",
       "expenses": "Ausgaben",
       "goals": "Ziele",
+      "savings": "Sparen",
+      "investments": "Investitionen",
+      "opportunities": "Chancen",
       "profile": "Profil",
       "settings": "Einstellungen",
       "subscription": "Abo"

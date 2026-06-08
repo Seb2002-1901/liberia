@@ -1,6 +1,19 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+/**
+ * Phase 5.0 S2 — mot-marque "LIBERIA" + petite icône graph.
+ *
+ * Refonte light premium : finis le badge or et l'ombre dorée.
+ * L'icône passe sur un fond bleu marine (token --navy), le texte
+ * "LIBERIA" en navy uppercase wide-tracking. Cohérence stricte avec
+ * la sidebar des maquettes (voir docs/design-system/mockups/).
+ *
+ * L'icône représente une courbe ascendante (graph) — symbole de
+ * progression financière, en ligne avec la promesse produit "ton
+ * argent / patrimoine / objectifs progressent".
+ */
+
 interface BrandMarkProps {
   href?: string;
   size?: "sm" | "md" | "lg";
@@ -27,15 +40,14 @@ export function BrandMark({
       <span
         className={cn(
           "relative inline-flex shrink-0 items-center justify-center rounded-lg",
-          "bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--gold-muted))]",
-          "shadow-[0_4px_20px_-6px_hsl(var(--gold)/0.5)]",
+          "bg-navy",
           s.box,
         )}
         aria-hidden
       >
         <svg
           viewBox="0 0 24 24"
-          className="h-1/2 w-1/2 text-[hsl(var(--gold-foreground))]"
+          className="h-1/2 w-1/2 text-navy-foreground"
           fill="none"
           stroke="currentColor"
           strokeWidth="2.5"
@@ -50,7 +62,7 @@ export function BrandMark({
       {showWordmark && (
         <span
           className={cn(
-            "font-display font-semibold uppercase text-foreground",
+            "font-display font-semibold uppercase text-navy",
             s.text,
           )}
         >

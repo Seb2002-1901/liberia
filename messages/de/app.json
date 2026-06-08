@@ -1,4 +1,28 @@
 {
+  "savings": {
+    "metadata": { "title": "Sparen" },
+    "eyebrow": "Wachstum",
+    "title": "Deine Sparübersicht kommt bald",
+    "description": "Ein eigener Bereich, um dein Sparen zu visualisieren, zu projizieren und zu planen — ohne Produktempfehlungen.",
+    "teaser": "Du findest deine Sparquote, deinen Notgroschen, deine persönlichen Ziele und einen klaren Simulator, der dir den Effekt jedes beiseite gelegten CHF zeigt.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
+  "investments": {
+    "metadata": { "title": "Investitionen" },
+    "eyebrow": "Wachstum",
+    "title": "Dein Investitionsbereich kommt bald",
+    "description": "Ein lehrreicher Bereich, um zu verstehen, zu vergleichen und zu simulieren — ohne Produktnamen und Kaufempfehlungen.",
+    "teaser": "Du findest Hilfen, um ETFs zu verstehen, Szenarien zu vergleichen und das Wachstum eines Betrags über 5, 10 oder 20 Jahre zu simulieren. LIBERIA informiert und simuliert, empfiehlt aber kein konkretes Produkt.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
+  "opportunities": {
+    "metadata": { "title": "Chancen" },
+    "eyebrow": "Wachstum",
+    "title": "Dein Chancen-Katalog kommt bald",
+    "description": "Chancen sortiert nach Aufwand, Risiko und Zeitrahmen, um dein Einkommen zu steigern und deine Ziele schneller zu erreichen.",
+    "teaser": "Du findest konkrete Chancen: schnelle Einkommen, Zusatzeinkommen und langfristige Einkommen. Jede Chance zeigt Aufwand, Zeit, geschätzten Effekt und potenziellen Gewinn — ohne unrealistische Versprechen.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
   "profile": {
     "metadata": {
       "title": "Profil"
