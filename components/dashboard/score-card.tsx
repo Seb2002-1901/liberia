@@ -42,11 +42,13 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
+  // Phase 5.0 S3.1 v2 — ring affiné (8 → 6) + plus de respiration.
+  // Maquette dashboard.png : arc fin et élégant, pas un anneau épais.
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
-    radius: 42,
-    thickness: 8,
+    radius: 43,
+    thickness: 6,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -59,7 +61,9 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
         onClick={() => setDrawerOpen(true)}
         className={cn(
           "group relative w-full overflow-hidden rounded-2xl p-7 text-left",
-          "bg-gradient-to-br from-navy via-navy to-[hsl(221_83%_30%)]",
+          // Gradient ultra-subtil (3% écart max) — la carte doit
+          // paraître plate et profonde, pas électrique.
+          "bg-gradient-to-br from-navy via-navy to-[hsl(218_60%_22%)]",
           "shadow-card-navy",
           "transition-all duration-200",
           "hover:-translate-y-0.5 hover:shadow-card-hover",
@@ -101,29 +105,28 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             className="relative shrink-0"
             style={{ width: 112, height: 112 }}
           >
-            {/* Halo blanc très diffus derrière le ring (signature maquette) */}
+            {/* Halo blanc très diffus derrière le ring (signature maquette).
+                Phase 5.0 S3.1 v2 — opacité réduite (10 → 6%) pour
+                rester premium, pas surligné. */}
             <div
-              className="absolute inset-0 rounded-full bg-white/10 blur-2xl"
+              className="absolute inset-0 rounded-full bg-white/[0.06] blur-2xl"
               style={{ width: 112, height: 112 }}
             />
-            <svg
-              viewBox="0 0 100 100"
-              className="relative h-full w-full"
-              style={{ filter: "drop-shadow(0 4px 12px rgb(255 255 255 / 0.15))" }}
-            >
+            <svg viewBox="0 0 100 100" className="relative h-full w-full">
               {/* Track : anneau blanc translucide */}
               <path
                 d={ring.trackD}
                 fill="white"
                 fillRule="evenodd"
-                opacity={0.12}
+                opacity={0.14}
               />
-              {/* Arc de progression : blanc plein avec cap-end rond */}
+              {/* Arc de progression : blanc plein. Glow réduit
+                  (drop-shadow 0.3 → 0.12, ~-60%) — élégance. */}
               {ring.arcD && (
                 <path
                   d={ring.arcD}
                   fill="white"
-                  style={{ filter: "drop-shadow(0 0 4px rgb(255 255 255 / 0.3))" }}
+                  style={{ filter: "drop-shadow(0 0 3px rgb(255 255 255 / 0.12))" }}
                 />
               )}
             </svg>

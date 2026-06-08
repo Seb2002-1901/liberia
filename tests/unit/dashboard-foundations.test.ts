@@ -74,10 +74,11 @@ describe("Phase 5.0 S3.1 — ombres premium (boxShadow utilities)", () => {
 
   it("expose shadow-card-navy (ombre teintée navy pour ScoreCard)", () => {
     expect(tailwindSource).toMatch(/"card-navy":/);
-    // L'ombre navy DOIT comporter du bleu (var navy ≈ rgb(15 61 158))
-    // pour que la carte Score "lévite" sur fond blanc avec un halo
-    // bleuté discret. Sinon la carte paraît plate.
-    expect(tailwindSource).toMatch(/"card-navy":\s*["'][^"']*15 61 158/);
+    // L'ombre navy DOIT comporter du bleu (token --navy v2 ≈
+    // rgb(22 44 82) après recalibrage maquette) pour que la carte
+    // Score "lévite" sur fond blanc avec un halo bleuté discret.
+    // Sinon la carte paraît plate.
+    expect(tailwindSource).toMatch(/"card-navy":\s*["'][^"']*22 44 82/);
   });
 
   it("expose 4 halos colorés (primary, coral, violet, success)", () => {

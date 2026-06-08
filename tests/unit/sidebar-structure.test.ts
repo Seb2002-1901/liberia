@@ -159,11 +159,13 @@ describe("Phase 5.0 S2 — Sidebar : dimensions et theme", () => {
   });
 
   it("état actif item sidebar utilise primary (plus de gold)", () => {
-    // D6 validé : l'item actif passe en bleu primary. On vérifie
-    // que la branche `active` produit un fond primary/8 et une
-    // icône dans bg-primary/15 text-primary.
-    expect(appShellSource).toMatch(/active[^?]*\?[^"]*"bg-primary\/8/s);
-    expect(appShellSource).toMatch(/"bg-primary\/15 text-primary"/);
+    // D6 validé : l'item actif passe en bleu primary.
+    // Phase 5.0 S3.1 v2 — l'icône active passe en `bg-primary
+    // text-primary-foreground` (carré bleu plein avec icône blanche)
+    // pour matcher strictement la maquette dashboard.png (item
+    // "Tableau de bord" actif).
+    expect(appShellSource).toMatch(/active[^?]*\?[^"]*"bg-primary\/10/s);
+    expect(appShellSource).toMatch(/"bg-primary text-primary-foreground"/);
   });
 });
 

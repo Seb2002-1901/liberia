@@ -55,10 +55,12 @@
 
     --radius: 1rem;
 
-    /* Bleu marine de marque (#0F3D9E). Utilisé pour la carte Score
-       de santé financière (S3) et la wordmark de la sidebar. Token
-       autonome pour rester contrôlable indépendamment du primary. */
-    --navy: 221 83% 34%;
+    /* Bleu marine de marque. Phase 5.0 S3.1 v2 — calibré sur la
+       maquette dashboard.png : plus profond et moins saturé que
+       #0F3D9E (S1). La carte Score paraissait "trop électrique" sur
+       fond blanc — nouvelle valeur ~#162C52, plus dense, plus
+       conseiller financier premium. */
+    --navy: 218 60% 19%;
     --navy-foreground: 0 0% 100%;
 
     /* Legacy `--gold` remappé vers primary. 152 références existantes

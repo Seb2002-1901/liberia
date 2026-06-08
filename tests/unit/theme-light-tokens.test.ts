@@ -51,8 +51,11 @@ describe("Phase 5.0 S1 — tokens light premium (globals.css)", () => {
     expect(globalsSource).toMatch(/--primary:\s*221 83% 53%/);
   });
 
-  it("expose le brand navy #0F3D9E en HSL (221 83% 34%)", () => {
-    expect(globalsSource).toMatch(/--navy:\s*221 83% 34%/);
+  it("expose le brand navy calibré maquette dashboard.png (218 60% 19%)", () => {
+    // Phase 5.0 S3.1 v2 — recalibré sur la maquette : plus profond,
+    // moins saturé (#162C52 vs #0F3D9E S1). La carte Score paraissait
+    // "trop électrique" sur fond clair.
+    expect(globalsSource).toMatch(/--navy:\s*218 60% 19%/);
   });
 
   it("expose success #16A34A en HSL (142 76% 36%)", () => {

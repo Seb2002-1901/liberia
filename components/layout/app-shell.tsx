@@ -158,7 +158,7 @@ export function AppShell({
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar — 280 px, fond blanc cassé, hairline droite */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[280px] flex-col border-r border-border bg-card lg:flex">
-        <div className="flex h-16 items-center px-6">
+        <div className="flex h-[72px] items-center px-6">
           <BrandMark />
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3">
@@ -186,8 +186,10 @@ export function AppShell({
       </aside>
 
       {/* Topbar — fond clair, sans backdrop-blur. Greeting (lg+) à
-          gauche, NotificationBell + avatar à droite. */}
-      <header className="fixed inset-x-0 top-0 z-20 flex h-16 items-center border-b border-border bg-card lg:left-[280px]">
+          gauche, NotificationBell + avatar à droite. Phase 5.0
+          S3.1 v2 : hauteur passée 16 → 18 (72px) pour caler avec
+          la sidebar et donner plus d'air à la salutation. */}
+      <header className="fixed inset-x-0 top-0 z-20 flex h-[72px] items-center border-b border-border bg-card lg:left-[280px]">
         <div className="flex w-full items-center justify-between gap-3 px-4 lg:px-8">
           {/* Mobile : BrandMark compact. Desktop : Greeting injecté. */}
           <div className="flex min-w-0 items-center gap-3">
@@ -286,9 +288,12 @@ export function AppShell({
         </div>
       </header>
 
-      {/* Main content — padding gauche ajusté à 280 px (vs 256 avant) */}
-      <main className="pt-16 lg:pl-[280px]">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6 lg:px-10 lg:pb-12">
+      {/* Main content — padding gauche ajusté à 280 px (vs 256 avant).
+          Phase 5.0 S3.1 v2 : container élargi (6xl → 7xl) et pt
+          augmenté (6 → 8) pour matcher le rythme vertical de la
+          maquette dashboard.png (les cartes hero respirent en haut). */}
+      <main className="pt-[72px] lg:pl-[280px]">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-10 lg:pb-12">
           {children}
         </div>
       </main>
@@ -393,17 +398,17 @@ function SidebarLink({
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors duration-150",
+        "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
         active
-          ? "bg-primary/8 text-foreground"
+          ? "bg-primary/10 text-foreground"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground",
       )}
     >
       <span
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
+          "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
           active
-            ? "bg-primary/15 text-primary"
+            ? "bg-primary text-primary-foreground"
             : "bg-secondary text-muted-foreground group-hover:text-foreground",
         )}
       >

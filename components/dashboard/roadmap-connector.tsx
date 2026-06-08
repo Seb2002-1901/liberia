@@ -1,45 +1,42 @@
 /**
- * Phase 5.0 S3.1 — connecteur SVG entre 2 jalons de la roadmap.
+ * Phase 5.0 S3.1 v2 — connecteur SVG entre 2 jalons de la roadmap.
  *
- * Reproduit la signature visuelle de la maquette : ligne pointillée
- * horizontale avec une flèche à droite (sens du temps). Plus de
- * `ChevronRight` Lucide générique — c'est l'élément qui transforme
- * "4 cartes alignées" en "voyage temporel".
+ * Itération maquette stricte : ligne pointillée fine + petite tête
+ * de flèche, occupant une largeur fixe modeste (40 px) plutôt
+ * qu'une colonne grid pleine — les jalons doivent dominer
+ * visuellement, pas les connecteurs.
  *
- * Pur SVG, aucune dépendance. Le composant prend toute la largeur
- * de sa colonne grid via `w-full`.
- *
- * Affiché uniquement sur `lg+` (la roadmap verticalise sur mobile,
- * pas de connecteur nécessaire).
+ * Pur SVG, aucune dépendance. Affiché uniquement `lg+`.
  */
 
 export function RoadmapConnector() {
   return (
     <li
       aria-hidden
-      className="hidden items-center justify-center lg:col-span-1 lg:flex"
+      className="hidden shrink-0 items-center justify-center self-center lg:flex"
+      style={{ width: 40, height: 24 }}
     >
       <svg
-        viewBox="0 0 60 12"
-        className="h-3 w-full text-muted-foreground/50"
+        viewBox="0 0 40 10"
+        className="h-2.5 w-full text-muted-foreground/45"
         preserveAspectRatio="none"
       >
-        {/* Ligne pointillée — signature maquette */}
+        {/* Ligne pointillée fine */}
         <line
           x1="2"
-          y1="6"
-          x2="48"
-          y2="6"
+          y1="5"
+          x2="30"
+          y2="5"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="1.25"
           strokeLinecap="round"
-          strokeDasharray="2 4"
+          strokeDasharray="1.5 3"
         />
-        {/* Tête de flèche droite */}
+        {/* Tête de flèche petite */}
         <path
-          d="M 48 2 L 56 6 L 48 10"
+          d="M 31 1.5 L 37 5 L 31 8.5"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="1.25"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"

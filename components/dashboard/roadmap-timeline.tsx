@@ -70,10 +70,14 @@ export async function RoadmapTimeline({ milestones }: RoadmapTimelineProps) {
       </header>
 
       {/*
-        Grille desktop : 4 jalons + 3 connecteurs = 7 colonnes.
-        Mobile : grid-cols-1 stack vertical, connecteurs cachés.
+        Phase 5.0 S3.1 v2 — flexbox pour donner aux jalons toute la
+        largeur disponible. Les connecteurs prennent une place fixe
+        (40 px) et fine ; chaque jalon prend `flex-1` = part égale du
+        reste. Maquette dashboard.png : jalons larges + lignes
+        pointillées fines entre eux.
+        Mobile : stack vertical, connecteurs cachés.
       */}
-      <ol className="grid gap-4 lg:grid-cols-7 lg:items-stretch lg:gap-3">
+      <ol className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-0">
         {milestones.map((m, i) => (
           <React.Fragment key={m.kind}>
             <Milestone milestone={m} t={t} />
@@ -106,7 +110,7 @@ function Milestone({
       : null;
 
   return (
-    <li className="rounded-xl border border-border/40 bg-card p-4 shadow-card lg:col-span-1">
+    <li className="rounded-xl border border-border/40 bg-card p-5 shadow-card lg:flex-1 lg:basis-0">
       <span
         aria-hidden
         className={cn(

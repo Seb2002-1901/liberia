@@ -27,10 +27,13 @@ export function BrandMark({
   className,
   showWordmark = true,
 }: BrandMarkProps) {
+  // Phase 5.0 S3.1 v2 — wordmark plus présent dans la sidebar
+  // (feedback "logo plus présent"). Le `md` (sidebar par défaut)
+  // passe à `text-base` (16px) + tracking renforcé.
   const sizes = {
     sm: { box: "h-7 w-7", text: "text-sm tracking-[0.18em]" },
-    md: { box: "h-8 w-8", text: "text-sm tracking-[0.22em]" },
-    lg: { box: "h-10 w-10", text: "text-base tracking-[0.24em]" },
+    md: { box: "h-9 w-9", text: "text-base tracking-[0.24em]" },
+    lg: { box: "h-10 w-10", text: "text-lg tracking-[0.24em]" },
   } as const;
 
   const s = sizes[size];

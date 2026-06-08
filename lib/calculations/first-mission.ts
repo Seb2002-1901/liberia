@@ -191,23 +191,32 @@ function round1(n: number): number {
 }
 
 /**
- * Phase 5.0 S3.1 — montant suggéré d'épargne mensuelle pour la
+ * Phase 5.0 S3.1 v2 — montant suggéré d'épargne mensuelle pour la
  * mission low_resilience. Reproduction maquette "économiser 500 CHF
  * ce mois-ci" via une heuristique pure et déterministe :
  *
- *   - 5% du revenu mensuel (point de départ raisonnable et tenable)
+ *   - 5% du revenu mensuel (point de départ tenable)
  *   - arrondi au plus proche 50 CHF (lisibilité)
- *   - plancher de 100 CHF (sinon proposition non engageante)
+ *   - plancher 100 CHF (sinon proposition non engageante)
+ *   - plafond 500 CHF (au-delà la proposition devient écrasante
+ *     pour un premier mois — le user peut viser plus haut ensuite
+ *     via le coach, mais on lance volontairement bas pour qu'il
+ *     RÉUSSISSE et revienne)
+ *
+ * Le plafond à 500 CHF est aussi une décision produit cohérente
+ * avec la maquette dashboard.png — "500 CHF" est le palier
+ * iconique du premier fonds d'urgence.
  *
  * Exemples :
+ *   25 000 CHF revenu → 500 CHF suggéré (plafonné)
  *   10 000 CHF revenu → 500 CHF suggéré
  *    4 000 CHF revenu → 200 CHF suggéré
  *    1 000 CHF revenu → 100 CHF suggéré (plancher)
- *    0 CHF revenu     → 100 CHF (fallback profil sans revenu)
+ *    0 CHF revenu     → 100 CHF (fallback)
  */
 function suggestSavingsAmount(monthlyIncome: number): number {
   if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) return 100;
   const raw = monthlyIncome * 0.05;
   const rounded = Math.round(raw / 50) * 50;
-  return Math.max(100, rounded);
+  return Math.min(500, Math.max(100, rounded));
 }
