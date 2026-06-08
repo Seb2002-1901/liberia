@@ -289,11 +289,11 @@ export function AppShell({
       </header>
 
       {/* Main content — padding gauche ajusté à 280 px (vs 256 avant).
-          Phase 5.0 S3.1 v5 : densité maquette. pt-8 → pt-6 et
-          pb-24 → pb-16 pour réduire le scroll vertical sur 1440p
-          (feedback "occuper même hauteur que maquette"). */}
+          Phase 5.0 S3.1 v6 : densité ultime. pt-6 → pt-5, pb-16 →
+          pb-12 (vs pb-10). Plus de scroll vertical sur 1440p
+          (feedback "tout visible sans scroll sur 1440p"). */}
       <main className="pt-[72px] lg:pl-[280px]">
-        <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pb-10">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-5 sm:px-6 lg:px-10 lg:pb-8">
           {children}
         </div>
       </main>
@@ -354,14 +354,15 @@ function SidebarSection({
   title: string;
   children: React.ReactNode;
 }) {
-  // Phase 5.0 S3.1 v4 — feedback v3 : "menu légèrement plus
-  // compact". py-4 → py-3 (revient v2). Caption pb-2.5 → pb-2.
+  // Phase 5.0 S3.1 v6 — feedback v5 : "sidebar reste un peu plus
+  // lourde que la maquette, réduire espacements + paddings".
+  // py-3 → py-2, pb-2 → pb-1.5, space-y-0.5 → space-y-0.
   return (
-    <div className="py-3">
-      <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+    <div className="py-2">
+      <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {title}
       </p>
-      <div className="space-y-0.5">{children}</div>
+      <div className="space-y-0">{children}</div>
     </div>
   );
 }

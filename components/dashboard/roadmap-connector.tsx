@@ -1,16 +1,14 @@
 /**
- * Phase 5.0 S3.1 v5 — connecteur SVG entre 2 jalons de la roadmap.
+ * Phase 5.0 S3.1 v6 — connecteur SVG entre 2 jalons de la roadmap.
  *
- * Feedback v4 :
- *   - "diminuer l'impact visuel des flèches"
- *   - "renforcer l'effet timeline continue"
- *   - "rapprocher d'un seul composant cohérent"
+ * Feedback v5 : "connecteurs plus fins, ressembler à la maquette
+ * et non à des CTA". Continue de réduire la présence visuelle.
  *
- * Itération v5 :
- *   - Stroke 2.5 → 1.75 (flèches discrètes)
- *   - Couleur primary/55 → primary/35 (moins saturé, plus intégré)
- *   - Largeur 56 → 40 px (jalons rapprochés)
- *   - Lignes continues (solides, déjà v4)
+ * Itération v6 :
+ *   - Stroke 1.75 → 1.25 (lignes vraiment fines)
+ *   - Couleur primary/35 → primary/30 (plus intégré, moins saturé)
+ *   - Tête de flèche plus discrète
+ *   - Largeur 40 → 32 px (jalons encore plus proches)
  *
  * Pur SVG. Affiché uniquement `lg+`.
  */
@@ -20,28 +18,28 @@ export function RoadmapConnector() {
     <li
       aria-hidden
       className="hidden shrink-0 items-center justify-center self-center lg:flex"
-      style={{ width: 40, height: 24 }}
+      style={{ width: 32, height: 20 }}
     >
       <svg
-        viewBox="0 0 40 12"
-        className="h-3 w-full text-primary/35"
+        viewBox="0 0 32 10"
+        className="h-2.5 w-full text-primary/30"
         preserveAspectRatio="none"
       >
-        {/* Ligne solide bleue discrète */}
+        {/* Ligne fine continue */}
         <line
           x1="2"
-          y1="6"
-          x2="29"
-          y2="6"
+          y1="5"
+          x2="22"
+          y2="5"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="1.25"
           strokeLinecap="round"
         />
-        {/* Tête de flèche assortie */}
+        {/* Tête de flèche discrète */}
         <path
-          d="M 30 2 L 37 6 L 30 10"
+          d="M 23 1.5 L 29 5 L 23 8.5"
           stroke="currentColor"
-          strokeWidth="1.75"
+          strokeWidth="1.25"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"

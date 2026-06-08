@@ -115,33 +115,30 @@ function Milestone({
       : null;
 
   return (
-    // Phase 5.0 S3.1 v5 — densité maquette :
-    //   - p-5 → p-4 (cartes moins hautes)
-    //   - mobile snap-start min-w-[72%] pour scroll horizontal iOS
-    //   - desktop flex-1 basis-0 (largeur égale entre jalons)
-    //   - border-border/60 → border-border/50 (intégration timeline)
-    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-4 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
-      {/* Phase 5.0 S3.1 v5 — densité : badge h-14 → h-12. Today
-          conserve son ring-[3px] navy/20 (cercle visible) et son
-          score text-xl font-bold. */}
+    // Phase 5.0 S3.1 v6 — densité maximale : p-4 → p-3.5 (-10-15%
+    // hauteur), border-border/50 conservé.
+    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-3.5 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
+      {/* Phase 5.0 S3.1 v6 — feedback v5 : "badges légèrement plus
+          petits". h-12 → h-10. Icône h-5 → h-4. Score today
+          text-lg → text-base font-bold. Ring today [3px] → [2.5px]. */}
       <span
         aria-hidden
         className={cn(
-          "inline-flex h-12 w-12 items-center justify-center rounded-full",
+          "inline-flex h-10 w-10 items-center justify-center rounded-full",
           tone.bg,
           tone.fg,
-          isToday ? "ring-[3px] ring-navy/20" : tone.ring,
+          isToday ? "ring-[2.5px] ring-navy/20" : tone.ring,
         )}
       >
         {isToday && todayScore !== null ? (
-          <span className="font-display text-lg font-bold tabular-nums">
+          <span className="font-display text-base font-bold tabular-nums">
             {todayScore}
           </span>
         ) : (
-          <Icon className="h-5 w-5" />
+          <Icon className="h-4 w-4" />
         )}
       </span>
-      <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {t(milestone.eyebrowKey)}
       </p>
       <p className="mt-1 text-sm font-semibold leading-snug text-foreground">

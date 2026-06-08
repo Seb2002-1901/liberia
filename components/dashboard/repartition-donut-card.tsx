@@ -90,21 +90,21 @@ export async function RepartitionDonutCard({
     );
   }
 
-  // Phase 5.0 S3.1 v5 — feedback v4 : "diamètre -5%, épaisseur -5%".
-  // 160 → 152, thickness 18 → 17.
+  // Phase 5.0 S3.1 v6 — feedback v5 : "diamètre 5-8% de moins,
+  // épaisseur identique maquette". 152 → 144, thickness 17 → 16.
   const slices = buildDonutSlices(
     nonZero.map((r) => ({ id: r.category, value: r.total })),
-    { thickness: 17 },
+    { thickness: 16 },
   );
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <Eyebrow t={t} />
-      <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
+      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
         <div
           aria-hidden
           className="relative shrink-0"
-          style={{ width: 152, height: 152 }}
+          style={{ width: 144, height: 144 }}
         >
           <svg viewBox="0 0 100 100" className="h-full w-full">
             {slices.map((s, i) => (

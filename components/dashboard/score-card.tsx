@@ -42,13 +42,15 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
-  // Phase 5.0 S3.1 v5 — feedback v4 : "diamètre -5%, épaisseur -5%".
-  // 44 → 42, 9 → 8.5.
+  // Phase 5.0 S3.1 v6 — feedback v5 : "cercle légèrement plus
+  // grand, halo plus doux et plus diffus". Ring radius 42 → 43,
+  // thickness 8.5 → 9. Container repasse à 132. Halo blur-2xl
+  // → blur-3xl avec opacité 10 → 12% (plus diffus, plus doux).
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
-    radius: 42,
-    thickness: 8.5,
+    radius: 43,
+    thickness: 9,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -100,16 +102,16 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
             </p>
           </div>
 
-          {/* Ring + halo. Phase 5.0 S3.1 v5 — container 132 → 124
-              (-6% pour matcher diamètre réduit), halo opacité
-              14 → 10%, blur-3xl → blur-2xl, drop-shadow glow 0.25
-              → 0.18. */}
+          {/* Ring + halo. Phase 5.0 S3.1 v6 — container 124 → 132
+              (cercle légèrement plus grand), halo opacité 10 → 12%,
+              blur-2xl → blur-3xl avec inset -3 → -5 (halo plus
+              doux et plus diffus). Drop-shadow glow conservé. */}
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 124, height: 124 }}
+            style={{ width: 132, height: 132 }}
           >
-            <div className="absolute inset-[-3px] rounded-full bg-white/[0.10] blur-2xl" />
+            <div className="absolute inset-[-5px] rounded-full bg-white/[0.12] blur-3xl" />
             <svg viewBox="0 0 100 100" className="relative h-full w-full">
               <path
                 d={ring.trackD}
@@ -121,7 +123,7 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
                 <path
                   d={ring.arcD}
                   fill="white"
-                  style={{ filter: "drop-shadow(0 0 7px rgb(255 255 255 / 0.18))" }}
+                  style={{ filter: "drop-shadow(0 0 8px rgb(255 255 255 / 0.20))" }}
                 />
               )}
             </svg>
