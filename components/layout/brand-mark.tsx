@@ -30,10 +30,13 @@ export function BrandMark({
   // Phase 5.0 S3.1 v2 — wordmark plus présent dans la sidebar
   // (feedback "logo plus présent"). Le `md` (sidebar par défaut)
   // passe à `text-base` (16px) + tracking renforcé.
+  // Phase 5.0 S3.1 v3 — wordmark sidebar agrandi encore d'un cran
+  // (md text-base → text-lg) — la maquette montre "LIBERIA" très
+  // imposant en haut de la sidebar.
   const sizes = {
     sm: { box: "h-7 w-7", text: "text-sm tracking-[0.18em]" },
-    md: { box: "h-9 w-9", text: "text-base tracking-[0.24em]" },
-    lg: { box: "h-10 w-10", text: "text-lg tracking-[0.24em]" },
+    md: { box: "h-10 w-10", text: "text-lg tracking-[0.24em]" },
+    lg: { box: "h-11 w-11", text: "text-xl tracking-[0.24em]" },
   } as const;
 
   const s = sizes[size];

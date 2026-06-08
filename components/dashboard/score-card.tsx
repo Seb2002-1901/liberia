@@ -42,13 +42,14 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
   }
 
   const score = data.score.display;
-  // Phase 5.0 S3.1 v2 — ring affiné (8 → 6) + plus de respiration.
-  // Maquette dashboard.png : arc fin et élégant, pas un anneau épais.
+  // Phase 5.0 S3.1 v3 — ring repris à 7 (plus d'épaisseur que v2
+  // sans revenir à v1). Glow réorganisé : blur plus large, opacité
+  // contrôlée, plus diffus, plus premium.
   const ring = buildProgressRing(score / 100, {
     cx: 50,
     cy: 50,
     radius: 43,
-    thickness: 6,
+    thickness: 7,
   });
   const delta = data.delta?.netDelta ?? null;
   const deltaSign: "up" | "down" | "flat" =
@@ -61,9 +62,11 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
         onClick={() => setDrawerOpen(true)}
         className={cn(
           "group relative w-full overflow-hidden rounded-2xl p-7 text-left",
-          // Gradient ultra-subtil (3% écart max) — la carte doit
-          // paraître plate et profonde, pas électrique.
-          "bg-gradient-to-br from-navy via-navy to-[hsl(218_60%_22%)]",
+          // Phase 5.0 S3.1 v3 — bleu uniforme (pas de gradient).
+          // La maquette montre un navy quasi-flat ; la dimension
+          // vient de l'ombre + du contraste avec le ring blanc,
+          // pas d'un dégradé.
+          "bg-navy",
           "shadow-card-navy",
           "transition-all duration-200",
           "hover:-translate-y-0.5 hover:shadow-card-hover",
@@ -74,21 +77,24 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">
               {t("eyebrow")}
             </p>
-            <div className="mt-5 flex items-baseline gap-1">
-              <span className="font-display text-6xl font-bold tabular-nums text-white lg:text-7xl">
+            <div className="mt-5 flex items-baseline gap-1.5">
+              {/* Phase 5.0 S3.1 v3 — score plus imposant.
+                  Mobile text-6xl, desktop text-[88px] custom pour
+                  matcher la maquette (~80-90px). */}
+              <span className="font-display text-6xl font-bold leading-none tabular-nums text-white lg:text-[88px]">
                 {score}
               </span>
-              <span className="text-base font-medium text-white/50">
+              <span className="text-lg font-medium text-white/55">
                 {t("outOf")}
               </span>
             </div>
             <div className="mt-5 flex items-center">
               <DeltaBadge sign={deltaSign} />
             </div>
-            <p className="mt-2 text-xs text-white/70">
+            <p className="mt-2 text-xs text-white/75">
               {delta === null
                 ? t("deltaUnavailable")
                 : delta === 0
@@ -103,14 +109,12 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
           <div
             aria-hidden
             className="relative shrink-0"
-            style={{ width: 112, height: 112 }}
+            style={{ width: 124, height: 124 }}
           >
-            {/* Halo blanc très diffus derrière le ring (signature maquette).
-                Phase 5.0 S3.1 v2 — opacité réduite (10 → 6%) pour
-                rester premium, pas surligné. */}
+            {/* Phase 5.0 S3.1 v3 — halo plus large, plus diffus
+                (blur-3xl) — propre et premium, pas dur. */}
             <div
-              className="absolute inset-0 rounded-full bg-white/[0.06] blur-2xl"
-              style={{ width: 112, height: 112 }}
+              className="absolute inset-[-4px] rounded-full bg-white/[0.08] blur-3xl"
             />
             <svg viewBox="0 0 100 100" className="relative h-full w-full">
               {/* Track : anneau blanc translucide */}
@@ -118,15 +122,15 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
                 d={ring.trackD}
                 fill="white"
                 fillRule="evenodd"
-                opacity={0.14}
+                opacity={0.16}
               />
-              {/* Arc de progression : blanc plein. Glow réduit
-                  (drop-shadow 0.3 → 0.12, ~-60%) — élégance. */}
+              {/* Arc de progression : blanc plein avec drop-shadow
+                  plus diffus (blur 3 → 8) à opacité modérée. */}
               {ring.arcD && (
                 <path
                   d={ring.arcD}
                   fill="white"
-                  style={{ filter: "drop-shadow(0 0 3px rgb(255 255 255 / 0.12))" }}
+                  style={{ filter: "drop-shadow(0 0 8px rgb(255 255 255 / 0.18))" }}
                 />
               )}
             </svg>
@@ -182,7 +186,7 @@ function EmptyScoreCard() {
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl p-7 animate-fade-in",
-        "bg-gradient-to-br from-navy via-navy to-[hsl(221_83%_30%)]",
+        "bg-navy",
         "shadow-card-navy",
       )}
     >

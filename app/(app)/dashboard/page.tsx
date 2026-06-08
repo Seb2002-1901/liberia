@@ -237,9 +237,12 @@ export default async function DashboardPage() {
     monthlyIncome > 0 ? (cashflow / monthlyIncome) * 100 : null;
 
   return (
-    <div className="space-y-6">
+    // Phase 5.0 S3.1 v3 — rythme vertical aligné maquette.
+    // space-y-6 → space-y-8 entre les sections principales pour
+    // donner de l'air (Hero ↔ Roadmap ↔ KPI ↔ Cards ↔ CTA).
+    <div className="space-y-8">
       {/* Bloc 1 — Score / Priorité / Mission */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 lg:gap-5">
         <ScoreCard
           data={drawerData}
           currency={data.profile.currency}

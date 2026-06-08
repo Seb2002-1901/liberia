@@ -110,28 +110,31 @@ function Milestone({
       : null;
 
   return (
-    <li className="rounded-xl border border-border/40 bg-card p-5 shadow-card lg:flex-1 lg:basis-0">
+    <li className="rounded-xl border border-border/50 bg-card p-6 shadow-card lg:flex-1 lg:basis-0">
+      {/* Phase 5.0 S3.1 v3 — badge agrandi (10 → 12) pour donner
+          plus de présence visuelle. Score "today" en text-base
+          font-bold (vs text-xs) — il doit dominer le badge. */}
       <span
         aria-hidden
         className={cn(
-          "inline-flex h-10 w-10 items-center justify-center rounded-full",
+          "inline-flex h-12 w-12 items-center justify-center rounded-full",
           tone.bg,
           tone.fg,
           tone.ring,
         )}
       >
         {isToday && todayScore !== null ? (
-          <span className="font-display text-xs font-bold tabular-nums">
+          <span className="font-display text-base font-bold tabular-nums">
             {todayScore}
           </span>
         ) : (
-          <Icon className="h-4 w-4" />
+          <Icon className="h-5 w-5" />
         )}
       </span>
-      <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {t(milestone.eyebrowKey)}
       </p>
-      <p className="mt-1 text-sm font-semibold text-foreground">
+      <p className="mt-1 text-sm font-semibold leading-snug text-foreground">
         {t(milestone.titleKey, milestone.payload)}
       </p>
       <p className="mt-1 text-xs leading-[1.55] text-muted-foreground">

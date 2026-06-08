@@ -354,9 +354,11 @@ function SidebarSection({
   title: string;
   children: React.ReactNode;
 }) {
+  // Phase 5.0 S3.1 v3 — plus d'air entre sections (py-3 → py-4)
+  // + caption renforcée (text-[11px] → text-[11px] tracking serré).
   return (
-    <div className="py-3">
-      <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+    <div className="py-4">
+      <p className="px-3 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {title}
       </p>
       <div className="space-y-0.5">{children}</div>
