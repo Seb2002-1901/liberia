@@ -28,7 +28,7 @@ interface MissionCardProps {
 export async function MissionCard({ mission }: MissionCardProps) {
   const t = await getTranslations("dashboard.missionCard");
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
+    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
       <div className="flex items-center gap-2.5">
         <span
           aria-hidden

@@ -46,7 +46,7 @@ export function PriorityCard({
 
   return (
     <>
-      <article className="rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
+      <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {t("eyebrow")}
         </p>

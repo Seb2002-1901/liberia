@@ -51,10 +51,12 @@ describe("Phase 5.0 S1 — tokens light premium (globals.css)", () => {
     expect(globalsSource).toMatch(/--primary:\s*221 83% 53%/);
   });
 
-  it("expose le brand navy calibré maquette dashboard.png (218 65% 17%)", () => {
-    // Phase 5.0 S3.1 v4 — recalibré encore plus profond + saturé
-    // pour contraste maquette (#0F2A55 ≈ estimation #0F2851).
-    expect(globalsSource).toMatch(/--navy:\s*218 65% 17%/);
+  it("expose le brand navy extrait pixel maquette (220 95% 19%)", () => {
+    // Phase 5.0 S3.1 v9 — couleur extraite par analyse pixel
+    // Python/PIL : rgb(1, 30, 95) = #011E5F = HSL(220, 98%, 19%).
+    // Valeur stockée 220 95% 19% (S clampée à 95 pour rester dans
+    // une plage Tailwind raisonnable, écart visuel imperceptible).
+    expect(globalsSource).toMatch(/--navy:\s*220 95% 19%/);
   });
 
   it("expose success #16A34A en HSL (142 76% 36%)", () => {

@@ -34,7 +34,7 @@ export function KpiCard({
   hint,
 }: KpiCardProps) {
   return (
-    <article className="flex min-h-[88px] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-in">
+    <article className="flex min-h-[110px] flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-in">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>

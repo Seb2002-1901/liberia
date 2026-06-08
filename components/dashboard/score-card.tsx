@@ -60,8 +60,9 @@ export function ScoreCard({ data, currency, isDemo = false }: ScoreCardProps) {
         type="button"
         onClick={() => setDrawerOpen(true)}
         className={cn(
-          // Phase 5.0 S3.1 v7 — p-6 → p-5 (densité maquette).
-          "group relative w-full overflow-hidden rounded-2xl p-5 text-left",
+          // Phase 5.0 S3.1 v9 — p-5 → p-6 pour matcher hauteur
+          // hero maquette ≈ 215 px (mesurée pixel).
+          "group relative w-full overflow-hidden rounded-2xl p-6 text-left",
           "bg-navy",
           "shadow-card-navy",
           "transition-all duration-200",
@@ -174,7 +175,7 @@ function EmptyScoreCard() {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl p-5 animate-fade-in",
+        "relative overflow-hidden rounded-2xl p-6 animate-fade-in",
         "bg-navy",
         "shadow-card-navy",
       )}

@@ -98,15 +98,15 @@ const config: Config = {
       // par défaut, et `hover:shadow-card-hover` pour les cartes
       // interactives (ScoreCard, PriorityCard). Aucune ombre dépassant
       // 0.08 d'opacité — interdit produit premium.
-      // Phase 5.0 S3.1 v5 — feedback v4 : "ombres encore trop visibles,
-      // -15 à -20%". La maquette repose sur bordures + contraste +
-      // espacement, pas sur les ombres.
+      // Phase 5.0 S3.1 v9 — shadow-card-navy recalibré avec la
+       // nouvelle couleur navy extraite pixel (#011E5F → rgb 2 30 95).
+       // Le halo bleu sous la carte Score doit refléter le navy v9.
       boxShadow: {
         card: "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 6px 18px -8px rgb(15 23 42 / 0.08)",
         "card-hover":
           "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 10px 24px -8px rgb(15 23 42 / 0.11)",
         "card-navy":
-          "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 12px 32px -12px rgb(15 42 85 / 0.16)",
+          "0 1px 3px 0 rgb(15 23 42 / 0.06), 0 12px 32px -12px rgb(2 30 95 / 0.18)",
         "halo-primary":
           "0 0 0 1px rgb(37 99 235 / 0.10), 0 4px 16px -4px rgb(37 99 235 / 0.20)",
         "halo-coral":

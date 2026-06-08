@@ -55,12 +55,12 @@
 
     --radius: 1rem;
 
-    /* Bleu marine de marque. Phase 5.0 S3.1 v4 — recalibré encore
-       plus profond + plus saturé pour le contraste maquette
-       (feedback v3 : "navy plus profond, contraste plus fort").
-       218 60% 19% → 218 65% 17% ≈ #0F2A55 (proche estimation
-       maquette #0F2851). */
-    --navy: 218 65% 17%;
+    /* Bleu marine de marque. Phase 5.0 S3.1 v9 — couleur extraite
+       précisément de la maquette dashboard.png via analyse pixel
+       Python/PIL : rgb(1, 30, 95) = #011E5F = HSL(220, 98%, 19%).
+       Les versions précédentes (218 65% 17%) étaient trop
+       désaturées vs le bleu profond saturé de la maquette. */
+    --navy: 220 95% 19%;
     --navy-foreground: 0 0% 100%;
 
     /* Legacy `--gold` remappé vers primary. 152 références existantes
