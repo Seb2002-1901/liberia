@@ -74,11 +74,44 @@ const config: Config = {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        // Phase 5.0 S3.1 — palette charts premium.
+        // Violet : jalon roadmap 12 mois + slice "Loisirs & divers" donut.
+        // Coral  : icône priority (bouclier fonds d'urgence), plus chaud
+        //         que warning, plus rassurant que destructive.
+        "chart-violet": {
+          DEFAULT: "hsl(var(--chart-violet))",
+          foreground: "hsl(var(--chart-violet-foreground))",
+        },
+        "chart-coral": {
+          DEFAULT: "hsl(var(--chart-coral))",
+          foreground: "hsl(var(--chart-coral-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      // Phase 5.0 S3.1 — ombres premium (deux niveaux : base + hover).
+      // Calibrées sur couleur foreground avec opacités très faibles
+      // pour rester subtiles. Les composants utilisent `shadow-card`
+      // par défaut, et `hover:shadow-card-hover` pour les cartes
+      // interactives (ScoreCard, PriorityCard). Aucune ombre dépassant
+      // 0.08 d'opacité — interdit produit premium.
+      boxShadow: {
+        card: "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.06)",
+        "card-hover":
+          "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 12px 32px -12px rgb(15 23 42 / 0.08)",
+        "card-navy":
+          "0 2px 4px 0 rgb(15 23 42 / 0.06), 0 16px 40px -16px rgb(15 61 158 / 0.20)",
+        "halo-primary":
+          "0 0 0 1px rgb(37 99 235 / 0.10), 0 4px 16px -4px rgb(37 99 235 / 0.20)",
+        "halo-coral":
+          "0 0 0 1px rgb(237 96 47 / 0.10), 0 4px 16px -4px rgb(237 96 47 / 0.20)",
+        "halo-violet":
+          "0 0 0 1px rgb(154 92 217 / 0.10), 0 4px 16px -4px rgb(154 92 217 / 0.20)",
+        "halo-success":
+          "0 0 0 1px rgb(22 163 74 / 0.10), 0 4px 16px -4px rgb(22 163 74 / 0.20)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

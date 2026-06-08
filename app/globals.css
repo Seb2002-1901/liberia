@@ -73,6 +73,18 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 222 47% 11%;
+
+    /* Phase 5.0 S3.1 — palette charts premium.
+       - chart-violet : utilisé par le jalon 12 mois de la roadmap
+         (Priority Engine) et le segment "Loisirs & divers" du donut
+         de répartition des dépenses. Aligné maquette dashboard.png.
+       - chart-coral  : icône priority (bouclier "fonds d'urgence"),
+         plus chaud et plus rassurant qu'orange. Réservé contexte
+         alerte douce / protection. */
+    --chart-violet: 265 70% 60%;
+    --chart-violet-foreground: 0 0% 100%;
+    --chart-coral: 15 85% 60%;
+    --chart-coral-foreground: 0 0% 100%;
   }
 }
 
