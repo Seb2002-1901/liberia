@@ -90,9 +90,11 @@ export async function RepartitionDonutCard({
     );
   }
 
+  // Phase 5.0 S3.1 v5 — feedback v4 : "diamètre -5%, épaisseur -5%".
+  // 160 → 152, thickness 18 → 17.
   const slices = buildDonutSlices(
     nonZero.map((r) => ({ id: r.category, value: r.total })),
-    { thickness: 18 },
+    { thickness: 17 },
   );
 
   return (
@@ -102,7 +104,7 @@ export async function RepartitionDonutCard({
         <div
           aria-hidden
           className="relative shrink-0"
-          style={{ width: 160, height: 160 }}
+          style={{ width: 152, height: 152 }}
         >
           <svg viewBox="0 0 100 100" className="h-full w-full">
             {slices.map((s, i) => (

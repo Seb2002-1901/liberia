@@ -158,14 +158,15 @@ describe("Phase 5.0 S2 — Sidebar : dimensions et theme", () => {
     expect(appShellSource).toMatch(/lg:left-\[280px\]/);
   });
 
-  it("état actif item sidebar utilise primary (plus de gold)", () => {
-    // D6 validé : l'item actif passe en bleu primary.
-    // Phase 5.0 S3.1 v2 — l'icône active passe en `bg-primary
-    // text-primary-foreground` (carré bleu plein avec icône blanche)
-    // pour matcher strictement la maquette dashboard.png (item
-    // "Tableau de bord" actif).
-    expect(appShellSource).toMatch(/active[^?]*\?[^"]*"bg-primary\/10/s);
+  it("état actif item sidebar : fond gris bleuté + icône bleu plein", () => {
+    // Phase 5.0 S3.1 v5 — feedback v4 : "bouton actif moins bleu,
+    // plus gris bleuté". Le fond du link actif passe en
+    // `bg-secondary` (neutre gris bleuté). L'icône active conserve
+    // bg-primary text-primary-foreground (contraste pour identifier
+    // la page courante). Plus de gold nulle part.
+    expect(appShellSource).toMatch(/active[^?]*\?[^"]*"bg-secondary text-foreground"/s);
     expect(appShellSource).toMatch(/"bg-primary text-primary-foreground"/);
+    expect(appShellSource).not.toMatch(/bg-gold|text-gold/);
   });
 });
 

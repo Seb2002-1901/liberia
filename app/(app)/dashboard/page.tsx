@@ -237,10 +237,10 @@ export default async function DashboardPage() {
     monthlyIncome > 0 ? (cashflow / monthlyIncome) * 100 : null;
 
   return (
-    // Phase 5.0 S3.1 v3 — rythme vertical aligné maquette.
-    // space-y-6 → space-y-8 entre les sections principales pour
-    // donner de l'air (Hero ↔ Roadmap ↔ KPI ↔ Cards ↔ CTA).
-    <div className="space-y-8">
+    // Phase 5.0 S3.1 v5 — densité maquette : space-y-8 → space-y-6
+    // pour voir Hero + Roadmap + KPI + début cards bas sans scroll
+    // sur 1440p (feedback "dashboard occupe trop de hauteur").
+    <div className="space-y-6">
       {/* Bloc 1 — Score / Priorité / Mission */}
       <div className="grid gap-4 lg:grid-cols-3 lg:gap-5">
         <ScoreCard
@@ -261,8 +261,9 @@ export default async function DashboardPage() {
       {/* Bloc 2 — Roadmap horizontale */}
       <RoadmapTimeline milestones={roadmap} />
 
-      {/* Bloc 3 — 4 KPI */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Bloc 3 — 4 KPI. Phase 5.0 S3.1 v5 : mobile 2x2 (grid-cols-2)
+          au lieu de stack vertical. Maquette responsive iOS premium. */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <KpiCard
           label={t("income.label")}
           value={

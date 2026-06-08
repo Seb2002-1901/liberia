@@ -41,15 +41,15 @@ export function KpiCard({
   hint,
 }: KpiCardProps) {
   return (
-    // Phase 5.0 S3.1 v3 — min-h pour aligner les 4 cartes du strip,
-    // chiffre encore plus imposant (text-2xl/3xl → text-[28px]/text-[32px])
-    // pour matcher la présence visuelle maquette dashboard.png.
-    <article className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in flex flex-col justify-between min-h-[140px]">
+    // Phase 5.0 S3.1 v5 — densité maquette :
+    //   p-6 → p-5, min-h 140 → 120 (cartes moins hautes).
+    //   Mobile-first : chiffre text-2xl, desktop text-[30px].
+    <article className="flex min-h-[120px] flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-card animate-fade-in">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </p>
-      <div className="mt-3 flex items-baseline justify-between gap-3">
-        <p className="font-display text-[28px] font-bold leading-none tabular-nums text-foreground lg:text-[32px]">
+      <div className="mt-3 flex items-baseline justify-between gap-2">
+        <p className="font-display text-2xl font-bold leading-none tabular-nums text-foreground lg:text-[30px]">
           {value}
         </p>
         <DeltaBadge delta={delta ?? null} polarity={polarity} />

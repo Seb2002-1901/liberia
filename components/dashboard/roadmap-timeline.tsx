@@ -55,8 +55,8 @@ export async function RoadmapTimeline({ milestones }: RoadmapTimelineProps) {
   )) as unknown as Translator;
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-7 shadow-card animate-fade-in">
-      <header className="mb-6 flex items-baseline justify-between gap-4">
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-card animate-fade-in">
+      <header className="mb-5 flex items-baseline justify-between gap-4">
         <h2 className="font-display text-base font-semibold text-foreground">
           {t("title")}
         </h2>
@@ -70,14 +70,19 @@ export async function RoadmapTimeline({ milestones }: RoadmapTimelineProps) {
       </header>
 
       {/*
-        Phase 5.0 S3.1 v2 — flexbox pour donner aux jalons toute la
-        largeur disponible. Les connecteurs prennent une place fixe
-        (40 px) et fine ; chaque jalon prend `flex-1` = part égale du
-        reste. Maquette dashboard.png : jalons larges + lignes
-        pointillées fines entre eux.
-        Mobile : stack vertical, connecteurs cachés.
+        Phase 5.0 S3.1 v5 — feedback v4 :
+          desktop : timeline plus dense, plus intégrée
+          mobile  : SCROLL HORIZONTAL natif iOS (snap), pas 4 cartes
+                    énormes empilées
+
+        Mobile  : flex overflow-x-auto snap-x snap-mandatory,
+                  chaque jalon min-w-[72%] snap-start,
+                  -mx-6 px-6 pour overflow visuel bord-à-bord
+        Desktop : flex-row classique, jalons flex-1, connecteurs
+                  visibles. lg:overflow-visible pour annuler le
+                  scroll mobile.
       */}
-      <ol className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-0">
+      <ol className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-1 lg:mx-0 lg:snap-none lg:gap-0 lg:overflow-visible lg:px-0">
         {milestones.map((m, i) => (
           <React.Fragment key={m.kind}>
             <Milestone milestone={m} t={t} />
@@ -110,28 +115,26 @@ function Milestone({
       : null;
 
   return (
-    // Phase 5.0 S3.1 v4 — feedback v3 :
-    //   "cartes plus compactes, moins hautes, plus larges, contenu
-    //    centré verticalement"
-    // → p-6 → p-5 (cartes moins hautes)
-    // → flex flex-col justify-center (contenu centré vertical)
-    <li className="flex flex-col justify-center rounded-xl border border-border/60 bg-card p-5 shadow-card lg:flex-1 lg:basis-0">
-      {/* Phase 5.0 S3.1 v4 — feedback v3 : "cercle Aujourd'hui
-          beaucoup plus visible, score plus gros".
-          Badge h-12 → h-14, score text-base → text-xl font-bold,
-          contour ring-2 → ring-[3px] (today seulement) pour
-          contraste accru. */}
+    // Phase 5.0 S3.1 v5 — densité maquette :
+    //   - p-5 → p-4 (cartes moins hautes)
+    //   - mobile snap-start min-w-[72%] pour scroll horizontal iOS
+    //   - desktop flex-1 basis-0 (largeur égale entre jalons)
+    //   - border-border/60 → border-border/50 (intégration timeline)
+    <li className="flex min-w-[72%] shrink-0 snap-start flex-col justify-center rounded-xl border border-border/50 bg-card p-4 shadow-card lg:min-w-0 lg:shrink lg:snap-align-none lg:flex-1 lg:basis-0">
+      {/* Phase 5.0 S3.1 v5 — densité : badge h-14 → h-12. Today
+          conserve son ring-[3px] navy/20 (cercle visible) et son
+          score text-xl font-bold. */}
       <span
         aria-hidden
         className={cn(
-          "inline-flex h-14 w-14 items-center justify-center rounded-full",
+          "inline-flex h-12 w-12 items-center justify-center rounded-full",
           tone.bg,
           tone.fg,
           isToday ? "ring-[3px] ring-navy/20" : tone.ring,
         )}
       >
         {isToday && todayScore !== null ? (
-          <span className="font-display text-xl font-bold tabular-nums">
+          <span className="font-display text-lg font-bold tabular-nums">
             {todayScore}
           </span>
         ) : (
@@ -144,7 +147,7 @@ function Milestone({
       <p className="mt-1 text-sm font-semibold leading-snug text-foreground">
         {t(milestone.titleKey, milestone.payload)}
       </p>
-      <p className="mt-1 text-xs leading-[1.55] text-muted-foreground">
+      <p className="mt-0.5 text-xs leading-[1.5] text-muted-foreground">
         {t(milestone.subtitleKey, milestone.payload)}
       </p>
     </li>

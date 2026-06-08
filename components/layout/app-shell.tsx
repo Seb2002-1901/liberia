@@ -289,11 +289,11 @@ export function AppShell({
       </header>
 
       {/* Main content — padding gauche ajusté à 280 px (vs 256 avant).
-          Phase 5.0 S3.1 v2 : container élargi (6xl → 7xl) et pt
-          augmenté (6 → 8) pour matcher le rythme vertical de la
-          maquette dashboard.png (les cartes hero respirent en haut). */}
+          Phase 5.0 S3.1 v5 : densité maquette. pt-8 → pt-6 et
+          pb-24 → pb-16 pour réduire le scroll vertical sur 1440p
+          (feedback "occuper même hauteur que maquette"). */}
       <main className="pt-[72px] lg:pl-[280px]">
-        <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-10 lg:pb-12">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pb-10">
           {children}
         </div>
       </main>
@@ -396,16 +396,19 @@ function SidebarLink({
     );
   }
   return (
-    // Phase 5.0 S3.1 v4 — feedback v3 : "menu plus compact, icônes
-    // légèrement plus petites". py-2.5 → py-2, icône box h-8 → h-7.
+    // Phase 5.0 S3.1 v5 — feedback v4 : "bouton actif moins bleu,
+    // moins haut, plus gris bleuté". py-2 → py-1.5, fond actif
+    // primary/10 → secondary (gris bleuté neutre). Icône active
+    // conserve bg-primary text-primary-foreground (contraste pour
+    // identifier la page courante).
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-150",
+        "group flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150",
         active
-          ? "bg-primary/10 text-foreground"
-          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+          ? "bg-secondary text-foreground"
+          : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
       )}
     >
       <span
