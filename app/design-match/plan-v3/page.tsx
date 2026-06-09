@@ -58,8 +58,8 @@ const H = {
   topbar: 68,
   planHeader: 64,
   mission: 168,
-  roadmap: 274,
-  bottomRow: 226,
+  roadmap: 260,
+  bottomRow: 264,
   gap: 12,
   rightCardGap: 10,
 };
@@ -414,7 +414,10 @@ function PlanHeaderCard() {
           Basé sur votre situation actuelle, vos objectifs et vos priorités.
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 22, flexShrink: 0 }}>
+      {/* Divider vertical subtil entre le titre et les métriques —
+          structure le bloc sans alourdir, comble l'effet "trop vide". */}
+      <div aria-hidden style={{ width: 1, alignSelf: "stretch", marginLeft: -8, backgroundColor: C.borderGhost, flexShrink: 0 }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 26, flexShrink: 0 }}>
         <HeaderMetric
           label="Score actuel"
           value="46"
@@ -430,8 +433,8 @@ function PlanHeaderCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 28,
-                height: 28,
+                width: 30,
+                height: 30,
                 borderRadius: 8,
                 backgroundColor: C.coralBg,
               }}
@@ -451,8 +454,8 @@ function PlanHeaderCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 28,
-                height: 28,
+                width: 30,
+                height: 30,
                 borderRadius: 8,
                 backgroundColor: C.successBg,
               }}
@@ -518,11 +521,11 @@ function HeaderMetric({
         <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4, marginTop: 1 }}>
           <span
             style={{
-              fontSize: 14.5,
+              fontSize: 15.5,
               fontWeight: 700,
               color: C.textDark,
               fontFamily: "Outfit, Inter, system-ui",
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.015em",
               lineHeight: 1.1,
               fontVariantNumeric: "tabular-nums",
             }}
@@ -530,7 +533,7 @@ function HeaderMetric({
             {value}
           </span>
           {unit && (
-            <span style={{ fontSize: 11.5, color: C.textLight, fontWeight: 500 }}>{unit}</span>
+            <span style={{ fontSize: 12, color: C.textLight, fontWeight: 500 }}>{unit}</span>
           )}
         </span>
         {progress !== undefined && (
@@ -571,42 +574,25 @@ function MissionCard() {
         flexDirection: "column",
       }}
     >
-      {/* Glow ambient subtil (bleu clair top-right). Plus discret
-          que le bouclier précédent — la décoration ne concurrence
-          plus le contenu métier. */}
+      {/* Décision design : suppression du bouclier décoratif
+          (était "ni visible ni invisible") au profit d'un glow
+          ambient subtil unique — même langage que dashboard-v3
+          ScoreCard et coach-v3 SituationCard. La décoration est
+          désormais cohérente avec le système et ne concurrence
+          plus aucun chiffre. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           right: -40,
           top: -40,
-          width: 200,
-          height: 200,
+          width: 220,
+          height: 220,
           background:
-            "radial-gradient(circle, rgba(96, 165, 250, 0.18) 0%, rgba(96, 165, 250, 0) 65%)",
+            "radial-gradient(circle, rgba(96, 165, 250, 0.22) 0%, rgba(96, 165, 250, 0) 65%)",
           pointerEvents: "none",
         }}
       />
-      {/* Bouclier décoratif — opacity réduite (0.18 → 0.07) et
-          taille réduite (110 → 80) pour cesser de concurrencer
-          les chiffres métier. */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: 22,
-          top: 18,
-          width: 80,
-          height: 80,
-          pointerEvents: "none",
-          opacity: 0.07,
-        }}
-      >
-        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          <polyline points="9 12 11 14 15 10" />
-        </svg>
-      </div>
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill={C.gold}>
@@ -774,17 +760,19 @@ function RoadmapCard() {
         </span>
       </div>
 
-      {/* Rail icônes compressé (44 → 36, icons 38 → 32). Connecteur :
-          ligne pleine au lieu du dashed dashboard-v3 (plan = chemin
-          progressif). 25 % du tracé en primary (Phase 1 done). */}
-      <div style={{ position: "relative", marginTop: 12, height: 36 }}>
+      {/* Rail icônes — compression supplémentaire (36 → 32 px,
+          icons 32 → 28). Marges 12 → 10 sur les 2 axes du rail.
+          Connecteur : ligne pleine au lieu du dashed dashboard-v3
+          (plan = chemin progressif). 25 % du tracé en primary
+          (Phase 1 done, 4 colonnes équilibrées). */}
+      <div style={{ position: "relative", marginTop: 10, height: 32 }}>
         <div
           aria-hidden
           style={{
             position: "absolute",
             left: "12.5%",
             right: "12.5%",
-            top: 17,
+            top: 15,
             height: 2,
             background: `linear-gradient(to right, ${C.primary} 0%, ${C.primary} 25%, ${C.borderGhost} 25%, ${C.borderGhost} 100%)`,
             borderRadius: 999,
@@ -798,10 +786,7 @@ function RoadmapCard() {
         </div>
       </div>
 
-      {/* 4 colonnes de tâches — pageBg, hauteur naturelle (les
-          colonnes s'alignent stretch sur la plus haute, plus jamais
-          de troncature). */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 10 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
@@ -860,8 +845,8 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
         ? `2px solid ${C.primary}`
         : `1.5px solid ${C.borderGhost}`;
   const strokeFuture = variant === "future" ? C.textLight : C.primary;
-  const SIZE = 32;
-  const ICON = 14;
+  const SIZE = 28;
+  const ICON = 13;
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <span
@@ -1067,8 +1052,8 @@ function ProjectionCard() {
     { label: "Dans 12 mois", value: 78 },
   ];
   const W = 280;
-  const HH = 92;
-  const PAD = { top: 18, right: 18, bottom: 22, left: 18 };
+  const HH = 110;
+  const PAD = { top: 22, right: 28, bottom: 14, left: 8 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const minV = 40;
@@ -1084,6 +1069,10 @@ function ProjectionCard() {
     .join(" ");
   const baselineY = PAD.top + innerH;
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
+  // Y-axis ticks alignés sur les valeurs réelles (40 / 60 / 80)
+  // pour donner du contexte de progression — même langage que
+  // dashboard-v3 EvolutionCard.
+  const yTicks = [40, 60, 80];
   return (
     <div
       style={{
@@ -1095,9 +1084,30 @@ function ProjectionCard() {
         flexDirection: "column",
       }}
     >
-      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Si vous suivez ce plan
-      </p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Si vous suivez ce plan
+        </p>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 3,
+            padding: "2px 7px",
+            borderRadius: 999,
+            backgroundColor: C.successBg,
+            fontSize: 10,
+            fontWeight: 700,
+            color: C.success,
+          }}
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="17 6 23 6 23 12" />
+            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+          </svg>
+          +32 pts
+        </span>
+      </div>
       <p
         style={{
           margin: "3px 0 0 0",
@@ -1110,32 +1120,56 @@ function ProjectionCard() {
       >
         Projection de votre score
       </p>
-      <div style={{ marginTop: 6, height: 110 }}>
+      <div style={{ marginTop: 8, height: 130 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="none" style={{ display: "block" }}>
           <defs>
             <linearGradient id="proj-grad-v3" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.20" />
+              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
               <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
             </linearGradient>
           </defs>
+          {/* Lignes de grille Y */}
+          {yTicks.map((v) => {
+            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
+            return (
+              <line key={v} x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
+            );
+          })}
+          {/* Labels Y à droite */}
+          {yTicks.map((v) => {
+            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
+            return (
+              <text key={`y-${v}`} x={W - PAD.right + 4} y={y + 3} fontSize="8.5" fill={C.textLight}>
+                {v}
+              </text>
+            );
+          })}
           <path d={areaD} fill="url(#proj-grad-v3)" />
           <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <g key={i}>
-              <circle cx={p.x} cy={p.y} r={3.4} fill="white" stroke={C.primary} strokeWidth={1.8} />
-              <text
-                x={p.x}
-                y={p.y - 8}
-                textAnchor="middle"
-                fontSize="10"
-                fontWeight="700"
-                fill={C.textDark}
-                fontFamily="Outfit, Inter, system-ui"
-              >
-                {p.value}
-              </text>
-            </g>
-          ))}
+          {scaled.map((p, i) => {
+            const isLast = i === scaled.length - 1;
+            return (
+              <g key={i}>
+                {/* Cercle avec halo pour le dernier (target) */}
+                {isLast && (
+                  <circle cx={p.x} cy={p.y} r={8} fill={C.primary} fillOpacity={0.14} />
+                )}
+                <circle cx={p.x} cy={p.y} r={isLast ? 4.5 : 3.4} fill="white" stroke={C.primary} strokeWidth={isLast ? 2.2 : 1.8} />
+                {/* Label valeur au-dessus, pill blanc shadow */}
+                <text
+                  x={p.x}
+                  y={p.y - 10}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fontWeight={isLast ? 700 : 600}
+                  fill={isLast ? C.primary : C.textDark}
+                  fontFamily="Outfit, Inter, system-ui"
+                >
+                  {p.value}
+                </text>
+              </g>
+            );
+          })}
         </svg>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: C.textLight, marginTop: 2 }}>
@@ -1143,7 +1177,7 @@ function ProjectionCard() {
           <span key={p.label}>{p.label}</span>
         ))}
       </div>
-      <p style={{ margin: "8px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4 }}>
+      <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4 }}>
         En suivant ce plan, votre score pourrait augmenter de{" "}
         <strong style={{ color: C.textDark, fontWeight: 600 }}>32 points</strong> en 12 mois.
       </p>
@@ -1248,22 +1282,23 @@ function ActionsSemaineCard() {
       </div>
       <button
         style={{
-          marginTop: 8,
-          padding: 0,
+          marginTop: 10,
+          padding: "6px 10px",
           alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
-          gap: 4,
-          fontSize: 12,
-          fontWeight: 500,
+          gap: 5,
+          fontSize: 12.5,
+          fontWeight: 600,
           color: C.primary,
-          background: "none",
+          backgroundColor: C.primaryBg,
           border: "none",
+          borderRadius: 8,
           cursor: "pointer",
         }}
       >
         Voir toutes les actions
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
