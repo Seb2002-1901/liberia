@@ -68,7 +68,7 @@ const H = {
   roadmap: 135,
   kpi: 96,
   bottomRow: 192,
-  coachCta: 41,
+  coachCta: 36,
   gapHR: 12,
   gapRK: 10,
   gapKB: 10,
@@ -695,9 +695,11 @@ function Roadmap() {
           </svg>
         </button>
       </div>
-      <div style={{ flex: 1, display: "flex", alignItems: "stretch", gap: 0 }}>
+      {/* Grille stricte : 4 colonnes 25% chacune, milestones centrés
+          horizontalement dans leur colonne. Connecteurs en overlay
+          positionné aux frontières 25/50/75 %. */}
+      <div style={{ flex: 1, position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
         <Milestone eyebrow="AUJOURD'HUI" title="Score actuel" subtitle="Posez les bases solides" isToday score={46} />
-        <RoadmapConnector />
         <Milestone
           eyebrow="DANS 4 MOIS"
           title="Fonds d'urgence complet"
@@ -706,7 +708,6 @@ function Roadmap() {
           bg={C.successBg}
           fg={C.success}
         />
-        <RoadmapConnector />
         <Milestone
           eyebrow="DANS 12 MOIS"
           title="15 000 CHF d'épargne"
@@ -715,7 +716,6 @@ function Roadmap() {
           bg={C.violetBg}
           fg={C.violet}
         />
-        <RoadmapConnector />
         <Milestone
           eyebrow="DANS 3 ANS"
           title="Apport immobilier"
@@ -724,6 +724,23 @@ function Roadmap() {
           bg={C.successBg}
           fg={C.success}
         />
+        {/* Connecteurs en overlay aux frontières de colonnes,
+            centrés verticalement avec les badges. */}
+        {[25, 50, 75].map((pct) => (
+          <div
+            key={pct}
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: `${pct}%`,
+              top: 18,
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
+            }}
+          >
+            <RoadmapConnector />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -749,16 +766,15 @@ function Milestone({
   fg?: string;
 }) {
   return (
-    // RUBAN INTÉGRÉ : pas de border, pas de bg différent, pas d'ombre.
-    // Compact pour tenir dans roadmap 140 px.
+    // Milestone dans une colonne stricte 25 %. Contenu centré
+    // horizontalement (textAlign:center pour matérialiser la grille).
     <div
       style={{
-        flex: 1,
         minWidth: 0,
-        padding: "4px 10px",
+        padding: "0 14px",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         overflow: "hidden",
       }}
     >
@@ -865,9 +881,8 @@ function RoadmapConnector() {
   return (
     <div
       style={{
-        flexShrink: 0,
         width: 36,
-        alignSelf: "center",
+        height: 12,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -975,56 +990,63 @@ function KpiCard({
       >
         {label}
       </p>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-        <p
-          style={{
-            fontSize: 21,
-            fontWeight: 700,
-            color: C.textDark,
-            lineHeight: 1,
-            fontFamily: "Outfit, Inter, system-ui",
-            margin: 0,
-          }}
-        >
-          {value}
-        </p>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 2,
-            fontSize: 12,
-            fontWeight: 600,
-            color: delta.color,
-          }}
-        >
-          {delta.direction === "up" && (
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="7 17 17 7" />
-              <polyline points="7 7 17 7 17 17" />
-            </svg>
-          )}
-          {delta.direction === "down" && (
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="7 7 17 17" />
-              <polyline points="7 17 17 17 17 7" />
-            </svg>
-          )}
-          {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
-        </span>
-      </div>
+      {/* Valeur seule au-dessus */}
+      <p
+        style={{
+          fontSize: 21,
+          fontWeight: 700,
+          color: C.textDark,
+          lineHeight: 1,
+          fontFamily: "Outfit, Inter, system-ui",
+          margin: 0,
+        }}
+      >
+        {value}
+      </p>
+      {/* Ligne de base : hint à gauche, delta% + sparkline à droite,
+          tous alignés sur la MÊME baseline. Sparkline dans un
+          conteneur de largeur fixe identique pour les 4 cartes. */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <p style={{ fontSize: 11.5, color: C.textMuted, margin: 0 }}>{hint}</p>
-        <Sparkline points={sparkline.points} color={sparkline.color} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 2,
+              fontSize: 12,
+              fontWeight: 600,
+              color: delta.color,
+            }}
+          >
+            {delta.direction === "up" && (
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="7 17 17 7" />
+                <polyline points="7 7 17 7 17 17" />
+              </svg>
+            )}
+            {delta.direction === "down" && (
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="7 7 17 17" />
+                <polyline points="7 17 17 17 17 7" />
+              </svg>
+            )}
+            {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
+          </span>
+          <div style={{ width: 72, flexShrink: 0 }}>
+            <Sparkline points={sparkline.points} color={sparkline.color} />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* Mini sparkline SVG — 80×24 px, smooth line + subtle area */
+/* Mini sparkline SVG — 72×20 px, smooth line + subtle area.
+   Largeur 100% du conteneur parent (fixé à 72 px en KPI). */
 function Sparkline({ points, color }: { points: number[]; color: string }) {
-  const W = 80;
-  const HH = 24;
+  const W = 72;
+  const HH = 20;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const range = max - min || 1;
@@ -1038,9 +1060,9 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
     .join(" ");
   const areaD = `${pathD} L ${coords[coords.length - 1].x.toFixed(2)} ${HH - 1} L ${coords[0].x.toFixed(2)} ${HH - 1} Z`;
   return (
-    <svg width={W} height={HH} viewBox={`0 0 ${W} ${HH}`} style={{ flexShrink: 0 }}>
+    <svg width="100%" height={HH} viewBox={`0 0 ${W} ${HH}`} preserveAspectRatio="none" style={{ display: "block" }}>
       <path d={areaD} fill={color} fillOpacity={0.12} />
-      <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -1071,13 +1093,15 @@ function OpportunityCard() {
       }}
     >
       {/* Flèche financière premium — segments droits, sharp angles
-          (style Bloomberg/TradingView/Stripe). Aucune courbe. */}
+          (style Bloomberg/TradingView/Stripe). Aucune courbe.
+          Position : zone fixe à droite, centrée verticalement avec
+          le titre principal h3 (situé ~y 82-110 inside card). */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: 14,
-          top: 58,
+          right: 18,
+          top: 64,
           width: 64,
           height: 64,
           opacity: 0.9,
@@ -1216,7 +1240,9 @@ function RepartitionCard() {
         Répartition des dépenses
       </p>
       <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Ce mois-ci</p>
-      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 12 }}>
+      {/* Donut décalé +10 px à droite (paddingLeft 10) + gap 18 px
+          constant entre donut et légende (vs 12 avant). */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 18, paddingLeft: 10 }}>
         <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100 }}>
           <svg viewBox="0 0 100 100" width={100} height={100}>
             {slicesWithPaths.map((s) => (
@@ -1264,11 +1290,11 @@ function RepartitionCard() {
               key={s.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) auto auto",
-                gap: 6,
-                padding: "1px 0",
+                gridTemplateColumns: "minmax(0, 1fr) 36px 70px",
+                gap: 8,
+                height: 18,
                 fontSize: 11,
-                alignItems: "baseline",
+                alignItems: "center",
               }}
             >
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
@@ -1286,10 +1312,10 @@ function RepartitionCard() {
                   {s.label}
                 </span>
               </span>
-              <span style={{ color: C.textDark, fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ color: C.textDark, fontWeight: 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                 {s.pct}%
               </span>
-              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                 {s.amount}
               </span>
             </div>
