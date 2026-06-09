@@ -460,7 +460,7 @@ function ScoreCard() {
               /100
             </span>
           </div>
-          <div>
+          <div style={{ marginBottom: 6 }}>
             <span
               style={{
                 display: "inline-flex",
@@ -1429,14 +1429,14 @@ function RepartitionCard() {
               key={s.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 28px 64px",
-                columnGap: 8,
+                gridTemplateColumns: "minmax(0, 1fr) 24px 58px",
+                columnGap: 6,
                 height: 22,
-                fontSize: 11,
+                fontSize: 10.5,
                 alignItems: "center",
               }}
             >
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
                 <span
                   style={{
                     display: "inline-block",
@@ -1577,15 +1577,15 @@ function EvolutionCard() {
           {/* Badge "46 Score actuel" : positionné AU-DESSUS du point
               (vs à côté) pour ne pas toucher le bord droit ni la courbe.
               Pointe légère vers le point en dessous. */}
-          <g transform={`translate(${last.x - 22}, ${last.y - 38})`}>
-            <rect x="0" y="0" width="44" height="28" rx="6" fill={C.navy} />
-            <text x="22" y="12" textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui">
+          <g transform={`translate(${last.x - 25}, ${last.y - 39})`}>
+            <rect x="0" y="0" width="50" height="30" rx="6" fill={C.navy} />
+            <text x="25" y="13" textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui">
               46
             </text>
-            <text x="22" y="22" textAnchor="middle" fontSize="6.5" fill="rgba(255,255,255,0.7)" letterSpacing="0.5">
+            <text x="25" y="23" textAnchor="middle" fontSize="6.5" fill="rgba(255,255,255,0.7)" letterSpacing="0.5">
               SCORE ACTUEL
             </text>
-            <path d="M 18 28 L 22 32 L 26 28 Z" fill={C.navy} />
+            <path d="M 21 30 L 25 34 L 29 30 Z" fill={C.navy} />
           </g>
           {xLabels.map((label, i) => {
             const x = PAD.left + (i / (xLabels.length - 1)) * innerW;
