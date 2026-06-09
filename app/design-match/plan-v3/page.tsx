@@ -613,17 +613,17 @@ function MissionCard() {
         <h3
           style={{
             margin: "6px 0 0 0",
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: 700,
             color: "white",
-            lineHeight: 1.2,
+            lineHeight: 1.18,
             fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.02em",
+            letterSpacing: "-0.025em",
           }}
         >
           Construire votre fonds d&apos;urgence
         </h3>
-        <p style={{ margin: "4px 0 0 0", fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.4 }}>
+        <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "rgba(255,255,255,0.78)", lineHeight: 1.4 }}>
           Vous avez actuellement 0.0 mois de sécurité.
         </p>
       </div>
@@ -919,12 +919,12 @@ function PhaseColumn({
       style={{
         position: "relative",
         padding: "10px 12px",
-        // Phase active : bg légèrement teinté primary (#F4F8FF ≈
-        // primaryBg dilué) + box-shadow ring primary 0.10 pour
-        // marquer "current scope" sans agresser visuellement.
-        backgroundColor: isActive ? "#F4F8FF" : C.pageBg,
+        // Phase active : bg teinté primary (#EEF4FF ≈ primaryBg
+        // dilué) + inset ring primary 0.25 pour "current scope"
+        // visiblement distinct sans agresser visuellement.
+        backgroundColor: isActive ? "#EEF4FF" : C.pageBg,
         borderRadius: 12,
-        boxShadow: isActive ? `inset 0 0 0 1px rgba(37, 99, 235, 0.18)` : "none",
+        boxShadow: isActive ? `inset 0 0 0 1px rgba(37, 99, 235, 0.25)` : "none",
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
@@ -941,15 +941,15 @@ function PhaseColumn({
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                padding: "1px 5px",
+                padding: "2px 6px",
                 borderRadius: 999,
                 backgroundColor: C.primary,
                 color: "white",
-                fontSize: 8.5,
+                fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                lineHeight: 1.4,
+                lineHeight: 1.3,
               }}
             >
               En cours
@@ -1143,12 +1143,13 @@ function ProjectionCard() {
       </div>
       <p
         style={{
-          margin: "3px 0 0 0",
-          fontSize: 13.5,
+          margin: "4px 0 0 0",
+          fontSize: 15,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.015em",
+          lineHeight: 1.2,
         }}
       >
         Projection de votre score
@@ -1243,12 +1244,13 @@ function ActionsSemaineCard() {
       </p>
       <p
         style={{
-          margin: "3px 0 0 0",
-          fontSize: 13.5,
+          margin: "4px 0 0 0",
+          fontSize: 15,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.015em",
+          lineHeight: 1.2,
         }}
       >
         Vos 3 prochaines actions
@@ -1363,7 +1365,7 @@ function LevierCard() {
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
           letterSpacing: "-0.015em",
-          lineHeight: 1.3,
+          lineHeight: 1.25,
         }}
       >
         Augmenter vos revenus de 300&nbsp;CHF/mois
