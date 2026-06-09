@@ -64,15 +64,15 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  scoreCard: 172,
-  roadmap: 135,
-  kpi: 96,
-  bottomRow: 192,
-  coachCta: 36,
-  gapHR: 12,
-  gapRK: 10,
-  gapKB: 10,
-  gapBC: 12,
+  scoreCard: 178,
+  roadmap: 140,
+  kpi: 102,
+  bottomRow: 200,
+  coachCta: 56,
+  gapHR: 14,
+  gapRK: 12,
+  gapKB: 12,
+  gapBC: 14,
 };
 
 export default function DesignMatchDashboardV3() {
@@ -395,100 +395,149 @@ function Hero() {
 }
 
 function ScoreCard() {
+  // Ring progress math : circumference = 2π * r = 2π * 43 ≈ 270.18 px.
+  // Score 46/100 → fraction visible = 0.46. dashoffset = C * (1 - 0.46).
+  const ringR = 43;
+  const ringCirc = 2 * Math.PI * ringR;
+  const scoreFraction = 0.46;
+  const ringOffset = ringCirc * (1 - scoreFraction);
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
         height: H.scoreCard,
-        padding: 20,
+        padding: "22px 24px",
         backgroundColor: C.navy,
         borderRadius: 18,
         // Shadow plus forte pour LÉVITATION premium → hiérarchie
         boxShadow: SHADOW.navy,
       }}
     >
-      <div style={{ display: "flex", height: "100%", justifyContent: "space-between", alignItems: "stretch" }}>
+      {/* Glow décoratif derrière la ring — profondeur premium */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: -30,
+          top: -30,
+          width: 200,
+          height: 200,
+          background:
+            "radial-gradient(circle, rgba(96, 165, 250, 0.22) 0%, rgba(96, 165, 250, 0) 65%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ position: "relative", display: "flex", height: "100%", justifyContent: "space-between", alignItems: "stretch", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1, minWidth: 0 }}>
           <p
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: "rgba(255,255,255,0.75)",
+              color: "rgba(255,255,255,0.72)",
               letterSpacing: "0.2em",
               textTransform: "uppercase",
+              margin: 0,
             }}
           >
             Score de santé financière
           </p>
-          {/* Score "46" MASSIF — 92 px pour dominer la page */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+          {/* Score "46" — 76 px, tracking serré pour densité premium */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
             <span
               style={{
-                fontSize: 78,
+                fontSize: 76,
                 fontWeight: 700,
                 color: "white",
-                lineHeight: 0.95,
+                lineHeight: 0.92,
                 fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.035em",
               }}
             >
               46
             </span>
-            <span style={{ fontSize: 17, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
+            <span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)", fontWeight: 500, letterSpacing: "-0.01em" }}>
               /100
             </span>
           </div>
           <div>
-            <p
+            <span
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.success,
-                letterSpacing: "0.06em",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 4,
+                padding: "3px 8px",
+                borderRadius: 999,
+                backgroundColor: "rgba(16, 163, 127, 0.18)",
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: "#5EEAD4",
+                letterSpacing: "0.06em",
                 textTransform: "uppercase",
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="17 6 23 6 23 12" />
                 <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
               </svg>
               EN PROGRESSION
-            </p>
-            <p style={{ marginTop: 4, fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+            </span>
+            <p style={{ marginTop: 6, fontSize: 12, color: "rgba(255,255,255,0.7)", margin: "6px 0 0 0" }}>
               +6 pts depuis la semaine dernière
             </p>
           </div>
         </div>
-        {/* Ring RÉDUIT — 115 px (vs 130) pour rééquilibrer en faveur du "46" */}
-        <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100, alignSelf: "center" }}>
+        {/* Ring 108 px — équilibre visuel avec le score 76 px */}
+        <div style={{ position: "relative", flexShrink: 0, width: 108, height: 108, alignSelf: "center" }}>
           <div
+            aria-hidden
             style={{
               position: "absolute",
-              inset: -6,
+              inset: -8,
               borderRadius: 999,
-              backgroundColor: "rgba(255,255,255,0.12)",
-              filter: "blur(24px)",
+              backgroundColor: "rgba(255,255,255,0.10)",
+              filter: "blur(28px)",
             }}
           />
-          <svg viewBox="0 0 100 100" width={100} height={100} style={{ position: "relative" }}>
-            <circle cx="50" cy="50" r="43" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="7" />
+          <svg viewBox="0 0 100 100" width={108} height={108} style={{ position: "relative" }}>
+            <circle cx="50" cy="50" r={ringR} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="7" />
             <circle
               cx="50"
               cy="50"
-              r="43"
+              r={ringR}
               fill="none"
               stroke="white"
               strokeWidth="7"
               strokeLinecap="round"
-              strokeDasharray="270 271"
-              strokeDashoffset="68"
+              strokeDasharray={`${ringCirc.toFixed(2)} ${ringCirc.toFixed(2)}`}
+              strokeDashoffset={ringOffset.toFixed(2)}
               transform="rotate(-90 50 50)"
-              style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.35))" }}
+              style={{ filter: "drop-shadow(0 0 6px rgba(255,255,255,0.35))" }}
             />
+            {/* Centre de la ring : tier label (poids visuel ≤ score externe) */}
+            <text
+              x="50"
+              y="46"
+              textAnchor="middle"
+              fontSize="8.5"
+              fontWeight="600"
+              fill="rgba(255,255,255,0.55)"
+              letterSpacing="1.5"
+            >
+              NIVEAU
+            </text>
+            <text
+              x="50"
+              y="62"
+              textAnchor="middle"
+              fontSize="13.5"
+              fontWeight="700"
+              fill="white"
+              fontFamily="Outfit, Inter, system-ui"
+              letterSpacing="-0.01em"
+            >
+              Fragile
+            </text>
           </svg>
         </div>
       </div>
@@ -501,10 +550,9 @@ function PriorityCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: 20,
+        padding: "22px 24px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
-        // PAS DE BORDER — juste shadow soft
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
@@ -512,42 +560,70 @@ function PriorityCard() {
       }}
     >
       <div>
-        <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-          Votre priorité actuelle
-        </p>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginTop: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span
             style={{
               flexShrink: 0,
-              width: 48,
-              height: 48,
-              borderRadius: 12,
+              width: 28,
+              height: 28,
+              borderRadius: 8,
               backgroundColor: C.coralBg,
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.coral} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.coral} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </span>
-          <h3
+          <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", margin: 0 }}>
+            Votre priorité actuelle
+          </p>
+        </div>
+        <h3
+          style={{
+            fontSize: 16.5,
+            fontWeight: 700,
+            color: C.textDark,
+            lineHeight: 1.25,
+            margin: "14px 0 0 0",
+            fontFamily: "Outfit, Inter, system-ui",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Construire votre fonds d&apos;urgence
+        </h3>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 10 }}>
+          <span
             style={{
-              fontSize: 17,
+              fontSize: 22,
               fontWeight: 700,
-              color: C.textDark,
-              lineHeight: 1.25,
-              margin: 0,
+              color: C.coral,
               fontFamily: "Outfit, Inter, system-ui",
+              letterSpacing: "-0.025em",
+              lineHeight: 1,
             }}
           >
-            Construire votre fonds d&apos;urgence
-          </h3>
+            0.0
+          </span>
+          <span style={{ fontSize: 12, color: C.textMuted }}>mois sur 3 mois</span>
         </div>
-        <p style={{ marginTop: 14, fontSize: 13, color: C.textMuted }}>
-          0.0 mois de sécurité disponible
-        </p>
+        <div
+          style={{
+            marginTop: 8,
+            height: 4,
+            borderRadius: 999,
+            backgroundColor: C.coralBg,
+            overflow: "hidden",
+          }}
+          role="progressbar"
+          aria-valuenow={0}
+          aria-valuemin={0}
+          aria-valuemax={3}
+        >
+          <div style={{ width: "2%", height: "100%", backgroundColor: C.coral, borderRadius: 999 }} />
+        </div>
       </div>
       <button
         style={{
@@ -564,7 +640,7 @@ function PriorityCard() {
           cursor: "pointer",
         }}
       >
-        Voir pourquoi
+        Voir pourquoi c&apos;est critique
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
@@ -579,34 +655,33 @@ function MissionCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: 20,
+        padding: "22px 24px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
-        // PAS DE BORDER
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
       }}
     >
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span
             style={{
-              width: 22,
-              height: 22,
+              width: 28,
+              height: 28,
               backgroundColor: C.primaryBg,
-              borderRadius: 6,
+              borderRadius: 8,
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill={C.primary}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={C.primary}>
               <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
             </svg>
           </span>
-          <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", margin: 0 }}>
             Mission du moment
           </p>
         </div>
@@ -616,42 +691,42 @@ function MissionCard() {
             fontWeight: 700,
             color: C.textDark,
             lineHeight: 1.25,
-            margin: "18px 0 0 0",
+            margin: "16px 0 0 0",
             fontFamily: "Outfit, Inter, system-ui",
           }}
         >
-          Constituez votre premier fonds d&apos;urgence
+          Économisez 500 CHF ce mois-ci
         </h3>
-        <p style={{ marginTop: 8, fontSize: 13, color: C.textMuted, lineHeight: 1.5 }}>
-          Commencez par économiser 500 CHF ce mois-ci.
+        <p style={{ marginTop: 6, fontSize: 12.5, color: C.textMuted, lineHeight: 1.45, margin: "6px 0 0 0" }}>
+          Premier palier vers votre fonds d&apos;urgence.
         </p>
       </div>
-      {/* Bouton remonté dans le flux du texte (marginTop 20) plutôt
-          qu'épinglé en bas via space-between, qui le faisait paraître
-          orphelin. */}
-      <button
-        style={{
-          marginTop: 20,
-          alignSelf: "flex-start",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "8px 16px",
-          backgroundColor: C.navy,
-          color: "white",
-          fontSize: 13,
-          fontWeight: 600,
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Agir maintenant
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <button
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "9px 16px",
+            backgroundColor: C.navy,
+            color: "white",
+            fontSize: 13,
+            fontWeight: 600,
+            borderRadius: 9,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Agir maintenant
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+        <span style={{ fontSize: 11.5, color: C.textLight, whiteSpace: "nowrap" }}>
+          ~17 CHF / jour
+        </span>
+      </div>
     </div>
   );
 }
@@ -663,26 +738,30 @@ function Roadmap() {
     <div
       style={{
         height: H.roadmap,
-        padding: "14px 18px",
+        padding: "16px 22px 14px 22px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
-        // Pas de border, shadow soft
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: C.textDark, margin: 0, fontFamily: "Outfit, Inter, system-ui" }}>
-          Votre avenir, notre feuille de route
-        </h2>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <div>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: C.textDark, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+            Votre feuille de route
+          </h2>
+          <p style={{ marginTop: 2, fontSize: 11.5, color: C.textMuted, margin: "2px 0 0 0" }}>
+            Projection sur 3 ans, mise à jour chaque mois
+          </p>
+        </div>
         <button
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 4,
-            fontSize: 13,
+            fontSize: 12.5,
             fontWeight: 500,
             color: C.primary,
             background: "none",
@@ -705,16 +784,16 @@ function Roadmap() {
         <Milestone eyebrow="AUJOURD'HUI" title="Score actuel" subtitle="Posez les bases solides" isToday score={46} />
         <Milestone
           eyebrow="DANS 4 MOIS"
-          title="Fonds d'urgence complet"
-          subtitle="3 mois de dépenses couvertes"
+          title="1er coussin d'urgence"
+          subtitle="2 000 CHF d'avance disponibles"
           icon="shield"
           bg={C.successBg}
           fg={C.success}
         />
         <Milestone
           eyebrow="DANS 12 MOIS"
-          title="15 000 CHF d'épargne"
-          subtitle="Votre épargne prend de l'élan"
+          title="6 000 CHF d'épargne"
+          subtitle="Fonds d'urgence en bonne voie"
           icon="trend"
           bg={C.violetBg}
           fg={C.violet}
@@ -722,14 +801,17 @@ function Roadmap() {
         <Milestone
           eyebrow="DANS 3 ANS"
           title="Apport immobilier"
-          subtitle="Atteignez votre objectif"
+          subtitle="60 000 CHF capitalisés"
           icon="home"
           bg={C.successBg}
           fg={C.success}
         />
-        {/* Connecteurs en overlay aux frontières de colonnes,
-            alignement optique avec les badges (top: 21 → 23,
-            descente +2 px supplémentaires demandée). */}
+        {/* Connecteurs en overlay aux frontières 25/50/75 % :
+            chaque connecteur est centré entre deux badges
+            (les badges sont au centre optique de leur colonne).
+            top: 10 → connector centré sur l'axe vertical des
+            badges (badge 32 px → centre à y=16, connecteur 12 px
+            de haut → top = 16 - 6 = 10). */}
         {[25, 50, 75].map((pct) => (
           <div
             key={pct}
@@ -737,7 +819,7 @@ function Roadmap() {
             style={{
               position: "absolute",
               left: `${pct}%`,
-              top: 23,
+              top: 10,
               transform: "translateX(-50%)",
               pointerEvents: "none",
             }}
@@ -770,15 +852,18 @@ function Milestone({
   fg?: string;
 }) {
   return (
-    // Milestone dans une colonne stricte 25 %. Contenu centré
-    // horizontalement (textAlign:center pour matérialiser la grille).
+    // Milestone CENTRÉ optiquement dans sa colonne 25 % : alignItems
+    // center pour aligner badge + textes sur l'axe vertical de la
+    // colonne. Connecteurs (overlay aux 25 / 50 / 75 %) tombent ainsi
+    // exactement à mi-chemin entre deux badges → équilibre parfait.
     <div
       style={{
         minWidth: 0,
-        padding: "0 14px",
+        padding: "0 18px",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        alignItems: "center",
+        textAlign: "center",
         overflow: "hidden",
       }}
     >
@@ -787,17 +872,20 @@ function Milestone({
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 30,
-          height: 30,
-          backgroundColor: isToday ? "transparent" : bg,
+          width: 32,
+          height: 32,
+          backgroundColor: isToday ? "white" : bg,
           color: isToday ? C.primary : fg,
           borderRadius: 999,
           border: isToday ? `2px solid ${C.primary}` : "none",
+          boxShadow: isToday
+            ? `0 0 0 4px ${C.primaryBg}`
+            : "none",
           flexShrink: 0,
         }}
       >
         {isToday ? (
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.primary, fontFamily: "Outfit, Inter, system-ui" }}>
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em" }}>
             {score}
           </span>
         ) : (
@@ -806,23 +894,25 @@ function Milestone({
       </span>
       <p
         style={{
-          marginTop: 8,
+          marginTop: 10,
           fontSize: 9,
-          fontWeight: 600,
+          fontWeight: 700,
           color: C.textLight,
-          letterSpacing: "0.16em",
+          letterSpacing: "0.18em",
           textTransform: "uppercase",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
+          maxWidth: "100%",
+          margin: 0,
         }}
       >
         {eyebrow}
       </p>
       <p
         style={{
-          marginTop: 3,
-          fontSize: 12,
+          marginTop: 4,
+          fontSize: 12.5,
           fontWeight: 600,
           color: C.textDark,
           lineHeight: 1.25,
@@ -831,6 +921,8 @@ function Milestone({
           WebkitLineClamp: 1,
           WebkitBoxOrient: "vertical",
           textOverflow: "ellipsis",
+          maxWidth: "100%",
+          margin: 0,
         }}
         title={title}
       >
@@ -839,14 +931,16 @@ function Milestone({
       <p
         style={{
           marginTop: 2,
-          fontSize: 10.5,
+          fontSize: 11,
           color: C.textMuted,
-          lineHeight: 1.3,
+          lineHeight: 1.35,
           overflow: "hidden",
           display: "-webkit-box",
           WebkitLineClamp: 2,
           WebkitBoxOrient: "vertical",
           textOverflow: "ellipsis",
+          maxWidth: "100%",
+          margin: 0,
         }}
         title={subtitle}
       >
@@ -885,30 +979,30 @@ function RoadmapConnector() {
   return (
     <div
       style={{
-        width: 36,
+        width: 80,
         height: 12,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <svg viewBox="0 0 36 12" width={32} height={10}>
+      <svg viewBox="0 0 80 12" width={80} height={12}>
         <line
           x1="2"
           y1="6"
-          x2="24"
+          x2="66"
           y2="6"
           stroke={C.primary}
-          strokeOpacity="0.5"
-          strokeWidth="2"
+          strokeOpacity="0.45"
+          strokeWidth="1.6"
           strokeLinecap="round"
-          strokeDasharray="2 3"
+          strokeDasharray="2 4"
         />
         <path
-          d="M 25 1.5 L 33 6 L 25 10.5"
+          d="M 67 1.5 L 77 6 L 67 10.5"
           stroke={C.primary}
-          strokeOpacity="0.5"
-          strokeWidth="2"
+          strokeOpacity="0.55"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
@@ -972,10 +1066,9 @@ function KpiCard({
     <div
       style={{
         height: H.kpi,
-        padding: 14,
+        padding: "14px 16px",
         backgroundColor: C.cardBg,
-        borderRadius: 16,
-        // PAS DE BORDER. Shadow ultra-light.
+        borderRadius: 14,
         boxShadow: SHADOW.kpi,
         display: "flex",
         flexDirection: "column",
@@ -983,41 +1076,15 @@ function KpiCard({
         overflow: "hidden",
       }}
     >
-      <p
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          color: C.textMuted,
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </p>
-      {/* Valeur seule au-dessus */}
-      <p
-        style={{
-          fontSize: 21,
-          fontWeight: 700,
-          color: C.textDark,
-          lineHeight: 1,
-          fontFamily: "Outfit, Inter, system-ui",
-          margin: 0,
-        }}
-      >
-        {value}
-      </p>
-      {/* Ligne de base : hint à gauche, delta % + sparkline à droite,
-          tous alignés sur la MÊME baseline. Pour garantir que les 4
-          sparklines commencent et terminent AU MÊME ENDROIT visuel,
-          le span delta % a une largeur fixe (52 px, textAlign right)
-          → la sparkline démarre toujours au même x dans toutes les
-          cartes, peu importe la longueur du delta ("+3.2%" vs "—"). */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+      {/* Ligne 1 : label + delta pill (alignés sur même baseline) */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <p
           style={{
-            fontSize: 10.5,
+            fontSize: 10,
+            fontWeight: 600,
             color: C.textMuted,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
             margin: 0,
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -1025,49 +1092,90 @@ function KpiCard({
             minWidth: 0,
           }}
         >
-          {hint}
+          {label}
         </p>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: 2,
-              width: 44,
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: delta.color,
-            }}
-          >
-            {delta.direction === "up" && (
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="7 17 17 7" />
-                <polyline points="7 7 17 7 17 17" />
-              </svg>
-            )}
-            {delta.direction === "down" && (
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="7 7 17 17" />
-                <polyline points="7 17 17 17 17 7" />
-              </svg>
-            )}
-            {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
-          </span>
-          <div style={{ width: 56, flexShrink: 0 }}>
-            <Sparkline points={sparkline.points} color={sparkline.color} />
-          </div>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 2,
+            padding: "2px 6px",
+            borderRadius: 999,
+            backgroundColor:
+              delta.direction === "none"
+                ? "#FEF3C7"
+                : delta.color === C.success
+                  ? C.successBg
+                  : "#FEE2E2",
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: delta.color,
+            flexShrink: 0,
+            lineHeight: 1,
+          }}
+        >
+          {delta.direction === "up" && (
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="7 17 17 7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          )}
+          {delta.direction === "down" && (
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="7 7 17 17" />
+              <polyline points="7 17 17 17 17 7" />
+            </svg>
+          )}
+          {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
+        </span>
+      </div>
+      {/* Ligne 2 : valeur (massive) + sparkline collée à droite,
+          baselines alignées sur l'axe visuel central de la carte. */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <p
+          style={{
+            fontSize: 22,
+            fontWeight: 700,
+            color: C.textDark,
+            lineHeight: 1,
+            fontFamily: "Outfit, Inter, system-ui",
+            margin: 0,
+            letterSpacing: "-0.025em",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            minWidth: 0,
+          }}
+        >
+          {value}
+        </p>
+        <div style={{ width: 60, height: 24, flexShrink: 0 }}>
+          <Sparkline points={sparkline.points} color={sparkline.color} />
         </div>
       </div>
+      {/* Ligne 3 : hint, une ligne, ne se brise jamais */}
+      <p
+        style={{
+          fontSize: 11,
+          color: C.textMuted,
+          margin: 0,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {hint}
+      </p>
     </div>
   );
 }
 
-/* Mini sparkline SVG — 72×20 px, smooth line + subtle area.
-   Largeur 100% du conteneur parent (fixé à 72 px en KPI). */
+/* Mini sparkline SVG. Scaled à 100 % du conteneur, stroke
+   vector-effect non-scaling pour garder une épaisseur uniforme
+   quelle que soit la largeur réelle. */
 function Sparkline({ points, color }: { points: number[]; color: string }) {
-  const W = 72;
-  const HH = 20;
+  const W = 60;
+  const HH = 24;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const range = max - min || 1;
@@ -1081,9 +1189,9 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
     .join(" ");
   const areaD = `${pathD} L ${coords[coords.length - 1].x.toFixed(2)} ${HH - 1} L ${coords[0].x.toFixed(2)} ${HH - 1} Z`;
   return (
-    <svg width="100%" height={HH} viewBox={`0 0 ${W} ${HH}`} preserveAspectRatio="none" style={{ display: "block" }}>
-      <path d={areaD} fill={color} fillOpacity={0.12} />
-      <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    <svg width="100%" height="100%" viewBox={`0 0 ${W} ${HH}`} preserveAspectRatio="none" style={{ display: "block" }}>
+      <path d={areaD} fill={color} fillOpacity={0.14} />
+      <path d={pathD} fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -1107,114 +1215,121 @@ function OpportunityCard() {
         position: "relative",
         overflow: "hidden",
         height: H.bottomRow,
-        padding: 18,
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* Flèche financière premium — segments droits, sharp angles.
-          Réduite (82 → 58) + décalée plus à droite (right 30 → 14) et
-          descendue (top 58 → 84) pour ne plus concurrencer le titre. */}
+      {/* Décor subtil — pattern radial vert dans le coin sup. droit
+          (style Stripe). Donne du caractère sans concurrencer le texte. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: 14,
-          top: 84,
-          width: 58,
-          height: 58,
-          opacity: 0.85,
-          color: C.success,
+          right: -60,
+          top: -60,
+          width: 180,
+          height: 180,
+          background:
+            "radial-gradient(circle, rgba(16, 163, 127, 0.10) 0%, rgba(16, 163, 127, 0) 65%)",
+          pointerEvents: "none",
         }}
-      >
-        <svg viewBox="0 0 80 80" fill="none" width="100%" height="100%">
-          {/* Trend stepped line : montée → petite correction → remontée forte */}
-          <polyline
-            points="8 62 22 50 32 56 62 18"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinejoin="miter"
-            strokeLinecap="butt"
-            fill="none"
-          />
-          {/* Pointe de flèche angulaire nette pointant NE */}
-          <polyline
-            points="50 22 62 18 58 30"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinejoin="miter"
-            strokeLinecap="butt"
-            fill="none"
-          />
-        </svg>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      />
+      <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 10 }}>
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 24,
-            height: 24,
-            borderRadius: 6,
+            width: 28,
+            height: 28,
+            borderRadius: 8,
             backgroundColor: C.successBg,
+            flexShrink: 0,
           }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="22 4 12 14.01 9 11.01" />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            <polyline points="17 6 23 6 23 12" />
           </svg>
         </span>
-        <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
           Opportunité du moment
         </p>
       </div>
-      <p style={{ marginTop: 8, fontSize: 12, fontWeight: 600, color: C.success, lineHeight: 1.4 }}>
-        Le plus grand impact pour vous
-      </p>
       <h3
         style={{
-          fontSize: 15,
+          marginTop: 14,
+          fontSize: 16,
           fontWeight: 700,
           color: C.textDark,
-          lineHeight: 1.25,
-          maxWidth: "65%",
-          margin: "8px 0 0 0",
+          lineHeight: 1.3,
+          margin: "14px 0 0 0",
           fontFamily: "Outfit, Inter, system-ui",
+          letterSpacing: "-0.01em",
         }}
       >
         Augmentez vos revenus de 300 CHF/mois
       </h3>
-      <p style={{ marginTop: 6, fontSize: 11.5, color: C.textMuted, lineHeight: 1.4, maxWidth: "65%" }}>
-        aurait plus d&apos;impact que réduire vos dépenses de 100 CHF/mois.
+      <p style={{ marginTop: 6, fontSize: 12, color: C.textMuted, lineHeight: 1.5, margin: "6px 0 0 0" }}>
+        Plus d&apos;impact que réduire vos dépenses de 100 CHF/mois.
       </p>
-      <p style={{ marginTop: 10, fontSize: 11.5, color: C.textMuted }}>
-        Impact potentiel :{" "}
-        <span style={{ fontWeight: 700, color: C.success }}>+12 points sur votre score</span>
-      </p>
-      <button
+      {/* Bloc impact — callout structuré, plus de flèche décorative */}
+      <div
         style={{
-          marginTop: 10,
-          padding: "7px 14px",
-          display: "inline-flex",
+          marginTop: "auto",
+          display: "flex",
           alignItems: "center",
-          gap: 6,
-          backgroundColor: C.navy,
-          color: "white",
-          fontSize: 12,
-          fontWeight: 600,
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "10px 12px",
+          borderRadius: 10,
+          backgroundColor: C.successBg,
         }}
       >
-        Explorer comment
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: C.success, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            Impact score
+          </span>
+          <span
+            style={{
+              marginTop: 2,
+              fontSize: 18,
+              fontWeight: 700,
+              color: C.success,
+              fontFamily: "Outfit, Inter, system-ui",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            +12 pts
+          </span>
+        </div>
+        <button
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 14px",
+            backgroundColor: C.navy,
+            color: "white",
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+        >
+          Explorer
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
@@ -1249,23 +1364,24 @@ function RepartitionCard() {
     <div
       style={{
         height: H.bottomRow,
-        padding: 18,
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Répartition des dépenses
-      </p>
-      <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Ce mois-ci</p>
-      {/* Donut réduit 100 → 92, gap 26 → 18, paddingLeft 10 → 2
-          pour libérer ~22 px supplémentaires à la légende (labels
-          tronqués sur "Loisirs & divers" auparavant). */}
-      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 18, paddingLeft: 2 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 92, height: 92 }}>
-          <svg viewBox="0 0 100 100" width={92} height={92}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
+          Répartition des dépenses
+        </p>
+        <span style={{ fontSize: 10.5, color: C.textLight, fontWeight: 500 }}>Ce mois</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", marginTop: 14, gap: 16, flex: 1 }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 104, height: 104 }}>
+          <svg viewBox="0 0 100 100" width={104} height={104}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
@@ -1282,11 +1398,12 @@ function RepartitionCard() {
           >
             <p
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 700,
                 color: C.textDark,
                 margin: 0,
                 fontFamily: "Outfit, Inter, system-ui",
+                letterSpacing: "-0.02em",
               }}
             >
               15 893
@@ -1295,10 +1412,11 @@ function RepartitionCard() {
               style={{
                 fontSize: 8.5,
                 fontWeight: 600,
-                color: C.textMuted,
-                letterSpacing: "0.18em",
+                color: C.textLight,
+                letterSpacing: "0.2em",
                 margin: 0,
                 textTransform: "uppercase",
+                marginTop: 1,
               }}
             >
               CHF
@@ -1311,14 +1429,14 @@ function RepartitionCard() {
               key={s.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 32px 66px",
-                gap: 6,
-                height: 18,
+                gridTemplateColumns: "minmax(0, 1fr) 28px 64px",
+                columnGap: 8,
+                height: 22,
                 fontSize: 11,
                 alignItems: "center",
               }}
             >
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <span
                   style={{
                     display: "inline-block",
@@ -1329,14 +1447,14 @@ function RepartitionCard() {
                     flexShrink: 0,
                   }}
                 />
-                <span style={{ color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span style={{ color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>
                   {s.label}
                 </span>
               </span>
-              <span style={{ color: C.textDark, fontWeight: 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+              <span style={{ color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                 {s.pct}%
               </span>
-              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums", textAlign: "right", paddingLeft: 4 }}>
+              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                 {s.amount}
               </span>
             </div>
@@ -1345,11 +1463,12 @@ function RepartitionCard() {
       </div>
       <button
         style={{
-          marginTop: 12,
+          marginTop: 4,
+          alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
-          fontSize: 13,
+          fontSize: 12.5,
           fontWeight: 500,
           color: C.primary,
           background: "none",
@@ -1371,12 +1490,10 @@ function RepartitionCard() {
 function EvolutionCard() {
   const points = [22, 30, 38, 32, 42, 50, 54, 46];
   const W = 320;
-  // Hauteur réduite (122 → 96) pour que le lien "Voir l'historique"
-  // ne soit plus rogné par l'overflow:hidden de la carte (H.bottomRow
-  // = 192). PAD.right augmenté (50 → 58) pour décoller le badge "46"
-  // du bord droit.
-  const HH = 96;
-  const PAD = { top: 4, right: 58, bottom: 20, left: 2 };
+  const HH = 110;
+  // PAD.right large (60) pour héberger le badge "46" sans qu'il
+  // touche le bord. PAD.bottom 22 pour X-axis intégrés au SVG.
+  const PAD = { top: 8, right: 60, bottom: 22, left: 4 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1390,25 +1507,47 @@ function EvolutionCard() {
   const baselineY = PAD.top + innerH;
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
   const last = scaled[scaled.length - 1];
-  const xLabels = ["1 avr.", "15 avr.", "1 mai", "15 mai", "1 juin"];
+  const xLabels = ["1 avr", "15 avr", "1 mai", "15 mai", "1 juin"];
 
   return (
     <div
       style={{
         height: H.bottomRow,
-        padding: "18px 30px 18px 18px",
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Évolution du score
-      </p>
-      <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Votre progression</p>
-      <div style={{ marginTop: 6 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
+          Évolution du score
+        </p>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 3,
+            padding: "2px 7px",
+            borderRadius: 999,
+            backgroundColor: C.successBg,
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: C.success,
+          }}
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="7 17 17 7" />
+            <polyline points="7 7 17 7 17 17" />
+          </svg>
+          +24 pts (60j)
+        </span>
+      </div>
+      <div style={{ marginTop: 10, flex: 1, minHeight: 0 }}>
+        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
           <defs>
             <linearGradient id="evo-gradient-v3" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
@@ -1422,26 +1561,32 @@ function EvolutionCard() {
           {[25, 50, 75, 100].map((v) => {
             const y = PAD.top + ((100 - v) / 100) * innerH;
             return (
-              <text key={`y-${v}`} x={W - PAD.right + 6} y={y + 3} fontSize="9" fill={C.textMuted}>
+              <text key={`y-${v}`} x={W - PAD.right + 6} y={y + 3} fontSize="8.5" fill={C.textLight}>
                 {v}
               </text>
             );
           })}
           <path d={areaD} fill="url(#evo-gradient-v3)" />
-          <path d={pathD} stroke={C.primary} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={pathD} stroke={C.primary} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
           {scaled.slice(0, -1).map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={3} fill={C.cardBg} stroke={C.primary} strokeWidth={1.5} />
+            <circle key={i} cx={p.x} cy={p.y} r={2.5} fill={C.cardBg} stroke={C.primary} strokeWidth={1.5} />
           ))}
-          <circle cx={last.x} cy={last.y} r={4} fill={C.primary} />
-          <rect x={last.x + 6} y={last.y - 14} width={40} height={26} rx={5} fill={C.navy} />
-          <text x={last.x + 26} y={last.y - 3} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
-            46
-          </text>
-          <text x={last.x + 26} y={last.y + 8} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
-            Score actuel
-          </text>
-          {/* X-axis labels INTÉGRÉS dans le SVG (vs row HTML séparée)
-              → gain de place pour aérer le lien dessous. */}
+          {/* Last point : cercle plus marqué (highlight current) */}
+          <circle cx={last.x} cy={last.y} r={5} fill="white" stroke={C.primary} strokeWidth={2} />
+          <circle cx={last.x} cy={last.y} r={2.5} fill={C.primary} />
+          {/* Badge "46 Score actuel" : positionné AU-DESSUS du point
+              (vs à côté) pour ne pas toucher le bord droit ni la courbe.
+              Pointe légère vers le point en dessous. */}
+          <g transform={`translate(${last.x - 22}, ${last.y - 38})`}>
+            <rect x="0" y="0" width="44" height="28" rx="6" fill={C.navy} />
+            <text x="22" y="12" textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui">
+              46
+            </text>
+            <text x="22" y="22" textAnchor="middle" fontSize="6.5" fill="rgba(255,255,255,0.7)" letterSpacing="0.5">
+              SCORE ACTUEL
+            </text>
+            <path d="M 18 28 L 22 32 L 26 28 Z" fill={C.navy} />
+          </g>
           {xLabels.map((label, i) => {
             const x = PAD.left + (i / (xLabels.length - 1)) * innerW;
             const anchor = i === 0 ? "start" : i === xLabels.length - 1 ? "end" : "middle";
@@ -1450,8 +1595,8 @@ function EvolutionCard() {
                 key={label}
                 x={x}
                 y={HH - 6}
-                fontSize="9"
-                fill={C.textMuted}
+                fontSize="8.5"
+                fill={C.textLight}
                 textAnchor={anchor}
               >
                 {label}
@@ -1460,15 +1605,14 @@ function EvolutionCard() {
           })}
         </svg>
       </div>
-      {/* Lien "Voir l'historique" — marginTop réduit (12 → 8) pour
-          assurer la visibilité du lien dans la carte 192 px. */}
       <button
         style={{
-          marginTop: 8,
+          marginTop: 6,
+          alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
-          fontSize: 12,
+          fontSize: 12.5,
           fontWeight: 500,
           color: C.primary,
           background: "none",
@@ -1491,60 +1635,66 @@ function EvolutionCard() {
 
 function CoachCta() {
   return (
-    // Toute la ligne en align-items: center → icône, bloc texte et
-    // bouton CTA partagent la même axe vertical médian. Hauteur
-    // inchangée (36 px). Bloc texte sans flex (laisse les 2 p
-    // s'empiler) mais le wrapper parent les centre.
     <div
       style={{
         height: H.coachCta,
-        padding: "0 18px",
+        padding: "0 20px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
         boxShadow: SHADOW.flat,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        gap: 16,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             borderRadius: 999,
             backgroundColor: C.primaryBg,
             flexShrink: 0,
           }}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </span>
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <p style={{ fontSize: 13.5, fontWeight: 600, color: C.textDark, margin: 0, lineHeight: 1.2 }}>
-            Parler à mon conseiller
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", minWidth: 0 }}>
+          <p style={{ fontSize: 13.5, fontWeight: 600, color: C.textDark, margin: 0, lineHeight: 1.3 }}>
+            Parler à votre conseiller
           </p>
-          <p style={{ fontSize: 12, color: C.textMuted, margin: 0, lineHeight: 1.2 }}>
+          <p
+            style={{
+              fontSize: 12,
+              color: C.textMuted,
+              margin: 0,
+              lineHeight: 1.3,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             Posez une question, obtenez des conseils personnalisés.
           </p>
         </div>
       </div>
       <button
         style={{
-          padding: "9px 16px",
+          padding: "9px 18px",
           display: "inline-flex",
           alignItems: "center",
-          justifyContent: "center",
           gap: 8,
           backgroundColor: C.navy,
           color: "white",
           fontSize: 12.5,
           fontWeight: 600,
-          borderRadius: 8,
+          borderRadius: 9,
           border: "none",
           cursor: "pointer",
           flexShrink: 0,
