@@ -443,7 +443,7 @@ function ScoreCard() {
             Score de santé financière
           </p>
           {/* Score "46" — 76 px, tracking serré pour densité premium */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4, transform: "translateY(-4px)" }}>
             <span
               style={{
                 fontSize: 76,
@@ -460,7 +460,7 @@ function ScoreCard() {
               /100
             </span>
           </div>
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: 12, transform: "translateY(-10px)" }}>
             <span
               style={{
                 display: "inline-flex",
