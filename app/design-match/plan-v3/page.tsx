@@ -58,7 +58,7 @@ const H = {
   topbar: 68,
   planHeader: 64,
   mission: 168,
-  roadmap: 260,
+  roadmap: 254,
   bottomRow: 264,
   gap: 12,
   rightCardGap: 10,
@@ -414,10 +414,7 @@ function PlanHeaderCard() {
           Basé sur votre situation actuelle, vos objectifs et vos priorités.
         </p>
       </div>
-      {/* Divider vertical subtil — structure le bloc sans alourdir.
-          margin auto pour respiration équilibrée. */}
-      <div aria-hidden style={{ width: 1, height: 36, backgroundColor: C.borderGhost, flexShrink: 0 }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 26, flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 24, flexShrink: 0 }}>
         <HeaderMetric
           label="Score actuel"
           value="46"
@@ -732,33 +729,26 @@ function RoadmapCard() {
     <div
       style={{
         minHeight: H.roadmap,
-        padding: "16px 20px",
+        padding: "14px 18px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        // PAS d'overflow:hidden — c'est ce qui rognait les Phase
-        // cards. Le card grandit si le contenu l'exige.
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 15,
-            fontWeight: 700,
-            color: C.textDark,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Votre feuille de route
-        </h2>
-        <span style={{ fontSize: 11, color: C.textMuted, fontWeight: 500 }}>
-          4 / 22 étapes
-        </span>
-      </div>
+      <h2
+        style={{
+          margin: 0,
+          fontSize: 15,
+          fontWeight: 700,
+          color: C.textDark,
+          fontFamily: "Outfit, Inter, system-ui",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        Votre feuille de route
+      </h2>
 
       {/* Rail icônes — compression supplémentaire (36 → 32 px,
           icons 32 → 28). Marges 12 → 10 sur les 2 axes du rail.
@@ -779,27 +769,23 @@ function RoadmapCard() {
           }}
         />
         <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", height: "100%" }}>
-          {/* Phase 1 = ACTIVE (en cours : 2 done + 1 active + 1 todo).
-              Le rail head est cohérent avec la colonne. Le check icon
-              à l'intérieur signale les progrès déjà accomplis. */}
-          <PhaseHead variant="active" icon="check" />
+          <PhaseHead variant="done" icon="check" />
           <PhaseHead variant="future" icon="chart" />
           <PhaseHead variant="future" icon="rocket" />
           <PhaseHead variant="future" icon="home" />
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 8 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
           duration="3 mois"
-          isActive
           tasks={[
-            { label: "Ajouter mes dépenses", state: "done" },
+            { label: "Ajouter toutes les dépenses", state: "done" },
             { label: "Définir un objectif", state: "done" },
-            { label: "Constituer 1 mois d'urgence", state: "active", note: "En cours" },
-            { label: "Atteindre 3 mois d'urgence", state: "todo" },
+            { label: "Construire 1 mois d'urgence", state: "active", note: "En cours" },
+            { label: "Construire 3 mois d'urgence", state: "todo", note: "À faire" },
           ]}
         />
         <PhaseColumn
@@ -818,8 +804,8 @@ function RoadmapCard() {
           duration="6-24 mois"
           tasks={[
             { label: "Augmenter les revenus", state: "todo" },
-            { label: "Réserve à long terme", state: "todo" },
-            { label: "Développer mes compétences", state: "todo" },
+            { label: "Construire une réserve long terme", state: "todo" },
+            { label: "Développer vos compétences", state: "todo" },
           ]}
         />
         <PhaseColumn
@@ -827,8 +813,8 @@ function RoadmapCard() {
           title="Investir"
           duration="2 ans et +"
           tasks={[
-            { label: "Démarrer les investissements", state: "todo" },
-            { label: "Diversifier le portefeuille", state: "todo" },
+            { label: "Commencer les investissements", state: "todo" },
+            { label: "Diversifier", state: "todo" },
             { label: "Construire le patrimoine", state: "todo" },
           ]}
         />
@@ -906,74 +892,43 @@ function PhaseColumn({
   title,
   duration,
   tasks,
-  isActive = false,
 }: {
   phase: string;
   title: string;
   duration: string;
   tasks: { label: string; state: "done" | "active" | "todo"; note?: string }[];
-  isActive?: boolean;
 }) {
   return (
     <div
       style={{
-        position: "relative",
-        padding: "10px 12px",
-        // Phase active : bg teinté primary (#EEF4FF ≈ primaryBg
-        // dilué) + inset ring primary 0.25 pour "current scope"
-        // visiblement distinct sans agresser visuellement.
-        backgroundColor: isActive ? "#EEF4FF" : C.pageBg,
-        borderRadius: 12,
-        boxShadow: isActive ? `inset 0 0 0 1px rgba(37, 99, 235, 0.25)` : "none",
+        padding: "8px 12px 10px",
+        backgroundColor: C.pageBg,
+        borderRadius: 10,
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
       }}
     >
-      {/* Eyebrow PHASE X + chip "EN COURS" (si active) + durée */}
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
-        <span style={{ display: "inline-flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: isActive ? C.primary : C.textLight, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-            {phase}
-          </p>
-          {isActive && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "2px 6px",
-                borderRadius: 999,
-                backgroundColor: C.primary,
-                color: "white",
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                lineHeight: 1.3,
-              }}
-            >
-              En cours
-            </span>
-          )}
-        </span>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums" }}>
-          {duration}
-        </p>
-      </div>
+      <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: C.textLight, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        {phase}
+      </p>
       <p
         style={{
-          margin: "3px 0 0 0",
-          fontSize: 13.5,
+          margin: "2px 0 0 0",
+          fontSize: 13,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.015em",
+          letterSpacing: "-0.01em",
           lineHeight: 1.2,
         }}
       >
         {title}
       </p>
-      <ul style={{ marginTop: 8, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 5 }}>
+      <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.3 }}>
+        Durée estimée&nbsp;: {duration}
+      </p>
+      <ul style={{ marginTop: 6, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
         {tasks.map((t) => (
           <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
             <TaskBullet state={t.state} />
@@ -981,9 +936,9 @@ function PhaseColumn({
               <p
                 style={{
                   margin: 0,
-                  fontSize: 11,
-                  fontWeight: t.state === "active" ? 600 : 500,
-                  color: t.state === "todo" ? C.textMuted : C.textDark,
+                  fontSize: 10.5,
+                  fontWeight: 500,
+                  color: C.textDark,
                   lineHeight: 1.3,
                   wordBreak: "break-word",
                 }}
@@ -993,11 +948,11 @@ function PhaseColumn({
               {t.note && (
                 <p
                   style={{
-                    margin: "1px 0 0 0",
+                    margin: 0,
                     fontSize: 9.5,
-                    fontWeight: 700,
                     color: t.state === "active" ? C.primary : C.textLight,
-                    letterSpacing: "0.04em",
+                    fontWeight: 500,
+                    lineHeight: 1.2,
                   }}
                 >
                   {t.note}
@@ -1105,7 +1060,6 @@ function ProjectionCard() {
   // Y-axis ticks alignés sur les valeurs réelles (40 / 60 / 80)
   // pour donner du contexte de progression — même langage que
   // dashboard-v3 EvolutionCard.
-  const yTicks = [40, 60, 80];
   return (
     <div
       style={{
@@ -1117,30 +1071,9 @@ function ProjectionCard() {
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Si vous suivez ce plan
-        </p>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
-            borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-          </svg>
-          +32 pts
-        </span>
-      </div>
+      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Si vous suivez ce plan
+      </p>
       <p
         style={{
           margin: "4px 0 0 0",
@@ -1162,48 +1095,24 @@ function ProjectionCard() {
               <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
             </linearGradient>
           </defs>
-          {/* Lignes de grille Y */}
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <line key={v} x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-            );
-          })}
-          {/* Labels Y à droite */}
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <text key={`y-${v}`} x={W - PAD.right + 4} y={y + 3} fontSize="8.5" fill={C.textLight}>
-                {v}
-              </text>
-            );
-          })}
           <path d={areaD} fill="url(#proj-grad-v3)" />
           <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => {
-            const isLast = i === scaled.length - 1;
-            return (
-              <g key={i}>
-                {/* Cercle avec halo pour le dernier (target) */}
-                {isLast && (
-                  <circle cx={p.x} cy={p.y} r={8} fill={C.primary} fillOpacity={0.14} />
-                )}
-                <circle cx={p.x} cy={p.y} r={isLast ? 4.5 : 3.4} fill="white" stroke={C.primary} strokeWidth={isLast ? 2.2 : 1.8} />
-                {/* Label valeur au-dessus, pill blanc shadow */}
-                <text
-                  x={p.x}
-                  y={p.y - 10}
-                  textAnchor="middle"
-                  fontSize="10"
-                  fontWeight={isLast ? 700 : 600}
-                  fill={isLast ? C.primary : C.textDark}
-                  fontFamily="Outfit, Inter, system-ui"
-                >
-                  {p.value}
-                </text>
-              </g>
-            );
-          })}
+          {scaled.map((p, i) => (
+            <g key={i}>
+              <circle cx={p.x} cy={p.y} r={3.4} fill="white" stroke={C.primary} strokeWidth={1.8} />
+              <text
+                x={p.x}
+                y={p.y - 8}
+                textAnchor="middle"
+                fontSize="10"
+                fontWeight="700"
+                fill={C.textDark}
+                fontFamily="Outfit, Inter, system-ui"
+              >
+                {p.value}
+              </text>
+            </g>
+          ))}
         </svg>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, marginTop: 4, fontWeight: 500 }}>
@@ -1457,7 +1366,7 @@ function RightRail() {
 }
 
 function ProgressionGlobaleCard() {
-  const r = 30;
+  const r = 26;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.18);
   return (
@@ -1473,22 +1382,22 @@ function ProgressionGlobaleCard() {
         Progression globale
       </p>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 12 }}>
-        <div style={{ flexShrink: 0, width: 76, height: 76, position: "relative" }}>
-          <svg viewBox="0 0 76 76" width={76} height={76}>
-            <circle cx="38" cy="38" r={r} fill="none" stroke={C.primaryBg} strokeWidth="6" />
+        <div style={{ flexShrink: 0, width: 68, height: 68, position: "relative" }}>
+          <svg viewBox="0 0 68 68" width={68} height={68}>
+            <circle cx="34" cy="34" r={r} fill="none" stroke={C.primaryBg} strokeWidth="5" />
             <circle
-              cx="38"
-              cy="38"
+              cx="34"
+              cy="34"
               r={r}
               fill="none"
               stroke={C.primary}
-              strokeWidth="6"
+              strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 38 38)"
+              transform="rotate(-90 34 34)"
             />
-            <text x="38" y="43" textAnchor="middle" fontSize="17" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.025em">
+            <text x="34" y="39" textAnchor="middle" fontSize="15" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
               18 %
             </text>
           </svg>
@@ -1497,10 +1406,8 @@ function ProgressionGlobaleCard() {
           <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
             Plan en cours
           </p>
-          <p style={{ margin: "4px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
-            <span style={{ color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>4</span>
-            {" / "}
-            <span style={{ fontVariantNumeric: "tabular-nums" }}>22</span> étapes complétées
+          <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
+            4 étapes sur 22 complétées
           </p>
         </div>
       </div>
@@ -1628,62 +1535,20 @@ function ConseillerRecommandeCard() {
         boxShadow: SHADOW.card,
       }}
     >
-      {/* Eyebrow + sparkle icon navy : signature Coach IA cohérente
-          avec /design-match/coach-v3 — crédibilité + branding produit. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 22,
-            height: 22,
-            borderRadius: 6,
-            backgroundColor: C.navy,
-            flexShrink: 0,
-          }}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
-            <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-          Votre conseiller recommande
-        </p>
-      </div>
-      {/* Bloc citation premium : guillemets primary décoratifs en
-          large taille + texte serré, langage éditorial vs simple
-          quote italique. */}
-      <div style={{ position: "relative", marginTop: 12 }}>
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: -6,
-            left: -2,
-            fontSize: 28,
-            color: C.primary,
-            fontFamily: "Outfit, Inter, system-ui",
-            fontWeight: 700,
-            lineHeight: 1,
-            opacity: 0.35,
-            pointerEvents: "none",
-          }}
-        >
-          “
-        </span>
-        <p
-          style={{
-            margin: 0,
-            paddingLeft: 14,
-            fontSize: 12.5,
-            color: C.textDark,
-            lineHeight: 1.55,
-          }}
-        >
-          Commencez par compléter toutes vos dépenses, puis construisez votre premier mois de sécurité. Chaque petite action vous rapproche de vos objectifs.
-        </p>
-      </div>
+      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+        Votre conseiller recommande
+      </p>
+      <p
+        style={{
+          margin: "10px 0 0 0",
+          fontSize: 12.5,
+          color: C.textDark,
+          lineHeight: 1.55,
+          fontStyle: "italic",
+        }}
+      >
+        «&nbsp;Commencez par compléter toutes vos dépenses, puis construisez votre premier mois de sécurité. Chaque petite action vous rapproche de vos objectifs.&nbsp;»
+      </p>
       <button
         style={{
           marginTop: 12,
