@@ -56,10 +56,10 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  planHeader: 68,
-  mission: 188,
-  roadmap: 268,
-  bottomRow: 218,
+  planHeader: 64,
+  mission: 168,
+  roadmap: 274,
+  bottomRow: 226,
   gap: 12,
   rightCardGap: 10,
 };
@@ -69,23 +69,19 @@ export default function DesignMatchPlanV3() {
     <div
       style={{
         display: "flex",
-        height: "100vh",
-        overflow: "hidden",
+        minHeight: "100vh",
         backgroundColor: C.pageBg,
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
       <Sidebar />
-      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column" }}>
         <Topbar />
         <main
           style={{
-            flex: 1,
-            minHeight: 0,
             padding: "0 32px 16px 32px",
             display: "grid",
             gridTemplateColumns: "minmax(0, 1fr) 320px",
-            gridTemplateRows: "1fr",
             gap: 24,
             maxWidth: 1440,
             margin: "0 auto",
@@ -374,7 +370,7 @@ function Topbar() {
 
 function MainColumn() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0, gap: H.gap }}>
+    <div style={{ display: "flex", flexDirection: "column", minWidth: 0, gap: H.gap }}>
       <PlanHeaderCard />
       <MissionCard />
       <RoadmapCard />
@@ -389,8 +385,8 @@ function PlanHeaderCard() {
   return (
     <div
       style={{
-        height: H.planHeader,
-        padding: "14px 20px",
+        minHeight: H.planHeader,
+        padding: "12px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -565,9 +561,9 @@ function MissionCard() {
     <div
       style={{
         position: "relative",
-        overflow: "hidden",
-        height: H.mission,
-        padding: "20px 22px",
+        overflow: "hidden", // garde le clip pour le glow + bouclier décoratif uniquement
+        minHeight: H.mission,
+        padding: "18px 22px",
         backgroundColor: C.navy,
         borderRadius: 18,
         boxShadow: SHADOW.navy,
@@ -630,18 +626,18 @@ function MissionCard() {
         </div>
         <h3
           style={{
-            margin: "8px 0 0 0",
-            fontSize: 22,
+            margin: "6px 0 0 0",
+            fontSize: 20,
             fontWeight: 700,
             color: "white",
-            lineHeight: 1.15,
+            lineHeight: 1.2,
             fontFamily: "Outfit, Inter, system-ui",
             letterSpacing: "-0.02em",
           }}
         >
           Construire votre fonds d&apos;urgence
         </h3>
-        <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.4 }}>
+        <p style={{ margin: "4px 0 0 0", fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.4 }}>
           Vous avez actuellement 0.0 mois de sécurité.
         </p>
       </div>
@@ -749,14 +745,15 @@ function RoadmapCard() {
   return (
     <div
       style={{
-        height: H.roadmap,
+        minHeight: H.roadmap,
         padding: "16px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        // PAS d'overflow:hidden — c'est ce qui rognait les Phase
+        // cards. Le card grandit si le contenu l'exige.
       }}
     >
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
@@ -801,8 +798,10 @@ function RoadmapCard() {
         </div>
       </div>
 
-      {/* 4 colonnes de tâches — pageBg, padding 10/12, allow wrap 2L */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 12, flex: 1, minHeight: 0 }}>
+      {/* 4 colonnes de tâches — pageBg, hauteur naturelle (les
+          colonnes s'alignent stretch sur la plus haute, plus jamais
+          de troncature). */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 12 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
@@ -811,7 +810,7 @@ function RoadmapCard() {
             { label: "Ajouter mes dépenses", state: "done" },
             { label: "Définir un objectif", state: "done" },
             { label: "Constituer 1 mois d'urgence", state: "active", note: "En cours" },
-            { label: "Atteindre 3 mois d'urgence", state: "todo", note: "À faire" },
+            { label: "Atteindre 3 mois d'urgence", state: "todo" },
           ]}
         />
         <PhaseColumn
@@ -1052,7 +1051,7 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
 
 function BottomRow() {
   return (
-    <div style={{ height: H.bottomRow, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+    <div style={{ minHeight: H.bottomRow, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
       <ProjectionCard />
       <ActionsSemaineCard />
       <LevierCard />
@@ -1094,7 +1093,6 @@ function ProjectionCard() {
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -1112,7 +1110,7 @@ function ProjectionCard() {
       >
         Projection de votre score
       </p>
-      <div style={{ marginTop: 6, flex: 1, minHeight: 0 }}>
+      <div style={{ marginTop: 6, height: 110 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="none" style={{ display: "block" }}>
           <defs>
             <linearGradient id="proj-grad-v3" x1="0" y1="0" x2="0" y2="1">
@@ -1171,7 +1169,6 @@ function ActionsSemaineCard() {
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -1286,7 +1283,6 @@ function LevierCard() {
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -1381,8 +1377,6 @@ function RightRail() {
         flexDirection: "column",
         gap: H.rightCardGap,
         minWidth: 0,
-        minHeight: 0,
-        overflowY: "auto",
       }}
     >
       <ProgressionGlobaleCard />
