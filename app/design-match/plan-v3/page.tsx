@@ -56,12 +56,12 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  planHeader: 72,
-  mission: 162,
-  roadmap: 308,
-  bottomRow: 196,
+  planHeader: 68,
+  mission: 188,
+  roadmap: 268,
+  bottomRow: 218,
   gap: 12,
-  rightCardGap: 12,
+  rightCardGap: 10,
 };
 
 export default function DesignMatchPlanV3() {
@@ -567,29 +567,46 @@ function MissionCard() {
         position: "relative",
         overflow: "hidden",
         height: H.mission,
-        padding: "20px 24px",
+        padding: "20px 22px",
         backgroundColor: C.navy,
         borderRadius: 18,
         boxShadow: SHADOW.navy,
         display: "flex",
         flexDirection: "column",
-        gap: 14,
       }}
     >
-      {/* Bouclier décoratif top-right (style screenshot) */}
+      {/* Glow ambient subtil (bleu clair top-right). Plus discret
+          que le bouclier précédent — la décoration ne concurrence
+          plus le contenu métier. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: 24,
-          top: 18,
-          width: 110,
-          height: 110,
+          right: -40,
+          top: -40,
+          width: 200,
+          height: 200,
+          background:
+            "radial-gradient(circle, rgba(96, 165, 250, 0.18) 0%, rgba(96, 165, 250, 0) 65%)",
           pointerEvents: "none",
-          opacity: 0.18,
+        }}
+      />
+      {/* Bouclier décoratif — opacity réduite (0.18 → 0.07) et
+          taille réduite (110 → 80) pour cesser de concurrencer
+          les chiffres métier. */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: 22,
+          top: 18,
+          width: 80,
+          height: 80,
+          pointerEvents: "none",
+          opacity: 0.07,
         }}
       >
-        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <polyline points="9 12 11 14 15 10" />
         </svg>
@@ -603,7 +620,7 @@ function MissionCard() {
             style={{
               fontSize: 10,
               fontWeight: 700,
-              color: "rgba(255,255,255,0.78)",
+              color: "rgba(255,255,255,0.82)",
               letterSpacing: "0.22em",
               textTransform: "uppercase",
             }}
@@ -613,8 +630,8 @@ function MissionCard() {
         </div>
         <h3
           style={{
-            margin: "6px 0 0 0",
-            fontSize: 24,
+            margin: "8px 0 0 0",
+            fontSize: 22,
             fontWeight: 700,
             color: "white",
             lineHeight: 1.15,
@@ -624,21 +641,25 @@ function MissionCard() {
         >
           Construire votre fonds d&apos;urgence
         </h3>
-        <p style={{ margin: "4px 0 0 0", fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.4 }}>
+        <p style={{ margin: "6px 0 0 0", fontSize: 12.5, color: "rgba(255,255,255,0.72)", lineHeight: 1.4 }}>
           Vous avez actuellement 0.0 mois de sécurité.
         </p>
       </div>
+      {/* Footer row : OBJECTIF + PROGRESSION à gauche, CTA à droite.
+          marginTop:auto pousse la row en bas ; alignItems:center
+          réintègre le CTA dans le flux (axe vertical aligné avec
+          les valeurs progression). */}
       <div
         style={{
           marginTop: "auto",
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
           justifyContent: "space-between",
           gap: 20,
           position: "relative",
         }}
       >
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 28, flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 26, flex: 1, minWidth: 0 }}>
           <div style={{ flexShrink: 0 }}>
             <p
               style={{
@@ -652,11 +673,11 @@ function MissionCard() {
             >
               Objectif
             </p>
-            <p style={{ margin: "5px 0 0 0", fontSize: 13.5, fontWeight: 600, color: "white" }}>
+            <p style={{ margin: "6px 0 0 0", fontSize: 13.5, fontWeight: 600, color: "white", whiteSpace: "nowrap" }}>
               3 mois de dépenses
             </p>
           </div>
-          <div style={{ flex: 1, minWidth: 0, maxWidth: 380 }}>
+          <div style={{ flex: 1, minWidth: 0, maxWidth: 360 }}>
             <p
               style={{
                 margin: 0,
@@ -669,8 +690,8 @@ function MissionCard() {
             >
               Progression
             </p>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 5 }}>
-              <span style={{ fontSize: 13.5, fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums" }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 6, gap: 8 }}>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
                 500 CHF <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>/ 15 000 CHF</span>
               </span>
               <span style={{ fontSize: 12.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
@@ -679,8 +700,8 @@ function MissionCard() {
             </div>
             <div
               style={{
-                marginTop: 5,
-                height: 4,
+                marginTop: 6,
+                height: 5,
                 borderRadius: 999,
                 backgroundColor: "rgba(255,255,255,0.16)",
                 overflow: "hidden",
@@ -699,7 +720,7 @@ function MissionCard() {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            padding: "10px 18px",
+            padding: "11px 18px",
             backgroundColor: "white",
             color: C.navy,
             fontSize: 12.5,
@@ -708,6 +729,7 @@ function MissionCard() {
             border: "none",
             cursor: "pointer",
             flexShrink: 0,
+            boxShadow: "0 4px 12px -4px rgba(0, 0, 0, 0.18)",
           }}
         >
           Continuer cette mission
@@ -728,7 +750,7 @@ function RoadmapCard() {
     <div
       style={{
         height: H.roadmap,
-        padding: "18px 22px",
+        padding: "16px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
@@ -737,32 +759,37 @@ function RoadmapCard() {
         overflow: "hidden",
       }}
     >
-      <h2
-        style={{
-          margin: 0,
-          fontSize: 15,
-          fontWeight: 700,
-          color: C.textDark,
-          fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        Votre feuille de route
-      </h2>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 15,
+            fontWeight: 700,
+            color: C.textDark,
+            fontFamily: "Outfit, Inter, system-ui",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Votre feuille de route
+        </h2>
+        <span style={{ fontSize: 11, color: C.textMuted, fontWeight: 500 }}>
+          4 / 22 étapes
+        </span>
+      </div>
 
-      {/* Rail icônes — 4 colonnes 25 %, connecteurs lignes pleines
-          aux frontières 25/50/75 % (vs dashed du dashboard-v3 :
-          plan d'action = chemin progressif, lignes continues). */}
-      <div style={{ position: "relative", marginTop: 16, height: 44 }}>
+      {/* Rail icônes compressé (44 → 36, icons 38 → 32). Connecteur :
+          ligne pleine au lieu du dashed dashboard-v3 (plan = chemin
+          progressif). 25 % du tracé en primary (Phase 1 done). */}
+      <div style={{ position: "relative", marginTop: 12, height: 36 }}>
         <div
           aria-hidden
           style={{
             position: "absolute",
             left: "12.5%",
             right: "12.5%",
-            top: 21,
+            top: 17,
             height: 2,
-            background: `linear-gradient(to right, ${C.primary} 0%, ${C.borderGhost} 33%, ${C.borderGhost} 100%)`,
+            background: `linear-gradient(to right, ${C.primary} 0%, ${C.primary} 25%, ${C.borderGhost} 25%, ${C.borderGhost} 100%)`,
             borderRadius: 999,
           }}
         />
@@ -774,17 +801,17 @@ function RoadmapCard() {
         </div>
       </div>
 
-      {/* 4 colonnes de tâches */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 14, flex: 1, minHeight: 0 }}>
+      {/* 4 colonnes de tâches — pageBg, padding 10/12, allow wrap 2L */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 12, flex: 1, minHeight: 0 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
           duration="3 mois"
           tasks={[
-            { label: "Ajouter toutes les dépenses", state: "done" },
+            { label: "Ajouter mes dépenses", state: "done" },
             { label: "Définir un objectif", state: "done" },
-            { label: "Construire 1 mois d'urgence", state: "active", note: "En cours" },
-            { label: "Construire 3 mois d'urgence", state: "todo", note: "À faire" },
+            { label: "Constituer 1 mois d'urgence", state: "active", note: "En cours" },
+            { label: "Atteindre 3 mois d'urgence", state: "todo", note: "À faire" },
           ]}
         />
         <PhaseColumn
@@ -803,8 +830,8 @@ function RoadmapCard() {
           duration="6-24 mois"
           tasks={[
             { label: "Augmenter les revenus", state: "todo" },
-            { label: "Construire une réserve long terme", state: "todo" },
-            { label: "Développer vos compétences", state: "todo" },
+            { label: "Réserve à long terme", state: "todo" },
+            { label: "Développer mes compétences", state: "todo" },
           ]}
         />
         <PhaseColumn
@@ -812,8 +839,8 @@ function RoadmapCard() {
           title="Investir"
           duration="2 ans et +"
           tasks={[
-            { label: "Commencer les investissements", state: "todo" },
-            { label: "Diversifier", state: "todo" },
+            { label: "Démarrer les investissements", state: "todo" },
+            { label: "Diversifier le portefeuille", state: "todo" },
             { label: "Construire le patrimoine", state: "todo" },
           ]}
         />
@@ -834,6 +861,8 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
         ? `2px solid ${C.primary}`
         : `1.5px solid ${C.borderGhost}`;
   const strokeFuture = variant === "future" ? C.textLight : C.primary;
+  const SIZE = 32;
+  const ICON = 14;
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <span
@@ -841,8 +870,8 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 38,
-          height: 38,
+          width: SIZE,
+          height: SIZE,
           borderRadius: 999,
           backgroundColor: fill,
           border: ring === "none" ? "none" : ring,
@@ -855,18 +884,18 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
         }}
       >
         {icon === "check" && (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         )}
         {icon === "chart" && (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
             <polyline points="17 6 23 6 23 12" />
           </svg>
         )}
         {icon === "rocket" && (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
             <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
             <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
@@ -874,7 +903,7 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
           </svg>
         )}
         {icon === "home" && (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="none" stroke={strokeFuture} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
@@ -898,22 +927,27 @@ function PhaseColumn({
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "10px 12px",
         backgroundColor: C.pageBg,
         borderRadius: 12,
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
-        overflow: "hidden",
       }}
     >
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textLight, letterSpacing: "0.22em", textTransform: "uppercase" }}>
-        {phase}
-      </p>
+      {/* Eyebrow PHASE X + durée combinée à droite — économie verticale */}
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
+        <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: C.textLight, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          {phase}
+        </p>
+        <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums" }}>
+          {duration}
+        </p>
+      </div>
       <p
         style={{
           margin: "3px 0 0 0",
-          fontSize: 13.5,
+          fontSize: 13,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
@@ -922,26 +956,20 @@ function PhaseColumn({
       >
         {title}
       </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 10.5, color: C.textMuted }}>
-        Durée estimée&nbsp;: {duration}
-      </p>
-      <ul style={{ marginTop: 10, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
+      <ul style={{ marginTop: 8, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 5 }}>
         {tasks.map((t) => (
-          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
             <TaskBullet state={t.state} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <p
                 style={{
                   margin: 0,
-                  fontSize: 11.5,
+                  fontSize: 11,
                   fontWeight: t.state === "active" ? 600 : 500,
                   color: t.state === "todo" ? C.textMuted : C.textDark,
                   lineHeight: 1.3,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  wordBreak: "break-word",
                 }}
-                title={t.label}
               >
                 {t.label}
               </p>
@@ -949,8 +977,8 @@ function PhaseColumn({
                 <p
                   style={{
                     margin: "1px 0 0 0",
-                    fontSize: 10,
-                    fontWeight: 600,
+                    fontSize: 9.5,
+                    fontWeight: 700,
                     color: t.state === "active" ? C.primary : C.textLight,
                     letterSpacing: "0.04em",
                   }}
@@ -1126,10 +1154,13 @@ function ProjectionCard() {
 }
 
 function ActionsSemaineCard() {
+  // Libellés reformulés courts pour tenir sur 1 ligne dans la
+  // colonne ~250 px (sans whiteSpace nowrap ni ellipsis), avec
+  // impact concis "+X pts" en chip success.
   const actions = [
-    { num: 1, title: "Ajouter votre assurance maladie", impact: "+2 pts sur votre score" },
-    { num: 2, title: "Mettre 500 CHF de côté", impact: "+4 pts sur votre score" },
-    { num: 3, title: "Créer un objectif immobilier", impact: "+3 pts sur votre score" },
+    { num: 1, title: "Ajouter assurance maladie", impact: "+2 pts" },
+    { num: 2, title: "Mettre 500 CHF de côté", impact: "+4 pts" },
+    { num: 3, title: "Créer objectif immobilier", impact: "+3 pts" },
   ];
   return (
     <div
@@ -1158,7 +1189,7 @@ function ActionsSemaineCard() {
       >
         Vos 3 prochaines actions
       </p>
-      <div style={{ marginTop: 8, flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ marginTop: 10, flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
         {actions.map((a) => (
           <button
             key={a.num}
@@ -1192,15 +1223,27 @@ function ActionsSemaineCard() {
             >
               {a.num}
             </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {a.title}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.3 }}>
-                Impact&nbsp;: <span style={{ color: C.success, fontWeight: 600 }}>{a.impact}</span>
-              </p>
-            </div>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <p style={{ flex: 1, margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3, wordBreak: "break-word" }}>
+              {a.title}
+            </p>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "2px 7px",
+                borderRadius: 999,
+                backgroundColor: C.successBg,
+                color: C.success,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                flexShrink: 0,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {a.impact}
+            </span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
