@@ -579,14 +579,14 @@ function MissionCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: "20px 20px 24px 20px",
+        padding: 20,
         backgroundColor: C.cardBg,
         borderRadius: 18,
         // PAS DE BORDER
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
       }}
     >
       <div>
@@ -626,9 +626,12 @@ function MissionCard() {
           Commencez par économiser 500 CHF ce mois-ci.
         </p>
       </div>
-      {/* Bouton CORRIGÉ : padding 8/16 + radius 8 (mesure maquette : 28 px de haut) */}
+      {/* Bouton remonté dans le flux du texte (marginTop 20) plutôt
+          qu'épinglé en bas via space-between, qui le faisait paraître
+          orphelin. */}
       <button
         style={{
+          marginTop: 20,
           alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
@@ -1010,17 +1013,29 @@ function KpiCard({
           le span delta % a une largeur fixe (52 px, textAlign right)
           → la sparkline démarre toujours au même x dans toutes les
           cartes, peu importe la longueur du delta ("+3.2%" vs "—"). */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <p style={{ fontSize: 11.5, color: C.textMuted, margin: 0 }}>{hint}</p>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+        <p
+          style={{
+            fontSize: 10.5,
+            color: C.textMuted,
+            margin: 0,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            minWidth: 0,
+          }}
+        >
+          {hint}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <span
             style={{
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "flex-end",
               gap: 2,
-              width: 52,
-              fontSize: 12,
+              width: 44,
+              fontSize: 11.5,
               fontWeight: 600,
               color: delta.color,
             }}
@@ -1039,7 +1054,7 @@ function KpiCard({
             )}
             {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
           </span>
-          <div style={{ width: 72, flexShrink: 0 }}>
+          <div style={{ width: 56, flexShrink: 0 }}>
             <Sparkline points={sparkline.points} color={sparkline.color} />
           </div>
         </div>
@@ -1098,19 +1113,18 @@ function OpportunityCard() {
         boxShadow: SHADOW.card,
       }}
     >
-      {/* Flèche financière premium — segments droits, sharp angles
-          (style Bloomberg/TradingView/Stripe). Aucune courbe.
-          Taille +12.5 % (64 → 72) + recentrage dans la zone droite
-          (right 18 → 30 pour ne plus paraître "posée dans un coin"). */}
+      {/* Flèche financière premium — segments droits, sharp angles.
+          Réduite (82 → 58) + décalée plus à droite (right 30 → 14) et
+          descendue (top 58 → 84) pour ne plus concurrencer le titre. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: 30,
-          top: 58,
-          width: 82,
-          height: 82,
-          opacity: 0.9,
+          right: 14,
+          top: 84,
+          width: 58,
+          height: 58,
+          opacity: 0.85,
           color: C.success,
         }}
       >
@@ -1246,11 +1260,12 @@ function RepartitionCard() {
         Répartition des dépenses
       </p>
       <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Ce mois-ci</p>
-      {/* Donut décalé +10 px à droite (paddingLeft 10) + gap 26 px
-          entre donut et légende (18 + 8 supplémentaires demandés). */}
-      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 26, paddingLeft: 10 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100 }}>
-          <svg viewBox="0 0 100 100" width={100} height={100}>
+      {/* Donut réduit 100 → 92, gap 26 → 18, paddingLeft 10 → 2
+          pour libérer ~22 px supplémentaires à la légende (labels
+          tronqués sur "Loisirs & divers" auparavant). */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 18, paddingLeft: 2 }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 92, height: 92 }}>
+          <svg viewBox="0 0 100 100" width={92} height={92}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
@@ -1296,8 +1311,8 @@ function RepartitionCard() {
               key={s.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 36px 70px",
-                gap: 8,
+                gridTemplateColumns: "minmax(0, 1fr) 32px 66px",
+                gap: 6,
                 height: 18,
                 fontSize: 11,
                 alignItems: "center",
@@ -1356,12 +1371,12 @@ function RepartitionCard() {
 function EvolutionCard() {
   const points = [22, 30, 38, 32, 42, 50, 54, 46];
   const W = 320;
-  // Chart taller : 105 → 122 (+17 px hauteur utile demandée).
-  const HH = 122;
-  // PAD.bottom 18 → 24 pour héberger les labels x-axis INTÉGRÉS
-  // dans le SVG (vs ligne HTML séparée). Gain net = espace pour
-  // le lien "Voir l'historique" plus aéré dessous.
-  const PAD = { top: 6, right: 50, bottom: 24, left: 2 };
+  // Hauteur réduite (122 → 96) pour que le lien "Voir l'historique"
+  // ne soit plus rogné par l'overflow:hidden de la carte (H.bottomRow
+  // = 192). PAD.right augmenté (50 → 58) pour décoller le badge "46"
+  // du bord droit.
+  const HH = 96;
+  const PAD = { top: 4, right: 58, bottom: 20, left: 2 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1392,9 +1407,7 @@ function EvolutionCard() {
         Évolution du score
       </p>
       <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Votre progression</p>
-      {/* Chart container marginTop 6 → 10 : descend le graphique de
-          4 px pour mieux occuper la moitié basse de la carte. */}
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 6 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH}>
           <defs>
             <linearGradient id="evo-gradient-v3" x1="0" y1="0" x2="0" y2="1">
@@ -1420,11 +1433,11 @@ function EvolutionCard() {
             <circle key={i} cx={p.x} cy={p.y} r={3} fill={C.cardBg} stroke={C.primary} strokeWidth={1.5} />
           ))}
           <circle cx={last.x} cy={last.y} r={4} fill={C.primary} />
-          <rect x={last.x + 6} y={last.y - 16} width={44} height={28} rx={6} fill={C.navy} />
-          <text x={last.x + 28} y={last.y - 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
+          <rect x={last.x + 6} y={last.y - 14} width={40} height={26} rx={5} fill={C.navy} />
+          <text x={last.x + 26} y={last.y - 3} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
             46
           </text>
-          <text x={last.x + 28} y={last.y + 8} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
+          <text x={last.x + 26} y={last.y + 8} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
             Score actuel
           </text>
           {/* X-axis labels INTÉGRÉS dans le SVG (vs row HTML séparée)
@@ -1447,11 +1460,11 @@ function EvolutionCard() {
           })}
         </svg>
       </div>
-      {/* Lien "Voir l'historique" — marginTop 4 → 12 pour respirer
-          davantage sous le graphique. */}
+      {/* Lien "Voir l'historique" — marginTop réduit (12 → 8) pour
+          assurer la visibilité du lien dans la carte 192 px. */}
       <button
         style={{
-          marginTop: 12,
+          marginTop: 8,
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
