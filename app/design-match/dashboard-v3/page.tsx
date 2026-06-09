@@ -63,16 +63,16 @@ const SHADOW = {
 };
 
 const H = {
-  topbar: 72,
-  scoreCard: 180,
-  roadmap: 140,
-  kpi: 100,
-  bottomRow: 200,
-  coachCta: 44,
-  gapHR: 16,
+  topbar: 70,
+  scoreCard: 175,
+  roadmap: 138,
+  kpi: 98,
+  bottomRow: 196,
+  coachCta: 42,
+  gapHR: 14,
   gapRK: 10,
   gapKB: 12,
-  gapBC: 16,
+  gapBC: 14,
 };
 
 export default function DesignMatchDashboardV3() {
@@ -909,24 +909,28 @@ function KpiRow() {
         value="25 000 CHF"
         delta={{ sign: "+", value: "3.2%", direction: "up", color: C.success }}
         hint="Après impôts"
+        sparkline={{ points: [30, 35, 32, 40, 38, 45, 50, 55], color: "#10A37F" }}
       />
       <KpiCard
         label="DÉPENSES MENSUELLES"
         value="15 893 CHF"
         delta={{ sign: "-", value: "2.1%", direction: "down", color: C.success }}
         hint="63% de vos revenus"
+        sparkline={{ points: [50, 55, 48, 52, 45, 40, 38, 35], color: "#DC2626" }}
       />
       <KpiCard
         label="RESTE À VIVRE"
         value="9 107 CHF"
         delta={{ sign: "+", value: "5.3%", direction: "up", color: C.success }}
         hint="36.6% de vos revenus"
+        sparkline={{ points: [25, 28, 32, 30, 38, 42, 45, 52], color: "#10A37F" }}
       />
       <KpiCard
         label="FONDS D'URGENCE"
         value="0.0 mois"
         delta={{ sign: "", value: "—", direction: "none", color: C.amber }}
         hint="500 CHF disponibles"
+        sparkline={{ points: [40, 30, 25, 35, 28, 38, 32, 36], color: "#F59E0B" }}
       />
     </div>
   );
@@ -937,11 +941,13 @@ function KpiCard({
   value,
   delta,
   hint,
+  sparkline,
 }: {
   label: string;
   value: string;
   delta: { sign: string; value: string; direction: "up" | "down" | "none"; color: string };
   hint: string;
+  sparkline: { points: number[]; color: string };
 }) {
   return (
     <div
@@ -1007,8 +1013,35 @@ function KpiCard({
           {delta.direction === "none" ? delta.value : `${delta.sign}${delta.value}`}
         </span>
       </div>
-      <p style={{ fontSize: 12, color: C.textMuted }}>{hint}</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <p style={{ fontSize: 11.5, color: C.textMuted, margin: 0 }}>{hint}</p>
+        <Sparkline points={sparkline.points} color={sparkline.color} />
+      </div>
     </div>
+  );
+}
+
+/* Mini sparkline SVG — 80×24 px, smooth line + subtle area */
+function Sparkline({ points, color }: { points: number[]; color: string }) {
+  const W = 80;
+  const HH = 24;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+  const coords = points.map((v, i) => {
+    const x = (i / (points.length - 1)) * (W - 2) + 1;
+    const y = HH - 2 - ((v - min) / range) * (HH - 4);
+    return { x, y };
+  });
+  const pathD = coords
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+    .join(" ");
+  const areaD = `${pathD} L ${coords[coords.length - 1].x.toFixed(2)} ${HH - 1} L ${coords[0].x.toFixed(2)} ${HH - 1} Z`;
+  return (
+    <svg width={W} height={HH} viewBox={`0 0 ${W} ${HH}`} style={{ flexShrink: 0 }}>
+      <path d={areaD} fill={color} fillOpacity={0.12} />
+      <path d={pathD} fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -1042,10 +1075,10 @@ function OpportunityCard() {
         style={{
           position: "absolute",
           right: 14,
-          top: 60,
-          width: 80,
-          height: 80,
-          opacity: 0.75,
+          top: 55,
+          width: 70,
+          height: 70,
+          opacity: 0.85,
           color: C.success,
         }}
       >
@@ -1125,12 +1158,14 @@ function OpportunityCard() {
 }
 
 function RepartitionCard() {
+  // Donut palette MONOCHROME BLEUE (capture maquette) — du navy
+  // profond aux gris-bleu pâles. Plus de couleurs accents.
   const slices = [
-    { id: "logement", label: "Logement", pct: 35, amount: "5 500 CHF", color: C.navy },
-    { id: "alimentation", label: "Alimentation", pct: 20, amount: "3 200 CHF", color: C.primary },
-    { id: "transport", label: "Transport", pct: 15, amount: "2 400 CHF", color: C.success },
-    { id: "assurances", label: "Assurances", pct: 10, amount: "1 600 CHF", color: C.coral },
-    { id: "loisirs", label: "Loisirs & divers", pct: 20, amount: "3 193 CHF", color: C.violet },
+    { id: "logement", label: "Logement", pct: 35, amount: "5 500 CHF", color: "#011E5F" },
+    { id: "alimentation", label: "Alimentation", pct: 20, amount: "3 200 CHF", color: "#2563EB" },
+    { id: "transport", label: "Transport", pct: 15, amount: "2 400 CHF", color: "#60A5FA" },
+    { id: "assurances", label: "Assurances", pct: 10, amount: "1 600 CHF", color: "#A5B4DC" },
+    { id: "loisirs", label: "Loisirs & divers", pct: 20, amount: "3 193 CHF", color: "#C7CFE3" },
   ];
   const slicesWithPaths = (() => {
     let cursor = -90;
