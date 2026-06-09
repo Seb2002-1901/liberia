@@ -63,16 +63,16 @@ const SHADOW = {
 };
 
 const H = {
-  topbar: 70,
-  scoreCard: 175,
-  roadmap: 138,
-  kpi: 98,
-  bottomRow: 196,
-  coachCta: 42,
-  gapHR: 14,
+  topbar: 68,
+  scoreCard: 172,
+  roadmap: 135,
+  kpi: 96,
+  bottomRow: 192,
+  coachCta: 41,
+  gapHR: 12,
   gapRK: 10,
-  gapKB: 12,
-  gapBC: 14,
+  gapKB: 10,
+  gapBC: 12,
 };
 
 export default function DesignMatchDashboardV3() {
@@ -1070,21 +1070,39 @@ function OpportunityCard() {
         boxShadow: SHADOW.card,
       }}
     >
+      {/* Flèche financière premium — segments droits, sharp angles
+          (style Bloomberg/TradingView/Stripe). Aucune courbe. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           right: 14,
-          top: 55,
-          width: 70,
-          height: 70,
-          opacity: 0.85,
+          top: 58,
+          width: 64,
+          height: 64,
+          opacity: 0.9,
           color: C.success,
         }}
       >
         <svg viewBox="0 0 80 80" fill="none" width="100%" height="100%">
-          <path d="M 10 64 Q 32 50 44 36 Q 56 22 68 14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <path d="M 60 12 L 70 12 L 70 22" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          {/* Trend stepped line : montée → petite correction → remontée forte */}
+          <polyline
+            points="8 62 22 50 32 56 62 18"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinejoin="miter"
+            strokeLinecap="butt"
+            fill="none"
+          />
+          {/* Pointe de flèche angulaire nette pointant NE */}
+          <polyline
+            points="50 22 62 18 58 30"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinejoin="miter"
+            strokeLinecap="butt"
+            fill="none"
+          />
         </svg>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
