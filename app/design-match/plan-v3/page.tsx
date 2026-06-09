@@ -779,8 +779,11 @@ function RoadmapCard() {
           }}
         />
         <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", height: "100%" }}>
-          <PhaseHead variant="done" icon="check" />
-          <PhaseHead variant="active" icon="chart" />
+          {/* Phase 1 = ACTIVE (en cours : 2 done + 1 active + 1 todo).
+              Le rail head est cohérent avec la colonne. Le check icon
+              à l'intérieur signale les progrès déjà accomplis. */}
+          <PhaseHead variant="active" icon="check" />
+          <PhaseHead variant="future" icon="chart" />
           <PhaseHead variant="future" icon="rocket" />
           <PhaseHead variant="future" icon="home" />
         </div>
@@ -791,6 +794,7 @@ function RoadmapCard() {
           phase="Phase 1"
           title="Sécuriser"
           duration="3 mois"
+          isActive
           tasks={[
             { label: "Ajouter mes dépenses", state: "done" },
             { label: "Définir un objectif", state: "done" },
@@ -902,28 +906,56 @@ function PhaseColumn({
   title,
   duration,
   tasks,
+  isActive = false,
 }: {
   phase: string;
   title: string;
   duration: string;
   tasks: { label: string; state: "done" | "active" | "todo"; note?: string }[];
+  isActive?: boolean;
 }) {
   return (
     <div
       style={{
+        position: "relative",
         padding: "10px 12px",
-        backgroundColor: C.pageBg,
+        // Phase active : bg légèrement teinté primary (#F4F8FF ≈
+        // primaryBg dilué) + box-shadow ring primary 0.10 pour
+        // marquer "current scope" sans agresser visuellement.
+        backgroundColor: isActive ? "#F4F8FF" : C.pageBg,
         borderRadius: 12,
+        boxShadow: isActive ? `inset 0 0 0 1px rgba(37, 99, 235, 0.18)` : "none",
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
       }}
     >
-      {/* Eyebrow PHASE X + durée combinée à droite — économie verticale */}
+      {/* Eyebrow PHASE X + chip "EN COURS" (si active) + durée */}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
-        <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: C.textLight, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-          {phase}
-        </p>
+        <span style={{ display: "inline-flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: isActive ? C.primary : C.textLight, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+            {phase}
+          </p>
+          {isActive && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "1px 5px",
+                borderRadius: 999,
+                backgroundColor: C.primary,
+                color: "white",
+                fontSize: 8.5,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                lineHeight: 1.4,
+              }}
+            >
+              En cours
+            </span>
+          )}
+        </span>
         <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums" }}>
           {duration}
         </p>
@@ -1173,7 +1205,7 @@ function ProjectionCard() {
           })}
         </svg>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9.5, color: C.textLight, marginTop: 2 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, marginTop: 4, fontWeight: 500 }}>
         {points.map((p) => (
           <span key={p.label}>{p.label}</span>
         ))}
@@ -1423,7 +1455,7 @@ function RightRail() {
 }
 
 function ProgressionGlobaleCard() {
-  const r = 26;
+  const r = 30;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.18);
   return (
@@ -1439,22 +1471,22 @@ function ProgressionGlobaleCard() {
         Progression globale
       </p>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 12 }}>
-        <div style={{ flexShrink: 0, width: 68, height: 68, position: "relative" }}>
-          <svg viewBox="0 0 68 68" width={68} height={68}>
-            <circle cx="34" cy="34" r={r} fill="none" stroke={C.primaryBg} strokeWidth="5" />
+        <div style={{ flexShrink: 0, width: 76, height: 76, position: "relative" }}>
+          <svg viewBox="0 0 76 76" width={76} height={76}>
+            <circle cx="38" cy="38" r={r} fill="none" stroke={C.primaryBg} strokeWidth="6" />
             <circle
-              cx="34"
-              cy="34"
+              cx="38"
+              cy="38"
               r={r}
               fill="none"
               stroke={C.primary}
-              strokeWidth="5"
+              strokeWidth="6"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 34 34)"
+              transform="rotate(-90 38 38)"
             />
-            <text x="34" y="39" textAnchor="middle" fontSize="15" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
+            <text x="38" y="43" textAnchor="middle" fontSize="17" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.025em">
               18 %
             </text>
           </svg>
@@ -1463,8 +1495,10 @@ function ProgressionGlobaleCard() {
           <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
             Plan en cours
           </p>
-          <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
-            4 étapes sur 22 complétées
+          <p style={{ margin: "4px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
+            <span style={{ color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>4</span>
+            {" / "}
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>22</span> étapes complétées
           </p>
         </div>
       </div>
@@ -1592,20 +1626,62 @@ function ConseillerRecommandeCard() {
         boxShadow: SHADOW.card,
       }}
     >
-      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-        Votre conseiller recommande
-      </p>
-      <p
-        style={{
-          margin: "10px 0 0 0",
-          fontSize: 12.5,
-          color: C.textDark,
-          lineHeight: 1.55,
-          fontStyle: "italic",
-        }}
-      >
-        «&nbsp;Commencez par compléter toutes vos dépenses, puis construisez votre premier mois de sécurité. Chaque petite action vous rapproche de vos objectifs.&nbsp;»
-      </p>
+      {/* Eyebrow + sparkle icon navy : signature Coach IA cohérente
+          avec /design-match/coach-v3 — crédibilité + branding produit. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 22,
+            height: 22,
+            borderRadius: 6,
+            backgroundColor: C.navy,
+            flexShrink: 0,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
+            <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
+          </svg>
+        </span>
+        <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          Votre conseiller recommande
+        </p>
+      </div>
+      {/* Bloc citation premium : guillemets primary décoratifs en
+          large taille + texte serré, langage éditorial vs simple
+          quote italique. */}
+      <div style={{ position: "relative", marginTop: 12 }}>
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: -6,
+            left: -2,
+            fontSize: 28,
+            color: C.primary,
+            fontFamily: "Outfit, Inter, system-ui",
+            fontWeight: 700,
+            lineHeight: 1,
+            opacity: 0.35,
+            pointerEvents: "none",
+          }}
+        >
+          “
+        </span>
+        <p
+          style={{
+            margin: 0,
+            paddingLeft: 14,
+            fontSize: 12.5,
+            color: C.textDark,
+            lineHeight: 1.55,
+          }}
+        >
+          Commencez par compléter toutes vos dépenses, puis construisez votre premier mois de sécurité. Chaque petite action vous rapproche de vos objectifs.
+        </p>
+      </div>
       <button
         style={{
           marginTop: 12,
