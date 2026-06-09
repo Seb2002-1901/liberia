@@ -437,7 +437,7 @@ function ScoreCard() {
               color: "rgba(255,255,255,0.72)",
               letterSpacing: "0.2em",
               textTransform: "uppercase",
-              margin: 0,
+              margin: "2px 0 0 0",
             }}
           >
             Score de santé financière
@@ -460,7 +460,7 @@ function ScoreCard() {
               /100
             </span>
           </div>
-          <div style={{ marginBottom: 6 }}>
+          <div style={{ marginBottom: 12 }}>
             <span
               style={{
                 display: "inline-flex",
@@ -517,7 +517,7 @@ function ScoreCard() {
             {/* Centre de la ring : tier label (poids visuel ≤ score externe) */}
             <text
               x="50"
-              y="46"
+              y="48"
               textAnchor="middle"
               fontSize="8.5"
               fontWeight="600"
@@ -528,7 +528,7 @@ function ScoreCard() {
             </text>
             <text
               x="50"
-              y="62"
+              y="64"
               textAnchor="middle"
               fontSize="13.5"
               fontWeight="700"
