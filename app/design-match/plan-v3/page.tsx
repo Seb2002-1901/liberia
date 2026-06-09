@@ -56,12 +56,12 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  planHeader: 64,
-  mission: 168,
-  roadmap: 254,
-  bottomRow: 264,
-  gap: 12,
-  rightCardGap: 10,
+  planHeader: 72,
+  mission: 192,
+  roadmap: 300,
+  bottomRow: 260,
+  gap: 14,
+  rightCardGap: 12,
 };
 
 export default function DesignMatchPlanV3() {
@@ -561,9 +561,9 @@ function MissionCard() {
     <div
       style={{
         position: "relative",
-        overflow: "hidden", // garde le clip pour le glow + bouclier décoratif uniquement
+        overflow: "hidden",
         minHeight: H.mission,
-        padding: "18px 22px",
+        padding: "22px 24px",
         backgroundColor: C.navy,
         borderRadius: 18,
         boxShadow: SHADOW.navy,
@@ -590,22 +590,21 @@ function MissionCard() {
           pointerEvents: "none",
         }}
       />
-      {/* Bouclier décoratif top-right — visible dans la maquette
-          de référence. Opacity 0.18 et taille 120 px alignés sur
-          la maquette. */}
+      {/* Bouclier décoratif top-right — reproduction maquette :
+          taille 130 px, opacity 0.22, stroke 1.5. */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           right: 28,
-          top: 22,
-          width: 120,
-          height: 120,
+          top: 26,
+          width: 130,
+          height: 130,
           pointerEvents: "none",
-          opacity: 0.18,
+          opacity: 0.22,
         }}
       >
-        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <polyline points="9 12 11 14 15 10" />
         </svg>
@@ -749,7 +748,7 @@ function RoadmapCard() {
     <div
       style={{
         minHeight: H.roadmap,
-        padding: "14px 18px",
+        padding: "18px 22px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
@@ -770,19 +769,17 @@ function RoadmapCard() {
         Votre feuille de route
       </h2>
 
-      {/* Rail icônes — compression supplémentaire (36 → 32 px,
-          icons 32 → 28). Marges 12 → 10 sur les 2 axes du rail.
-          Connecteur : ligne pleine au lieu du dashed dashboard-v3
-          (plan = chemin progressif). 25 % du tracé en primary
-          (Phase 1 done, 4 colonnes équilibrées). */}
-      <div style={{ position: "relative", marginTop: 10, height: 32 }}>
+      {/* Rail icônes maquette : height 40, icons 38 px (=
+          variante "active"/"future" 38, "done" 38 filled blue).
+          Connecteur ligne pleine 25 % primary (Phase 1 done). */}
+      <div style={{ position: "relative", marginTop: 14, height: 40 }}>
         <div
           aria-hidden
           style={{
             position: "absolute",
             left: "12.5%",
             right: "12.5%",
-            top: 15,
+            top: 19,
             height: 2,
             background: `linear-gradient(to right, ${C.primary} 0%, ${C.primary} 25%, ${C.borderGhost} 25%, ${C.borderGhost} 100%)`,
             borderRadius: 999,
@@ -796,7 +793,7 @@ function RoadmapCard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 8 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 14 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
@@ -855,8 +852,8 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
         ? `2px solid ${C.primary}`
         : `1.5px solid ${C.borderGhost}`;
   const strokeFuture = variant === "future" ? C.textLight : C.primary;
-  const SIZE = 28;
-  const ICON = 13;
+  const SIZE = 38;
+  const ICON = 16;
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <span
@@ -921,45 +918,45 @@ function PhaseColumn({
   return (
     <div
       style={{
-        padding: "8px 12px 10px",
+        padding: "14px 16px",
         backgroundColor: C.pageBg,
-        borderRadius: 10,
+        borderRadius: 12,
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
       }}
     >
-      <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: C.textLight, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+      <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: C.textLight, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         {phase}
       </p>
       <p
         style={{
-          margin: "2px 0 0 0",
-          fontSize: 13,
+          margin: "4px 0 0 0",
+          fontSize: 14,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.015em",
           lineHeight: 1.2,
         }}
       >
         {title}
       </p>
-      <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.3 }}>
+      <p style={{ margin: "3px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.3 }}>
         Durée estimée&nbsp;: {duration}
       </p>
-      <ul style={{ marginTop: 6, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
+      <ul style={{ marginTop: 12, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 7 }}>
         {tasks.map((t) => (
-          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
+          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
             <TaskBullet state={t.state} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <p
                 style={{
                   margin: 0,
-                  fontSize: 10.5,
+                  fontSize: 11.5,
                   fontWeight: 500,
                   color: C.textDark,
-                  lineHeight: 1.3,
+                  lineHeight: 1.35,
                   wordBreak: "break-word",
                 }}
               >
@@ -968,11 +965,11 @@ function PhaseColumn({
               {t.note && (
                 <p
                   style={{
-                    margin: 0,
-                    fontSize: 9.5,
+                    margin: "2px 0 0 0",
+                    fontSize: 10,
                     color: t.state === "active" ? C.primary : C.textLight,
                     fontWeight: 500,
-                    lineHeight: 1.2,
+                    lineHeight: 1.3,
                   }}
                 >
                   {t.note}
@@ -994,15 +991,15 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 16,
-          height: 16,
+          width: 18,
+          height: 18,
           borderRadius: 999,
           backgroundColor: C.success,
           flexShrink: 0,
           marginTop: 1,
         }}
       >
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </span>
@@ -1013,8 +1010,8 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
       <span
         style={{
           display: "inline-block",
-          width: 16,
-          height: 16,
+          width: 18,
+          height: 18,
           borderRadius: 999,
           backgroundColor: "white",
           border: `2px solid ${C.primary}`,
@@ -1028,8 +1025,8 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
     <span
       style={{
         display: "inline-block",
-        width: 16,
-        height: 16,
+        width: 18,
+        height: 18,
         borderRadius: 999,
         border: `1.5px solid ${C.borderGhost}`,
         backgroundColor: "white",
@@ -1374,13 +1371,13 @@ function RightRail() {
 }
 
 function ProgressionGlobaleCard() {
-  const r = 26;
+  const r = 28;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.18);
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "18px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1389,23 +1386,23 @@ function ProgressionGlobaleCard() {
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Progression globale
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 12 }}>
-        <div style={{ flexShrink: 0, width: 68, height: 68, position: "relative" }}>
-          <svg viewBox="0 0 68 68" width={68} height={68}>
-            <circle cx="34" cy="34" r={r} fill="none" stroke={C.primaryBg} strokeWidth="5" />
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 14 }}>
+        <div style={{ flexShrink: 0, width: 72, height: 72, position: "relative" }}>
+          <svg viewBox="0 0 72 72" width={72} height={72}>
+            <circle cx="36" cy="36" r={r} fill="none" stroke={C.primaryBg} strokeWidth="5.5" />
             <circle
-              cx="34"
-              cy="34"
+              cx="36"
+              cy="36"
               r={r}
               fill="none"
               stroke={C.primary}
-              strokeWidth="5"
+              strokeWidth="5.5"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 34 34)"
+              transform="rotate(-90 36 36)"
             />
-            <text x="34" y="39" textAnchor="middle" fontSize="15" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
+            <text x="36" y="41" textAnchor="middle" fontSize="16" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
               18 %
             </text>
           </svg>
@@ -1478,7 +1475,7 @@ function ImpactPlanCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "18px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1537,7 +1534,7 @@ function ConseillerRecommandeCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "18px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1614,7 +1611,7 @@ function ActionsRapidesRailCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "18px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
