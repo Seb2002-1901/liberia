@@ -65,9 +65,9 @@ const SHADOW = {
 const H = {
   topbar: 68,
   scoreCard: 178,
-  roadmap: 140,
+  roadmap: 172,
   kpi: 102,
-  bottomRow: 200,
+  bottomRow: 204,
   coachCta: 56,
   gapHR: 14,
   gapRK: 12,
@@ -747,7 +747,7 @@ function Roadmap() {
         overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: C.textDark, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
             Votre feuille de route
