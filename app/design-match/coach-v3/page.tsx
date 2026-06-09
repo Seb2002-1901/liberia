@@ -546,6 +546,7 @@ function ChatThread() {
             title="Augmenter vos revenus de 300 CHF/mois"
             impact="+12 pts"
             detail="Levier le plus puissant sur votre score (32 % du calcul)."
+            isPrimary
           />
           <LeverRow
             rank={2}
@@ -571,7 +572,73 @@ function ChatThread() {
       <UserMessage time="10:32" status="read">
         Montre-moi comment réduire mes dépenses fixes.
       </UserMessage>
+      <TypingIndicator />
     </div>
+  );
+}
+
+function TypingIndicator() {
+  return (
+    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+      <span
+        aria-hidden
+        style={{
+          flexShrink: 0,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          backgroundColor: C.navy,
+          marginTop: 2,
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+          <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
+        </svg>
+      </span>
+      <div>
+        <div
+          aria-label="Coach IA est en train d'écrire"
+          style={{
+            padding: "12px 16px",
+            backgroundColor: C.assistantBubble,
+            borderRadius: "4px 14px 14px 14px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <TypingDot delay="0s" />
+          <TypingDot delay="0.16s" />
+          <TypingDot delay="0.32s" />
+        </div>
+        <p style={{ marginTop: 4, fontSize: 10.5, color: C.textLight, margin: "4px 0 0 4px" }}>
+          Coach IA écrit…
+        </p>
+      </div>
+      {/* Keyframes inlined via <style> pour rester autonome (pas
+          d'imports Tailwind ni de classes globales). */}
+      <style>{`@keyframes coach-typing { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }`}</style>
+    </div>
+  );
+}
+
+function TypingDot({ delay }: { delay: string }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        display: "inline-block",
+        width: 6,
+        height: 6,
+        borderRadius: 999,
+        backgroundColor: C.textMuted,
+        animation: "coach-typing 1.2s ease-in-out infinite",
+        animationDelay: delay,
+      }}
+    />
   );
 }
 
@@ -674,6 +741,7 @@ function LeverRow({
   title,
   impact,
   detail,
+  isPrimary = false,
 }: {
   rank: number;
   color: string;
@@ -681,19 +749,40 @@ function LeverRow({
   title: string;
   impact: string;
   detail: string;
+  isPrimary?: boolean;
 }) {
   return (
     <div
       style={{
+        position: "relative",
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "10px 12px",
-        backgroundColor: C.cardBg,
+        // Sur le #1 : padding-left renforcé pour héberger l'accent
+        // vertical 3 px (success), bg très légèrement tinté
+        // (#F4FBF8 ≈ successBg dilué). Aucun effet flashy, juste un
+        // shift de lecture côté best lever.
+        padding: isPrimary ? "11px 12px 11px 15px" : "10px 12px",
+        backgroundColor: isPrimary ? "#F4FBF8" : C.cardBg,
         borderRadius: 10,
         boxShadow: SHADOW.flat,
+        overflow: "hidden",
       }}
     >
+      {isPrimary && (
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 8,
+            bottom: 8,
+            width: 3,
+            borderRadius: "0 3px 3px 0",
+            backgroundColor: C.success,
+          }}
+        />
+      )}
       <span
         style={{
           display: "inline-flex",
@@ -702,18 +791,27 @@ function LeverRow({
           width: 24,
           height: 24,
           borderRadius: 999,
-          backgroundColor: colorBg,
-          color: color,
+          backgroundColor: isPrimary ? color : colorBg,
+          color: isPrimary ? "white" : color,
           fontSize: 11.5,
           fontWeight: 700,
           fontFamily: "Outfit, Inter, system-ui",
           flexShrink: 0,
+          boxShadow: isPrimary ? `0 0 0 3px rgba(16, 163, 127, 0.14)` : "none",
         }}
       >
         {rank}
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 12.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12.5,
+            fontWeight: isPrimary ? 700 : 600,
+            color: C.textDark,
+            lineHeight: 1.3,
+          }}
+        >
           {title}
         </p>
         <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4 }}>
@@ -722,7 +820,7 @@ function LeverRow({
       </div>
       <span
         style={{
-          fontSize: 11.5,
+          fontSize: isPrimary ? 12.5 : 11.5,
           fontWeight: 700,
           color: color,
           fontVariantNumeric: "tabular-nums",
@@ -926,8 +1024,10 @@ function RightRail() {
 }
 
 function SituationCard() {
-  // Mini-ring : circumference 2π × 28 ≈ 175.93. Score 46 → offset = c * (1 − 0.46)
-  const r = 28;
+  // Mini-ring : circumference 2π × 32 ≈ 201.06. Score 46 → offset = c * (1 − 0.46).
+  // Ring 80 px (vs 72 ≈ +11 %), strokeWidth 7 et glow drop-shadow alignés
+  // strictement sur le ScoreCard du dashboard-v3.
+  const r = 32;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.46);
   return (
@@ -935,7 +1035,7 @@ function SituationCard() {
       style={{
         position: "relative",
         overflow: "hidden",
-        padding: "16px 18px",
+        padding: "18px 20px",
         backgroundColor: C.navy,
         borderRadius: 16,
         boxShadow: SHADOW.navy,
@@ -947,8 +1047,8 @@ function SituationCard() {
           position: "absolute",
           right: -30,
           top: -30,
-          width: 140,
-          height: 140,
+          width: 160,
+          height: 160,
           background:
             "radial-gradient(circle, rgba(96, 165, 250, 0.22) 0%, rgba(96, 165, 250, 0) 65%)",
           pointerEvents: "none",
@@ -967,23 +1067,35 @@ function SituationCard() {
       >
         Votre situation
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 12, position: "relative" }}>
-        <div style={{ flexShrink: 0, width: 72, height: 72, position: "relative" }}>
-          <svg viewBox="0 0 70 70" width={72} height={72}>
-            <circle cx="35" cy="35" r={r} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="6" />
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14, position: "relative" }}>
+        <div style={{ flexShrink: 0, width: 80, height: 80, position: "relative" }}>
+          {/* Inner glow blur — strict copie du dashboard-v3 (inset:-8 + blur 28) */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: -8,
+              borderRadius: 999,
+              backgroundColor: "rgba(255,255,255,0.10)",
+              filter: "blur(28px)",
+            }}
+          />
+          <svg viewBox="0 0 80 80" width={80} height={80} style={{ position: "relative" }}>
+            <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="7" />
             <circle
-              cx="35"
-              cy="35"
+              cx="40"
+              cy="40"
               r={r}
               fill="none"
               stroke="white"
-              strokeWidth="6"
+              strokeWidth="7"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 35 35)"
+              transform="rotate(-90 40 40)"
+              style={{ filter: "drop-shadow(0 0 6px rgba(255,255,255,0.35))" }}
             />
-            <text x="35" y="40" textAnchor="middle" fontSize="20" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
+            <text x="40" y="46" textAnchor="middle" fontSize="22" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.025em">
               46
             </text>
           </svg>
@@ -1130,25 +1242,49 @@ function PrioriteMomentCard() {
       >
         Construire votre fonds d&apos;urgence
       </h3>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 8 }}>
+      {/* Hiérarchie progression :
+          0.0 (massif coral) / 3.0 (textLight) mois  →  2 % atteint
+          → chiffre dominant + dénominateur lisible + chip pourcentage. */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: 10, gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
+          <span
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              color: C.coral,
+              fontFamily: "Outfit, Inter, system-ui",
+              letterSpacing: "-0.03em",
+              lineHeight: 1,
+            }}
+          >
+            0.0
+          </span>
+          <span style={{ fontSize: 13, color: C.textLight, fontWeight: 500, fontFamily: "Outfit, Inter, system-ui" }}>
+            / 3.0
+          </span>
+          <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 3 }}>mois</span>
+        </div>
         <span
           style={{
-            fontSize: 20,
-            fontWeight: 700,
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "2px 7px",
+            borderRadius: 999,
+            backgroundColor: C.coralBg,
             color: C.coral,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
+            fontSize: 10.5,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            fontVariantNumeric: "tabular-nums",
           }}
         >
-          0.0
+          2 % atteint
         </span>
-        <span style={{ fontSize: 11.5, color: C.textMuted }}>mois sur 3 mois</span>
       </div>
       <div
         style={{
           marginTop: 8,
-          height: 4,
+          height: 6,
           borderRadius: 999,
           backgroundColor: C.coralBg,
           overflow: "hidden",
@@ -1160,9 +1296,10 @@ function PrioriteMomentCard() {
       >
         <div style={{ width: "2%", height: "100%", backgroundColor: C.coral, borderRadius: 999 }} />
       </div>
-      <p style={{ margin: "10px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
-        Votre coussin doit atteindre <strong style={{ color: C.textDark, fontWeight: 600 }}>47 679 CHF</strong> (3 × dépenses mensuelles).
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10.5, color: C.textLight }}>
+        <span>500 CHF</span>
+        <span>Cible 47 679 CHF</span>
+      </div>
       <button
         style={{
           marginTop: 10,
