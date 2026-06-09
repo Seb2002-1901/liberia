@@ -725,7 +725,8 @@ function Roadmap() {
           fg={C.success}
         />
         {/* Connecteurs en overlay aux frontières de colonnes,
-            centrés verticalement avec les badges. */}
+            alignement optique avec les badges (top: 18 → 21,
+            descente de 3 px demandée). */}
         {[25, 50, 75].map((pct) => (
           <div
             key={pct}
@@ -733,7 +734,7 @@ function Roadmap() {
             style={{
               position: "absolute",
               left: `${pct}%`,
-              top: 18,
+              top: 21,
               transform: "translateX(-50%)",
               pointerEvents: "none",
             }}
@@ -1003,9 +1004,12 @@ function KpiCard({
       >
         {value}
       </p>
-      {/* Ligne de base : hint à gauche, delta% + sparkline à droite,
-          tous alignés sur la MÊME baseline. Sparkline dans un
-          conteneur de largeur fixe identique pour les 4 cartes. */}
+      {/* Ligne de base : hint à gauche, delta % + sparkline à droite,
+          tous alignés sur la MÊME baseline. Pour garantir que les 4
+          sparklines commencent et terminent AU MÊME ENDROIT visuel,
+          le span delta % a une largeur fixe (52 px, textAlign right)
+          → la sparkline démarre toujours au même x dans toutes les
+          cartes, peu importe la longueur du delta ("+3.2%" vs "—"). */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <p style={{ fontSize: 11.5, color: C.textMuted, margin: 0 }}>{hint}</p>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1013,7 +1017,9 @@ function KpiCard({
             style={{
               display: "inline-flex",
               alignItems: "center",
+              justifyContent: "flex-end",
               gap: 2,
+              width: 52,
               fontSize: 12,
               fontWeight: 600,
               color: delta.color,
@@ -1094,16 +1100,16 @@ function OpportunityCard() {
     >
       {/* Flèche financière premium — segments droits, sharp angles
           (style Bloomberg/TradingView/Stripe). Aucune courbe.
-          Position : zone fixe à droite, centrée verticalement avec
-          le titre principal h3 (situé ~y 82-110 inside card). */}
+          Taille +12.5 % (64 → 72) + recentrage dans la zone droite
+          (right 18 → 30 pour ne plus paraître "posée dans un coin"). */}
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: 18,
-          top: 64,
-          width: 64,
-          height: 64,
+          right: 30,
+          top: 58,
+          width: 72,
+          height: 72,
           opacity: 0.9,
           color: C.success,
         }}
@@ -1240,9 +1246,9 @@ function RepartitionCard() {
         Répartition des dépenses
       </p>
       <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Ce mois-ci</p>
-      {/* Donut décalé +10 px à droite (paddingLeft 10) + gap 18 px
-          constant entre donut et légende (vs 12 avant). */}
-      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 18, paddingLeft: 10 }}>
+      {/* Donut décalé +10 px à droite (paddingLeft 10) + gap 26 px
+          entre donut et légende (18 + 8 supplémentaires demandés). */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 26, paddingLeft: 10 }}>
         <div style={{ position: "relative", flexShrink: 0, width: 100, height: 100 }}>
           <svg viewBox="0 0 100 100" width={100} height={100}>
             {slicesWithPaths.map((s) => (
@@ -1351,7 +1357,10 @@ function EvolutionCard() {
   const points = [22, 30, 38, 32, 42, 50, 54, 46];
   const W = 320;
   const HH = 105;
-  const PAD = { top: 8, right: 36, bottom: 18, left: 6 };
+  // PAD.right augmenté 36 → 50 : décale le callout "46 Score actuel"
+  // de 14 px vers la gauche pour qu'il ne colle plus au bord droit
+  // de la carte (respiration visuelle identique au reste).
+  const PAD = { top: 8, right: 50, bottom: 18, left: 6 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1370,7 +1379,9 @@ function EvolutionCard() {
     <div
       style={{
         height: H.bottomRow,
-        padding: 18,
+        // +12 px padding-right (18 → 30) pour respiration visuelle
+        // — le badge "46" ne colle plus au bord droit.
+        padding: "18px 30px 18px 18px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
@@ -1462,6 +1473,10 @@ function EvolutionCard() {
 
 function CoachCta() {
   return (
+    // Toute la ligne en align-items: center → icône, bloc texte et
+    // bouton CTA partagent la même axe vertical médian. Hauteur
+    // inchangée (36 px). Bloc texte sans flex (laisse les 2 p
+    // s'empiler) mais le wrapper parent les centre.
     <div
       style={{
         height: H.coachCta,
@@ -1484,17 +1499,18 @@ function CoachCta() {
             height: 32,
             borderRadius: 999,
             backgroundColor: C.primaryBg,
+            flexShrink: 0,
           }}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </span>
-        <div>
-          <p style={{ fontSize: 13.5, fontWeight: 600, color: C.textDark, margin: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <p style={{ fontSize: 13.5, fontWeight: 600, color: C.textDark, margin: 0, lineHeight: 1.2 }}>
             Parler à mon conseiller
           </p>
-          <p style={{ fontSize: 12, color: C.textMuted, margin: 0 }}>
+          <p style={{ fontSize: 12, color: C.textMuted, margin: 0, lineHeight: 1.2 }}>
             Posez une question, obtenez des conseils personnalisés.
           </p>
         </div>
@@ -1504,6 +1520,7 @@ function CoachCta() {
           padding: "9px 16px",
           display: "inline-flex",
           alignItems: "center",
+          justifyContent: "center",
           gap: 8,
           backgroundColor: C.navy,
           color: "white",
@@ -1512,6 +1529,7 @@ function CoachCta() {
           borderRadius: 8,
           border: "none",
           cursor: "pointer",
+          flexShrink: 0,
         }}
       >
         Démarrer une conversation
