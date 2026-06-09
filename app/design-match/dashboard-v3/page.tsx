@@ -725,8 +725,8 @@ function Roadmap() {
           fg={C.success}
         />
         {/* Connecteurs en overlay aux frontières de colonnes,
-            alignement optique avec les badges (top: 18 → 21,
-            descente de 3 px demandée). */}
+            alignement optique avec les badges (top: 21 → 23,
+            descente +2 px supplémentaires demandée). */}
         {[25, 50, 75].map((pct) => (
           <div
             key={pct}
@@ -734,7 +734,7 @@ function Roadmap() {
             style={{
               position: "absolute",
               left: `${pct}%`,
-              top: 21,
+              top: 23,
               transform: "translateX(-50%)",
               pointerEvents: "none",
             }}
@@ -1356,11 +1356,12 @@ function RepartitionCard() {
 function EvolutionCard() {
   const points = [22, 30, 38, 32, 42, 50, 54, 46];
   const W = 320;
-  const HH = 105;
-  // PAD.right augmenté 36 → 50 : décale le callout "46 Score actuel"
-  // de 14 px vers la gauche pour qu'il ne colle plus au bord droit
-  // de la carte (respiration visuelle identique au reste).
-  const PAD = { top: 8, right: 50, bottom: 18, left: 6 };
+  // Chart taller : 105 → 122 (+17 px hauteur utile demandée).
+  const HH = 122;
+  // PAD.bottom 18 → 24 pour héberger les labels x-axis INTÉGRÉS
+  // dans le SVG (vs ligne HTML séparée). Gain net = espace pour
+  // le lien "Voir l'historique" plus aéré dessous.
+  const PAD = { top: 6, right: 50, bottom: 24, left: 6 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1374,13 +1375,12 @@ function EvolutionCard() {
   const baselineY = PAD.top + innerH;
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
   const last = scaled[scaled.length - 1];
+  const xLabels = ["1 avr.", "15 avr.", "1 mai", "15 mai", "1 juin"];
 
   return (
     <div
       style={{
         height: H.bottomRow,
-        // +12 px padding-right (18 → 30) pour respiration visuelle
-        // — le badge "46" ne colle plus au bord droit.
         padding: "18px 30px 18px 18px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
@@ -1392,7 +1392,9 @@ function EvolutionCard() {
         Évolution du score
       </p>
       <p style={{ marginTop: 2, fontSize: 11.5, color: C.textLight }}>Votre progression</p>
-      <div style={{ marginTop: 6 }}>
+      {/* Chart container marginTop 6 → 10 : descend le graphique de
+          4 px pour mieux occuper la moitié basse de la carte. */}
+      <div style={{ marginTop: 10 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH}>
           <defs>
             <linearGradient id="evo-gradient-v3" x1="0" y1="0" x2="0" y2="1">
@@ -1425,28 +1427,31 @@ function EvolutionCard() {
           <text x={last.x + 28} y={last.y + 7} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
             Score actuel
           </text>
+          {/* X-axis labels INTÉGRÉS dans le SVG (vs row HTML séparée)
+              → gain de place pour aérer le lien dessous. */}
+          {xLabels.map((label, i) => {
+            const x = PAD.left + (i / (xLabels.length - 1)) * innerW;
+            const anchor = i === 0 ? "start" : i === xLabels.length - 1 ? "end" : "middle";
+            return (
+              <text
+                key={label}
+                x={x}
+                y={HH - 6}
+                fontSize="9"
+                fill={C.textMuted}
+                textAnchor={anchor}
+              >
+                {label}
+              </text>
+            );
+          })}
         </svg>
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 10,
-            color: C.textMuted,
-            display: "flex",
-            justifyContent: "space-between",
-            paddingLeft: PAD.left,
-            paddingRight: PAD.right,
-          }}
-        >
-          <span>1 avr.</span>
-          <span>15 avr.</span>
-          <span>1 mai</span>
-          <span>15 mai</span>
-          <span>1 juin</span>
-        </div>
       </div>
+      {/* Lien "Voir l'historique" — marginTop 4 → 12 pour respirer
+          davantage sous le graphique. */}
       <button
         style={{
-          marginTop: 4,
+          marginTop: 12,
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
