@@ -414,9 +414,9 @@ function PlanHeaderCard() {
           Basé sur votre situation actuelle, vos objectifs et vos priorités.
         </p>
       </div>
-      {/* Divider vertical subtil entre le titre et les métriques —
-          structure le bloc sans alourdir, comble l'effet "trop vide". */}
-      <div aria-hidden style={{ width: 1, alignSelf: "stretch", marginLeft: -8, backgroundColor: C.borderGhost, flexShrink: 0 }} />
+      {/* Divider vertical subtil — structure le bloc sans alourdir.
+          margin auto pour respiration équilibrée. */}
+      <div aria-hidden style={{ width: 1, height: 36, backgroundColor: C.borderGhost, flexShrink: 0 }} />
       <div style={{ display: "flex", alignItems: "center", gap: 26, flexShrink: 0 }}>
         <HeaderMetric
           label="Score actuel"
@@ -711,7 +711,7 @@ function MissionCard() {
             border: "none",
             cursor: "pointer",
             flexShrink: 0,
-            boxShadow: "0 4px 12px -4px rgba(0, 0, 0, 0.18)",
+            boxShadow: "0 2px 6px -2px rgba(0, 0, 0, 0.10)",
           }}
         >
           Continuer cette mission
@@ -931,11 +931,12 @@ function PhaseColumn({
       <p
         style={{
           margin: "3px 0 0 0",
-          fontSize: 13,
+          fontSize: 13.5,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.015em",
+          lineHeight: 1.2,
         }}
       >
         {title}
@@ -1283,7 +1284,7 @@ function ActionsSemaineCard() {
       <button
         style={{
           marginTop: 10,
-          padding: "6px 10px",
+          padding: 0,
           alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
@@ -1291,9 +1292,8 @@ function ActionsSemaineCard() {
           fontSize: 12.5,
           fontWeight: 600,
           color: C.primary,
-          backgroundColor: C.primaryBg,
+          background: "none",
           border: "none",
-          borderRadius: 8,
           cursor: "pointer",
         }}
       >
@@ -1325,18 +1325,18 @@ function LevierCard() {
       </p>
       <p
         style={{
-          margin: "5px 0 0 0",
-          fontSize: 14,
+          margin: "6px 0 0 0",
+          fontSize: 15,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
+          letterSpacing: "-0.015em",
           lineHeight: 1.3,
         }}
       >
         Augmenter vos revenus de 300&nbsp;CHF/mois
       </p>
-      <p style={{ margin: "5px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
+      <p style={{ margin: "6px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
         Impact&nbsp;:{" "}
         <span style={{ color: C.success, fontWeight: 700 }}>+12 pts sur votre score</span>
       </p>
@@ -1346,7 +1346,7 @@ function LevierCard() {
           display: "flex",
           alignItems: "center",
           gap: 12,
-          padding: "10px 12px",
+          padding: "9px 12px",
           backgroundColor: C.successBg,
           borderRadius: 10,
         }}
@@ -1358,7 +1358,7 @@ function LevierCard() {
           <p
             style={{
               margin: "3px 0 0 0",
-              fontSize: 19,
+              fontSize: 17,
               fontWeight: 700,
               color: C.success,
               fontFamily: "Outfit, Inter, system-ui",
@@ -1370,7 +1370,7 @@ function LevierCard() {
             3 600 CHF
           </p>
         </div>
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
           <polyline points="17 6 23 6 23 12" />
         </svg>
