@@ -414,7 +414,7 @@ function PlanHeaderCard() {
           Basé sur votre situation actuelle, vos objectifs et vos priorités.
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 24, flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
         <HeaderMetric
           label="Score actuel"
           value="46"
@@ -430,13 +430,13 @@ function PlanHeaderCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 30,
-                height: 30,
+                width: 28,
+                height: 28,
                 borderRadius: 8,
                 backgroundColor: C.coralBg,
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.coral} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.coral} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </span>
@@ -451,13 +451,13 @@ function PlanHeaderCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 30,
-                height: 30,
+                width: 28,
+                height: 28,
                 borderRadius: 8,
                 backgroundColor: C.successBg,
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
                 <polyline points="17 6 23 6 23 12" />
               </svg>
@@ -518,19 +518,19 @@ function HeaderMetric({
         <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4, marginTop: 1 }}>
           <span
             style={{
-              fontSize: 15.5,
+              fontSize: 14,
               fontWeight: 700,
               color: C.textDark,
               fontFamily: "Outfit, Inter, system-ui",
               letterSpacing: "-0.015em",
-              lineHeight: 1.1,
+              lineHeight: 1.15,
               fontVariantNumeric: "tabular-nums",
             }}
           >
             {value}
           </span>
           {unit && (
-            <span style={{ fontSize: 12, color: C.textLight, fontWeight: 500 }}>{unit}</span>
+            <span style={{ fontSize: 11, color: C.textLight, fontWeight: 500 }}>{unit}</span>
           )}
         </span>
         {progress !== undefined && (
@@ -590,6 +590,26 @@ function MissionCard() {
           pointerEvents: "none",
         }}
       />
+      {/* Bouclier décoratif top-right — visible dans la maquette
+          de référence. Opacity 0.18 et taille 120 px alignés sur
+          la maquette. */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: 28,
+          top: 22,
+          width: 120,
+          height: 120,
+          pointerEvents: "none",
+          opacity: 0.18,
+        }}
+      >
+        <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <polyline points="9 12 11 14 15 10" />
+        </svg>
+      </div>
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill={C.gold}>
@@ -609,8 +629,8 @@ function MissionCard() {
         </div>
         <h3
           style={{
-            margin: "6px 0 0 0",
-            fontSize: 22,
+            margin: "8px 0 0 0",
+            fontSize: 24,
             fontWeight: 700,
             color: "white",
             lineHeight: 1.18,
@@ -1115,7 +1135,7 @@ function ProjectionCard() {
           ))}
         </svg>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.textMuted, marginTop: 4, fontWeight: 500 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: C.textMuted, marginTop: 4, fontWeight: 500, whiteSpace: "nowrap" }}>
         {points.map((p) => (
           <span key={p.label}>{p.label}</span>
         ))}
@@ -1129,13 +1149,13 @@ function ProjectionCard() {
 }
 
 function ActionsSemaineCard() {
-  // Libellés reformulés courts pour tenir sur 1 ligne dans la
-  // colonne ~250 px (sans whiteSpace nowrap ni ellipsis), avec
-  // impact concis "+X pts" en chip success.
+  // Format maquette : titre complet + sous-texte "Impact : +X pts
+  // sur votre score" sous chaque action (pas de chip). Chevron à
+  // droite.
   const actions = [
-    { num: 1, title: "Ajouter assurance maladie", impact: "+2 pts" },
-    { num: 2, title: "Mettre 500 CHF de côté", impact: "+4 pts" },
-    { num: 3, title: "Créer objectif immobilier", impact: "+3 pts" },
+    { num: 1, title: "Ajouter votre assurance maladie", impact: "+2 pts sur votre score" },
+    { num: 2, title: "Mettre 500 CHF de côté", impact: "+4 pts sur votre score" },
+    { num: 3, title: "Créer un objectif immobilier", impact: "+3 pts sur votre score" },
   ];
   return (
     <div
@@ -1198,26 +1218,14 @@ function ActionsSemaineCard() {
             >
               {a.num}
             </span>
-            <p style={{ flex: 1, margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3, wordBreak: "break-word" }}>
-              {a.title}
-            </p>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "2px 7px",
-                borderRadius: 999,
-                backgroundColor: C.successBg,
-                color: C.success,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.02em",
-                flexShrink: 0,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {a.impact}
-            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3, wordBreak: "break-word" }}>
+                {a.title}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.3 }}>
+                Impact&nbsp;: <span style={{ color: C.success, fontWeight: 600 }}>{a.impact}</span>
+              </p>
+            </div>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <polyline points="9 18 15 12 9 6" />
             </svg>
