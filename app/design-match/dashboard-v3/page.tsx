@@ -579,7 +579,7 @@ function MissionCard() {
     <div
       style={{
         height: H.scoreCard,
-        padding: 20,
+        padding: "20px 20px 24px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         // PAS DE BORDER
@@ -1108,8 +1108,8 @@ function OpportunityCard() {
           position: "absolute",
           right: 30,
           top: 58,
-          width: 72,
-          height: 72,
+          width: 82,
+          height: 82,
           opacity: 0.9,
           color: C.success,
         }}
@@ -1321,7 +1321,7 @@ function RepartitionCard() {
               <span style={{ color: C.textDark, fontWeight: 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
                 {s.pct}%
               </span>
-              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+              <span style={{ color: C.textMuted, fontVariantNumeric: "tabular-nums", textAlign: "right", paddingLeft: 4 }}>
                 {s.amount}
               </span>
             </div>
@@ -1361,7 +1361,7 @@ function EvolutionCard() {
   // PAD.bottom 18 → 24 pour héberger les labels x-axis INTÉGRÉS
   // dans le SVG (vs ligne HTML séparée). Gain net = espace pour
   // le lien "Voir l'historique" plus aéré dessous.
-  const PAD = { top: 6, right: 50, bottom: 24, left: 6 };
+  const PAD = { top: 6, right: 50, bottom: 24, left: 2 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const scaled = points.map((v, i) => ({
@@ -1420,11 +1420,11 @@ function EvolutionCard() {
             <circle key={i} cx={p.x} cy={p.y} r={3} fill={C.cardBg} stroke={C.primary} strokeWidth={1.5} />
           ))}
           <circle cx={last.x} cy={last.y} r={4} fill={C.primary} />
-          <rect x={last.x + 8} y={last.y - 14} width={40} height={24} rx={5} fill={C.navy} />
-          <text x={last.x + 28} y={last.y - 3} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
+          <rect x={last.x + 6} y={last.y - 16} width={44} height={28} rx={6} fill={C.navy} />
+          <text x={last.x + 28} y={last.y - 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
             46
           </text>
-          <text x={last.x + 28} y={last.y + 7} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
+          <text x={last.x + 28} y={last.y + 8} textAnchor="middle" fontSize="6" fill="white" fillOpacity="0.85">
             Score actuel
           </text>
           {/* X-axis labels INTÉGRÉS dans le SVG (vs row HTML séparée)
