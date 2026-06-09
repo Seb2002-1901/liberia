@@ -482,7 +482,7 @@ function ScoreCard() {
               </svg>
               EN PROGRESSION
             </span>
-            <p style={{ marginTop: 6, fontSize: 12, color: "rgba(255,255,255,0.7)", margin: "6px 0 0 0" }}>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: "4px 0 0 0", lineHeight: 1.25 }}>
               +6 pts depuis la semaine dernière
             </p>
           </div>
