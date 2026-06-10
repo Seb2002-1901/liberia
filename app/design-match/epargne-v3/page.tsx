@@ -877,26 +877,26 @@ function SimulateurCard() {
       </div>
       <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted }}>Mensuel</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Mensuel</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
             1 200 CHF
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted }}>Rendement</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Rendement</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
             2.5 % / an
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted }}>Total versé</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Total versé</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
             144 000 CHF
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted }}>Intérêts</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 12, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Intérêts</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
             +28 592 CHF
           </p>
         </div>
@@ -907,12 +907,12 @@ function SimulateurCard() {
 
 function ProduitsCard() {
   const products = [
-    { label: "Compte épargne", sub: "Haute rémunération", rate: "1.25 %", rateNote: "Taux annuel", color: C.success, bg: C.successBg, iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
-    { label: "3e pilier bancaire", sub: "Profil fiscal optimisé", rate: "Optimisé", rateNote: "Avantage fiscal", color: C.amber, bg: C.amberBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Compte à terme", sub: "12 mois", rate: "1.60 %", rateNote: "Taux fixe", color: C.violet, bg: C.violetBg, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M12 6v6l4 2" },
+    { label: "Compte épargne", sub: "Haute rémunération", rate: "1.25 %", rateNote: "Taux annuel", color: C.success, bg: C.successBg, featured: true, iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
+    { label: "3e pilier bancaire", sub: "Profil fiscal optimisé", rate: "Optimisé", rateNote: "Avantage fiscal", color: C.amber, bg: C.amberBg, featured: false, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
+    { label: "Compte à terme", sub: "12 mois", rate: "1.60 %", rateNote: "Taux fixe", color: C.violet, bg: C.violetBg, featured: false, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M12 6v6l4 2" },
   ];
   return (
-    <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Produits recommandés
       </p>
@@ -928,15 +928,22 @@ function ProduitsCard() {
               </svg>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {p.label}
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
+                  {p.label}
+                </p>
+                {p.featured && (
+                  <span style={{ padding: "1px 5px", fontSize: 8.5, fontWeight: 700, color: C.success, backgroundColor: C.successBg, borderRadius: 4, letterSpacing: "0.04em" }}>
+                    Recommandé
+                  </span>
+                )}
+              </div>
               <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
                 {p.sub}
               </p>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: C.textDark, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: p.color, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
                 {p.rate}
               </p>
               <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted }}>
@@ -956,7 +963,7 @@ function ConseilIAFooter() {
   return (
     <div
       style={{
-        padding: "11px 16px",
+        padding: "15px 16px",
         backgroundColor: C.navy,
         borderRadius: 12,
         boxShadow: SHADOW.flat,
@@ -994,7 +1001,7 @@ function ConseilIAFooter() {
       </div>
       <button
         style={{
-          padding: "7px 14px",
+          padding: "9px 14px",
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
