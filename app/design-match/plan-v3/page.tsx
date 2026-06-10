@@ -57,11 +57,11 @@ const SHADOW = {
 const H = {
   topbar: 68,
   planHeader: 64,
-  mission: 168,
-  roadmap: 254,
-  bottomRow: 264,
+  mission: 152,
+  roadmap: 244,
+  bottomRow: 240,
   gap: 12,
-  rightCardGap: 10,
+  rightCardGap: 8,
 };
 
 export default function DesignMatchPlanV3() {
@@ -563,7 +563,7 @@ function MissionCard() {
         position: "relative",
         overflow: "hidden", // garde le clip pour le glow + bouclier décoratif uniquement
         minHeight: H.mission,
-        padding: "18px 22px",
+        padding: "14px 18px",
         backgroundColor: C.navy,
         borderRadius: 18,
         boxShadow: SHADOW.navy,
@@ -597,10 +597,10 @@ function MissionCard() {
         aria-hidden
         style={{
           position: "absolute",
-          right: 28,
-          top: 22,
-          width: 120,
-          height: 120,
+          right: 24,
+          top: 18,
+          width: 90,
+          height: 90,
           pointerEvents: "none",
           opacity: 0.18,
         }}
@@ -629,8 +629,8 @@ function MissionCard() {
         </div>
         <h3
           style={{
-            margin: "8px 0 0 0",
-            fontSize: 24,
+            margin: "6px 0 0 0",
+            fontSize: 22,
             fontWeight: 700,
             color: "white",
             lineHeight: 1.18,
@@ -640,7 +640,7 @@ function MissionCard() {
         >
           Construire votre fonds d&apos;urgence
         </h3>
-        <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "rgba(255,255,255,0.78)", lineHeight: 1.4 }}>
+        <p style={{ margin: "3px 0 0 0", fontSize: 12, color: "rgba(255,255,255,0.78)", lineHeight: 1.4 }}>
           Vous avez actuellement 0.0 mois de sécurité.
         </p>
       </div>
@@ -749,7 +749,7 @@ function RoadmapCard() {
     <div
       style={{
         minHeight: H.roadmap,
-        padding: "14px 18px",
+        padding: "10px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 18,
         boxShadow: SHADOW.card,
@@ -775,14 +775,14 @@ function RoadmapCard() {
           Connecteur : ligne pleine au lieu du dashed dashboard-v3
           (plan = chemin progressif). 25 % du tracé en primary
           (Phase 1 done, 4 colonnes équilibrées). */}
-      <div style={{ position: "relative", marginTop: 10, height: 32 }}>
+      <div style={{ position: "relative", marginTop: 6, height: 28 }}>
         <div
           aria-hidden
           style={{
             position: "absolute",
             left: "12.5%",
             right: "12.5%",
-            top: 15,
+            top: 13,
             height: 2,
             background: `linear-gradient(to right, ${C.primary} 0%, ${C.primary} 25%, ${C.borderGhost} 25%, ${C.borderGhost} 100%)`,
             borderRadius: 999,
@@ -855,8 +855,8 @@ function PhaseHead({ variant, icon }: { variant: "done" | "active" | "future"; i
         ? `2px solid ${C.primary}`
         : `1.5px solid ${C.borderGhost}`;
   const strokeFuture = variant === "future" ? C.textLight : C.primary;
-  const SIZE = 28;
-  const ICON = 13;
+  const SIZE = 24;
+  const ICON = 12;
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <span
@@ -921,7 +921,7 @@ function PhaseColumn({
   return (
     <div
       style={{
-        padding: "8px 12px 10px",
+        padding: "6px 10px",
         backgroundColor: C.pageBg,
         borderRadius: 10,
         display: "flex",
@@ -934,8 +934,8 @@ function PhaseColumn({
       </p>
       <p
         style={{
-          margin: "2px 0 0 0",
-          fontSize: 13,
+          margin: "1px 0 0 0",
+          fontSize: 12.5,
           fontWeight: 700,
           color: C.textDark,
           fontFamily: "Outfit, Inter, system-ui",
@@ -945,18 +945,18 @@ function PhaseColumn({
       >
         {title}
       </p>
-      <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.3 }}>
+      <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.3 }}>
         Durée estimée&nbsp;: {duration}
       </p>
-      <ul style={{ marginTop: 6, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
+      <ul style={{ marginTop: 5, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 1 }}>
         {tasks.map((t) => (
-          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
+          <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
             <TaskBullet state={t.state} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <p
                 style={{
                   margin: 0,
-                  fontSize: 10.5,
+                  fontSize: 10,
                   fontWeight: 500,
                   color: C.textDark,
                   lineHeight: 1.3,
@@ -969,7 +969,7 @@ function PhaseColumn({
                 <p
                   style={{
                     margin: 0,
-                    fontSize: 9.5,
+                    fontSize: 9,
                     color: t.state === "active" ? C.primary : C.textLight,
                     fontWeight: 500,
                     lineHeight: 1.2,
@@ -994,8 +994,8 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 16,
-          height: 16,
+          width: 14,
+          height: 14,
           borderRadius: 999,
           backgroundColor: C.success,
           flexShrink: 0,
@@ -1013,8 +1013,8 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
       <span
         style={{
           display: "inline-block",
-          width: 16,
-          height: 16,
+          width: 14,
+          height: 14,
           borderRadius: 999,
           backgroundColor: "white",
           border: `2px solid ${C.primary}`,
@@ -1107,7 +1107,7 @@ function ProjectionCard() {
       >
         Projection de votre score
       </p>
-      <div style={{ marginTop: 8, height: 130 }}>
+      <div style={{ marginTop: 6, height: 105 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="none" style={{ display: "block" }}>
           <defs>
             <linearGradient id="proj-grad-v3" x1="0" y1="0" x2="0" y2="1">
@@ -1192,7 +1192,7 @@ function ActionsSemaineCard() {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              padding: "8px 10px",
+              padding: "6px 8px",
               borderRadius: 10,
               border: "none",
               backgroundColor: C.pageBg,
@@ -1293,11 +1293,11 @@ function LevierCard() {
       </p>
       <div
         style={{
-          marginTop: 10,
+          marginTop: 8,
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          padding: "9px 12px",
+          gap: 10,
+          padding: "7px 10px",
           backgroundColor: C.successBg,
           borderRadius: 10,
         }}
@@ -1380,7 +1380,7 @@ function ProgressionGlobaleCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1478,7 +1478,7 @@ function ImpactPlanCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1537,7 +1537,7 @@ function ConseillerRecommandeCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
@@ -1614,7 +1614,7 @@ function ActionsRapidesRailCard() {
   return (
     <div
       style={{
-        padding: "16px 18px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
