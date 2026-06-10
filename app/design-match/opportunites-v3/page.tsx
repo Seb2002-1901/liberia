@@ -440,7 +440,7 @@ function HeroOpportunites() {
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette semaine</span>
           </div>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            Potentiel identifié&nbsp;: <span style={{ fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums" }}>2 480 CHF / mois</span>
+            <span style={{ fontWeight: 700, color: C.textLight, fontVariantNumeric: "tabular-nums" }}>2 480 CHF / mois</span> <span style={{ opacity: 0.7 }}>de potentiel</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
@@ -567,11 +567,11 @@ function TopOpportunitesCard() {
               </svg>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.success, fontWeight: 700, fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
+              <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
                 {it.gain}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.2 }}>
+                {it.label}
               </p>
             </div>
             <span
@@ -629,7 +629,7 @@ function GainsFutursCard() {
             <div style={{ width: "21%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
           </div>
           <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            35 000
+            35 000 CHF
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
@@ -638,7 +638,7 @@ function GainsFutursCard() {
             <div style={{ width: "56%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
           </div>
           <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            92 000
+            92 000 CHF
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
@@ -647,7 +647,7 @@ function GainsFutursCard() {
             <div style={{ width: "100%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
           </div>
           <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            165 000
+            165 000 CHF
           </span>
         </div>
       </div>
