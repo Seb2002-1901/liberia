@@ -1,19 +1,18 @@
 /**
  * Phase 5.0 — /design-match/profil-v3
  *
- * Page Profil V3 — cockpit identité financière aligné sur
+ * Page Profil V3 — cockpit COMPTE UTILISATEUR aligné sur
  * Revenus V3 (référence cockpit officielle). Mêmes tokens, mêmes
- * hauteurs, mêmes patterns que les 9 autres pages V3 verrouillées
- * (dashboard, coach, plan, revenus, depenses, budget, objectifs,
- * epargne, investissements, opportunites).
+ * hauteurs, mêmes patterns que les 11 autres pages V3 verrouillées.
  *
- * Cette page répond à "Qui suis-je financièrement ?" et NON à
- * "Paramètres de mon compte".
+ * Cette page n'est PAS une analyse financière — celle-ci vit
+ * dans /design-match/mon-analyse-v3. Profil V3 = identité,
+ * préférences, abonnement, documents, sécurité, paramètres.
  *
  * DESKTOP (cockpit one-page, ≥ 1200) :
- *   Row 1 (1.6fr / 1fr)        : ProfilHero · ScoreGlobalCard
- *   Row 2 (1.2fr / 1fr / 1fr)  : IdentiteFinanciereCard · ForcesCard · AxesCard
- *   Row 3 (1.4fr / 1fr / 1fr)  : ProgressionCard · ProjectionCard · ConseilIACard
+ *   Row 1 (1.6fr / 1fr)        : ProfilHero (blanc) · CompletudeCard
+ *   Row 2 (1.2fr / 1fr / 1fr)  : InfosPersoCard · PreferencesCard · AbonnementCard
+ *   Row 3 (1.2fr / 1fr / 1fr)  : DocumentsCard · SecuriteCard · ParametresRapidesCard
  *   Row 4 (full width)         : MissionFooter
  *
  * MOBILE/TABLET (< 1200) : stack vertical via media queries.
@@ -60,14 +59,14 @@ export default function DesignMatchProfilV3() {
     <>
       <style>{`
         @media (max-width: 1199px) {
-          [data-pro-row] { grid-template-columns: 1fr !important; }
-          [data-pro-main] { padding: 0 20px 12px 20px !important; gap: 10px !important; }
+          [data-prof-row] { grid-template-columns: 1fr !important; }
+          [data-prof-main] { padding: 0 20px 12px 20px !important; gap: 10px !important; }
         }
         @media (max-width: 999px) {
-          [data-pro-sidebar] { display: none !important; }
-          [data-pro-content] { margin-left: 0 !important; }
-          [data-pro-main] { padding: 0 16px 16px 16px !important; }
-          [data-pro-topbar] { padding: 0 16px !important; }
+          [data-prof-sidebar] { display: none !important; }
+          [data-prof-content] { margin-left: 0 !important; }
+          [data-prof-main] { padding: 0 16px 16px 16px !important; }
+          [data-prof-topbar] { padding: 0 16px !important; }
         }
       `}</style>
       <div
@@ -78,13 +77,13 @@ export default function DesignMatchProfilV3() {
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",
         }}
       >
-        <div data-pro-sidebar>
+        <div data-prof-sidebar>
           <Sidebar />
         </div>
-        <div data-pro-content style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div data-prof-content style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
           <Topbar />
           <main
-            data-pro-main
+            data-prof-main
             style={{
               padding: "0 24px 6px 24px",
               maxWidth: 1440,
@@ -95,19 +94,19 @@ export default function DesignMatchProfilV3() {
               gap: 6,
             }}
           >
-            <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
+            <div data-prof-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
               <ProfilHero />
-              <ScoreGlobalCard />
+              <CompletudeCard />
             </div>
-            <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
-              <IdentiteFinanciereCard />
-              <ForcesCard />
-              <AxesCard />
+            <div data-prof-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
+              <InfosPersoCard />
+              <PreferencesCard />
+              <AbonnementCard />
             </div>
-            <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
-              <ProgressionCard />
-              <ProjectionCard />
-              <ConseilIACard />
+            <div data-prof-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
+              <DocumentsCard />
+              <SecuriteCard />
+              <ParametresRapidesCard />
             </div>
             <MissionFooter />
           </main>
@@ -160,6 +159,7 @@ function Sidebar() {
         <NavSection title="PRINCIPAL">
           <NavItem label="Tableau de bord" iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" />
           <NavItem label="Coach IA" iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <NavItem label="Mon analyse" iconPath="M22 12h-4l-3 9L9 3l-3 9H2" />
           <NavItem label="Plan d'action" iconPath="M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </NavSection>
         <NavSection title="FINANCES">
@@ -299,7 +299,7 @@ function NavItem({
 function Topbar() {
   return (
     <header
-      data-pro-topbar
+      data-prof-topbar
       style={{
         height: 60,
         padding: "0 24px",
@@ -311,10 +311,10 @@ function Topbar() {
     >
       <div>
         <h1 style={{ fontSize: 19, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-          Bonjour Sébastien <span style={{ fontWeight: 400 }}>👋</span>
+          Mon profil
         </h1>
         <p style={{ marginTop: 2, fontSize: 11.5, color: C.textMuted, margin: "2px 0 0 0" }}>
-          Découvrez qui vous êtes financièrement et où vous allez.
+          Gérez vos informations personnelles, vos préférences et votre sécurité.
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -395,101 +395,140 @@ function ProfilHero() {
   return (
     <div
       style={{
-        position: "relative",
-        padding: "14px 20px",
-        backgroundColor: C.navy,
+        padding: "14px 18px",
+        backgroundColor: C.cardBg,
         borderRadius: 14,
-        boxShadow: SHADOW.navy,
-        overflow: "hidden",
+        boxShadow: SHADOW.card,
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
         minHeight: 112,
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: -40,
-          top: -40,
-          width: 180,
-          height: 180,
-          background:
-            "radial-gradient(circle, rgba(96, 165, 250, 0.20) 0%, rgba(96, 165, 250, 0) 65%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.78)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
-            Profil financier
-          </p>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 30,
-                fontWeight: 700,
-                color: "white",
-                lineHeight: 1,
-                fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "-0.025em",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              84 / 100
-            </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +22 pts
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette année</span>
-          </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.1 }}>
-            Profil discipliné en forte progression
-          </p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
-            Niveau Confirmé · objectif Expert
-          </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "84%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              84%
-            </span>
-          </div>
-        </div>
+      <div style={{ position: "relative", flexShrink: 0 }}>
         <div
           style={{
-            width: 60,
-            height: 60,
+            width: 76,
+            height: 76,
             borderRadius: 999,
             background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            flexShrink: 0,
-            boxShadow: "0 6px 18px -6px rgba(0, 0, 0, 0.30)",
             color: "white",
-            fontSize: 22,
+            fontSize: 28,
             fontWeight: 700,
             fontFamily: "Outfit, Inter, system-ui",
             letterSpacing: "-0.02em",
+            boxShadow: "0 6px 18px -6px rgba(245, 158, 11, 0.40)",
           }}
           aria-hidden
         >
           SG
+        </div>
+        <span
+          style={{
+            position: "absolute",
+            bottom: 2,
+            right: 2,
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            backgroundColor: C.navy,
+            border: "2px solid white",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+          aria-label="Modifier la photo"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
+          </svg>
+        </span>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.015em", lineHeight: 1.1 }}>
+            Sébastien Golay
+          </p>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 16,
+              height: 16,
+              borderRadius: 999,
+              backgroundColor: C.primary,
+              flexShrink: 0,
+            }}
+            aria-label="Profil vérifié"
+          >
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
+          <span
+            style={{
+              padding: "1px 7px",
+              fontSize: 9,
+              fontWeight: 700,
+              color: C.gold,
+              backgroundColor: "#FFF8E1",
+              borderRadius: 999,
+              letterSpacing: "0.04em",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              flexShrink: 0,
+            }}
+          >
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
+            </svg>
+            LIBERIA Premium
+          </span>
+        </div>
+        <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 16, rowGap: 3, fontSize: 10.5, color: C.textMuted }}>
+          <InfoLine iconPath="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z|M22 6l-10 7L2 6">
+            sebastien.golay@gmail.com
+          </InfoLine>
+          <InfoLine iconPath="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.93.37 1.85.7 2.73a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.35-1.35a2 2 0 0 1 2.11-.45c.88.33 1.8.57 2.73.7A2 2 0 0 1 22 16.92z">
+            +41 79 123 45 67
+          </InfoLine>
+          <InfoLine iconPath="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z|M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z">
+            Lausanne, Suisse
+          </InfoLine>
+          <InfoLine iconPath="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z|M16 2v4|M8 2v4|M3 10h18">
+            Membre depuis mars 2024
+          </InfoLine>
         </div>
       </div>
     </div>
   );
 }
 
-function ScoreGlobalCard() {
-  const stats = [
-    { label: "Score financier", value: "84 / 100", color: C.primary },
-    { label: "Discipline", value: "91 %", color: C.success },
-    { label: "Épargne", value: "24 %", color: C.success },
-    { label: "Croissance", value: "+18 %", color: C.success },
-  ];
+function InfoLine({ iconPath, children }: { iconPath: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+        {iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+      </svg>
+      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function CompletudeCard() {
+  const pct = 78;
+  const R = 26;
+  const C2 = 2 * Math.PI * R;
+  const dash = (pct / 100) * C2;
   return (
     <div
       style={{
@@ -498,29 +537,104 @@ function ScoreGlobalCard() {
         borderRadius: 14,
         boxShadow: SHADOW.card,
         display: "flex",
-        flexDirection: "column",
+        alignItems: "center",
+        gap: 12,
         minHeight: 112,
       }}
     >
+      <div style={{ position: "relative", width: 68, height: 68, flexShrink: 0 }}>
+        <svg width={68} height={68} viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r={R} fill="none" stroke={C.primaryBg} strokeWidth="6" />
+          <circle
+            cx="32"
+            cy="32"
+            r={R}
+            fill="none"
+            stroke={C.primary}
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray={`${dash} ${C2}`}
+            transform="rotate(-90 32 32)"
+          />
+        </svg>
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>
+            {pct}%
+          </span>
+        </div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Votre progression
+        </p>
+        <p style={{ margin: "2px 0 0 0", fontSize: 12.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
+          Profil complété
+        </p>
+        <p style={{ margin: "2px 0 0 0", fontSize: 10.5, color: C.success, fontWeight: 600 }}>
+          Continuez comme ça !
+        </p>
+        <button
+          style={{
+            marginTop: 6,
+            padding: "6px 10px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 5,
+            backgroundColor: C.navy,
+            color: "white",
+            fontSize: 11,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            alignSelf: "flex-start",
+          }}
+        >
+          Compléter mon profil
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════ ROW 2 ═══════════════ */
+
+function InfosPersoCard() {
+  const items = [
+    { label: "Nom complet", value: "Sébastien Golay", iconPath: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
+    { label: "Email", value: "sebastien.golay@gmail.com", iconPath: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z|M22 6l-10 7L2 6" },
+    { label: "Téléphone", value: "+41 79 123 45 67", iconPath: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.93.37 1.85.7 2.73a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.35-1.35a2 2 0 0 1 2.11-.45c.88.33 1.8.57 2.73.7A2 2 0 0 1 22 16.92z" },
+    { label: "Adresse", value: "Chemin des Primevères 12, Lausanne", iconPath: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z|M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" },
+  ];
+  return (
+    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Score global
+        Informations personnelles
       </p>
-      <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
-        {stats.map((s) => (
-          <div key={s.label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{s.label}</p>
-            <p
-              style={{
-                margin: "1px 0 0 0",
-                fontSize: 12,
-                fontWeight: 700,
-                color: s.color,
-                fontFamily: "Outfit, Inter, system-ui",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {s.value}
-            </p>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Vos informations de base
+      </p>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+        {items.map((it) => (
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.cardBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+              </svg>
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
+                {it.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {it.value}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -532,16 +646,77 @@ function ScoreGlobalCard() {
           alignItems: "center",
           justifyContent: "center",
           gap: 5,
-          backgroundColor: C.navy,
-          color: "white",
-          fontSize: 11.5,
+          backgroundColor: C.primaryBg,
+          color: C.primary,
+          fontSize: 11,
           fontWeight: 600,
           borderRadius: 8,
           border: "none",
           cursor: "pointer",
         }}
       >
-        Voir mon analyse
+        Modifier mes informations
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function PreferencesCard() {
+  const items = [
+    { label: "Langue", value: "Français", iconPath: "M5 8h14|M5 12h14|M5 16h10" },
+    { label: "Devise", value: "CHF · Franc suisse", iconPath: "M12 1v22|M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
+    { label: "Notifications", value: "Email + Push", iconPath: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9|M10.3 21a1.94 1.94 0 0 0 3.4 0" },
+    { label: "Communication", value: "Hebdomadaire", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
+  ];
+  return (
+    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Préférences
+      </p>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Personnalisez votre expérience
+      </p>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+        {items.map((it) => (
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.cardBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.violet} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+              </svg>
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
+                {it.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {it.value}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: "6px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+          backgroundColor: C.violetBg,
+          color: C.violet,
+          fontSize: 11,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Gérer mes préférences
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
@@ -551,20 +726,18 @@ function ScoreGlobalCard() {
   );
 }
 
-/* ═══════════════ ROW 2 ═══════════════ */
-
-function IdentiteFinanciereCard() {
-  const traits = [
-    { label: "Profil", value: "Investisseur équilibré", color: C.primary },
-    { label: "Horizon", value: "Long terme (10+ ans)", color: C.violet },
-    { label: "Tolérance risque", value: "Modérée", color: C.amber },
-    { label: "Objectif principal", value: "Liberté financière", color: C.success },
+function AbonnementCard() {
+  const items = [
+    { label: "Plan actuel", value: "LIBERIA Premium", iconPath: "M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" },
+    { label: "Conseiller assigné", value: "Marie Dupont", iconPath: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
+    { label: "Parrainage", value: "Invitez vos amis", iconPath: "M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2|M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z|M20 8v6|M23 11h-6" },
+    { label: "Membre depuis", value: "Mars 2024", iconPath: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z|M16 2v4|M8 2v4|M3 10h18" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
         <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Identité financière
+          Abonnement
         </p>
         <span
           style={{
@@ -574,98 +747,35 @@ function IdentiteFinanciereCard() {
             padding: "1px 7px",
             fontSize: 9,
             fontWeight: 700,
-            color: C.gold,
-            backgroundColor: "#FFF8E1",
+            color: C.success,
+            backgroundColor: C.successBg,
             borderRadius: 999,
             letterSpacing: "0.04em",
           }}
         >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
-          </svg>
-          Top 15 %
+          <span style={{ width: 5, height: 5, borderRadius: 999, backgroundColor: C.success }} />
+          Premium actif
         </span>
       </div>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Qui vous êtes en finance
-      </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {traits.map((t) => (
-          <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ fontSize: 10, color: C.textMuted, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {t.label}
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: t.color, fontFamily: "Outfit, Inter, system-ui", textAlign: "right", flexShrink: 0 }}>
-              {t.value}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ForcesCard() {
-  const items = [
-    "Épargne régulière",
-    "Budget maîtrisé",
-    "Objectifs définis",
-    "Progression constante",
-  ];
-  return (
-    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Forces financières
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Vos points forts
+        Votre formule Liberia
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         {items.map((it) => (
-          <div key={it} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.successBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.cardBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
-              {it}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AxesCard() {
-  const items = [
-    "Revenus passifs",
-    "Diversification",
-    "Optimisation fiscale",
-    "Accélération investissement",
-  ];
-  return (
-    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Axes de progrès
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        À travailler ensemble
-      </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.amberBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12" y2="17" />
-              </svg>
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
-              {it}
-            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
+                {it.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {it.value}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -675,227 +785,206 @@ function AxesCard() {
 
 /* ═══════════════ ROW 3 ═══════════════ */
 
-function ProgressionCard() {
-  const points = [
-    { label: "Nov.", value: 62 },
-    { label: "Déc.", value: 64 },
-    { label: "Janv.", value: 67 },
-    { label: "Févr.", value: 69 },
-    { label: "Mars", value: 72 },
-    { label: "Avr.", value: 74 },
-    { label: "Mai", value: 76 },
-    { label: "Juin", value: 78 },
-    { label: "Juil.", value: 80 },
-    { label: "Août", value: 81 },
-    { label: "Sept.", value: 83 },
-    { label: "Oct.", value: 84 },
+function DocumentsCard() {
+  const docs = [
+    { label: "Pièce d'identité", file: "Passeport.pdf", date: "12.03.2024", color: C.primary, bg: C.primaryBg },
+    { label: "Justificatif de domicile", file: "Facture_Electricite.pdf", date: "12.03.2024", color: C.success, bg: C.successBg },
+    { label: "Déclaration d'impôts", file: "Impots_2023.pdf", date: "18.02.2024", color: C.amber, bg: C.amberBg },
+    { label: "Relevés bancaires", file: "UBS_Releve_2024.pdf", date: "01.03.2024", color: C.violet, bg: C.violetBg },
   ];
-  const W = 360;
-  const HH = 108;
-  const PAD = { top: 14, right: 14, bottom: 14, left: 32 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 50;
-  const maxV = 100;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [60, 70, 80, 90];
-  const last = scaled[scaled.length - 1];
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-        <div>
-          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-            Progression
-          </p>
-          <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Score sur 12 derniers mois
-          </p>
-        </div>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
-            borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-          </svg>
-          +22 pts
-        </span>
-      </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="pro-prog-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v}
-                </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#pro-prog-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            84 / 100
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-function ProjectionCard() {
-  return (
-    <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Projection profil
+        Documents
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Votre trajectoire
+        Vos documents récents
       </p>
-      <div style={{ marginTop: 8, padding: "8px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Score estimé dans 3 ans
-        </p>
-        <p
-          style={{
-            margin: "2px 0 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            color: C.success,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          95 / 100
-        </p>
-      </div>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2027</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "88%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
+        {docs.map((d) => (
+          <div key={d.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: d.bg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={d.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {d.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {d.file}
+              </p>
+            </div>
+            <span style={{ fontSize: 9, color: C.textLight, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+              {d.date}
+            </span>
           </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            88 / 100
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2028</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "91%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            91 / 100
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2029</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "95%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            95 / 100
-          </span>
-        </div>
+        ))}
       </div>
-    </div>
-  );
-}
-
-function ConseilIACard() {
-  return (
-    <div
-      style={{
-        padding: "15px 14px",
-        backgroundColor: C.primaryBg,
-        borderRadius: 14,
-        boxShadow: SHADOW.card,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 22,
-            height: 22,
-            borderRadius: 6,
-            backgroundColor: C.primary,
-            flexShrink: 0,
-          }}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
-            <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.primary, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Conseil IA
-        </p>
-      </div>
-      <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Vous progressez plus vite que 82 % des utilisateurs.
-      </p>
-      <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        En maintenant votre rythme actuel, vous pourriez atteindre un score financier de <span style={{ color: C.primary, fontWeight: 700 }}>95/100</span> dans moins de 3 ans.
-      </p>
       <button
         style={{
-          marginTop: 8,
-          padding: "7px 12px",
+          marginTop: 6,
+          padding: "6px 12px",
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
           gap: 5,
-          backgroundColor: C.primary,
-          color: "white",
-          fontSize: 11.5,
+          backgroundColor: C.primaryBg,
+          color: C.primary,
+          fontSize: 11,
           fontWeight: 600,
           borderRadius: 8,
           border: "none",
           cursor: "pointer",
         }}
       >
-        Parler à mon conseiller
+        Voir tous les documents
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function SecuriteCard() {
+  const items = [
+    { label: "Mot de passe", sub: "Modifié il y a 2 mois", color: C.primary, bg: C.primaryBg, iconPath: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z|M7 11V7a5 5 0 0 1 10 0v4" },
+    { label: "Authentification 2FA", sub: "Activée", color: C.success, bg: C.successBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z|M9 12l2 2 4-4" },
+    { label: "Sessions actives", sub: "2 appareils connectés", color: C.amber, bg: C.amberBg, iconPath: "M2 3h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z|M8 21h8|M12 17v4" },
+    { label: "Appareils de confiance", sub: "3 appareils", color: C.violet, bg: C.violetBg, iconPath: "M5 2h14a2 2 0 0 1 2 2v16l-4-2-3 2-4-2-3 2-4-2V4a2 2 0 0 1 2-2z" },
+  ];
+  return (
+    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Sécurité
+      </p>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Protégez votre compte
+      </p>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+        {items.map((it) => (
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+              </svg>
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {it.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2 }}>
+                {it.sub}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: "6px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+          backgroundColor: C.successBg,
+          color: C.success,
+          fontSize: 11,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Gérer la sécurité
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function ParametresRapidesCard() {
+  const toggles = [
+    { label: "Mode sombre", sub: "Confort visuel", on: false },
+    { label: "Notifications push", sub: "Alertes en temps réel", on: true },
+    { label: "Confidentialité", sub: "Données chiffrées", on: true },
+    { label: "Mode prudence", sub: "Plafond automatique", on: false },
+  ];
+  return (
+    <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Paramètres rapides
+      </p>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        À portée de clic
+      </p>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+        {toggles.map((t) => (
+          <div key={t.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
+                {t.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2 }}>
+                {t.sub}
+              </p>
+            </div>
+            <span
+              style={{
+                position: "relative",
+                width: 26,
+                height: 14,
+                borderRadius: 999,
+                backgroundColor: t.on ? C.success : C.borderGhost,
+                flexShrink: 0,
+                transition: "background-color 0.2s",
+              }}
+              aria-checked={t.on}
+              role="switch"
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: 1,
+                  left: t.on ? 13 : 1,
+                  width: 12,
+                  height: 12,
+                  borderRadius: 999,
+                  backgroundColor: "white",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.18)",
+                  transition: "left 0.2s",
+                }}
+              />
+            </span>
+          </div>
+        ))}
+      </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: "6px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+          backgroundColor: C.pageBg,
+          color: C.textDark,
+          fontSize: 11,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Tous les paramètres
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
@@ -936,22 +1025,22 @@ function MissionFooter() {
           }}
           aria-hidden
         >
-          🏆
+          👤
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Score financier <span style={{ fontVariantNumeric: "tabular-nums" }}>84 / 100</span>
+            Votre profil est complété à <span style={{ fontVariantNumeric: "tabular-nums" }}>78 %</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
-              <div style={{ width: "84%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+              <div style={{ width: "78%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
             <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              84 % atteint
+              78 %
             </span>
           </div>
           <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
-            Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>11 points</span> pour atteindre le niveau Expert.
+            Complétez les informations restantes pour une expérience optimale.
           </p>
         </div>
       </div>
@@ -971,7 +1060,7 @@ function MissionFooter() {
           flexShrink: 0,
         }}
       >
-        Atteindre le niveau Expert
+        Compléter mon profil
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
