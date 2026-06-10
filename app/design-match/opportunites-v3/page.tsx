@@ -439,8 +439,11 @@ function HeroOpportunites() {
             </span>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette semaine</span>
           </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            <span style={{ fontWeight: 700, color: C.textLight, fontVariantNumeric: "tabular-nums" }}>2 480 CHF / mois</span> <span style={{ opacity: 0.7 }}>de potentiel</span>
+          <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
+            2 480 CHF / mois
+          </p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
+            Potentiel identifié
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
@@ -567,11 +570,11 @@ function TopOpportunitesCard() {
               </svg>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
-                {it.gain}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.2 }}>
+              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
                 {it.label}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
+                {it.gain}
               </p>
             </div>
             <span
@@ -813,11 +816,11 @@ function EvolutionCard() {
 
 function CategoriesCard() {
   const cats = [
-    { label: "Dépenses", pct: 35, color: C.coral },
-    { label: "Investissements", pct: 25, color: C.primary },
-    { label: "Fiscalité", pct: 20, color: C.violet },
-    { label: "Épargne", pct: 15, color: C.success },
-    { label: "Revenus passifs", pct: 5, color: C.amber },
+    { label: "Dépenses", pct: 35, color: C.coral, bg: C.coralBg },
+    { label: "Investissements", pct: 25, color: C.primary, bg: C.primaryBg },
+    { label: "Fiscalité", pct: 20, color: C.violet, bg: C.violetBg },
+    { label: "Épargne", pct: 15, color: C.success, bg: C.successBg },
+    { label: "Revenus passifs", pct: 5, color: C.amber, bg: C.amberBg },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -830,11 +833,22 @@ function CategoriesCard() {
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
         {cats.map((c) => (
           <div key={c.label}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
               <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {c.label}
               </span>
-              <span style={{ fontSize: 9.5, color: c.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+              <span
+                style={{
+                  padding: "1px 6px",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: c.color,
+                  backgroundColor: c.bg,
+                  borderRadius: 999,
+                  fontVariantNumeric: "tabular-nums",
+                  flexShrink: 0,
+                }}
+              >
                 {c.pct}%
               </span>
             </div>
