@@ -508,7 +508,7 @@ function ScoreGlobalCard() {
       }}
     >
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Score global
+        Décomposition du score
       </p>
       <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
         {stats.map((s) => (
@@ -570,7 +570,7 @@ function ProfilAnalyseCard() {
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
         <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Profil d&apos;analyse
+          Signature financière
         </p>
         <span
           style={{
@@ -952,9 +952,14 @@ function MissionFooter() {
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
               <div style={{ width: "84%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              84 % atteint
-            </span>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.1 }}>
+              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: "0.04em" }}>
+                Niveau Confirmé
+              </span>
+              <span style={{ marginTop: 1, fontSize: 11, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
+                84 / 100
+              </span>
+            </div>
           </div>
           <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
             Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>11 points</span> pour atteindre le niveau Expert.
