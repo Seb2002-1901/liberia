@@ -601,10 +601,10 @@ function RepartitionCard() {
             </p>
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3 }}>
           {slicesWithPaths.map((s) => (
-            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10.5 }}>
-              <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: 999, backgroundColor: s.color, flexShrink: 0 }} />
+            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10 }}>
+              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 999, backgroundColor: s.color, flexShrink: 0 }} />
               <span style={{ flex: 1, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {s.label}
               </span>
@@ -626,17 +626,15 @@ function AlertesCard() {
       tag: "+23%",
       tagColor: C.danger,
       tagBg: C.dangerBg,
-      sub: "412 CHF de plus que la moyenne",
       iconColor: C.danger,
       iconBg: C.dangerBg,
       iconPath: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z|M12 9v4|M12 17h.01",
     },
     {
-      label: "Abonnements",
+      label: "Abonnements peu utilisés",
       tag: "184 CHF",
       tagColor: C.amber,
       tagBg: C.amberBg,
-      sub: "4 abonnements peu utilisés",
       iconColor: C.amber,
       iconBg: C.amberBg,
       iconPath: "M20 7h-3V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM9 4h6v3H9V4z",
@@ -646,7 +644,6 @@ function AlertesCard() {
       tag: "1 240 CHF",
       tagColor: C.success,
       tagBg: C.successBg,
-      sub: "En optimisant ces postes",
       iconColor: C.success,
       iconBg: C.successBg,
       iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22",
@@ -660,23 +657,18 @@ function AlertesCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Optimisations détectées
       </p>
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 8 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, backgroundColor: it.iconBg, flexShrink: 0 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={it.iconColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 7px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.iconBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.iconColor} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.2 }}>
-                {it.sub}
-              </p>
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: it.tagColor, fontVariantNumeric: "tabular-nums", flexShrink: 0, padding: "2px 6px", backgroundColor: it.tagBg, borderRadius: 999 }}>
+            <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {it.label}
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: it.tagColor, fontVariantNumeric: "tabular-nums", flexShrink: 0, padding: "1px 6px", backgroundColor: it.tagBg, borderRadius: 999 }}>
               {it.tag}
             </span>
           </div>
@@ -706,10 +698,10 @@ function Top5Card() {
           </p>
         </div>
       </div>
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
         {rows.map((r) => (
-          <div key={r.rank} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 999, backgroundColor: C.primary, color: "white", fontSize: 9.5, fontWeight: 700, fontFamily: "Outfit, Inter, system-ui", flexShrink: 0 }}>
+          <div key={r.rank} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: 999, backgroundColor: C.primary, color: "white", fontSize: 9, fontWeight: 700, fontFamily: "Outfit, Inter, system-ui", flexShrink: 0 }}>
               {r.rank}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -721,11 +713,11 @@ function Top5Card() {
                   {r.amount}
                 </span>
               </div>
-              <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ height: 3, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
                 <div style={{ width: `${r.pct * 2.5}%`, height: "100%", backgroundColor: r.color, borderRadius: 999 }} />
               </div>
             </div>
-            <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 24, textAlign: "right" }}>
+            <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 22, textAlign: "right" }}>
               {r.pct}%
             </span>
           </div>
@@ -855,8 +847,8 @@ function RecurrentesCard() {
               display: "flex",
               alignItems: "center",
               gap: 6,
-              padding: "5px 0",
-              fontSize: 11,
+              padding: "4px 0",
+              fontSize: 10.5,
               borderBottom: i === rows.length - 1 ? "none" : `1px solid ${C.borderGhost}`,
             }}
           >
@@ -871,19 +863,19 @@ function RecurrentesCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 14,
-                height: 14,
+                width: 12,
+                height: 12,
                 borderRadius: 999,
                 backgroundColor: r.status === "ok" ? C.successBg : C.amberBg,
                 flexShrink: 0,
               }}
             >
               {r.status === "ok" ? (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               ) : (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="9" x2="12" y2="13" />
                   <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
