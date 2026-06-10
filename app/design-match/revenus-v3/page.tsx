@@ -1,20 +1,16 @@
 /**
  * Phase 5.0 — /design-match/revenus-v3
  *
- * Page Revenus V3 — reproduction fidèle de la maquette de référence.
- * Langage visuel strictement aligné sur dashboard-v3, coach-v3 et
- * plan-v3 (références verrouillées).
+ * Page Revenus V3 — cockpit financier dense aligné sur dashboard-v3,
+ * coach-v3 et plan-v3 (références verrouillées).
  *
- * Structure :
- *   Sidebar 248  ·  Main 1fr  ·  Right rail 320
+ * DESKTOP (cockpit one-page, ≥ 1200) :
+ *   Row 1 : RevenusHero navy (1.6fr) · PotentielCard (1fr)
+ *   Row 2 : SourcesCard · EvolutionCard · ProjectionCard (3 × 1fr)
+ *   Row 3 : CategoryTable (1.3fr) · OpportunitesCard · ConseilCard
+ *   Footer : MissionFooter (full width)
  *
- * Main column :
- *   RevenusHero · SourcesCard · EvolutionCard · CategoryTableCard
- *
- * Right rail :
- *   PotentielCard · OpportunitesCard · ProjectionCard · ConseilCard
- *
- * Bottom strip (full width) : MissionFooter
+ * MOBILE/TABLET (< 1200) : tout stack verticalement (scrollable).
  */
 
 export const metadata = {
@@ -35,7 +31,6 @@ const C = {
   notifBadge: "#7FA2E6",
   success: "#10A37F",
   successBg: "#ECFDF5",
-  successPale: "#F0FAF6",
   coral: "#F97757",
   coralBg: "#FFF1EC",
   violet: "#9061F9",
@@ -43,7 +38,6 @@ const C = {
   amber: "#F59E0B",
   amberBg: "#FEF3C7",
   gold: "#FBBF24",
-  donutAmber: "#F59E0B",
   donutGrey: "#E2E8F0",
 };
 
@@ -56,36 +50,63 @@ const SHADOW = {
 
 export default function DesignMatchRevenusV3() {
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: C.pageBg,
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-      }}
-    >
-      <Sidebar />
-      <div style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <Topbar />
-        <main
-          style={{
-            padding: "0 24px 16px 24px",
-            maxWidth: 1440,
-            margin: "0 auto",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-          }}
-        >
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 320px", gap: 20 }}>
-            <MainColumn />
-            <RightRail />
-          </div>
-          <MissionFooter />
-        </main>
+    <>
+      <style>{`
+        @media (max-width: 1199px) {
+          [data-rev-row] { grid-template-columns: 1fr !important; }
+          [data-rev-main] { padding: 0 20px 12px 20px !important; gap: 12px !important; }
+        }
+        @media (max-width: 999px) {
+          [data-rev-sidebar] { display: none !important; }
+          [data-rev-content] { margin-left: 0 !important; }
+          [data-rev-main] { padding: 0 16px 16px 16px !important; }
+          [data-rev-topbar] { padding: 0 16px !important; }
+        }
+      `}</style>
+      <div
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          backgroundColor: C.pageBg,
+          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        }}
+      >
+        <div data-rev-sidebar>
+          <Sidebar />
+        </div>
+        <div data-rev-content style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <Topbar />
+          <main
+            data-rev-main
+            style={{
+              padding: "0 24px 12px 24px",
+              maxWidth: 1440,
+              margin: "0 auto",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div data-rev-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
+              <RevenusHero />
+              <PotentielCard />
+            </div>
+            <div data-rev-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+              <SourcesCard />
+              <EvolutionCard />
+              <ProjectionCard />
+            </div>
+            <div data-rev-row style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 8 }}>
+              <CategoryTableCard />
+              <OpportunitesCard />
+              <ConseilCard />
+            </div>
+            <MissionFooter />
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -271,8 +292,9 @@ function NavItem({
 function Topbar() {
   return (
     <header
+      data-rev-topbar
       style={{
-        height: 64,
+        height: 60,
         padding: "0 24px",
         display: "flex",
         alignItems: "center",
@@ -281,10 +303,10 @@ function Topbar() {
       }}
     >
       <div>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        <h1 style={{ fontSize: 19, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
           Bonjour Sébastien <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
-        <p style={{ marginTop: 3, fontSize: 12, color: C.textMuted, margin: "3px 0 0 0" }}>
+        <p style={{ marginTop: 2, fontSize: 11.5, color: C.textMuted, margin: "2px 0 0 0" }}>
           Voici le détail de vos revenus et comment les augmenter.
         </p>
       </div>
@@ -293,8 +315,8 @@ function Topbar() {
           aria-label="Notifications"
           style={{
             position: "relative",
-            width: 34,
-            height: 34,
+            width: 32,
+            height: 32,
             borderRadius: 999,
             border: "none",
             backgroundColor: C.cardBg,
@@ -314,12 +336,12 @@ function Topbar() {
               position: "absolute",
               top: -2,
               right: -2,
-              width: 15,
-              height: 15,
+              width: 14,
+              height: 14,
               borderRadius: 999,
               backgroundColor: C.notifBadge,
               color: "white",
-              fontSize: 9.5,
+              fontSize: 9,
               fontWeight: 700,
               display: "inline-flex",
               alignItems: "center",
@@ -333,8 +355,8 @@ function Topbar() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            padding: "4px 10px 4px 4px",
+            gap: 7,
+            padding: "3px 10px 3px 3px",
             borderRadius: 999,
             backgroundColor: C.cardBg,
             boxShadow: SHADOW.kpi,
@@ -342,16 +364,16 @@ function Topbar() {
         >
           <div
             style={{
-              width: 28,
-              height: 28,
+              width: 26,
+              height: 26,
               borderRadius: 999,
               background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
             }}
           />
-          <span style={{ fontSize: 12.5, fontWeight: 500, color: C.textDark }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: C.textDark }}>
             Sébastien Golay
           </span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
@@ -360,29 +382,19 @@ function Topbar() {
   );
 }
 
-/* ═══════════════ MAIN COLUMN ═══════════════ */
-
-function MainColumn() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", minWidth: 0, gap: 16 }}>
-      <RevenusHero />
-      <SourcesCard />
-      <EvolutionCard />
-      <CategoryTableCard />
-    </div>
-  );
-}
+/* ═══════════════ ROW 1 : HERO + POTENTIEL ═══════════════ */
 
 function RevenusHero() {
   return (
     <div
       style={{
         position: "relative",
-        padding: "22px 28px",
+        padding: "14px 20px",
         backgroundColor: C.navy,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.navy,
         overflow: "hidden",
+        minHeight: 122,
       }}
     >
       <div
@@ -391,25 +403,25 @@ function RevenusHero() {
           position: "absolute",
           right: -40,
           top: -40,
-          width: 200,
-          height: 200,
+          width: 180,
+          height: 180,
           background:
             "radial-gradient(circle, rgba(96, 165, 250, 0.20) 0%, rgba(96, 165, 250, 0) 65%)",
           pointerEvents: "none",
         }}
       />
-      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, height: "100%" }}>
         <div>
-          <p style={{ margin: 0, fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,0.78)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
+          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.78)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
             Revenus mensuels totaux
           </p>
           <p
             style={{
-              margin: "10px 0 0 0",
-              fontSize: 40,
+              margin: "6px 0 0 0",
+              fontSize: 32,
               fontWeight: 700,
               color: "white",
-              lineHeight: 1.05,
+              lineHeight: 1,
               fontFamily: "Outfit, Inter, system-ui",
               letterSpacing: "-0.025em",
               fontVariantNumeric: "tabular-nums",
@@ -421,17 +433,17 @@ function RevenusHero() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 6,
-              marginTop: 12,
-              padding: "4px 9px",
+              gap: 5,
+              marginTop: 8,
+              padding: "3px 8px",
               borderRadius: 999,
               backgroundColor: "rgba(16, 163, 127, 0.18)",
-              fontSize: 11.5,
+              fontSize: 10.5,
               fontWeight: 700,
               color: "#5EEAD4",
             }}
           >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="17 6 23 6 23 12" />
               <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
             </svg>
@@ -441,18 +453,18 @@ function RevenusHero() {
         </div>
         <div
           style={{
-            width: 72,
-            height: 72,
+            width: 60,
+            height: 60,
             borderRadius: 999,
             backgroundColor: "white",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 8px 20px -6px rgba(0, 0, 0, 0.25)",
+            boxShadow: "0 6px 18px -6px rgba(0, 0, 0, 0.30)",
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
             <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
             <path d="M18 12a2 2 0 0 0 0 4h4v-4z" />
@@ -463,17 +475,91 @@ function RevenusHero() {
   );
 }
 
-/* ═══════════════ SOURCES CARD (DONUT) ═══════════════ */
+function PotentielCard() {
+  return (
+    <div
+      style={{
+        padding: "12px 16px",
+        backgroundColor: C.cardBg,
+        borderRadius: 14,
+        boxShadow: SHADOW.card,
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 122,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.success, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+          Potentiel IA
+        </p>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+          <polyline points="17 6 23 6 23 12" />
+        </svg>
+      </div>
+      <p
+        style={{
+          margin: "6px 0 0 0",
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: C.textDark,
+          lineHeight: 1.3,
+          fontFamily: "Outfit, Inter, system-ui",
+        }}
+      >
+        +300 CHF/mois identifiés
+      </p>
+      <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, letterSpacing: "0.04em" }}>Score</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 14, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
+            +12 pts
+          </p>
+        </div>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontSize: 9.5, color: C.textMuted, letterSpacing: "0.04em" }}>Gain/an</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 14, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
+            3 600 CHF
+          </p>
+        </div>
+      </div>
+      <button
+        style={{
+          marginTop: "auto",
+          padding: "7px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+          backgroundColor: C.navy,
+          color: "white",
+          fontSize: 11.5,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Voir les solutions
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+/* ═══════════════ ROW 2 : SOURCES + EVOLUTION + PROJECTION ═══════════════ */
 
 function SourcesCard() {
   const slices = [
-    { id: "salaire", label: "Salaire principal", amount: "18 000 CHF", pct: 72, color: C.primary },
-    { id: "secondaire", label: "Activité secondaire", amount: "3 000 CHF", pct: 12, color: C.success },
-    { id: "passifs", label: "Revenus passifs", amount: "2 000 CHF", pct: 8, color: C.amber },
-    { id: "dividendes", label: "Dividendes", amount: "1 500 CHF", pct: 6, color: C.violet },
-    { id: "autres", label: "Autres revenus", amount: "500 CHF", pct: 2, color: C.donutGrey },
+    { id: "salaire", label: "Salaire", pct: 72, color: C.primary },
+    { id: "secondaire", label: "Activité 2nd.", pct: 12, color: C.success },
+    { id: "passifs", label: "Passifs", pct: 8, color: C.amber },
+    { id: "dividendes", label: "Dividendes", pct: 6, color: C.violet },
+    { id: "autres", label: "Autres", pct: 2, color: C.donutGrey },
   ];
-
   let cursor = -90;
   const gap = 1;
   const usableDeg = 360 - gap * slices.length;
@@ -486,122 +572,47 @@ function SourcesCard() {
     cursor = endDeg + gap;
     return { ...s, path };
   });
-
   return (
-    <div
-      style={{
-        padding: "22px 24px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Sources de revenus
-      </h2>
-      <p style={{ margin: "3px 0 0 0", fontSize: 12.5, color: C.textMuted }}>
-        Répartition de vos revenus mensuels
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 32, marginTop: 18 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 180, height: 180 }}>
-          <svg viewBox="0 0 100 100" width={180} height={180}>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Répartition mensuelle
+      </p>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 96, height: 96 }}>
+          <svg viewBox="0 0 100 100" width={96} height={96}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
           </svg>
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: 22,
-                fontWeight: 700,
-                color: C.textDark,
-                fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              25 000
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+              25K
             </p>
-            <p style={{ margin: "3px 0 0 0", fontSize: 11, color: C.textMuted, letterSpacing: "0.12em" }}>
+            <p style={{ margin: "2px 0 0 0", fontSize: 8.5, color: C.textMuted, letterSpacing: "0.14em" }}>
               CHF
             </p>
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 5 }}>
           {slicesWithPaths.map((s) => (
-            <div
-              key={s.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 100px 44px",
-                columnGap: 12,
-                alignItems: "center",
-                fontSize: 13,
-              }}
-            >
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: 10,
-                    height: 10,
-                    borderRadius: 999,
-                    backgroundColor: s.color,
-                    flexShrink: 0,
-                  }}
-                />
-                <span style={{ color: C.textDark, fontWeight: 500 }}>{s.label}</span>
+            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+              <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: 999, backgroundColor: s.color, flexShrink: 0 }} />
+              <span style={{ flex: 1, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {s.label}
               </span>
-              <span style={{ color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
-                {s.amount}
-              </span>
-              <span style={{ color: C.textMuted, fontWeight: 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+              <span style={{ color: C.textMuted, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
                 {s.pct}%
               </span>
             </div>
           ))}
         </div>
       </div>
-      <button
-        style={{
-          marginTop: 22,
-          width: "100%",
-          padding: "12px",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          backgroundColor: "transparent",
-          border: `1px solid ${C.borderGhost}`,
-          fontSize: 12.5,
-          fontWeight: 500,
-          color: C.textDark,
-          borderRadius: 10,
-          cursor: "pointer",
-        }}
-      >
-        Voir le détail de chaque source
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
     </div>
   );
 }
-
-/* ═══════════════ EVOLUTION CHART CARD ═══════════════ */
 
 function EvolutionCard() {
   const points = [
@@ -612,69 +623,59 @@ function EvolutionCard() {
     { label: "Sept.", value: 23500 },
     { label: "Oct.", value: 25000 },
   ];
-  const W = 600;
-  const HH = 200;
-  const PAD = { top: 18, right: 14, bottom: 28, left: 50 };
+  const W = 280;
+  const HH = 120;
+  const PAD = { top: 12, right: 10, bottom: 18, left: 30 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 10000;
-  const maxV = 30000;
+  const minV = 15000;
+  const maxV = 26000;
   const range = maxV - minV;
   const scaled = points.map((p, i) => ({
     ...p,
     x: PAD.left + (i / (points.length - 1)) * innerW,
     y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
   }));
-  const pathD = scaled
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
-    .join(" ");
+  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
   const baselineY = PAD.top + innerH;
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [10000, 15000, 20000, 25000, 30000];
-
+  const yTicks = [15000, 20000, 25000];
   return (
-    <div
-      style={{
-        padding: "22px 24px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Évolution de vos revenus
-          </h2>
-          <p style={{ margin: "3px 0 0 0", fontSize: 12.5, color: C.textMuted }}>
-            Sur les 6 derniers mois
+          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            Évolution
+          </p>
+          <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+            6 derniers mois
           </p>
         </div>
         <button
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 5,
-            padding: "6px 12px",
+            gap: 3,
+            padding: "3px 7px",
             backgroundColor: C.pageBg,
             border: `1px solid ${C.borderGhost}`,
-            fontSize: 12,
+            fontSize: 10.5,
             fontWeight: 500,
             color: C.textDark,
-            borderRadius: 8,
+            borderRadius: 6,
             cursor: "pointer",
           }}
         >
           6 mois
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
       </div>
-      <div style={{ marginTop: 18, height: 200 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="none" style={{ display: "block" }}>
+      <div style={{ marginTop: 4, flex: 1 }}>
+        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
           <defs>
-            <linearGradient id="revenue-grad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="evo-grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
               <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
             </linearGradient>
@@ -683,20 +684,20 @@ function EvolutionCard() {
             const y = PAD.top + innerH - ((v - minV) / range) * innerH;
             return (
               <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.6} />
-                <text x={PAD.left - 8} y={y + 3} fontSize="10" fill={C.textLight} textAnchor="end">
-                  {v / 1000}K CHF
+                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
+                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
+                  {v / 1000}K
                 </text>
               </g>
             );
           })}
-          <path d={areaD} fill="url(#revenue-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          <path d={areaD} fill="url(#evo-grad)" />
+          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
           {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={3.5} fill="white" stroke={C.primary} strokeWidth={2} />
+            <circle key={i} cx={p.x} cy={p.y} r={2.5} fill="white" stroke={C.primary} strokeWidth={1.5} />
           ))}
           {scaled.map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 8} fontSize="10" fill={C.textLight} textAnchor="middle">
+            <text key={`x-${p.label}`} x={p.x} y={HH - 4} fontSize="8" fill={C.textLight} textAnchor="middle">
               {p.label}
             </text>
           ))}
@@ -706,90 +707,90 @@ function EvolutionCard() {
   );
 }
 
-/* ═══════════════ CATEGORY TABLE CARD ═══════════════ */
+function ProjectionCard() {
+  const rows = [
+    { label: "Dans 1 an", value: "28 600", delta: "+3 600" },
+    { label: "Dans 3 ans", value: "34 800", delta: "+10 800" },
+    { label: "Dans 5 ans", value: "43 000", delta: "+18 000" },
+  ];
+  return (
+    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Projection
+      </p>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Avec +300 CHF/mois
+      </p>
+      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+        {rows.map((r) => (
+          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 8 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.successBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                <polyline points="17 6 23 6 23 12" />
+              </svg>
+            </span>
+            <span style={{ flex: 1, fontSize: 11, color: C.textMuted }}>{r.label}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.textDark, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
+              {r.value}
+            </span>
+            <span style={{ fontSize: 10.5, color: C.success, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+              {r.delta}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════ ROW 3 : TABLE + OPPORTUNITES + CONSEIL ═══════════════ */
 
 function CategoryTableCard() {
   const rows = [
-    { cat: "Salaire principal", amount: "18 000 CHF", evo: "+3.4%", positive: true, sparkline: [10, 12, 13, 14, 16, 18] },
-    { cat: "Activité secondaire", amount: "3 000 CHF", evo: "+8.7%", positive: true, sparkline: [5, 6, 7, 9, 12, 15] },
-    { cat: "Revenus passifs", amount: "2 000 CHF", evo: "+2.1%", positive: true, sparkline: [8, 9, 9, 10, 11, 11] },
-    { cat: "Dividendes", amount: "1 500 CHF", evo: "+1.3%", positive: true, sparkline: [7, 8, 8, 9, 9, 10] },
-    { cat: "Autres revenus", amount: "500 CHF", evo: "-2.0%", positive: false, sparkline: [12, 11, 10, 8, 7, 6] },
+    { cat: "Salaire principal", amount: "18 000", evo: "+3.4%", positive: true, sparkline: [10, 12, 13, 14, 16, 18] },
+    { cat: "Activité secondaire", amount: "3 000", evo: "+8.7%", positive: true, sparkline: [5, 6, 7, 9, 12, 15] },
+    { cat: "Revenus passifs", amount: "2 000", evo: "+2.1%", positive: true, sparkline: [8, 9, 9, 10, 11, 11] },
+    { cat: "Dividendes", amount: "1 500", evo: "+1.3%", positive: true, sparkline: [7, 8, 8, 9, 9, 10] },
+    { cat: "Autres revenus", amount: "500", evo: "-2.0%", positive: false, sparkline: [12, 11, 10, 8, 7, 6] },
   ];
-
   return (
-    <div
-      style={{
-        padding: "22px 24px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Détail par catégorie
-      </h2>
-      <p style={{ margin: "3px 0 0 0", fontSize: 12.5, color: C.textMuted }}>
-        Analyse de vos différentes sources de revenus
       </p>
-      <table style={{ width: "100%", marginTop: 18, borderCollapse: "collapse", fontSize: 13 }}>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Sources analysées
+      </p>
+      <table style={{ width: "100%", marginTop: 8, borderCollapse: "collapse", fontSize: 11.5 }}>
         <thead>
           <tr style={{ borderBottom: `1px solid ${C.borderGhost}` }}>
-            <th style={{ textAlign: "left", padding: "10px 0", fontWeight: 500, color: C.textMuted, fontSize: 11.5 }}>
-              Catégorie
-            </th>
-            <th style={{ textAlign: "left", padding: "10px 0", fontWeight: 500, color: C.textMuted, fontSize: 11.5 }}>
-              Montant
-            </th>
-            <th style={{ textAlign: "left", padding: "10px 0", fontWeight: 500, color: C.textMuted, fontSize: 11.5 }}>
-              Évolution (3 mois)
-            </th>
-            <th style={{ textAlign: "left", padding: "10px 0", fontWeight: 500, color: C.textMuted, fontSize: 11.5 }}>
-              Tendance
-            </th>
+            <th style={{ textAlign: "left", padding: "4px 0", fontWeight: 600, color: C.textLight, fontSize: 9.5, letterSpacing: "0.06em" }}>CATÉGORIE</th>
+            <th style={{ textAlign: "right", padding: "4px 0", fontWeight: 600, color: C.textLight, fontSize: 9.5, letterSpacing: "0.06em" }}>MONTANT</th>
+            <th style={{ textAlign: "right", padding: "4px 0", fontWeight: 600, color: C.textLight, fontSize: 9.5, letterSpacing: "0.06em" }}>3M</th>
+            <th style={{ textAlign: "right", padding: "4px 0", fontWeight: 600, color: C.textLight, fontSize: 9.5, letterSpacing: "0.06em" }}>TENDANCE</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={r.cat} style={{ borderBottom: i === rows.length - 1 ? "none" : `1px solid ${C.borderGhost}` }}>
-              <td style={{ padding: "14px 0", color: C.textDark, fontWeight: 500 }}>{r.cat}</td>
-              <td style={{ padding: "14px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{r.amount}</td>
-              <td style={{ padding: "14px 0", color: r.positive ? C.success : "#DC2626", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{r.evo}</td>
-              <td style={{ padding: "14px 0", width: 100 }}>
+              <td style={{ padding: "7px 0", color: C.textDark, fontWeight: 500 }}>{r.cat}</td>
+              <td style={{ padding: "7px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{r.amount}</td>
+              <td style={{ padding: "7px 0", color: r.positive ? C.success : "#DC2626", fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{r.evo}</td>
+              <td style={{ padding: "7px 0", width: 60, textAlign: "right" }}>
                 <MiniSparkline points={r.sparkline} color={r.positive ? C.success : "#DC2626"} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        style={{
-          marginTop: 18,
-          padding: 0,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 5,
-          fontSize: 12.5,
-          fontWeight: 500,
-          color: C.primary,
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Voir le détail complet
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
     </div>
   );
 }
 
 function MiniSparkline({ points, color }: { points: number[]; color: string }) {
-  const W = 80;
-  const HH = 24;
+  const W = 50;
+  const HH = 16;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const range = max - min || 1;
@@ -798,123 +799,11 @@ function MiniSparkline({ points, color }: { points: number[]; color: string }) {
     const y = HH - 2 - ((v - min) / range) * (HH - 4);
     return { x, y };
   });
-  const pathD = coords
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
-    .join(" ");
+  const pathD = coords.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
   return (
-    <svg width={W} height={HH} viewBox={`0 0 ${W} ${HH}`} style={{ display: "block" }}>
-      <path d={pathD} stroke={color} strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={W} height={HH} viewBox={`0 0 ${W} ${HH}`} style={{ display: "inline-block", verticalAlign: "middle" }}>
+      <path d={pathD} stroke={color} strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-/* ═══════════════ RIGHT RAIL ═══════════════ */
-
-function RightRail() {
-  return (
-    <aside style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-      <PotentielCard />
-      <OpportunitesCard />
-      <ProjectionCard />
-      <ConseilCard />
-    </aside>
-  );
-}
-
-function PotentielCard() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        padding: "18px 20px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-        <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: C.success, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-          Potentiel identifié par votre IA
-        </p>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-      </div>
-      <h3
-        style={{
-          margin: "10px 0 0 0",
-          fontSize: 16,
-          fontWeight: 700,
-          color: C.textDark,
-          lineHeight: 1.3,
-          fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.015em",
-        }}
-      >
-        Vous pourriez augmenter vos revenus de 300 CHF/mois
-      </h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16, padding: "12px 14px", backgroundColor: C.pageBg, borderRadius: 10 }}>
-        <div>
-          <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.3 }}>Impact sur votre score</p>
-          <p
-            style={{
-              margin: "4px 0 0 0",
-              fontSize: 17,
-              fontWeight: 700,
-              color: C.success,
-              fontFamily: "Outfit, Inter, system-ui",
-              letterSpacing: "-0.02em",
-              lineHeight: 1,
-            }}
-          >
-            +12 pts
-          </p>
-        </div>
-        <div>
-          <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.3 }}>Gain annuel potentiel</p>
-          <p
-            style={{
-              margin: "4px 0 0 0",
-              fontSize: 17,
-              fontWeight: 700,
-              color: C.textDark,
-              fontFamily: "Outfit, Inter, system-ui",
-              letterSpacing: "-0.02em",
-              lineHeight: 1,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            3 600 CHF
-          </p>
-        </div>
-      </div>
-      <button
-        style={{
-          marginTop: 14,
-          width: "100%",
-          padding: "11px 14px",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          backgroundColor: C.navy,
-          color: "white",
-          fontSize: 12.5,
-          fontWeight: 600,
-          borderRadius: 10,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Voir les solutions
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
-    </div>
   );
 }
 
@@ -924,197 +813,58 @@ function OpportunitesCard() {
       tag: "RAPIDE",
       tagColor: C.success,
       tagBg: C.successBg,
-      iconColor: C.success,
-      iconBg: C.successBg,
-      iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z",
-      title: "Revendre des objets inutilisés",
-      sub: "Vendez ce que vous n'utilisez plus",
+      title: "Revendre des objets",
       gain: "+500 CHF",
-      gainLabel: "Gain unique estimé",
     },
     {
       tag: "MOYEN TERME",
       tagColor: C.primary,
       tagBg: C.primaryBg,
-      iconColor: C.primary,
-      iconBg: C.primaryBg,
-      iconPath: "M20 7h-3V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM9 4h6v3H9V4z",
       title: "Mission freelance",
-      sub: "Développement web / Design / Conseil",
-      gain: "+300 CHF / mois",
-      gainLabel: "Gain mensuel estimé",
+      gain: "+300 CHF/mois",
     },
     {
       tag: "LONG TERME",
       tagColor: C.violet,
       tagBg: C.violetBg,
-      iconColor: C.violet,
-      iconBg: C.violetBg,
-      iconPath: "M3 3v18h18|M7 17V9|M11 17v-5|M15 17V7|M19 17v-3",
       title: "Investir en ETF",
-      sub: "Faire travailler votre argent",
       gain: "+8% / an",
-      gainLabel: "Rendement estimé",
     },
   ];
   return (
-    <div
-      style={{
-        padding: "18px 20px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Opportunités de revenus
-      </h3>
-      <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted }}>
-        Sélectionnées pour vous par votre IA
+    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Opportunités
       </p>
-      <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Sélection IA
+      </p>
+      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         {items.map((it) => (
-          <button
-            key={it.title}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              padding: "12px 12px",
-              borderRadius: 10,
-              border: `1px solid ${C.borderGhost}`,
-              backgroundColor: C.cardBg,
-              cursor: "pointer",
-              textAlign: "left",
-            }}
-          >
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                backgroundColor: it.iconBg,
-                flexShrink: 0,
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={it.iconColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
+          <div key={it.title} style={{ padding: "7px 8px", borderRadius: 8, backgroundColor: C.pageBg, display: "flex", flexDirection: "column", gap: 2 }}>
+            <span style={{ display: "inline-flex", alignSelf: "flex-start", padding: "1px 6px", borderRadius: 999, backgroundColor: it.tagBg, color: it.tagColor, fontSize: 8.5, fontWeight: 700, letterSpacing: "0.1em" }}>
+              {it.tag}
             </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: it.tagColor, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                {it.tag}
-              </p>
-              <p style={{ margin: "3px 0 0 0", fontSize: 12.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 6 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
                 {it.title}
-              </p>
-              <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.3 }}>
-                {it.sub}
-              </p>
-              <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 6 }}>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: C.success, fontVariantNumeric: "tabular-nums" }}>
-                  {it.gain}
-                </span>
-                <span style={{ fontSize: 10.5, color: C.textMuted }}>
-                  {it.gainLabel}
-                </span>
-              </div>
+              </span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                {it.gain}
+              </span>
             </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        ))}
-      </div>
-      <button
-        style={{
-          marginTop: 14,
-          padding: 0,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 5,
-          fontSize: 12.5,
-          fontWeight: 500,
-          color: C.primary,
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Voir toutes les opportunités
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
-function ProjectionCard() {
-  const rows = [
-    { label: "Dans 1 an", value: "28 600 CHF", delta: "+3 600 CHF" },
-    { label: "Dans 3 ans", value: "34 800 CHF", delta: "+10 800 CHF" },
-    { label: "Dans 5 ans", value: "43 000 CHF", delta: "+18 000 CHF" },
-  ];
-  return (
-    <div
-      style={{
-        padding: "18px 20px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Projection avec +300 CHF/mois
-      </h3>
-      <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted }}>
-        Impact sur vos revenus futurs
-      </p>
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-        {rows.map((r) => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 28,
-                height: 28,
-                borderRadius: 8,
-                backgroundColor: C.successBg,
-                flexShrink: 0,
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                <polyline points="17 6 23 6 23 12" />
-              </svg>
-            </span>
-            <span style={{ flex: 1, fontSize: 12.5, color: C.textDark, fontWeight: 500 }}>
-              {r.label}
-            </span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: C.textDark, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-              {r.value}
-            </span>
-            <span style={{ fontSize: 11.5, color: C.success, fontWeight: 600, fontVariantNumeric: "tabular-nums", minWidth: 80, textAlign: "right" }}>
-              {r.delta}
-            </span>
           </div>
         ))}
       </div>
       <button
         style={{
-          marginTop: 16,
+          marginTop: 6,
           padding: 0,
+          alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
-          gap: 5,
-          fontSize: 12.5,
+          gap: 4,
+          fontSize: 11,
           fontWeight: 500,
           color: C.primary,
           background: "none",
@@ -1122,8 +872,8 @@ function ProjectionCard() {
           cursor: "pointer",
         }}
       >
-        Voir la projection complète
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        Voir toutes
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
@@ -1136,124 +886,130 @@ function ConseilCard() {
   return (
     <div
       style={{
-        padding: "18px 20px",
+        padding: "12px 14px",
         backgroundColor: C.primaryBg,
-        borderRadius: 16,
-        boxShadow: SHADOW.card,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill={C.primary}>
-          <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
-        </svg>
-        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-          Conseil de votre coach IA
-        </h3>
-      </div>
-      <p style={{ margin: "12px 0 0 0", fontSize: 12, color: C.textDark, lineHeight: 1.55 }}>
-        Le plus grand levier pour améliorer votre situation financière n&apos;est plus la réduction des dépenses.
-      </p>
-      <p style={{ margin: "10px 0 0 0", fontSize: 12, color: C.textDark, lineHeight: 1.55 }}>
-        L&apos;augmentation de revenus offre un potentiel supérieur dans votre situation actuelle.
-      </p>
-      <p style={{ margin: "10px 0 0 0", fontSize: 12, color: C.textDark, lineHeight: 1.55 }}>
-        Concentrez-vous sur les opportunités à impact rapide et moyen terme.
-      </p>
-      <button
-        style={{
-          marginTop: 14,
-          width: "100%",
-          padding: "10px 14px",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          backgroundColor: "white",
-          color: C.primary,
-          fontSize: 12.5,
-          fontWeight: 600,
-          borderRadius: 10,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-        Parler à mon conseiller
-      </button>
-    </div>
-  );
-}
-
-/* ═══════════════ MISSION FOOTER (full width strip) ═══════════════ */
-
-function MissionFooter() {
-  return (
-    <div
-      style={{
-        padding: "16px 22px",
-        backgroundColor: C.cardBg,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.card,
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 20,
+        flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 38,
-            height: 38,
+            width: 22,
+            height: 22,
+            borderRadius: 6,
+            backgroundColor: C.navy,
+            flexShrink: 0,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
+            <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
+          </svg>
+        </span>
+        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Conseil IA
+        </p>
+      </div>
+      <p style={{ margin: "8px 0 0 0", fontSize: 11.5, color: C.textDark, lineHeight: 1.45 }}>
+        L&apos;augmentation de revenus offre un potentiel supérieur à la réduction des dépenses.
+      </p>
+      <p style={{ margin: "6px 0 0 0", fontSize: 11.5, color: C.textDark, lineHeight: 1.45 }}>
+        Concentrez-vous sur les opportunités à impact rapide et moyen terme.
+      </p>
+      <button
+        style={{
+          marginTop: "auto",
+          width: "100%",
+          padding: "7px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          backgroundColor: "white",
+          color: C.primary,
+          fontSize: 11.5,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        Parler au conseiller
+      </button>
+    </div>
+  );
+}
+
+/* ═══════════════ MISSION FOOTER ═══════════════ */
+
+function MissionFooter() {
+  return (
+    <div
+      style={{
+        padding: "10px 16px",
+        backgroundColor: C.cardBg,
+        borderRadius: 12,
+        boxShadow: SHADOW.flat,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 16,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 30,
+            height: 30,
             borderRadius: 999,
             backgroundColor: C.primary,
             flexShrink: 0,
           }}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <circle cx="12" cy="12" r="6" />
             <circle cx="12" cy="12" r="2" />
           </svg>
         </span>
         <div style={{ minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textMuted, letterSpacing: "0.04em" }}>
+          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 600, color: C.textMuted, letterSpacing: "0.04em" }}>
             Mission du moment
           </p>
-          <p style={{ margin: "2px 0 0 0", fontSize: 14.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.25 }}>
+          <p style={{ margin: "1px 0 0 0", fontSize: 12.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
             Trouver une opportunité pour gagner +300 CHF/mois
-          </p>
-          <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted }}>
-            Impact&nbsp;:{" "}
-            <span style={{ color: C.textDark, fontWeight: 600 }}>+12 pts sur votre score</span>
-            {"  •  "}
-            Gain annuel&nbsp;: <span style={{ color: C.textDark, fontWeight: 600 }}>3 600 CHF</span>
           </p>
         </div>
       </div>
       <button
         style={{
-          padding: "10px 18px",
+          padding: "7px 14px",
           display: "inline-flex",
           alignItems: "center",
-          gap: 7,
+          gap: 6,
           backgroundColor: C.navy,
           color: "white",
-          fontSize: 12.5,
+          fontSize: 11.5,
           fontWeight: 600,
-          borderRadius: 10,
+          borderRadius: 8,
           border: "none",
           cursor: "pointer",
           flexShrink: 0,
         }}
       >
-        Commencer maintenant
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        Commencer
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
