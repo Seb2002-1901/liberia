@@ -570,8 +570,8 @@ function CompletudeCard() {
         <p style={{ margin: "2px 0 0 0", fontSize: 12.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
           Profil complété
         </p>
-        <p style={{ margin: "2px 0 0 0", fontSize: 10.5, color: C.success, fontWeight: 600 }}>
-          Continuez comme ça !
+        <p style={{ margin: "2px 0 0 0", fontSize: 10, color: C.success, fontWeight: 600, lineHeight: 1.3 }}>
+          Plus que <span style={{ fontVariantNumeric: "tabular-nums" }}>22 %</span> pour débloquer toutes les recommandations.
         </p>
         <button
           style={{
@@ -779,6 +779,31 @@ function AbonnementCard() {
           </div>
         ))}
       </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: "5px 10px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 6,
+          backgroundColor: "transparent",
+          color: C.gold,
+          fontSize: 10,
+          fontWeight: 600,
+          borderRadius: 7,
+          border: `1px dashed ${C.amberBg}`,
+          cursor: "pointer",
+        }}
+      >
+        <span>
+          Évolution possible&nbsp;: <span style={{ fontWeight: 700, color: C.textDark }}>Passer à Elite</span>
+        </span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -789,8 +814,8 @@ function DocumentsCard() {
   const docs = [
     { label: "Pièce d'identité", file: "Passeport.pdf", date: "12.03.2024", color: C.primary, bg: C.primaryBg },
     { label: "Justificatif de domicile", file: "Facture_Electricite.pdf", date: "12.03.2024", color: C.success, bg: C.successBg },
-    { label: "Déclaration d'impôts", file: "Impots_2023.pdf", date: "18.02.2024", color: C.amber, bg: C.amberBg },
-    { label: "Relevés bancaires", file: "UBS_Releve_2024.pdf", date: "01.03.2024", color: C.violet, bg: C.violetBg },
+    { label: "Analyse fiscale 2025", file: "Analyse_fiscale_2025.pdf", date: "18.02.2025", color: C.amber, bg: C.amberBg },
+    { label: "Rapport patrimoine", file: "Rapport_patrimoine_Q1.pdf", date: "01.03.2025", color: C.violet, bg: C.violetBg },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -798,7 +823,7 @@ function DocumentsCard() {
         Documents
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Vos documents récents
+        Documents personnels et analyses générées
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         {docs.map((d) => (
@@ -913,10 +938,10 @@ function SecuriteCard() {
 
 function ParametresRapidesCard() {
   const toggles = [
-    { label: "Mode sombre", sub: "Confort visuel", on: false },
-    { label: "Notifications push", sub: "Alertes en temps réel", on: true },
-    { label: "Confidentialité", sub: "Données chiffrées", on: true },
-    { label: "Mode prudence", sub: "Plafond automatique", on: false },
+    { label: "Alertes budget", sub: "Dépassement détecté", on: true },
+    { label: "Alertes opportunités", sub: "Nouvelles pistes IA", on: true },
+    { label: "Alertes objectifs", sub: "Jalons atteints", on: false },
+    { label: "Résumé hebdomadaire IA", sub: "Chaque dimanche", on: true },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
