@@ -670,8 +670,8 @@ function ProgressionMensuelleCard() {
     { label: "Oct.", value: 96200 },
   ];
   const W = 360;
-  const HH = 105;
-  const PAD = { top: 14, right: 14, bottom: 18, left: 36 };
+  const HH = 95;
+  const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const minV = 0;
@@ -834,7 +834,7 @@ function ConseilIACard() {
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "6px 14px",
         backgroundColor: C.primaryBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
@@ -940,6 +940,8 @@ function MissionFooter() {
           </p>
           <p style={{ margin: "1px 0 0 0", fontSize: 10.5, color: C.textMuted }}>
             Continuez comme ça, vous construisez votre avenir.
+            {" • "}
+            <span style={{ color: C.success, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>62 % de l&apos;objectif global atteint</span>
           </p>
         </div>
       </div>
