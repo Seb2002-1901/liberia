@@ -701,7 +701,7 @@ function ObjectifsFinancesCard() {
                 <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {g.label}
                 </span>
-                <span style={{ fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                <span style={{ fontSize: 9.5, color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
                   {g.amount}
                 </span>
               </div>
@@ -709,7 +709,7 @@ function ObjectifsFinancesCard() {
                 <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
                   <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
                 </div>
-                <span style={{ fontSize: 9.5, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right" }}>
+                <span style={{ fontSize: 9.5, color: g.color, fontWeight: 600, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right", opacity: 0.8 }}>
                   {g.pct}%
                 </span>
               </div>
@@ -981,7 +981,7 @@ function MissionFooter() {
   return (
     <div
       style={{
-        padding: "15px 16px",
+        padding: "13px 16px",
         backgroundColor: C.navy,
         borderRadius: 12,
         boxShadow: SHADOW.flat,
@@ -1012,7 +1012,7 @@ function MissionFooter() {
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
             Objectif patrimoine <span style={{ fontVariantNumeric: "tabular-nums" }}>500 000 CHF</span>
           </p>
-          <div style={{ marginTop: 5, display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
               <div style={{ width: "49%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
@@ -1020,6 +1020,9 @@ function MissionFooter() {
               49 % atteint
             </span>
           </div>
+          <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
+            Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>251 500 CHF</span> pour atteindre votre objectif patrimonial.
+          </p>
         </div>
       </div>
       <button
