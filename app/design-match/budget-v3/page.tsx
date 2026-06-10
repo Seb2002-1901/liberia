@@ -82,13 +82,13 @@ export default function DesignMatchBudgetV3() {
           <main
             data-bud-main
             style={{
-              padding: "0 24px 12px 24px",
+              padding: "0 24px 6px 24px",
               maxWidth: 1440,
               margin: "0 auto",
               width: "100%",
               display: "flex",
               flexDirection: "column",
-              gap: 8,
+              gap: 6,
             }}
           >
             <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -400,7 +400,7 @@ function BudgetHero() {
         borderRadius: 14,
         boxShadow: SHADOW.navy,
         overflow: "hidden",
-        minHeight: 116,
+        minHeight: 112,
       }}
     >
       <div
@@ -1081,7 +1081,7 @@ function ConseilIACard() {
   return (
     <div
       style={{
-        padding: "10px 16px",
+        padding: "5px 16px",
         backgroundColor: C.primaryBg,
         borderRadius: 12,
         boxShadow: SHADOW.flat,
