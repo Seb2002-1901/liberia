@@ -66,33 +66,70 @@ const H = {
 
 export default function DesignMatchPlanV3() {
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: C.pageBg,
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-      }}
-    >
-      <Sidebar />
-      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column" }}>
-        <Topbar />
-        <main
-          style={{
-            padding: "0 32px 16px 32px",
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) 320px",
-            gap: 24,
-            maxWidth: 1440,
-            margin: "0 auto",
-            width: "100%",
-          }}
-        >
-          <MainColumn />
-          <RightRail />
-        </main>
+    <>
+      {/* Responsive global :
+          - Desktop ≥ 1200 : layout 3 colonnes complet (default inline styles)
+          - Laptop 1000-1200 : padding réduit, gap réduit
+          - Tablet 768-999 : sidebar cachée, right rail stack
+          - Mobile < 768 : single column
+          Tous ces overrides utilisent !important pour battre les
+          styles inline. */}
+      <style>{`
+        @media (max-width: 1200px) {
+          [data-plan-main] {
+            padding: 0 20px 12px 20px !important;
+            gap: 20px !important;
+          }
+          [data-plan-right] { width: 280px !important; }
+          [data-plan-grid-cols] { grid-template-columns: minmax(0, 1fr) 280px !important; }
+        }
+        @media (max-width: 999px) {
+          [data-plan-sidebar] { display: none !important; }
+          [data-plan-content] { margin-left: 0 !important; }
+          [data-plan-grid-cols] { grid-template-columns: 1fr !important; }
+          [data-plan-right] { width: auto !important; }
+          [data-plan-main] { padding: 0 16px 16px 16px !important; }
+        }
+        @media (max-width: 767px) {
+          [data-plan-topbar] { padding: 0 16px !important; }
+          [data-plan-bottom-row] { grid-template-columns: 1fr !important; }
+          [data-plan-roadmap-grid] { grid-template-columns: 1fr 1fr !important; }
+        }
+      `}</style>
+      <div
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          backgroundColor: C.pageBg,
+          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        }}
+      >
+        <div data-plan-sidebar>
+          <Sidebar />
+        </div>
+        <div data-plan-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <Topbar />
+          <main
+            data-plan-main
+            data-plan-grid-cols
+            style={{
+              padding: "0 32px 16px 32px",
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) 320px",
+              gap: 24,
+              maxWidth: 1440,
+              margin: "0 auto",
+              width: "100%",
+            }}
+          >
+            <MainColumn />
+            <div data-plan-right>
+              <RightRail />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -277,6 +314,7 @@ function NavItem({
 function Topbar() {
   return (
     <header
+      data-plan-topbar
       style={{
         height: H.topbar,
         padding: "0 32px",
@@ -796,7 +834,7 @@ function RoadmapCard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 8 }}>
+      <div data-plan-roadmap-grid style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 8 }}>
         <PhaseColumn
           phase="Phase 1"
           title="Sécuriser"
@@ -1044,7 +1082,7 @@ function TaskBullet({ state }: { state: "done" | "active" | "todo" }) {
 
 function BottomRow() {
   return (
-    <div style={{ minHeight: H.bottomRow, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+    <div data-plan-bottom-row style={{ minHeight: H.bottomRow, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
       <ProjectionCard />
       <ActionsSemaineCard />
       <LevierCard />
