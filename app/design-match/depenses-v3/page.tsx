@@ -396,7 +396,7 @@ function DepensesHero() {
         borderRadius: 14,
         boxShadow: SHADOW.navy,
         overflow: "hidden",
-        minHeight: 122,
+        minHeight: 116,
       }}
     >
       <div
@@ -687,7 +687,7 @@ function Top5Card() {
     { rank: 5, label: "Assurances", amount: "1 120", pct: 7, color: C.coral },
   ];
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
         <div>
           <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -897,7 +897,7 @@ function ConseilCard() {
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "12px 14px 4px 14px",
         backgroundColor: C.primaryBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
