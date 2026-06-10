@@ -611,9 +611,9 @@ function AllocationCard() {
 
 function OpportunitesCard() {
   const items = [
-    { label: "ETF Monde", sub: "Croissance long terme", potential: "+8 %", color: C.success, bg: C.successBg, iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
-    { label: "Immobilier", sub: "Diversification", potential: "+6 %", color: C.primary, bg: C.primaryBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Obligations", sub: "Sécurité du rendement", potential: "+3 %", color: C.violet, bg: C.violetBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+    { label: "ETF Monde", sub: "Potentiel long terme", potential: "+8 %", color: C.success, bg: C.successBg, iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
+    { label: "Immobilier", sub: "Diversification patrimoniale", potential: "+6 %", color: C.primary, bg: C.primaryBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
+    { label: "Obligations", sub: "Réduction de la volatilité", potential: "+3 %", color: C.violet, bg: C.violetBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
   ];
   return (
     <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -664,10 +664,10 @@ function OpportunitesCard() {
 
 function ObjectifsFinancesCard() {
   const goals = [
-    { emoji: "🏠", label: "Maison", pct: 62, color: C.success },
-    { emoji: "🌍", label: "Voyage", pct: 50, color: C.primary },
-    { emoji: "🏖", label: "Retraite", pct: 24, color: C.violet },
-    { emoji: "💰", label: "Liberté financière", pct: 15, color: C.amber },
+    { emoji: "🏠", label: "Maison", amount: "62 000 / 100 000 CHF", pct: 62, color: C.success },
+    { emoji: "🌍", label: "Voyage", amount: "15 000 / 30 000 CHF", pct: 50, color: C.primary },
+    { emoji: "🏖", label: "Retraite", amount: "72 000 / 300 000 CHF", pct: 24, color: C.violet },
+    { emoji: "💰", label: "Liberté financière", amount: "15 000 / 100 000 CHF", pct: 15, color: C.amber },
   ];
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -697,16 +697,21 @@ function ObjectifsFinancesCard() {
               {g.emoji}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2, gap: 6 }}>
                 <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {g.label}
                 </span>
-                <span style={{ fontSize: 10, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
-                  {g.pct} %
+                <span style={{ fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                  {g.amount}
                 </span>
               </div>
-              <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-                <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                  <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+                </div>
+                <span style={{ fontSize: 9.5, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right" }}>
+                  {g.pct}%
+                </span>
               </div>
             </div>
           </div>
@@ -873,7 +878,7 @@ function ProjectionCard() {
       </div>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>1 an</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2027</span>
           <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: "56%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
           </div>
@@ -882,7 +887,7 @@ function ProjectionCard() {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>3 ans</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2029</span>
           <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: "72%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
           </div>
@@ -891,7 +896,7 @@ function ProjectionCard() {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>5 ans</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2031</span>
           <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: "100%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
           </div>
