@@ -551,46 +551,46 @@ function BudgetCategorieCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Prévu vs Réel
       </p>
-      <div style={{ display: "flex", gap: 14, marginTop: 8, alignItems: "center" }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 110, height: 110 }}>
-          <svg viewBox="0 0 100 100" width={110} height={110}>
+      <div style={{ display: "flex", gap: 12, marginTop: 6, alignItems: "center" }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 90, height: 90 }}>
+          <svg viewBox="0 0 100 100" width={90} height={90}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+            <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
               18 000
             </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8.5, color: C.textMuted, letterSpacing: "0.14em" }}>
+            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em" }}>
               CHF
             </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8.5, color: C.textMuted }}>
+            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted }}>
               Dépenses
             </p>
           </div>
         </div>
-        <table style={{ flex: 1, borderCollapse: "collapse", fontSize: 10.5 }}>
+        <table style={{ flex: 1, borderCollapse: "collapse", fontSize: 10 }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${C.borderGhost}` }}>
-              <th style={{ textAlign: "left", padding: "3px 0", fontWeight: 600, color: C.textLight, fontSize: 9, letterSpacing: "0.06em" }}>CATÉGORIE</th>
-              <th style={{ textAlign: "right", padding: "3px 0", fontWeight: 600, color: C.textLight, fontSize: 9, letterSpacing: "0.06em" }}>PRÉVU</th>
-              <th style={{ textAlign: "right", padding: "3px 0", fontWeight: 600, color: C.textLight, fontSize: 9, letterSpacing: "0.06em" }}>RÉEL</th>
-              <th style={{ width: 24, textAlign: "right", padding: "3px 0", fontWeight: 600, color: C.textLight, fontSize: 9, letterSpacing: "0.06em" }}>✓</th>
+              <th style={{ textAlign: "left", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>CATÉGORIE</th>
+              <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>PRÉVU</th>
+              <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>RÉEL</th>
+              <th style={{ width: 22, textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>✓</th>
             </tr>
           </thead>
           <tbody>
             {slicesWithPaths.map((s, i) => (
               <tr key={s.id} style={{ borderBottom: i === slicesWithPaths.length - 1 ? "none" : `1px solid ${C.borderGhost}` }}>
-                <td style={{ padding: "4px 0", color: C.textDark, fontWeight: 500 }}>
+                <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 500 }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 999, backgroundColor: s.color }} />
+                    <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: 999, backgroundColor: s.color }} />
                     {s.label}
                   </span>
                 </td>
-                <td style={{ padding: "4px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.prevu}</td>
-                <td style={{ padding: "4px 0", color: s.status === "ok" ? C.textDark : C.amber, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.reel}</td>
-                <td style={{ padding: "4px 0", textAlign: "right" }}>
+                <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.prevu}</td>
+                <td style={{ padding: "3px 0", color: s.status === "ok" ? C.textDark : C.amber, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.reel}</td>
+                <td style={{ padding: "3px 0", textAlign: "right" }}>
                   <StatusIcon ok={s.status === "ok"} />
                 </td>
               </tr>
@@ -647,29 +647,29 @@ function SanteBudgetCard() {
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Santé du budget
       </p>
-      <div style={{ position: "relative", width: 130, height: 75, margin: "8px auto 0 auto" }}>
-        <svg viewBox="0 0 100 60" width={130} height={75}>
-          <path d={trackPath} fill="none" stroke={C.borderGhost} strokeWidth="9" strokeLinecap="round" />
-          <path d={arcPath} fill="none" stroke={scoreColor} strokeWidth="9" strokeLinecap="round" />
+      <div style={{ position: "relative", width: 110, height: 62, margin: "4px auto 0 auto" }}>
+        <svg viewBox="0 0 100 60" width={110} height={62}>
+          <path d={trackPath} fill="none" stroke={C.borderGhost} strokeWidth="8" strokeLinecap="round" />
+          <path d={arcPath} fill="none" stroke={scoreColor} strokeWidth="8" strokeLinecap="round" />
         </svg>
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end" }}>
-          <p style={{ margin: 0, fontSize: 22, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.025em", lineHeight: 1 }}>
-            {score}<span style={{ fontSize: 12, color: C.textMuted, fontWeight: 500 }}>/100</span>
+          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.025em", lineHeight: 1 }}>
+            {score}<span style={{ fontSize: 10.5, color: C.textMuted, fontWeight: 500 }}>/100</span>
           </p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, letterSpacing: "0.04em" }}>
+          <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, letterSpacing: "0.04em" }}>
             Score budget
           </p>
         </div>
       </div>
-      <div style={{ marginTop: 8, padding: "7px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", alignItems: "flex-start", gap: 7 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: 4, backgroundColor: C.success, flexShrink: 0, marginTop: 1 }}>
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+      <div style={{ marginTop: 6, padding: "5px 8px", backgroundColor: C.successBg, borderRadius: 7, display: "flex", alignItems: "flex-start", gap: 6 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: C.success, flexShrink: 0, marginTop: 1 }}>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: C.success }}>Excellent !</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 10, color: C.textDark, lineHeight: 1.3 }}>
+          <p style={{ margin: 0, fontSize: 10.5, fontWeight: 700, color: C.success }}>Excellent !</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textDark, lineHeight: 1.3 }}>
             Vous respectez votre budget et épargnez plus que la moyenne.
           </p>
         </div>
@@ -691,8 +691,8 @@ function EvolutionBudgetCard() {
     { label: "Oct.", reel: 15893, prevu: 18000 },
   ];
   const W = 360;
-  const HH = 130;
-  const PAD = { top: 14, right: 12, bottom: 22, left: 36 };
+  const HH = 105;
+  const PAD = { top: 10, right: 12, bottom: 18, left: 32 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const minV = 0;
@@ -865,8 +865,8 @@ function ProjectionEpargneCard() {
     { label: "Dans 12 mois", value: 95000 },
   ];
   const W = 240;
-  const HH = 110;
-  const PAD = { top: 18, right: 12, bottom: 22, left: 12 };
+  const HH = 95;
+  const PAD = { top: 16, right: 12, bottom: 18, left: 12 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
   const minV = 0;
@@ -913,13 +913,13 @@ function ProjectionEpargneCard() {
           ))}
         </svg>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 8px", backgroundColor: C.successBg, borderRadius: 7, marginTop: 4 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: 4, backgroundColor: C.success, flexShrink: 0 }}>
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", backgroundColor: C.successBg, borderRadius: 7, marginTop: 2 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: C.success, flexShrink: 0 }}>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </span>
-        <p style={{ margin: 0, fontSize: 10, color: C.textDark, lineHeight: 1.3 }}>
+        <p style={{ margin: 0, fontSize: 9.5, color: C.textDark, lineHeight: 1.3 }}>
           Vous êtes sur la bonne trajectoire !
         </p>
       </div>
@@ -941,13 +941,13 @@ function RepartitionIdealeCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Règle 50/30/20
       </p>
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8, flex: 1, justifyContent: "center" }}>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1, justifyContent: "center" }}>
         {rows.map((r) => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <span
               style={{
-                width: 32,
-                fontSize: 14,
+                width: 28,
+                fontSize: 13,
                 fontWeight: 700,
                 color: C.textDark,
                 fontFamily: "Outfit, Inter, system-ui",
@@ -958,17 +958,17 @@ function RepartitionIdealeCard() {
               {r.tag}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-                <span style={{ fontSize: 11, color: C.textDark, fontWeight: 500 }}>{r.label}</span>
-                <span style={{ fontSize: 11, color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 500 }}>{r.label}</span>
+                <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                   {r.amount} CHF
                 </span>
               </div>
-              <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ height: 3, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
                 <div style={{ width: `${r.pct * 1.5}%`, height: "100%", backgroundColor: r.color, borderRadius: 999 }} />
               </div>
             </div>
-            <span style={{ fontSize: 10.5, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 24, textAlign: "right" }}>
+            <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 22, textAlign: "right" }}>
               {r.pct}%
             </span>
           </div>
@@ -976,8 +976,8 @@ function RepartitionIdealeCard() {
       </div>
       <button
         style={{
-          marginTop: 6,
-          padding: "6px 10px",
+          marginTop: 4,
+          padding: "4px 0",
           alignSelf: "flex-start",
           display: "inline-flex",
           alignItems: "center",
@@ -988,7 +988,6 @@ function RepartitionIdealeCard() {
           background: "none",
           border: "none",
           cursor: "pointer",
-          paddingLeft: 0,
         }}
       >
         En savoir plus
@@ -1037,15 +1036,15 @@ function ActionsRapidesCard() {
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Actions rapides
       </p>
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", flex: 1 }}>
+      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", flex: 1 }}>
         {items.map((it, idx) => (
           <button
             key={it.title}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 9,
-              padding: "5px 0",
+              gap: 8,
+              padding: "3px 0",
               background: "none",
               border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
@@ -1053,20 +1052,20 @@ function ActionsRapidesCard() {
               textAlign: "left",
             }}
           >
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 7, backgroundColor: it.bg, flexShrink: 0 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
+              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
                 {it.title}
               </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2 }}>
                 {it.sub}
               </p>
             </div>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
