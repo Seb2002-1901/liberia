@@ -56,12 +56,12 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  planHeader: 56,
-  mission: 152,
-  roadmap: 244,
+  planHeader: 60,
+  mission: 160,
+  roadmap: 248,
   bottomRow: 240,
-  gap: 8,
-  rightCardGap: 6,
+  gap: 10,
+  rightCardGap: 8,
 };
 
 export default function DesignMatchPlanV3() {
@@ -597,10 +597,10 @@ function MissionCard() {
         aria-hidden
         style={{
           position: "absolute",
-          right: 24,
-          top: 18,
-          width: 90,
-          height: 90,
+          right: 18,
+          top: 12,
+          width: 84,
+          height: 84,
           pointerEvents: "none",
           opacity: 0.18,
         }}
@@ -718,13 +718,13 @@ function MissionCard() {
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 8,
-            padding: "11px 18px",
+            gap: 6,
+            padding: "8px 14px",
             backgroundColor: "white",
             color: C.navy,
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: 600,
-            borderRadius: 10,
+            borderRadius: 8,
             border: "none",
             cursor: "pointer",
             flexShrink: 0,
@@ -732,7 +732,7 @@ function MissionCard() {
           }}
         >
           Continuer cette mission
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
@@ -948,7 +948,7 @@ function PhaseColumn({
       <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.3 }}>
         Durée estimée&nbsp;: {duration}
       </p>
-      <ul style={{ marginTop: 5, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 1 }}>
+      <ul style={{ marginTop: 6, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 3 }}>
         {tasks.map((t) => (
           <li key={t.label} style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
             <TaskBullet state={t.state} />
@@ -1537,7 +1537,7 @@ function ConseillerRecommandeCard() {
   return (
     <div
       style={{
-        padding: "10px 12px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
@@ -1614,7 +1614,7 @@ function ActionsRapidesRailCard() {
   return (
     <div
       style={{
-        padding: "10px 12px",
+        padding: "12px 14px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
@@ -1623,15 +1623,15 @@ function ActionsRapidesRailCard() {
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Actions rapides
       </p>
-      <div style={{ marginTop: 3, display: "flex", flexDirection: "column" }}>
+      <div style={{ marginTop: 4, display: "flex", flexDirection: "column" }}>
         {items.map((it, idx) => (
           <button
             key={it.title}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              padding: "4px 0",
+              gap: 9,
+              padding: "5px 0",
               background: "none",
               border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
