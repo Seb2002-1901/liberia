@@ -95,20 +95,20 @@ export default function DesignMatchBudgetV3() {
               <BudgetHero />
               <AperçuRapideCard />
             </div>
-            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 8 }}>
+            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
               <BudgetCategorieCard />
               <SanteBudgetCard />
-            </div>
-            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 8 }}>
-              <EvolutionBudgetCard />
               <AlerteBudgetaireCard />
             </div>
-            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 8 }}>
+              <EvolutionBudgetCard />
               <ProjectionEpargneCard />
               <RepartitionIdealeCard />
-              <ActionsRapidesCard />
             </div>
-            <ConseilIACard />
+            <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 8 }}>
+              <ActionsRapidesCard />
+              <ConseilIACard />
+            </div>
           </main>
         </div>
       </div>
