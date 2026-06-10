@@ -60,7 +60,7 @@ const H = {
   mission: 148,
   roadmap: 232,
   bottomRow: 220,
-  gap: 8,
+  gap: 6,
   rightCardGap: 6,
 };
 
@@ -113,7 +113,7 @@ export default function DesignMatchPlanV3() {
             data-plan-main
             data-plan-grid-cols
             style={{
-              padding: "0 24px 12px 24px",
+              padding: "0 24px 8px 24px",
               display: "grid",
               gridTemplateColumns: "minmax(0, 1fr) 296px",
               gap: 20,
