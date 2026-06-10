@@ -56,7 +56,7 @@ const SHADOW = {
 
 const H = {
   topbar: 68,
-  planHeader: 64,
+  planHeader: 56,
   mission: 152,
   roadmap: 244,
   bottomRow: 240,
@@ -386,14 +386,14 @@ function PlanHeaderCard() {
     <div
       style={{
         minHeight: H.planHeader,
-        padding: "12px 20px",
+        padding: "11px 20px",
         backgroundColor: C.cardBg,
         borderRadius: 16,
         boxShadow: SHADOW.card,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 24,
+        gap: 22,
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -414,7 +414,7 @@ function PlanHeaderCard() {
           Basé sur votre situation actuelle, vos objectifs et vos priorités.
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
         <HeaderMetric
           label="Score actuel"
           value="46"
@@ -1374,13 +1374,13 @@ function RightRail() {
 }
 
 function ProgressionGlobaleCard() {
-  const r = 22;
+  const r = 20;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.18);
   return (
     <div
       style={{
-        padding: "10px 12px",
+        padding: "9px 11px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
@@ -1389,23 +1389,23 @@ function ProgressionGlobaleCard() {
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Progression globale
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
-        <div style={{ flexShrink: 0, width: 56, height: 56, position: "relative" }}>
-          <svg viewBox="0 0 56 56" width={56} height={56}>
-            <circle cx="28" cy="28" r={r} fill="none" stroke={C.primaryBg} strokeWidth="4.5" />
+      <div style={{ display: "flex", alignItems: "center", gap: 11, marginTop: 7 }}>
+        <div style={{ flexShrink: 0, width: 52, height: 52, position: "relative" }}>
+          <svg viewBox="0 0 52 52" width={52} height={52}>
+            <circle cx="26" cy="26" r={r} fill="none" stroke={C.primaryBg} strokeWidth="4" />
             <circle
-              cx="28"
-              cy="28"
+              cx="26"
+              cy="26"
               r={r}
               fill="none"
               stroke={C.primary}
-              strokeWidth="4.5"
+              strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 28 28)"
+              transform="rotate(-90 26 26)"
             />
-            <text x="28" y="32" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
+            <text x="26" y="30" textAnchor="middle" fontSize="12.5" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
               18 %
             </text>
           </svg>
@@ -1478,7 +1478,7 @@ function ImpactPlanCard() {
   return (
     <div
       style={{
-        padding: "10px 12px",
+        padding: "8px 12px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
@@ -1488,7 +1488,7 @@ function ImpactPlanCard() {
         Impact de votre plan
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textLight }}>Sur 12 mois</p>
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5 }}>
+      <div style={{ marginTop: 7, display: "flex", flexDirection: "column", gap: 4 }}>
         {rows.map((r) => (
           <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
@@ -1496,14 +1496,14 @@ function ImpactPlanCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 26,
-                height: 26,
-                borderRadius: 7,
+                width: 22,
+                height: 22,
+                borderRadius: 6,
                 backgroundColor: r.bg,
                 flexShrink: 0,
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={r.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={r.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 {r.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
@@ -1548,10 +1548,10 @@ function ConseillerRecommandeCard() {
       </p>
       <p
         style={{
-          margin: "6px 0 0 0",
+          margin: "5px 0 0 0",
           fontSize: 11.5,
           color: C.textDark,
-          lineHeight: 1.4,
+          lineHeight: 1.25,
           fontStyle: "italic",
         }}
       >
@@ -1559,9 +1559,9 @@ function ConseillerRecommandeCard() {
       </p>
       <button
         style={{
-          marginTop: 8,
+          marginTop: 6,
           width: "100%",
-          padding: "7px 12px",
+          padding: "6px 12px",
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
@@ -1623,15 +1623,15 @@ function ActionsRapidesRailCard() {
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Actions rapides
       </p>
-      <div style={{ marginTop: 4, display: "flex", flexDirection: "column" }}>
+      <div style={{ marginTop: 3, display: "flex", flexDirection: "column" }}>
         {items.map((it, idx) => (
           <button
             key={it.title}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              padding: "5px 0",
+              gap: 8,
+              padding: "4px 0",
               background: "none",
               border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
@@ -1644,18 +1644,18 @@ function ActionsRapidesRailCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 26,
-                height: 26,
+                width: 22,
+                height: 22,
                 borderRadius: 999,
                 backgroundColor: it.bg,
                 flexShrink: 0,
               }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
-            <p style={{ flex: 1, margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.25 }}>
+            <p style={{ flex: 1, margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
               {it.title}
             </p>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
