@@ -60,8 +60,8 @@ const H = {
   mission: 152,
   roadmap: 244,
   bottomRow: 240,
-  gap: 12,
-  rightCardGap: 8,
+  gap: 8,
+  rightCardGap: 6,
 };
 
 export default function DesignMatchPlanV3() {
@@ -1374,59 +1374,59 @@ function RightRail() {
 }
 
 function ProgressionGlobaleCard() {
-  const r = 26;
+  const r = 22;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - 0.18);
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "10px 12px",
         backgroundColor: C.cardBg,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.card,
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Progression globale
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 12 }}>
-        <div style={{ flexShrink: 0, width: 68, height: 68, position: "relative" }}>
-          <svg viewBox="0 0 68 68" width={68} height={68}>
-            <circle cx="34" cy="34" r={r} fill="none" stroke={C.primaryBg} strokeWidth="5" />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <div style={{ flexShrink: 0, width: 56, height: 56, position: "relative" }}>
+          <svg viewBox="0 0 56 56" width={56} height={56}>
+            <circle cx="28" cy="28" r={r} fill="none" stroke={C.primaryBg} strokeWidth="4.5" />
             <circle
-              cx="34"
-              cy="34"
+              cx="28"
+              cy="28"
               r={r}
               fill="none"
               stroke={C.primary}
-              strokeWidth="5"
+              strokeWidth="4.5"
               strokeLinecap="round"
               strokeDasharray={`${c.toFixed(2)} ${c.toFixed(2)}`}
               strokeDashoffset={offset.toFixed(2)}
-              transform="rotate(-90 34 34)"
+              transform="rotate(-90 28 28)"
             />
-            <text x="34" y="39" textAnchor="middle" fontSize="15" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
+            <text x="28" y="32" textAnchor="middle" fontSize="13" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.02em">
               18 %
             </text>
           </svg>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          <p style={{ margin: 0, fontSize: 12.5, fontWeight: 600, color: C.textDark, lineHeight: 1.25 }}>
             Plan en cours
           </p>
-          <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: C.textMuted, lineHeight: 1.4 }}>
+          <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.3 }}>
             4 étapes sur 22 complétées
           </p>
         </div>
       </div>
       <button
         style={{
-          marginTop: 10,
+          marginTop: 8,
           padding: 0,
           display: "inline-flex",
           alignItems: "center",
           gap: 4,
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: 500,
           color: C.primary,
           background: "none",
@@ -1435,7 +1435,7 @@ function ProgressionGlobaleCard() {
         }}
       >
         Voir le détail
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
@@ -1478,43 +1478,43 @@ function ImpactPlanCard() {
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "10px 12px",
         backgroundColor: C.cardBg,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.card,
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Impact de votre plan
       </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 11.5, color: C.textLight }}>Sur 12 mois</p>
-      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+      <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textLight }}>Sur 12 mois</p>
+      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5 }}>
         {rows.map((r) => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 30,
-                height: 30,
-                borderRadius: 8,
+                width: 26,
+                height: 26,
+                borderRadius: 7,
                 backgroundColor: r.bg,
                 flexShrink: 0,
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={r.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={r.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 {r.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 11.5, color: C.textMuted, lineHeight: 1.3 }}>
+              <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.2 }}>
                 {r.label}
               </p>
               <p
                 style={{
-                  margin: "1px 0 0 0",
-                  fontSize: 13.5,
+                  margin: 0,
+                  fontSize: 12.5,
                   fontWeight: 700,
                   color: C.textDark,
                   fontFamily: "Outfit, Inter, system-ui",
@@ -1537,9 +1537,9 @@ function ConseillerRecommandeCard() {
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "10px 12px",
         backgroundColor: C.cardBg,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.card,
       }}
     >
@@ -1548,10 +1548,10 @@ function ConseillerRecommandeCard() {
       </p>
       <p
         style={{
-          margin: "10px 0 0 0",
-          fontSize: 12.5,
+          margin: "6px 0 0 0",
+          fontSize: 11.5,
           color: C.textDark,
-          lineHeight: 1.55,
+          lineHeight: 1.4,
           fontStyle: "italic",
         }}
       >
@@ -1559,23 +1559,23 @@ function ConseillerRecommandeCard() {
       </p>
       <button
         style={{
-          marginTop: 12,
+          marginTop: 8,
           width: "100%",
-          padding: "9px 14px",
+          padding: "7px 12px",
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
+          gap: 6,
           backgroundColor: C.primaryBg,
           color: C.primary,
-          fontSize: 12.5,
+          fontSize: 12,
           fontWeight: 600,
-          borderRadius: 9,
+          borderRadius: 8,
           border: "none",
           cursor: "pointer",
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         Parler au coach IA
@@ -1614,24 +1614,24 @@ function ActionsRapidesRailCard() {
   return (
     <div
       style={{
-        padding: "12px 14px",
+        padding: "10px 12px",
         backgroundColor: C.cardBg,
-        borderRadius: 16,
+        borderRadius: 14,
         boxShadow: SHADOW.card,
       }}
     >
       <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.2em", textTransform: "uppercase" }}>
         Actions rapides
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column" }}>
+      <div style={{ marginTop: 4, display: "flex", flexDirection: "column" }}>
         {items.map((it, idx) => (
           <button
             key={it.title}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12,
-              padding: "8px 0",
+              gap: 10,
+              padding: "5px 0",
               background: "none",
               border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
@@ -1644,21 +1644,21 @@ function ActionsRapidesRailCard() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 30,
-                height: 30,
+                width: 26,
+                height: 26,
                 borderRadius: 999,
                 backgroundColor: it.bg,
                 flexShrink: 0,
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
               </svg>
             </span>
-            <p style={{ flex: 1, margin: 0, fontSize: 12.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            <p style={{ flex: 1, margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.25 }}>
               {it.title}
             </p>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
