@@ -99,7 +99,7 @@ export default function DesignMatchInvestissementsV3() {
             <div data-inv-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
               <AllocationCard />
               <OpportunitesCard />
-              <ProduitsCard />
+              <ObjectifsFinancesCard />
             </div>
             <div data-inv-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
               <PerformanceChartCard />
@@ -662,54 +662,78 @@ function OpportunitesCard() {
   );
 }
 
-function ProduitsCard() {
-  const products = [
-    { label: "Compte titres", sub: "Multi-actifs", rate: "1.85 %", rateNote: "Frais réduits", color: C.success, bg: C.successBg, featured: true, iconPath: "M21 12V7H5a2 2 0 0 1 0-4h14v4|M3 5v14a2 2 0 0 0 2 2h16v-5|M18 12a2 2 0 0 0 0 4h4v-4z" },
-    { label: "ETF Monde", sub: "Indice MSCI World", rate: "+8.2 %", rateNote: "Performance 1 an", color: C.primary, bg: C.primaryBg, featured: false, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M2 12h20|M12 2a15 15 0 0 1 0 20|M12 2a15 15 0 0 0 0 20" },
-    { label: "Pilier 3a", sub: "Avantage fiscal", rate: "Optimisé", rateNote: "Déductible", color: C.violet, bg: C.violetBg, featured: false, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+function ObjectifsFinancesCard() {
+  const goals = [
+    { emoji: "🏠", label: "Maison", pct: 62, color: C.success },
+    { emoji: "🌍", label: "Voyage", pct: 50, color: C.primary },
+    { emoji: "🏖", label: "Retraite", pct: 24, color: C.violet },
+    { emoji: "💰", label: "Liberté financière", pct: 15, color: C.amber },
   ];
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Produits
+        Objectifs financés
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Investissements recommandés
+        Ce que votre portefeuille contribue à réaliser
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {products.map((p) => (
-          <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: p.bg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {p.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
+        {goals.map((g) => (
+          <div key={g.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                backgroundColor: C.pageBg,
+                fontSize: 12,
+                flexShrink: 0,
+              }}
+              aria-hidden
+            >
+              {g.emoji}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                  {p.label}
-                </p>
-                {p.featured && (
-                  <span style={{ padding: "1px 5px", fontSize: 8.5, fontWeight: 700, color: C.success, backgroundColor: C.successBg, borderRadius: 4, letterSpacing: "0.04em" }}>
-                    Recommandé
-                  </span>
-                )}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {g.label}
+                </span>
+                <span style={{ fontSize: 10, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                  {g.pct} %
+                </span>
               </div>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {p.sub}
-              </p>
-            </div>
-            <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: p.color, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-                {p.rate}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted }}>
-                {p.rateNote}
-              </p>
+              <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+              </div>
             </div>
           </div>
         ))}
       </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: 0,
+          alignSelf: "flex-start",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          backgroundColor: "transparent",
+          color: C.primary,
+          fontSize: 10.5,
+          fontWeight: 600,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Voir tous les objectifs
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
     </div>
   );
 }
