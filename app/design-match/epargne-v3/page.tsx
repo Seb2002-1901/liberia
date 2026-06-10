@@ -599,16 +599,16 @@ function RepartitionCard() {
     return { ...s, path };
   });
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Répartition
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Par type d&apos;épargne
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 92, height: 92 }}>
-          <svg viewBox="0 0 100 100" width={92} height={92}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <div style={{ position: "relative", flexShrink: 0, width: 104, height: 104 }}>
+          <svg viewBox="0 0 100 100" width={104} height={104}>
             {slicesWithPaths.map((s) => (
               <path key={s.id} d={s.path} fill={s.color} />
             ))}
@@ -650,7 +650,7 @@ function ObjectifsEpargneCard() {
     { label: "Voyage en famille", amount: "1 000 / 5 000", pct: 20, color: C.violet, iconBg: C.violetBg, iconPath: "M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" },
   ];
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Objectifs d&apos;épargne
       </p>
@@ -697,7 +697,7 @@ function RecommandationsCard() {
     { label: "Épargne retraite", sub: "Optimisez votre 3e pilier", action: "Optimiser", color: C.violet, bg: C.violetBg, iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
   ];
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Recommandations
       </p>
@@ -760,7 +760,7 @@ function EvolutionCard() {
     { label: "Oct.", value: 14500 },
   ];
   const W = 360;
-  const HH = 95;
+  const HH = 108;
   const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
@@ -849,7 +849,7 @@ function EvolutionCard() {
 
 function SimulateurCard() {
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Simulateur d&apos;épargne
       </p>
@@ -912,7 +912,7 @@ function ProduitsCard() {
     { label: "Compte à terme", sub: "12 mois", rate: "1.60 %", rateNote: "Taux fixe", color: C.violet, bg: C.violetBg, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M12 6v6l4 2" },
   ];
   return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Produits recommandés
       </p>
@@ -956,7 +956,7 @@ function ConseilIAFooter() {
   return (
     <div
       style={{
-        padding: "6px 16px",
+        padding: "11px 16px",
         backgroundColor: C.navy,
         borderRadius: 12,
         boxShadow: SHADOW.flat,
