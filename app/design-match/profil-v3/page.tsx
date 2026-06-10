@@ -729,7 +729,7 @@ function PreferencesCard() {
 function AbonnementCard() {
   const items = [
     { label: "Plan actuel", value: "LIBERIA Premium", iconPath: "M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" },
-    { label: "Conseiller assigné", value: "Marie Dupont", iconPath: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" },
+    { label: "Assistant principal", value: "Coach IA Liberia", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
     { label: "Parrainage", value: "Invitez vos amis", iconPath: "M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2|M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z|M20 8v6|M23 11h-6" },
     { label: "Membre depuis", value: "Mars 2024", iconPath: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z|M16 2v4|M8 2v4|M3 10h18" },
   ];
@@ -796,8 +796,8 @@ function AbonnementCard() {
           cursor: "pointer",
         }}
       >
-        <span>
-          Évolution possible&nbsp;: <span style={{ fontWeight: 700, color: C.textDark }}>Passer à Elite</span>
+        <span style={{ fontWeight: 700, color: C.textDark }}>
+          Découvrir les options d&apos;abonnement
         </span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
