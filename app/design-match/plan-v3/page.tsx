@@ -55,13 +55,13 @@ const SHADOW = {
 };
 
 const H = {
-  topbar: 68,
-  planHeader: 60,
-  mission: 160,
-  roadmap: 248,
-  bottomRow: 240,
-  gap: 10,
-  rightCardGap: 8,
+  topbar: 60,
+  planHeader: 56,
+  mission: 148,
+  roadmap: 232,
+  bottomRow: 220,
+  gap: 8,
+  rightCardGap: 6,
 };
 
 export default function DesignMatchPlanV3() {
@@ -107,16 +107,16 @@ export default function DesignMatchPlanV3() {
         <div data-plan-sidebar>
           <Sidebar />
         </div>
-        <div data-plan-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div data-plan-content style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
           <Topbar />
           <main
             data-plan-main
             data-plan-grid-cols
             style={{
-              padding: "0 32px 16px 32px",
+              padding: "0 24px 12px 24px",
               display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) 320px",
-              gap: 24,
+              gridTemplateColumns: "minmax(0, 1fr) 296px",
+              gap: 20,
               maxWidth: 1440,
               margin: "0 auto",
               width: "100%",
@@ -143,36 +143,36 @@ function Sidebar() {
         top: 0,
         left: 0,
         bottom: 0,
-        width: 280,
+        width: 248,
         backgroundColor: C.cardBg,
         borderRight: `1px solid ${C.borderGhost}`,
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "20px 24px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "16px 20px" }}>
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 30,
-            height: 30,
+            width: 26,
+            height: 26,
             backgroundColor: C.navy,
-            borderRadius: 8,
+            borderRadius: 7,
           }}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 20V6" />
             <path d="M4 20h14" />
             <path d="M8 14l4-4 3 3 5-6" />
           </svg>
         </span>
-        <span style={{ color: C.navy, letterSpacing: "0.16em", fontSize: 15, fontWeight: 700 }}>
+        <span style={{ color: C.navy, letterSpacing: "0.16em", fontSize: 14, fontWeight: 700 }}>
           LIBERIA
         </span>
       </div>
-      <nav style={{ flex: 1, overflowY: "auto", padding: "0 12px" }}>
+      <nav style={{ flex: 1, overflowY: "auto", padding: "0 10px" }}>
         <NavSection title="PRINCIPAL">
           <NavItem label="Tableau de bord" iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" />
           <NavItem label="Coach IA" iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -194,37 +194,37 @@ function Sidebar() {
           <NavItem label="Profil" iconPath="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
         </NavSection>
       </nav>
-      <div style={{ padding: 12 }}>
+      <div style={{ padding: 10 }}>
         <div
           style={{
-            padding: 16,
+            padding: 12,
             backgroundColor: C.cardBg,
-            borderRadius: 12,
+            borderRadius: 11,
             boxShadow: SHADOW.kpi,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={C.gold}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={C.gold}>
               <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
             </svg>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.textDark, letterSpacing: "0.04em" }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: C.textDark, letterSpacing: "0.04em" }}>
               LIBERIA PREMIUM
             </span>
           </div>
-          <p style={{ marginTop: 8, fontSize: 11.5, color: C.textMuted, lineHeight: 1.45 }}>
+          <p style={{ marginTop: 6, fontSize: 11, color: C.textMuted, lineHeight: 1.4 }}>
             Débloquez tout le potentiel de votre conseiller financier.
           </p>
           <button
             style={{
               width: "100%",
-              marginTop: 12,
-              padding: "8px 12px",
+              marginTop: 8,
+              padding: "6px 10px",
               border: "none",
               backgroundColor: C.pageBg,
-              fontSize: 12,
+              fontSize: 11.5,
               fontWeight: 500,
               color: C.textDark,
-              borderRadius: 8,
+              borderRadius: 7,
               cursor: "pointer",
             }}
           >
@@ -238,11 +238,11 @@ function Sidebar() {
 
 function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 12 }}>
+    <div style={{ marginBottom: 8 }}>
       <p
         style={{
-          padding: "8px 12px 6px 12px",
-          fontSize: 10.5,
+          padding: "6px 10px 4px 10px",
+          fontSize: 10,
           fontWeight: 600,
           color: C.textLight,
           letterSpacing: "0.16em",
@@ -272,10 +272,10 @@ function NavItem({
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 10,
-        padding: "7px 10px",
+        gap: 9,
+        padding: "5px 8px",
         backgroundColor: active ? C.primaryBg : "transparent",
-        borderRadius: 8,
+        borderRadius: 7,
         cursor: "pointer",
         marginBottom: 1,
       }}
@@ -285,20 +285,20 @@ function NavItem({
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 26,
-          height: 26,
+          width: 22,
+          height: 22,
           backgroundColor: active ? C.primary : "#F1F5F9",
-          borderRadius: 6,
+          borderRadius: 5,
         }}
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? "white" : C.textMuted} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={active ? "white" : C.textMuted} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
           {iconCircle && <circle cx="12" cy="12" r="10" />}
           {paths.map((d, i) => <path key={i} d={d} />)}
         </svg>
       </span>
       <span
         style={{
-          fontSize: 13,
+          fontSize: 12.5,
           fontWeight: active ? 600 : 500,
           color: active ? C.textDark : C.textMuted,
         }}
