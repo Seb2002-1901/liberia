@@ -670,7 +670,7 @@ function PreferencesCard() {
     { label: "Langue", value: "Français", iconPath: "M5 8h14|M5 12h14|M5 16h10" },
     { label: "Devise", value: "CHF · Franc suisse", iconPath: "M12 1v22|M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
     { label: "Notifications", value: "Email + Push", iconPath: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9|M10.3 21a1.94 1.94 0 0 0 3.4 0" },
-    { label: "Communication", value: "Hebdomadaire", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
+    { label: "Canal préféré", value: "Hebdomadaire", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -1030,7 +1030,7 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Votre profil est complété à <span style={{ fontVariantNumeric: "tabular-nums" }}>78 %</span>
+            Profil complété à <span style={{ fontVariantNumeric: "tabular-nums" }}>78 %</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
