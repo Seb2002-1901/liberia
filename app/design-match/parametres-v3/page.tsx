@@ -481,7 +481,7 @@ function ScoreParametresCard() {
     { label: "Notifications", value: "Activées", color: C.success },
     { label: "Sécurité", value: "Élevée", color: C.success },
     { label: "Confidentialité", value: "Optimale", color: C.primary },
-    { label: "Synchronisation", value: "Active", color: C.success },
+    { label: "Automatisations", value: "4 / 4 actives", color: C.success },
   ];
   return (
     <div
@@ -836,7 +836,7 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Compte configuré à <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
+            Configuration du compte&nbsp;: <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
