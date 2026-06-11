@@ -496,6 +496,11 @@ function PricingSection() {
     {
       name: "Standard",
       price: "14.95",
+      // Audit produit : tarif annuel doit être visible dès la landing
+      // sans obliger l'utilisateur à aller sur /pricing.
+      yearlyPrice: "149",
+      yearlyMonthlyEq: "12.42",
+      yearlySavings: "30",
       tagline: "Le cockpit financier essentiel.",
       features: [
         "Score financier et analyse complète",
@@ -509,6 +514,9 @@ function PricingSection() {
     {
       name: "Premium",
       price: "19.95",
+      yearlyPrice: "199",
+      yearlyMonthlyEq: "16.58",
+      yearlySavings: "40",
       tagline: "Toute la puissance du copilote IA Liberia.",
       features: [
         "Tout Standard inclus",
@@ -566,9 +574,45 @@ function PricingSection() {
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, opacity: 0.85 }}>CHF / mois</span>
             </div>
+            {/* Sous-ligne mensuel : essai + carte requise */}
             <p style={{ margin: "4px 0 0 0", fontSize: 11.5, color: p.featured ? "rgba(255,255,255,0.7)" : C.textLight }}>
               Après 14 jours d&apos;essai gratuit · carte requise à l&apos;inscription
             </p>
+            {/* Option annuelle visible dès la landing (décision audit
+                produit) — l'utilisateur voit Standard 149 / Premium
+                199 sans avoir besoin d'aller sur /pricing. */}
+            <div
+              style={{
+                marginTop: 10,
+                padding: "8px 10px",
+                borderRadius: 10,
+                backgroundColor: p.featured ? "rgba(255,255,255,0.08)" : C.pageBg,
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+                gap: 8,
+                flexWrap: "wrap",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: p.featured ? "rgba(255,255,255,0.85)" : C.textDark,
+                }}
+              >
+                ou <span style={{ fontFamily: FONT_DISPLAY, fontSize: 14, fontWeight: 700 }}>{p.yearlyPrice} CHF / an</span>
+              </span>
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 500,
+                  color: p.featured ? "#5EEAD4" : C.success,
+                }}
+              >
+                ≈ {p.yearlyMonthlyEq} CHF/mois · économie ≈ {p.yearlySavings} CHF/an
+              </span>
+            </div>
             <ul style={{ margin: "18px 0 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
               {p.features.map((f) => (
                 <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, lineHeight: 1.5, color: p.featured ? "rgba(255,255,255,0.92)" : C.textDark }}>

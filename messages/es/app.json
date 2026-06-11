@@ -34,7 +34,7 @@
     },
     "fallbackName": "Miembro",
     "infoCard": "Información",
-    "planActive": "Plan Premium",
+    "planActive": "Suscripción activa",
     "planInactive": "Sin suscripción activa",
     "fields": {
       "fullName": "Nombre completo",
@@ -210,7 +210,7 @@
     "status": {
       "label": "Plan actual",
       "trialing": "Prueba",
-      "active": "Premium",
+      "active": "Activa",
       "pastDue": "Pago pendiente",
       "paused": "Prueba en pausa",
       "canceled": "Cancelado",

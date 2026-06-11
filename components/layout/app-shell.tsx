@@ -100,37 +100,30 @@ type NavId =
   | "profile";
 
 /**
- * Phase 6.0 — Mapping menu sidebar.
+ * Phase 6.0 — Mapping menu sidebar (audit zéro-tolérance).
  *
- * Stratégie post-nettoyage routes doublées :
- *   - SEUL le Dashboard utilise encore une page V3 (`dashboard-v3` est
- *     branché aux vraies données, commit 61791cf).
- *   - Les 11 autres items pointent directement vers leur route prod
- *     pour éviter le double-hop (sidebar → V3 → redirect → prod).
- *   - L'entrée "Mon analyse" a été retirée : aucune page prod dédiée
- *     n'existe et /design-match/mon-analyse-v3 redirige déjà vers
- *     /dashboard qui est déjà accessible via "Tableau de bord".
+ * Décision finale produit (11 juin 2026) : une seule expérience
+ * utilisateur visible. Toutes les routes V3 sont désactivées et
+ * redirigent vers leur équivalent prod. Aucune route /design-match/*
+ * n'est plus utilisée comme href dans la sidebar.
  *
  * `prod` est conservé sur chaque NavItem pour piloter l'état actif
  * (un utilisateur peut atterrir via une URL directe — la sidebar
  * doit allumer le bon item).
  */
-const NAV_V3: Record<NavId, { v3: string | null; prod: string }> = {
-  dashboard: { v3: "/design-match/dashboard-v3", prod: ROUTES.dashboard },
-  // Les V3 ci-dessous existent encore mais en mode "redirect → prod"
-  // (cf. app/design-match/<slug>-v3/page.tsx). On garde v3=null ici
-  // pour signaler qu'on NE LES UTILISE PLUS comme href dans la sidebar.
-  coach: { v3: null, prod: ROUTES.coach },
-  plan: { v3: null, prod: ROUTES.plan },
-  incomes: { v3: null, prod: ROUTES.incomes },
-  expenses: { v3: null, prod: ROUTES.expenses },
-  budget: { v3: null, prod: ROUTES.budget },
-  goals: { v3: null, prod: ROUTES.goals },
-  savings: { v3: null, prod: ROUTES.savings },
-  investments: { v3: null, prod: ROUTES.investments },
-  opportunities: { v3: null, prod: ROUTES.opportunities },
-  settings: { v3: null, prod: ROUTES.settings },
-  profile: { v3: null, prod: ROUTES.profile },
+const NAV_V3: Record<NavId, { prod: string }> = {
+  dashboard: { prod: ROUTES.dashboard },
+  coach: { prod: ROUTES.coach },
+  plan: { prod: ROUTES.plan },
+  incomes: { prod: ROUTES.incomes },
+  expenses: { prod: ROUTES.expenses },
+  budget: { prod: ROUTES.budget },
+  goals: { prod: ROUTES.goals },
+  savings: { prod: ROUTES.savings },
+  investments: { prod: ROUTES.investments },
+  opportunities: { prod: ROUTES.opportunities },
+  settings: { prod: ROUTES.settings },
+  profile: { prod: ROUTES.profile },
 };
 
 export function AppShell({
@@ -150,11 +143,9 @@ export function AppShell({
   /*  Navigation par sections (alignée maquette Phase 5.0)              */
   /* ------------------------------------------------------------------ */
 
-  // Helper : resout l'href effectif d'un item.
-  //   - dashboard → V3 (seule V3 live)
-  //   - autres → route prod directe (les V3 redirigent toutes vers
-  //     prod, mais autant éviter le double-hop)
-  const href = (id: NavId): string => NAV_V3[id].v3 ?? NAV_V3[id].prod;
+  // Helper : resout l'href de chaque item — toujours la route prod
+  // depuis le nettoyage zéro-tolérance du 11 juin 2026.
+  const href = (id: NavId): string => NAV_V3[id].prod;
 
   const SECTION_PRINCIPAL: NavItem[] = [
     { id: "dashboard", href: href("dashboard"), label: t("nav.dashboard"), icon: LayoutDashboard },
