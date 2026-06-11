@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   ArrowDownCircle,
   ArrowUpCircle,
   Compass,
@@ -77,10 +78,57 @@ interface AppShellProps {
 }
 
 interface NavItem {
+  /** URL cible (par défaut les pages cockpit V3 verrouillées sous /design-match/*-v3) */
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  /** Identifiant logique stable pour pilotage UX spécial (ex. demo mode) */
+  id?: NavId;
 }
+
+type NavId =
+  | "dashboard"
+  | "coach"
+  | "analyse"
+  | "plan"
+  | "incomes"
+  | "expenses"
+  | "budget"
+  | "goals"
+  | "savings"
+  | "investments"
+  | "opportunities"
+  | "settings"
+  | "profile";
+
+/**
+ * Phase 6.0 — Mapping menu sidebar → pages cockpit V3 design-match.
+ *
+ * Les 13 pages V3 lockées vivent sous /design-match/*-v3. La sidebar
+ * authentifiée pointe directement vers ces URLs (pas de redirect, pas
+ * de copie dans (app)/). Les routes prod (/dashboard, /budget, etc.)
+ * existent toujours mais ne sont plus accessibles via la sidebar :
+ * elles restent jointes par URL directe pour rollback rapide.
+ *
+ * Pour conserver l'état actif quand l'utilisateur est sur l'ancienne
+ * route prod (par exemple après refresh ou lien externe), on garde la
+ * correspondance prod ↔ V3 dans NAV_V3 et on l'utilise dans isActive.
+ */
+const NAV_V3: Record<NavId, { v3: string; prod: string }> = {
+  dashboard: { v3: "/design-match/dashboard-v3", prod: ROUTES.dashboard },
+  coach: { v3: "/design-match/coach-v3", prod: ROUTES.coach },
+  analyse: { v3: "/design-match/mon-analyse-v3", prod: "/analysis" },
+  plan: { v3: "/design-match/plan-v3", prod: ROUTES.plan },
+  incomes: { v3: "/design-match/revenus-v3", prod: ROUTES.incomes },
+  expenses: { v3: "/design-match/depenses-v3", prod: ROUTES.expenses },
+  budget: { v3: "/design-match/budget-v3", prod: ROUTES.budget },
+  goals: { v3: "/design-match/objectifs-v3", prod: ROUTES.goals },
+  savings: { v3: "/design-match/epargne-v3", prod: ROUTES.savings },
+  investments: { v3: "/design-match/investissements-v3", prod: ROUTES.investments },
+  opportunities: { v3: "/design-match/opportunites-v3", prod: ROUTES.opportunities },
+  settings: { v3: "/design-match/parametres-v3", prod: ROUTES.settings },
+  profile: { v3: "/design-match/profil-v3", prod: ROUTES.profile },
+};
 
 export function AppShell({
   children,
@@ -100,39 +148,43 @@ export function AppShell({
   /* ------------------------------------------------------------------ */
 
   const SECTION_PRINCIPAL: NavItem[] = [
-    { href: ROUTES.dashboard, label: t("nav.dashboard"), icon: LayoutDashboard },
-    { href: ROUTES.coach, label: t("nav.coach"), icon: MessageSquare },
-    { href: ROUTES.plan, label: t("nav.plan"), icon: Map },
+    { id: "dashboard", href: NAV_V3.dashboard.v3, label: t("nav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: NAV_V3.coach.v3, label: t("nav.coach"), icon: MessageSquare },
+    // Phase 6.0 — nouvel item entre Coach IA et Plan d'action.
+    // Pointe directement sur la page V3 lockée /design-match/mon-analyse-v3.
+    { id: "analyse", href: NAV_V3.analyse.v3, label: "Mon analyse", icon: Activity },
+    { id: "plan", href: NAV_V3.plan.v3, label: t("nav.plan"), icon: Map },
   ];
 
   const SECTION_FINANCES: NavItem[] = [
-    { href: ROUTES.incomes, label: t("nav.incomes"), icon: ArrowUpCircle },
-    { href: ROUTES.expenses, label: t("nav.expenses"), icon: ArrowDownCircle },
-    { href: ROUTES.budget, label: t("nav.budget"), icon: Wallet },
-    { href: ROUTES.goals, label: t("nav.goals"), icon: Target },
+    { id: "incomes", href: NAV_V3.incomes.v3, label: t("nav.incomes"), icon: ArrowUpCircle },
+    { id: "expenses", href: NAV_V3.expenses.v3, label: t("nav.expenses"), icon: ArrowDownCircle },
+    { id: "budget", href: NAV_V3.budget.v3, label: t("nav.budget"), icon: Wallet },
+    { id: "goals", href: NAV_V3.goals.v3, label: t("nav.goals"), icon: Target },
   ];
 
   const SECTION_CROISSANCE: NavItem[] = [
-    { href: ROUTES.savings, label: t("nav.savings"), icon: PiggyBank },
-    { href: ROUTES.investments, label: t("nav.investments"), icon: LineChart },
-    { href: ROUTES.opportunities, label: t("nav.opportunities"), icon: Compass },
+    { id: "savings", href: NAV_V3.savings.v3, label: t("nav.savings"), icon: PiggyBank },
+    { id: "investments", href: NAV_V3.investments.v3, label: t("nav.investments"), icon: LineChart },
+    { id: "opportunities", href: NAV_V3.opportunities.v3, label: t("nav.opportunities"), icon: Compass },
   ];
 
   const SECTION_PLUS: NavItem[] = [
-    { href: ROUTES.settings, label: t("nav.settings"), icon: Settings },
-    { href: ROUTES.profile, label: t("nav.profile"), icon: User },
+    { id: "settings", href: NAV_V3.settings.v3, label: t("nav.settings"), icon: Settings },
+    { id: "profile", href: NAV_V3.profile.v3, label: t("nav.profile"), icon: User },
   ];
 
   // Bottom nav mobile — inchangée S2 (D5 validé). 5 items max pour
   // tenir confortablement la largeur d'écran. Épargne/Invest/Opportu-
   // nités ne sont pas mis en mobile faute de place ; ils seront
   // accessibles via la page Profil/menu plus tard si besoin.
+  // Phase 6.0 — hrefs branchés sur les pages V3 design-match.
   const MOBILE_NAV: NavItem[] = [
-    { href: ROUTES.dashboard, label: t("mobileNav.dashboard"), icon: LayoutDashboard },
-    { href: ROUTES.coach, label: t("mobileNav.coach"), icon: MessageSquare },
-    { href: ROUTES.plan, label: t("mobileNav.plan"), icon: Map },
-    { href: ROUTES.budget, label: t("mobileNav.budget"), icon: Wallet },
-    { href: ROUTES.goals, label: t("mobileNav.goals"), icon: Target },
+    { id: "dashboard", href: NAV_V3.dashboard.v3, label: t("mobileNav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: NAV_V3.coach.v3, label: t("mobileNav.coach"), icon: MessageSquare },
+    { id: "plan", href: NAV_V3.plan.v3, label: t("mobileNav.plan"), icon: Map },
+    { id: "budget", href: NAV_V3.budget.v3, label: t("mobileNav.budget"), icon: Wallet },
+    { id: "goals", href: NAV_V3.goals.v3, label: t("mobileNav.goals"), icon: Target },
   ];
 
   // En démo, seul le Dashboard est cliquable (les autres redirigent
@@ -146,10 +198,10 @@ export function AppShell({
       label={item.label}
       icon={item.icon}
       active={
-        isActive(pathname, item.href) ||
-        (isDemo === true && pathname === "/demo" && item.href === ROUTES.dashboard)
+        isActive(pathname, item.href, item.id) ||
+        (isDemo === true && pathname === "/demo" && item.id === "dashboard")
       }
-      disabled={isDemo === true && item.href !== ROUTES.dashboard}
+      disabled={isDemo === true && item.id !== "dashboard"}
       disabledTooltip={t("menu.disabledTooltip")}
     />
   );
@@ -490,8 +542,34 @@ function PremiumCard({
   );
 }
 
-function isActive(pathname: string | null, href: string) {
+/**
+ * Phase 6.0 — état actif cross prod/V3.
+ *
+ * La sidebar pointe désormais sur les pages V3 design-match. L'état
+ * actif doit aussi s'allumer quand l'utilisateur est sur l'ancienne
+ * route prod correspondante (ex. /dashboard) pour éviter une sidebar
+ * "rien d'actif" pendant la transition.
+ *
+ * Comportement :
+ *  - exact match pathname === href (V3 ou démo) → actif
+ *  - sous-route /dashboard/foo → actif sur Dashboard (sauf si l'item
+ *    a un `id` connu : on s'appuie alors sur le mapping NAV_V3.prod)
+ *  - id fourni → compare aussi à NAV_V3[id].prod (et ses sous-routes)
+ */
+function isActive(pathname: string | null, href: string, id?: NavId) {
   if (!pathname) return false;
+  if (pathname === href) return true;
+  if (id) {
+    const prod = NAV_V3[id].prod;
+    if (id === "dashboard") {
+      // Dashboard est l'index, pas de sous-route prod à matcher.
+      if (pathname === prod) return true;
+    } else {
+      if (pathname === prod || pathname.startsWith(`${prod}/`)) return true;
+    }
+    return false;
+  }
+  // Sans id (fallback historique) : ancien comportement, prudent.
   if (href === "/dashboard") return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return pathname.startsWith(`${href}/`);
 }
