@@ -1,31 +1,79 @@
 /**
  * Phase 5.0 — /design-match/dashboard-v3
+ * Phase 6.0 — branchement données live (Server Component).
  *
- * Reconstruction "surfaces flottantes" — perception visuelle prioritaire.
+ * Le DESIGN V3 est figé (couleurs, ombres, structure, typographie).
+ * Cette page récupère désormais ses données depuis les services prod :
+ *   Score / delta / band   ← drawerData (FHS)
+ *   Évolution score (chart) ← listMyRecentSnapshots(12)
+ *   Revenus / Dépenses / Reste à vivre / Runway ← getFinanceData + helpers
+ *   Roadmap (4 jalons)     ← buildRoadmap + i18n dashboard.roadmap
+ *   Mission / Priorité     ← buildFirstMission + i18n
+ *   Opportunité du moment  ← detectOpportunities[0]
+ *   Répartition donut      ← buildCategoryBreakdown (ce mois)
  *
- * PHILOSOPHIE :
- * - Pas de "cartes bordées" → des SURFACES qui flottent sur le fond
- * - La hiérarchie domine : Score > Hero secondaires > Roadmap > KPI > Bottom > Coach
- * - Roadmap = UN ruban intégré, pas 5 mini-cartes
- * - Ombres SOFT et DIFFUSES, pas tight et défined
- * - Bordures quasi-invisibles ou absentes
+ * Les 6 boutons principaux pointent maintenant vers des routes réelles
+ * (mon-analyse-v3, plan-v3, opportunites-v3, depenses-v3, /coach).
+ * Les autres CTA (Voir toutes les projections, Premium, etc.) restent
+ * non branchés — phase ultérieure.
  *
- * Changements clés vs v2 :
- *   1. Pas de border sur les cards blanches (ou border: #F2F4F8 invisible)
- *   2. Roadmap milestones : 0 border, 0 shadow, 0 bg différent → flottent dans le parent
- *   3. Score "46" 92px (vs 80) + Ring 115px (vs 130) + thickness 7 (vs 9)
- *   4. Page bg #F9FAFD (vs #F5F7FA)
- *   5. Notif badge #7FA2E6 (vs #2563EB)
- *   6. Ombres : blur étendu, opacité réduite — quasi-imperceptibles mais profondes
- *   7. Score card : shadow navy plus forte pour "lévitation premium"
- *
- * Aucun composant @/components ni @/lib réutilisé. Fichier autonome.
+ * Les autres pages V3 (revenus, budget, …) restent statiques jusqu'à
+ * leur propre migration.
  */
 
-export const metadata = {
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import {
+  getFinanceData,
+  totalMonthly,
+} from "@/lib/services/finance";
+import {
+  calculateNetCashflow,
+  calculateRunway,
+} from "@/lib/calculations/finance";
+import {
+  buildBudgetStatus,
+  buildCategoryBreakdown,
+} from "@/lib/calculations/analytics";
+import {
+  detectOpportunities,
+  type Opportunity,
+  type OpportunityPriority,
+} from "@/lib/calculations/opportunities";
+import { buildFirstMission } from "@/lib/calculations/first-mission";
+import {
+  buildRoadmap,
+  type RoadmapMilestone,
+} from "@/lib/calculations/roadmap-templates";
+import {
+  computeIncomeMonthlyDelta,
+  computeExpenseMonthlyDelta,
+  computeRemainderMonthlyDelta,
+  type MonthlyDelta,
+} from "@/lib/calculations/kpi-delta";
+import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
+import { formatUserCurrency } from "@/lib/utils";
+import { EXPENSE_CATEGORIES, type GoalTypeId } from "@/lib/constants";
+import { listMyRecentSnapshots } from "@/lib/services/health-snapshots";
+import { createClient } from "@/lib/supabase/server";
+import {
+  gatherExtraSignals,
+  getOrSealDrawerData,
+} from "@/lib/services/health-writer";
+import type {
+  DrawerData,
+  SealedSnapshot,
+} from "@/lib/calculations/health/types";
+import type { CategoryBreakdownRow } from "@/lib/calculations/analytics";
+
+export const metadata: Metadata = {
   title: "Design Match v3 — Dashboard",
   robots: { index: false, follow: false },
 };
+
+// Per-request data via Supabase cookies — never prerender.
+export const dynamic = "force-dynamic";
 
 const C = {
   navy: "#011E5F",
@@ -75,7 +123,298 @@ const H = {
   gapBC: 14,
 };
 
-export default function DesignMatchDashboardV3() {
+/* ═══════════════ HELPERS ═══════════════ */
+
+/** Auth lookup parallèle. Renvoie null en mode dégradé pour que la
+ *  page rende quand même (drawerData / snapshots seront simplement
+ *  vides). Calqué sur app/(app)/dashboard/page.tsx. */
+async function getCurrentAuthUser(): Promise<{
+  id: string;
+  created_at: string | null;
+} | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    return { id: user.id, created_at: user.created_at ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/** Destinations cliquables des 6 boutons connectés ce sprint. Les
+ *  autres pages V3 restent des maquettes : ces liens y mènent sans
+ *  modifier leur contenu. */
+const ROUTES_V3 = {
+  monAnalyse: "/design-match/mon-analyse-v3",
+  plan: "/design-match/plan-v3",
+  opportunites: "/design-match/opportunites-v3",
+  depenses: "/design-match/depenses-v3",
+  coach: "/coach",
+} as const;
+
+/** Heuristique éditoriale recopiée de
+ *  components/dashboard/opportunity-highlight-card.tsx — mapping
+ *  priorité → points score affichés (PAS un calcul FHS réel). */
+const POINTS_BY_PRIORITY: Record<OpportunityPriority, number> = {
+  high: 12,
+  medium: 7,
+  low: 3,
+};
+
+/** Label catégorie depuis EXPENSE_CATEGORIES.id. */
+function expenseCategoryLabel(id: string): string {
+  return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
+}
+
+/** Mois courts FR pour les labels d'axe X de l'EvolutionCard.
+ *  Mapping basé sur Date.getUTCMonth() (0-11). */
+const MONTHS_FR_SHORT = [
+  "janv.",
+  "févr.",
+  "mars",
+  "avr.",
+  "mai",
+  "juin",
+  "juil.",
+  "août",
+  "sept.",
+  "oct.",
+  "nov.",
+  "déc.",
+] as const;
+
+function formatWeekLabel(weekIso: string): string {
+  const d = new Date(weekIso);
+  if (Number.isNaN(d.getTime())) return weekIso;
+  return `${d.getUTCDate()} ${MONTHS_FR_SHORT[d.getUTCMonth()]}`;
+}
+
+/* ═══════════════ DEFAULT EXPORT — Server Component ═══════════════ */
+
+export default async function DesignMatchDashboardV3() {
+  /* ------------------------------------------------------------------ */
+  /*  Data fetch                                                         */
+  /* ------------------------------------------------------------------ */
+
+  const [data, authedUser] = await Promise.all([
+    getFinanceData(),
+    getCurrentAuthUser(),
+  ]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Agrégats finance — copie 1:1 de app/(app)/dashboard/page.tsx       */
+  /* ------------------------------------------------------------------ */
+
+  const monthlyIncome =
+    totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
+  const fixedExpenses =
+    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
+  const variableExpenses = data.expenseBuckets.variable;
+  const totalExpenses = fixedExpenses + variableExpenses;
+  const currentSavings = data.financialProfile?.current_savings ?? 0;
+  const cashflow = calculateNetCashflow({
+    monthlyIncome,
+    monthlyExpenses: totalExpenses,
+  });
+  const runway = calculateRunway({
+    currentSavings,
+    monthlyExpenses: totalExpenses,
+  });
+  const monthBreakdown = buildCategoryBreakdown(
+    data.expenses,
+    "month",
+    EXPENSE_CATEGORIES.map((c) => c.id),
+  );
+  const monthBudgetStatus = buildBudgetStatus(
+    data.expenses,
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+  );
+  const opportunities = detectOpportunities({
+    expenseBuckets: data.expenseBuckets,
+    budgetStatus: monthBudgetStatus,
+    categoryBreakdown: monthBreakdown,
+    monthlyIncome,
+    runwayMonths: runway,
+    savingsRate:
+      monthlyIncome > 0 ? (monthlyIncome - fixedExpenses) / monthlyIncome : 0,
+  });
+  const topOpportunity = opportunities[0] ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Mission                                                            */
+  /* ------------------------------------------------------------------ */
+
+  const completeness = computeFinancialCompleteness({
+    incomes: data.incomes,
+    expenses: data.expenses,
+    goals: data.goals,
+    categoryBudgets: data.categoryBudgets,
+  });
+  const MAJOR_AREAS = [
+    "income",
+    "housing",
+    "insurance",
+    "food",
+    "transport",
+  ] as const;
+  const filledMajorSet = new Set<string>(completeness.detected);
+  const filledMajorAreasCount = MAJOR_AREAS.filter((a) =>
+    filledMajorSet.has(a),
+  ).length;
+  const firstMissingMajor =
+    MAJOR_AREAS.find((a) => !filledMajorSet.has(a)) ?? null;
+  const activeGoalsCount = data.goals.filter((g) => !g.is_completed).length;
+
+  /* ------------------------------------------------------------------ */
+  /*  FHS — drawer + snapshots                                           */
+  /* ------------------------------------------------------------------ */
+
+  let drawerData: DrawerData | null = null;
+  let recentSnapshots: SealedSnapshot[] = [];
+  if (authedUser?.id) {
+    try {
+      const extras = await gatherExtraSignals({
+        userId: authedUser.id,
+        financeData: data,
+        accountCreatedAt: authedUser.created_at ?? null,
+      });
+      drawerData = await getOrSealDrawerData({
+        userId: authedUser.id,
+        financeData: data,
+        extras,
+      });
+    } catch (err) {
+      console.error("[dashboard-v3] FHS drawer compute failed", err);
+    }
+    try {
+      recentSnapshots = await listMyRecentSnapshots(12);
+    } catch (err) {
+      console.error("[dashboard-v3] snapshot listing failed", err);
+    }
+  }
+
+  const firstMission = buildFirstMission({
+    goalsCount: activeGoalsCount,
+    runwayMonths: Number.isFinite(runway) ? runway : 999,
+    hasCurrentSavings: currentSavings > 0,
+    filledMajorAreasCount,
+    missingMajorArea: firstMissingMajor,
+    monthlyIncome,
+    recommendation: drawerData?.recommendation ?? null,
+  });
+
+  const primaryGoal = data.goals.find((g) => !g.is_completed) ?? null;
+  const mainGoalType =
+    (primaryGoal?.type as GoalTypeId | undefined) ?? null;
+  const roadmap = buildRoadmap({
+    priority: firstMission.priority,
+    mainGoalType,
+    currentScore: drawerData?.score.display ?? null,
+  });
+
+  /* ------------------------------------------------------------------ */
+  /*  Deltas KPI                                                         */
+  /* ------------------------------------------------------------------ */
+
+  const incomeDelta = computeIncomeMonthlyDelta(data.incomes);
+  const expenseDelta = computeExpenseMonthlyDelta(data.expenses);
+  const remainderDelta = computeRemainderMonthlyDelta(
+    data.incomes,
+    data.expenses,
+  );
+
+  /* ------------------------------------------------------------------ */
+  /*  i18n résolu serveur — passé en strings aux composants visuels      */
+  /* ------------------------------------------------------------------ */
+
+  // Casts `as never` : les keys sont dynamiques (priority / kind / band)
+  // donc next-intl ne peut pas les typer strictement. Pattern identique
+  // à components/dashboard/roadmap-timeline.tsx qui fait `t(milestone.eyebrowKey)`.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const tRoadmap = (await getTranslations("dashboard.roadmap")) as (
+    key: string,
+    values?: Record<string, string | number>,
+  ) => string;
+  const tBands = (await getTranslations(
+    "dashboard.scoreCard.tier.bands",
+  )) as (key: string) => string;
+  const tFirstMissionTitle = (await getTranslations(
+    "dashboard.firstMission.title",
+  )) as (key: string, values?: Record<string, string | number>) => string;
+  const tMissionCard = (await getTranslations(
+    "dashboard.missionCard",
+  )) as (key: string, values?: Record<string, string | number>) => string;
+  const tOppKind = (await getTranslations(
+    "app.finance.analytics.opportunities.kind",
+  )) as (key: string, values?: Record<string, string | number>) => string;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+
+  /* ------------------------------------------------------------------ */
+  /*  Strings résolues + données prêtes pour les sous-composants V3      */
+  /* ------------------------------------------------------------------ */
+
+  const firstName =
+    data.profile.full_name?.split(" ")[0]?.trim() || null;
+  const currency = data.profile.currency;
+
+  const resolvedMilestones: ResolvedMilestone[] = roadmap.map((m) => ({
+    kind: m.kind,
+    eyebrow: tRoadmap(m.eyebrowKey, m.payload).toUpperCase(),
+    title: tRoadmap(m.titleKey, m.payload),
+    subtitle: tRoadmap(m.subtitleKey, m.payload),
+    icon: m.icon,
+    tone: m.tone,
+    score: m.kind === "today" ? drawerData?.score.display ?? null : null,
+  }));
+
+  const score = drawerData?.score.display ?? null;
+  const scoreDelta = drawerData?.delta?.netDelta ?? null;
+  const tierLabel = drawerData ? tBands(drawerData.score.band) : "—";
+
+  const priorityTitle = tFirstMissionTitle(
+    firstMission.priority,
+    firstMission.payload,
+  );
+  const missionTitle = tMissionCard(
+    `${firstMission.priority}.title`,
+    firstMission.payload,
+  );
+  const missionSubline = tMissionCard(
+    `${firstMission.priority}.subline`,
+    firstMission.payload,
+  );
+  const missionCtaLabel = tMissionCard("cta");
+  const suggestedAmount =
+    typeof firstMission.payload.suggestedAmount === "number"
+      ? firstMission.payload.suggestedAmount
+      : null;
+  const dailyAmount =
+    suggestedAmount !== null && suggestedAmount > 0
+      ? Math.max(1, Math.round(suggestedAmount / 30))
+      : null;
+
+  let oppTitle: string | null = null;
+  let oppArgument: string | null = null;
+  let oppPoints: number | null = null;
+  if (topOpportunity) {
+    oppTitle = tOppKind(`${topOpportunity.kind}.title`, topOpportunity.payload);
+    oppArgument = tOppKind(
+      `${topOpportunity.kind}.argument`,
+      topOpportunity.payload,
+    );
+    oppPoints = POINTS_BY_PRIORITY[topOpportunity.priority];
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  Render — design V3 strictement préservé                            */
+  /* ------------------------------------------------------------------ */
+
   return (
     <div
       style={{
@@ -86,17 +425,55 @@ export default function DesignMatchDashboardV3() {
       }}
     >
       <Sidebar />
-      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column" }}>
-        <Topbar />
+      <div
+        style={{
+          marginLeft: 280,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Topbar firstName={firstName} fullName={data.profile.full_name ?? null} />
         <main style={{ flex: 1, padding: "0 42px 16px 42px" }}>
           <div style={{ maxWidth: 1176, margin: "0 auto" }}>
-            <Hero />
+            <Hero
+              score={score}
+              scoreDelta={scoreDelta}
+              tierLabel={tierLabel}
+              priorityTitle={priorityTitle}
+              runway={runway}
+              missionTitle={missionTitle}
+              missionSubline={missionSubline}
+              missionCtaLabel={missionCtaLabel}
+              dailyAmount={dailyAmount}
+              currency={currency}
+            />
             <div style={{ height: H.gapHR }} />
-            <Roadmap />
+            <Roadmap milestones={resolvedMilestones} />
             <div style={{ height: H.gapRK }} />
-            <KpiRow />
+            <KpiRow
+              monthlyIncome={monthlyIncome}
+              totalExpenses={totalExpenses}
+              cashflow={cashflow}
+              runway={runway}
+              currentSavings={currentSavings}
+              incomeDelta={incomeDelta}
+              expenseDelta={expenseDelta}
+              remainderDelta={remainderDelta}
+              profile={data.profile}
+            />
             <div style={{ height: H.gapKB }} />
-            <BottomRow />
+            <BottomRow
+              opportunity={topOpportunity}
+              oppTitle={oppTitle}
+              oppArgument={oppArgument}
+              oppPoints={oppPoints}
+              breakdown={monthBreakdown}
+              totalExpenses={totalExpenses}
+              profile={data.profile}
+              snapshots={recentSnapshots}
+              currentScore={score}
+            />
             <div style={{ height: H.gapBC }} />
             <CoachCta />
           </div>
@@ -104,6 +481,17 @@ export default function DesignMatchDashboardV3() {
       </div>
     </div>
   );
+}
+
+/** Milestone résolu côté serveur, prêt à rendre. */
+interface ResolvedMilestone {
+  kind: RoadmapMilestone["kind"];
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  icon: RoadmapMilestone["icon"];
+  tone: RoadmapMilestone["tone"];
+  score: number | null;
 }
 
 /* ═══════════════ SIDEBAR ═══════════════ */
@@ -289,7 +677,18 @@ function NavItem({
 
 /* ═══════════════ TOPBAR ═══════════════ */
 
-function Topbar() {
+function Topbar({
+  firstName,
+  fullName,
+}: {
+  firstName: string | null;
+  fullName: string | null;
+}) {
+  // Greeting branché sur le full_name réel (split sur l'espace, prénom
+  // uniquement, comme le composant Greeting prod). Fallback "explorer"
+  // si le profil n'a pas de nom (démo ou onboarding incomplet).
+  const displayName = firstName ?? "explorer";
+  const pillName = fullName ?? "Mon profil";
   return (
     <header
       style={{
@@ -303,7 +702,7 @@ function Topbar() {
     >
       <div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
-          Bonjour Sébastien <span style={{ fontWeight: 400 }}>👋</span>
+          Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
         <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted }}>
           Voici votre situation mise à jour aujourd&apos;hui.
@@ -371,7 +770,7 @@ function Topbar() {
             }}
           />
           <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
-            Sébastien Golay
+            {pillName}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
@@ -384,23 +783,87 @@ function Topbar() {
 
 /* ═══════════════ HERO — 3 surfaces flottantes ═══════════════ */
 
-function Hero() {
+interface HeroProps {
+  score: number | null;
+  scoreDelta: number | null;
+  tierLabel: string;
+  priorityTitle: string;
+  runway: number;
+  missionTitle: string;
+  missionSubline: string;
+  missionCtaLabel: string;
+  dailyAmount: number | null;
+  currency: string;
+}
+
+function Hero(props: HeroProps) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18 }}>
-      <ScoreCard />
-      <PriorityCard />
-      <MissionCard />
+      <ScoreCard
+        score={props.score}
+        scoreDelta={props.scoreDelta}
+        tierLabel={props.tierLabel}
+      />
+      <PriorityCard
+        priorityTitle={props.priorityTitle}
+        runway={props.runway}
+      />
+      <MissionCard
+        missionTitle={props.missionTitle}
+        missionSubline={props.missionSubline}
+        missionCtaLabel={props.missionCtaLabel}
+        dailyAmount={props.dailyAmount}
+        currency={props.currency}
+      />
     </div>
   );
 }
 
-function ScoreCard() {
+function ScoreCard({
+  score,
+  scoreDelta,
+  tierLabel,
+}: {
+  score: number | null;
+  scoreDelta: number | null;
+  tierLabel: string;
+}) {
   // Ring progress math : circumference = 2π * r = 2π * 43 ≈ 270.18 px.
-  // Score 46/100 → fraction visible = 0.46. dashoffset = C * (1 - 0.46).
+  // Fraction visible = score/100 (0 si score null pour fallback empty).
   const ringR = 43;
   const ringCirc = 2 * Math.PI * ringR;
-  const scoreFraction = 0.46;
+  const scoreFraction = score !== null ? Math.max(0, Math.min(1, score / 100)) : 0;
   const ringOffset = ringCirc * (1 - scoreFraction);
+
+  // Texte delta + badge dynamique selon le signe de scoreDelta.
+  // - null : "Première lecture — pas encore de comparaison"
+  // - 0   : "Score stable cette semaine"
+  // - >0  : "+N pts depuis la semaine dernière"  (badge "EN PROGRESSION")
+  // - <0  : "-N pts depuis la semaine dernière"  (badge "À SURVEILLER")
+  const deltaSign: "up" | "down" | "flat" | "none" =
+    scoreDelta === null
+      ? "none"
+      : scoreDelta === 0
+        ? "flat"
+        : scoreDelta > 0
+          ? "up"
+          : "down";
+  const deltaBadge =
+    deltaSign === "up"
+      ? { label: "EN PROGRESSION", color: "#5EEAD4", bg: "rgba(16, 163, 127, 0.18)" }
+      : deltaSign === "down"
+        ? { label: "À SURVEILLER", color: "#FBBF24", bg: "rgba(251, 191, 36, 0.18)" }
+        : deltaSign === "flat"
+          ? { label: "STABLE", color: "#94A3B8", bg: "rgba(148, 163, 184, 0.18)" }
+          : null;
+  const deltaText =
+    scoreDelta === null
+      ? "Première lecture du score"
+      : scoreDelta === 0
+        ? "Score stable cette semaine"
+        : scoreDelta > 0
+          ? `+${Math.round(scoreDelta)} pts depuis la semaine dernière`
+          : `${Math.round(scoreDelta)} pts depuis la semaine dernière`;
   return (
     <div
       style={{
@@ -454,36 +917,38 @@ function ScoreCard() {
                 letterSpacing: "-0.035em",
               }}
             >
-              46
+              {score ?? "—"}
             </span>
             <span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)", fontWeight: 500, letterSpacing: "-0.01em" }}>
               /100
             </span>
           </div>
           <div style={{ marginBottom: 12, transform: "translateY(-10px)" }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                padding: "3px 8px",
-                borderRadius: 999,
-                backgroundColor: "rgba(16, 163, 127, 0.18)",
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: "#5EEAD4",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-              }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="17 6 23 6 23 12" />
-                <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-              </svg>
-              EN PROGRESSION
-            </span>
+            {deltaBadge && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "3px 8px",
+                  borderRadius: 999,
+                  backgroundColor: deltaBadge.bg,
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: deltaBadge.color,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="17 6 23 6 23 12" />
+                  <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+                </svg>
+                {deltaBadge.label}
+              </span>
+            )}
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: "4px 0 0 0", lineHeight: 1.25 }}>
-              +6 pts depuis la semaine dernière
+              {deltaText}
             </p>
           </div>
         </div>
@@ -536,7 +1001,7 @@ function ScoreCard() {
               fontFamily="Outfit, Inter, system-ui"
               letterSpacing="-0.01em"
             >
-              Fragile
+              {tierLabel}
             </text>
           </svg>
         </div>
@@ -545,7 +1010,23 @@ function ScoreCard() {
   );
 }
 
-function PriorityCard() {
+function PriorityCard({
+  priorityTitle,
+  runway,
+}: {
+  priorityTitle: string;
+  runway: number;
+}) {
+  // Cible runway = 3 mois (alignée avec le seuil low_resilience de
+  // buildFirstMission). On clampe le ratio pour la barre de progression.
+  const TARGET_MONTHS = 3;
+  const runwayFinite = Number.isFinite(runway);
+  const runwayValue = runwayFinite ? Math.max(0, runway) : Infinity;
+  const ratio = runwayFinite
+    ? Math.max(0, Math.min(1, runwayValue / TARGET_MONTHS))
+    : 1;
+  const ratioPct = Math.max(2, Math.round(ratio * 100));
+  const runwayDisplay = runwayFinite ? runwayValue.toFixed(1) : "∞";
   return (
     <div
       style={{
@@ -592,7 +1073,7 @@ function PriorityCard() {
             letterSpacing: "-0.01em",
           }}
         >
-          Construire votre fonds d&apos;urgence
+          {priorityTitle}
         </h3>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 10 }}>
           <span
@@ -605,9 +1086,9 @@ function PriorityCard() {
               lineHeight: 1,
             }}
           >
-            0.0
+            {runwayDisplay}
           </span>
-          <span style={{ fontSize: 12, color: C.textMuted }}>mois sur 3 mois</span>
+          <span style={{ fontSize: 12, color: C.textMuted }}>mois sur {TARGET_MONTHS} mois</span>
         </div>
         <div
           style={{
@@ -618,14 +1099,22 @@ function PriorityCard() {
             overflow: "hidden",
           }}
           role="progressbar"
-          aria-valuenow={0}
+          aria-valuenow={runwayFinite ? Math.round(runwayValue * 10) / 10 : TARGET_MONTHS}
           aria-valuemin={0}
-          aria-valuemax={3}
+          aria-valuemax={TARGET_MONTHS}
         >
-          <div style={{ width: "2%", height: "100%", backgroundColor: C.coral, borderRadius: 999 }} />
+          <div
+            style={{
+              width: `${ratioPct}%`,
+              height: "100%",
+              backgroundColor: C.coral,
+              borderRadius: 999,
+            }}
+          />
         </div>
       </div>
-      <button
+      <Link
+        href={ROUTES_V3.monAnalyse}
         style={{
           alignSelf: "flex-start",
           display: "inline-flex",
@@ -634,10 +1123,7 @@ function PriorityCard() {
           fontSize: 13,
           fontWeight: 500,
           color: C.primary,
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Voir pourquoi c&apos;est critique
@@ -645,12 +1131,24 @@ function PriorityCard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
-function MissionCard() {
+function MissionCard({
+  missionTitle,
+  missionSubline,
+  missionCtaLabel,
+  dailyAmount,
+  currency,
+}: {
+  missionTitle: string;
+  missionSubline: string;
+  missionCtaLabel: string;
+  dailyAmount: number | null;
+  currency: string;
+}) {
   return (
     <div
       style={{
@@ -695,14 +1193,15 @@ function MissionCard() {
             fontFamily: "Outfit, Inter, system-ui",
           }}
         >
-          Économisez 500 CHF ce mois-ci
+          {missionTitle}
         </h3>
         <p style={{ marginTop: 6, fontSize: 12.5, color: C.textMuted, lineHeight: 1.45, margin: "6px 0 0 0" }}>
-          Premier palier vers votre fonds d&apos;urgence.
+          {missionSubline}
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <button
+        <Link
+          href={ROUTES_V3.plan}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -713,19 +1212,20 @@ function MissionCard() {
             fontSize: 13,
             fontWeight: 600,
             borderRadius: 9,
-            border: "none",
-            cursor: "pointer",
+            textDecoration: "none",
           }}
         >
-          Agir maintenant
+          {missionCtaLabel}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
-        </button>
-        <span style={{ fontSize: 11.5, color: C.textLight, whiteSpace: "nowrap" }}>
-          ~17 CHF / jour
-        </span>
+        </Link>
+        {dailyAmount !== null && (
+          <span style={{ fontSize: 11.5, color: C.textLight, whiteSpace: "nowrap" }}>
+            ~{dailyAmount} {currency} / jour
+          </span>
+        )}
       </div>
     </div>
   );
@@ -733,7 +1233,22 @@ function MissionCard() {
 
 /* ═══════════════ ROADMAP — RUBAN INTÉGRÉ ═══════════════ */
 
-function Roadmap() {
+// Mapping tone (RoadmapTone) → couleurs V3.
+// Aligné sur les badges existants du design : success vert,
+// violet, neutral (utilisé par "today" qui a son traitement
+// isToday spécifique), warning ambre, navy bleu profond.
+const TONE_PALETTE: Record<
+  RoadmapMilestone["tone"],
+  { bg: string; fg: string }
+> = {
+  success: { bg: C.successBg, fg: C.success },
+  violet: { bg: C.violetBg, fg: C.violet },
+  warning: { bg: "#FEF3C7", fg: C.amber },
+  navy: { bg: C.primaryBg, fg: C.navy },
+  neutral: { bg: "#F1F5F9", fg: C.textMuted },
+};
+
+function Roadmap({ milestones }: { milestones: ResolvedMilestone[] }) {
   return (
     <div
       style={{
@@ -781,31 +1296,23 @@ function Roadmap() {
           horizontalement dans leur colonne. Connecteurs en overlay
           positionné aux frontières 25/50/75 %. */}
       <div style={{ flex: 1, position: "relative", display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
-        <Milestone eyebrow="AUJOURD'HUI" title="Score actuel" subtitle="Posez les bases solides" isToday score={46} />
-        <Milestone
-          eyebrow="DANS 4 MOIS"
-          title="1er coussin d'urgence"
-          subtitle="2 000 CHF d'avance disponibles"
-          icon="shield"
-          bg={C.successBg}
-          fg={C.success}
-        />
-        <Milestone
-          eyebrow="DANS 12 MOIS"
-          title="6 000 CHF d'épargne"
-          subtitle="Fonds d'urgence en bonne voie"
-          icon="trend"
-          bg={C.violetBg}
-          fg={C.violet}
-        />
-        <Milestone
-          eyebrow="DANS 3 ANS"
-          title="Apport immobilier"
-          subtitle="60 000 CHF capitalisés"
-          icon="home"
-          bg={C.successBg}
-          fg={C.success}
-        />
+        {milestones.map((m) => {
+          const isToday = m.kind === "today";
+          const palette = isToday ? null : TONE_PALETTE[m.tone];
+          return (
+            <Milestone
+              key={m.kind}
+              eyebrow={m.eyebrow}
+              title={m.title}
+              subtitle={m.subtitle}
+              isToday={isToday}
+              score={m.score ?? undefined}
+              icon={isToday ? undefined : m.icon}
+              bg={palette?.bg}
+              fg={palette?.fg}
+            />
+          );
+        })}
         {/* Connecteurs en overlay aux frontières 25/50/75 % :
             chaque connecteur est centré entre deux badges
             (les badges sont au centre optique de leur colonne).
@@ -847,7 +1354,7 @@ function Milestone({
   subtitle: string;
   isToday?: boolean;
   score?: number;
-  icon?: "shield" | "trend" | "home";
+  icon?: RoadmapMilestone["icon"];
   bg?: string;
   fg?: string;
 }) {
@@ -886,10 +1393,10 @@ function Milestone({
       >
         {isToday ? (
           <span style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em" }}>
-            {score}
+            {score ?? "—"}
           </span>
         ) : (
-          <MilestoneIcon name={icon!} color={fg!} />
+          icon && fg ? <MilestoneIcon name={icon} color={fg} /> : null
         )}
       </span>
       <p
@@ -950,25 +1457,75 @@ function Milestone({
   );
 }
 
-function MilestoneIcon({ name, color }: { name: "shield" | "trend" | "home"; color: string }) {
-  if (name === "shield") {
+function MilestoneIcon({
+  name,
+  color,
+}: {
+  name: RoadmapMilestone["icon"];
+  color: string;
+}) {
+  // Mapping RoadmapIcon → SVG path. Le set V3 d'origine couvrait
+  // shield/trend/home ; on a étendu pour TrendingUp, Plane, Briefcase,
+  // Heart, Sparkles, Score (Score retombe en fallback Home pour les
+  // milestones non-today qui auraient ce kind).
+  const common = {
+    width: 14,
+    height: 14,
+    viewBox: "0 0 24 24",
+    fill: "none" as const,
+    stroke: color,
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  if (name === "Shield") {
     return (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg {...common}>
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         <polyline points="9 12 11 14 15 10" />
       </svg>
     );
   }
-  if (name === "trend") {
+  if (name === "TrendingUp") {
     return (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg {...common}>
         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
         <polyline points="17 6 23 6 23 12" />
       </svg>
     );
   }
+  if (name === "Plane") {
+    return (
+      <svg {...common}>
+        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
+      </svg>
+    );
+  }
+  if (name === "Briefcase") {
+    return (
+      <svg {...common}>
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      </svg>
+    );
+  }
+  if (name === "Heart") {
+    return (
+      <svg {...common}>
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    );
+  }
+  if (name === "Sparkles") {
+    return (
+      <svg {...common}>
+        <path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13" />
+      </svg>
+    );
+  }
+  // Home + Score (fallback) — icône maison.
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg {...{ ...common, width: 16, height: 16 }}>
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
@@ -1014,35 +1571,115 @@ function RoadmapConnector() {
 
 /* ═══════════════ KPI ROW — surfaces très légères ═══════════════ */
 
-function KpiRow() {
+interface KpiRowProps {
+  monthlyIncome: number;
+  totalExpenses: number;
+  cashflow: number;
+  runway: number;
+  currentSavings: number;
+  incomeDelta: MonthlyDelta;
+  expenseDelta: MonthlyDelta;
+  remainderDelta: MonthlyDelta;
+  profile: { currency: string; locale?: string | null; country?: string | null };
+}
+
+/** Convertit un MonthlyDelta en pill V3 :
+ *   - polarity income-like : up = vert, down = rouge
+ *   - polarity expense-like : up = rouge, down = vert (baisser dépenses = bien)
+ *   - polarity neutral : ambre
+ *   - direction "neutral" → pill "—" ambre
+ */
+function mapDelta(
+  delta: MonthlyDelta,
+  polarity: "income-like" | "expense-like" | "neutral",
+): { sign: string; value: string; direction: "up" | "down" | "none"; color: string } {
+  if (delta.direction === "neutral" || delta.percent === null) {
+    return { sign: "", value: "—", direction: "none", color: C.amber };
+  }
+  const arrow: "up" | "down" =
+    delta.direction === "positive" ? "up" : "down";
+  // Couleur positive/négative selon la polarity de la métrique.
+  let positiveColor: string;
+  if (polarity === "income-like") {
+    positiveColor = delta.direction === "positive" ? C.success : "#DC2626";
+  } else if (polarity === "expense-like") {
+    positiveColor = delta.direction === "positive" ? "#DC2626" : C.success;
+  } else {
+    positiveColor = C.amber;
+  }
+  return {
+    sign: delta.direction === "positive" ? "+" : "-",
+    value: `${delta.percent.toFixed(1)}%`,
+    direction: arrow,
+    color: positiveColor,
+  };
+}
+
+function KpiRow({
+  monthlyIncome,
+  totalExpenses,
+  cashflow,
+  runway,
+  currentSavings,
+  incomeDelta,
+  expenseDelta,
+  remainderDelta,
+  profile,
+}: KpiRowProps) {
+  const incomePill = mapDelta(incomeDelta, "income-like");
+  const expensePill = mapDelta(expenseDelta, "expense-like");
+  const remainderPill = mapDelta(remainderDelta, "income-like");
+  const expensesShareOfIncome =
+    monthlyIncome > 0 ? (totalExpenses / monthlyIncome) * 100 : null;
+  const remainderShareOfIncome =
+    monthlyIncome > 0 ? (cashflow / monthlyIncome) * 100 : null;
+  const runwayFinite = Number.isFinite(runway);
+  const runwayValue = runwayFinite ? Math.max(0, runway) : Infinity;
+  const currency = profile.currency;
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
       <KpiCard
         label="REVENUS MENSUELS"
-        value="25 000 CHF"
-        delta={{ sign: "+", value: "3.2%", direction: "up", color: C.success }}
-        hint="Après impôts"
+        value={monthlyIncome > 0 ? formatUserCurrency(monthlyIncome, profile) : "—"}
+        delta={incomePill}
+        hint={monthlyIncome > 0 ? "Après impôts" : "Aucun revenu renseigné"}
         sparkline={{ points: [30, 35, 32, 40, 38, 45, 50, 55], color: "#10A37F" }}
       />
       <KpiCard
         label="DÉPENSES MENSUELLES"
-        value="15 893 CHF"
-        delta={{ sign: "-", value: "2.1%", direction: "down", color: C.success }}
-        hint="63% de vos revenus"
+        value={totalExpenses > 0 ? formatUserCurrency(totalExpenses, profile) : "—"}
+        delta={expensePill}
+        hint={
+          expensesShareOfIncome !== null
+            ? `${expensesShareOfIncome.toFixed(0)}% de vos revenus`
+            : "Aucune dépense renseignée"
+        }
         sparkline={{ points: [50, 55, 48, 52, 45, 40, 38, 35], color: "#DC2626" }}
       />
       <KpiCard
         label="RESTE À VIVRE"
-        value="9 107 CHF"
-        delta={{ sign: "+", value: "5.3%", direction: "up", color: C.success }}
-        hint="36.6% de vos revenus"
+        value={
+          monthlyIncome > 0 || totalExpenses > 0
+            ? formatUserCurrency(cashflow, profile)
+            : "—"
+        }
+        delta={remainderPill}
+        hint={
+          remainderShareOfIncome !== null
+            ? `${remainderShareOfIncome.toFixed(1)}% de vos revenus`
+            : "—"
+        }
         sparkline={{ points: [25, 28, 32, 30, 38, 42, 45, 52], color: "#10A37F" }}
       />
       <KpiCard
         label="FONDS D'URGENCE"
-        value="0.0 mois"
+        value={runwayFinite ? `${runwayValue.toFixed(1)} mois` : "∞"}
         delta={{ sign: "", value: "—", direction: "none", color: C.amber }}
-        hint="500 CHF disponibles"
+        hint={
+          currentSavings > 0
+            ? `${formatUserCurrency(currentSavings, profile)} disponibles`
+            : `0 ${currency} disponibles`
+        }
         sparkline={{ points: [40, 30, 25, 35, 28, 38, 32, 36], color: "#F59E0B" }}
       />
     </div>
@@ -1198,17 +1835,55 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
 
 /* ═══════════════ BOTTOM ROW ═══════════════ */
 
-function BottomRow() {
+interface BottomRowProps {
+  opportunity: Opportunity | null;
+  oppTitle: string | null;
+  oppArgument: string | null;
+  oppPoints: number | null;
+  breakdown: CategoryBreakdownRow[];
+  totalExpenses: number;
+  profile: { currency: string; locale?: string | null; country?: string | null };
+  snapshots: SealedSnapshot[];
+  currentScore: number | null;
+}
+
+function BottomRow(props: BottomRowProps) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18 }}>
-      <OpportunityCard />
-      <RepartitionCard />
-      <EvolutionCard />
+      <OpportunityCard
+        opportunity={props.opportunity}
+        title={props.oppTitle}
+        argument={props.oppArgument}
+        points={props.oppPoints}
+      />
+      <RepartitionCard
+        breakdown={props.breakdown}
+        totalExpenses={props.totalExpenses}
+        profile={props.profile}
+      />
+      <EvolutionCard
+        snapshots={props.snapshots}
+        currentScore={props.currentScore}
+      />
     </div>
   );
 }
 
-function OpportunityCard() {
+function OpportunityCard({
+  opportunity,
+  title,
+  argument,
+  points,
+}: {
+  opportunity: Opportunity | null;
+  title: string | null;
+  argument: string | null;
+  points: number | null;
+}) {
+  // Empty state : si detectOpportunities() ne renvoie rien, le profil
+  // est jugé sain — on garde la structure visuelle mais on ajuste les
+  // chaînes pour ne pas afficher du faux.
+  const hasOpportunity = opportunity !== null && title !== null;
   return (
     <div
       style={{
@@ -1272,10 +1947,12 @@ function OpportunityCard() {
           letterSpacing: "-0.01em",
         }}
       >
-        Augmentez vos revenus de 300 CHF/mois
+        {hasOpportunity ? title : "Aucune opportunité urgente détectée"}
       </h3>
       <p style={{ marginTop: 6, fontSize: 12, color: C.textMuted, lineHeight: 1.5, margin: "6px 0 0 0" }}>
-        Plus d&apos;impact que réduire vos dépenses de 100 CHF/mois.
+        {hasOpportunity
+          ? argument
+          : "Continuez sur cette trajectoire — vos fondations sont saines."}
       </p>
       {/* Bloc impact — callout structuré, plus de flèche décorative */}
       <div
@@ -1304,10 +1981,11 @@ function OpportunityCard() {
               letterSpacing: "-0.02em",
             }}
           >
-            +12 pts
+            {hasOpportunity && points !== null ? `+${points} pts` : "—"}
           </span>
         </div>
-        <button
+        <Link
+          href={ROUTES_V3.opportunites}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -1318,8 +1996,7 @@ function OpportunityCard() {
             fontSize: 12,
             fontWeight: 600,
             borderRadius: 8,
-            border: "none",
-            cursor: "pointer",
+            textDecoration: "none",
             flexShrink: 0,
           }}
         >
@@ -1328,22 +2005,73 @@ function OpportunityCard() {
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
-        </button>
+        </Link>
       </div>
     </div>
   );
 }
 
-function RepartitionCard() {
-  // Donut palette MONOCHROME BLEUE (capture maquette) — du navy
-  // profond aux gris-bleu pâles. Plus de couleurs accents.
-  const slices = [
-    { id: "logement", label: "Logement", pct: 35, amount: "5 500 CHF", color: "#011E5F" },
-    { id: "alimentation", label: "Alimentation", pct: 20, amount: "3 200 CHF", color: "#2563EB" },
-    { id: "transport", label: "Transport", pct: 15, amount: "2 400 CHF", color: "#60A5FA" },
-    { id: "assurances", label: "Assurances", pct: 10, amount: "1 600 CHF", color: "#A5B4DC" },
-    { id: "loisirs", label: "Loisirs & divers", pct: 20, amount: "3 193 CHF", color: "#C7CFE3" },
-  ];
+// Palette monochrome bleue V3 — 5 nuances, ordre du plus dominant
+// au plus discret. Au-delà de 5 catégories, on regroupe en "Autres".
+const REPARTITION_PALETTE = ["#011E5F", "#2563EB", "#60A5FA", "#A5B4DC", "#C7CFE3"] as const;
+
+function RepartitionCard({
+  breakdown,
+  totalExpenses,
+  profile,
+}: {
+  breakdown: CategoryBreakdownRow[];
+  totalExpenses: number;
+  profile: { currency: string; locale?: string | null; country?: string | null };
+}) {
+  // Construit la liste donut : top 4 catégories (par total desc) +
+  // regroupement "Autres" si la liste a 5+ entrées. Préserve la palette
+  // monochrome de la maquette V3.
+  const sorted = [...breakdown]
+    .filter((r) => r.total > 0)
+    .sort((a, b) => b.total - a.total);
+  const slices = (() => {
+    if (sorted.length === 0) {
+      return [
+        {
+          id: "empty",
+          label: "Aucune dépense ce mois-ci",
+          pct: 100,
+          amount: formatUserCurrency(0, profile),
+          color: REPARTITION_PALETTE[4],
+        },
+      ];
+    }
+    if (sorted.length <= 5) {
+      return sorted.map((row, i) => ({
+        id: row.category,
+        label: expenseCategoryLabel(row.category),
+        pct: Math.round(row.share * 100),
+        amount: formatUserCurrency(row.total, profile),
+        color: REPARTITION_PALETTE[Math.min(i, REPARTITION_PALETTE.length - 1)],
+      }));
+    }
+    const top = sorted.slice(0, 4);
+    const rest = sorted.slice(4);
+    const restTotal = rest.reduce((s, r) => s + r.total, 0);
+    const restShare = rest.reduce((s, r) => s + r.share, 0);
+    return [
+      ...top.map((row, i) => ({
+        id: row.category,
+        label: expenseCategoryLabel(row.category),
+        pct: Math.round(row.share * 100),
+        amount: formatUserCurrency(row.total, profile),
+        color: REPARTITION_PALETTE[i],
+      })),
+      {
+        id: "_others",
+        label: "Autres",
+        pct: Math.round(restShare * 100),
+        amount: formatUserCurrency(restTotal, profile),
+        color: REPARTITION_PALETTE[4],
+      },
+    ];
+  })();
   const slicesWithPaths = (() => {
     let cursor = -90;
     const gap = 1;
@@ -1406,7 +2134,9 @@ function RepartitionCard() {
                 letterSpacing: "-0.02em",
               }}
             >
-              15 893
+              {totalExpenses > 0
+                ? new Intl.NumberFormat("fr-CH", { maximumFractionDigits: 0 }).format(totalExpenses)
+                : "—"}
             </p>
             <p
               style={{
@@ -1419,7 +2149,7 @@ function RepartitionCard() {
                 marginTop: 1,
               }}
             >
-              CHF
+              {profile.currency}
             </p>
           </div>
         </div>
@@ -1461,7 +2191,8 @@ function RepartitionCard() {
           ))}
         </div>
       </div>
-      <button
+      <Link
+        href={ROUTES_V3.depenses}
         style={{
           marginTop: 4,
           alignSelf: "flex-start",
@@ -1471,10 +2202,7 @@ function RepartitionCard() {
           fontSize: 12.5,
           fontWeight: 500,
           color: C.primary,
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Voir le détail
@@ -1482,13 +2210,28 @@ function RepartitionCard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
-function EvolutionCard() {
-  const points = [22, 30, 38, 32, 42, 50, 54, 46];
+function EvolutionCard({
+  snapshots,
+  currentScore,
+}: {
+  snapshots: SealedSnapshot[];
+  currentScore: number | null;
+}) {
+  // snapshots arrivent triés DESC par week (le plus récent en 0). On
+  // les remet en ordre chronologique pour le tracé. Si moins de 2
+  // points : fallback courbe mockée pour préserver le visuel de la
+  // maquette (mais on le marque dans le rapport).
+  const sortedChrono = [...snapshots].reverse();
+  const hasRealSeries = sortedChrono.length >= 2;
+  const points = hasRealSeries
+    ? sortedChrono.map((s) => s.result.display)
+    : [22, 30, 38, 32, 42, 50, 54, 46];
+
   const W = 320;
   const HH = 110;
   // PAD.right large (60) pour héberger le badge "46" sans qu'il
@@ -1507,7 +2250,26 @@ function EvolutionCard() {
   const baselineY = PAD.top + innerH;
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
   const last = scaled[scaled.length - 1];
-  const xLabels = ["1 avr", "15 avr", "1 mai", "15 mai", "1 juin"];
+
+  // 5 labels X évenly-spaced à partir des dates de snapshots quand
+  // possible. Sinon, labels mockés de la maquette.
+  const xLabels = hasRealSeries
+    ? [0, 1, 2, 3, 4].map((slot) => {
+        const idx = Math.round(
+          (slot * (sortedChrono.length - 1)) / 4,
+        );
+        const snap = sortedChrono[Math.min(idx, sortedChrono.length - 1)];
+        return formatWeekLabel(snap.week);
+      })
+    : ["1 avr", "15 avr", "1 mai", "15 mai", "1 juin"];
+
+  // Badge "+N pts (60j)" — delta entre 1er et dernier point réel.
+  // Fenêtre 60j ≈ 8-9 snapshots hebdo, mais on utilise toute la
+  // série dispo pour rester lisible. Caché si pas de série réelle.
+  const evoDelta = hasRealSeries
+    ? points[points.length - 1] - points[0]
+    : null;
+  const badgeScore = currentScore ?? points[points.length - 1];
 
   return (
     <div
@@ -1526,25 +2288,27 @@ function EvolutionCard() {
         <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
           Évolution du score
         </p>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
-            borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10.5,
-            fontWeight: 700,
-            color: C.success,
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="7 17 17 7" />
-            <polyline points="7 7 17 7 17 17" />
-          </svg>
-          +24 pts (60j)
-        </span>
+        {evoDelta !== null && (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "2px 7px",
+              borderRadius: 999,
+              backgroundColor: evoDelta >= 0 ? C.successBg : "#FEE2E2",
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: evoDelta >= 0 ? C.success : "#DC2626",
+            }}
+          >
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="7 17 17 7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+            {evoDelta >= 0 ? "+" : ""}{Math.round(evoDelta)} pts ({sortedChrono.length} sem.)
+          </span>
+        )}
       </div>
       <div style={{ marginTop: 10, flex: 1, minHeight: 0 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
@@ -1580,7 +2344,7 @@ function EvolutionCard() {
           <g transform={`translate(${last.x - 25}, ${last.y - 39})`}>
             <rect x="0" y="0" width="50" height="30" rx="6" fill={C.navy} />
             <text x="25" y="13" textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui">
-              46
+              {badgeScore}
             </text>
             <text x="25" y="23" textAnchor="middle" fontSize="6.5" fill="rgba(255,255,255,0.7)" letterSpacing="0.5">
               SCORE ACTUEL
@@ -1605,7 +2369,8 @@ function EvolutionCard() {
           })}
         </svg>
       </div>
-      <button
+      <Link
+        href={ROUTES_V3.monAnalyse}
         style={{
           marginTop: 6,
           alignSelf: "flex-start",
@@ -1615,10 +2380,7 @@ function EvolutionCard() {
           fontSize: 12.5,
           fontWeight: 500,
           color: C.primary,
-          background: "none",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Voir l&apos;historique
@@ -1626,7 +2388,7 @@ function EvolutionCard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
@@ -1684,7 +2446,8 @@ function CoachCta() {
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href={ROUTES_V3.coach}
         style={{
           padding: "9px 18px",
           display: "inline-flex",
@@ -1695,8 +2458,7 @@ function CoachCta() {
           fontSize: 12.5,
           fontWeight: 600,
           borderRadius: 9,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
           flexShrink: 0,
         }}
       >
@@ -1705,7 +2467,7 @@ function CoachCta() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
