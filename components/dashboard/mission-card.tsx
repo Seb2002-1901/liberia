@@ -46,15 +46,28 @@ export async function MissionCard({ mission }: MissionCardProps) {
       <p className="mt-2 text-sm text-muted-foreground">
         {t(`${mission.priority}.subline`, mission.payload)}
       </p>
+      {/* Audit zéro-tolérance — bouton confiné à la largeur de la carte :
+          - w-full toujours (mobile ET desktop) : plus de sm:w-auto qui
+            laissait le bouton dépasser la card si le label CTA était
+            long ("Voir le détail avec mon conseiller", "Aller plus
+            loin avec mon conseiller", etc.).
+          - max-w-full : ceinture + bretelles pour les flex parents.
+          - text-center sur le contenu : si le label wrap sur 2 lignes,
+            le centrage reste propre.
+          - whitespace-normal + leading-tight : autorise le wrap au
+            lieu de couper. */}
       <Button
         asChild
         variant="default"
         size="lg"
-        className="mt-3 w-full text-sm font-medium sm:w-auto"
+        className="mt-3 w-full max-w-full text-sm font-medium"
       >
-        <Link href={mission.ctaHref}>
-          {t("cta")}
-          <ArrowRight className="h-4 w-4" />
+        <Link
+          href={mission.ctaHref}
+          className="flex w-full items-center justify-center gap-1.5 whitespace-normal leading-tight text-center"
+        >
+          <span className="min-w-0 break-words">{t("cta")}</span>
+          <ArrowRight className="h-4 w-4 shrink-0" />
         </Link>
       </Button>
     </article>

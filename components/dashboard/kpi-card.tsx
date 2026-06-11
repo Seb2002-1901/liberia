@@ -39,12 +39,21 @@ export function KpiCard({
         {label}
       </p>
       <div className="mt-2 flex items-baseline justify-between gap-2">
-        <p className="font-display text-xl font-bold leading-none tabular-nums text-foreground lg:text-[26px]">
+        {/* Audit responsive zéro-tolérance — protection contre les
+            valeurs très grandes (>=7 chiffres) qui pourraient déborder
+            sur mobile grid-cols-2 (≈ 150 px par carte) : min-w-0 +
+            truncate sur le wrapper value. Le delta reste lisible à
+            droite (shrink-0). */}
+        <p className="min-w-0 truncate font-display text-xl font-bold leading-none tabular-nums text-foreground lg:text-[26px]">
           {value}
         </p>
-        <DeltaInline delta={delta ?? null} polarity={polarity} />
+        <span className="shrink-0">
+          <DeltaInline delta={delta ?? null} polarity={polarity} />
+        </span>
       </div>
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
+      {hint && (
+        <p className="mt-1.5 truncate text-xs text-muted-foreground">{hint}</p>
+      )}
     </article>
   );
 }
