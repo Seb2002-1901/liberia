@@ -576,10 +576,10 @@ function SettingsList({ items, accent, accentBg }: { items: SettingRow[]; accent
 
 function PreferencesIACard() {
   const items: SettingRow[] = [
-    { label: "Fréquence des recommandations", value: "Hebdomadaire", tone: "primary", iconPath: "M12 8v4l3 3|M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
-    { label: "Niveau de détail", value: "Avancé", tone: "primary", iconPath: "M3 12h18|M3 6h18|M3 18h12" },
+    { label: "Recommandations IA", value: "Hebdomadaire", tone: "primary", iconPath: "M12 8v4l3 3|M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
+    { label: "Niveau de personnalisation", value: "Avancé", tone: "primary", iconPath: "M3 12h18|M3 6h18|M3 18h12" },
     { label: "Résumés automatiques", value: "Activés", tone: "success", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-    { label: "Personnalisation IA", value: "Maximum", tone: "success", iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" },
+    { label: "Analyse proactive", value: "Maximum", tone: "success", iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -772,7 +772,7 @@ function ConseilIACard() {
         Configuration optimisée à 92 %.
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        Activez davantage d&apos;<span style={{ color: C.primary, fontWeight: 700 }}>intégrations</span> pour débloquer plus d&apos;automatisations IA.
+        Personnalisez davantage vos <span style={{ color: C.primary, fontWeight: 700 }}>préférences IA</span> pour tirer le meilleur parti de Liberia.
       </p>
       <button
         style={{
@@ -836,7 +836,7 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Configuration complétée à <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
+            Compte configuré à <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
