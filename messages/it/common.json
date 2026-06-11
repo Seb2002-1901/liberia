@@ -81,9 +81,9 @@
       "premiumActive": "Piano Premium attivo",
       "premiumThanks": "Grazie per il tuo supporto.",
       "trialCta": "Iniziare la mia prova di 14 giorni",
-      "trialBody": "14 giorni gratuiti, poi 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento.",
+      "trialBody": "14 giorni gratuiti (carta richiesta). Poi Standard 14.95 CHF/mese o Premium 24.95 CHF/mese. Disdicibile prima della fine della prova.",
       "resumeCta": "Riprendere il mio abbonamento",
-      "resumeBody": "Il tuo accesso è in pausa. Riprendi il tuo abbonamento a 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento."
+      "resumeBody": "Il tuo accesso è in pausa. Riprendi Standard (14.95 CHF/mese) o Premium (24.95 CHF/mese). Disdicibile in qualsiasi momento."
     }
   },
   "errorPages": {

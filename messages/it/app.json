@@ -1051,7 +1051,9 @@
     "ctaCheckoutYearly": "Iniziare prova annuale",
     "ctaCheckoutMonthly": "Iniziare prova mensile",
     "ctaStartTrial": "Iniziare {days} giorni gratuiti",
-    "fineprint": "Carta richiesta per iniziare. Addebito automatico alla fine dei {days} giorni. Disdicibile in qualsiasi momento.",
+    "fineprint": "Carta richiesta per iniziare la prova. Nessun addebito durante {days} giorni. Disdici prima della fine della prova per non pagare nulla.",
+    "intervalMonthly": "Mensile",
+    "intervalYearly": "Annuale",
     "portal": "Gestire il mio abbonamento",
     "errors": {
       "checkoutFallback": "Impossibile avviare il pagamento.",
@@ -1059,34 +1061,43 @@
       "generic": "Qualcosa è andato storto."
     },
     "feedback": {
-      "successTitle": "Pagamento ricevuto. Benvenuto in Premium.",
+      "successTitle": "Pagamento ricevuto. Benvenuto in LIBERIA.",
       "successBody": "Il tuo accesso si sta attivando, può richiedere qualche secondo.",
       "cancelled": "Pagamento annullato. Puoi riprovare in qualsiasi momento."
     },
     "plans": {
-      "monthly": {
-        "name": "Mensile",
-        "description": "Accesso completo a LIBERIA. Disdicibile in qualsiasi momento dal tuo account.",
+      "recommendedBadge": "Consigliato",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 giorni gratuiti, senza vincoli",
-          "Coach IA conversazionale",
-          "Piano finanziario IA personalizzato 30 / 60 / 90 giorni",
-          "Tracciamento completo del budget (entrate, spese, obiettivi)",
-          "Riepilogo settimanale via email",
-          "Disdicibile in qualsiasi momento"
-        ]
+          "Punteggio finanziario e analisi completa",
+          "Tracciamento entrate, spese, budget",
+          "Coach IA settimanale",
+          "Piano d'azione personalizzato",
+          "App mobile + desktop"
+        ],
+        "monthly": {
+          "description": "Il cockpit finanziario essenziale. Disdicibile prima della fine della prova."
+        },
+        "yearly": {
+          "description": "Standard fatturato annualmente. Circa 30 CHF risparmiati rispetto al mensile."
+        }
       },
-      "yearly": {
-        "name": "Annuale",
-        "description": "Sono ~9.99 CHF/mese — circa 60 CHF risparmiati all'anno.",
-        "badge": "Consigliato",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 giorni gratuiti, senza vincoli",
-          "Tutto del Mensile",
-          "Risparmia circa 60 CHF all'anno",
-          "Un addebito all'anno",
-          "Disdicibile in qualsiasi momento"
-        ]
+          "Tutto di Standard",
+          "Rilevamento avanzato di opportunità",
+          "Traiettoria patrimoniale a 3 anni",
+          "Riepilogo settimanale IA personalizzato",
+          "Supporto prioritario"
+        ],
+        "monthly": {
+          "description": "Il copilota IA completo. Disdicibile prima della fine della prova."
+        },
+        "yearly": {
+          "description": "Premium fatturato annualmente. Circa 50 CHF risparmiati rispetto al mensile."
+        }
       }
     }
   },

@@ -166,7 +166,7 @@
     "items": {
       "free": {
         "q": "É mesmo gratuito?",
-        "a": "Começas com uma experiência gratuita de 14 dias (cartão obrigatório para ativar). Após a experiência, a subscrição escolhida arranca automaticamente: 14.99 CHF/mês ou 119.99 CHF/ano. Podes cancelar a qualquer momento na tua conta, sem perguntas."
+        "a": "Não existe um plano gratuito permanente. Podes experimentar a demo sem conta (os dados introduzidos na demo não são guardados). Para usar LIBERIA a sério, começas uma experiência gratuita de 14 dias. Um cartão é exigido no registo para ativar a experiência — sem cobrança durante esses 14 dias. No fim da experiência, o plano escolhido arranca automaticamente (Standard 14.95 CHF/mês ou 149 CHF/ano, ou Premium 24.95 CHF/mês ou 249 CHF/ano). Cancela antes do fim da experiência para não pagares nada."
       },
       "cancelTrial": {
         "q": "O que acontece se cancelar durante a experiência?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Preços",
-        "html": "<ul><li>Subscrição mensal: 14.99 CHF / mês, debitada todos os meses após a experiência de 14 dias.</li><li>Subscrição anual: 119.99 CHF / ano (cerca de 9.99 CHF / mês, ≈ 60 CHF poupados por ano), debitada uma vez por ano.</li></ul><p>Os preços são apresentados em francos suíços (CHF), com impostos incluídos. Sem custos ocultos.</p>"
+        "html": "<p>Dois planos, cada um disponível mensal ou anual. A experiência de 14 dias está incluída em todos os casos (cartão exigido no registo, sem cobrança durante a experiência).</p><ul><li><strong>Standard mensal</strong>: 14.95 CHF / mês, debitado todos os meses após a experiência de 14 dias.</li><li><strong>Standard anual</strong>: 149 CHF / ano (cerca de 12.42 CHF / mês, ≈ 30 CHF poupados face ao mensal), debitado uma vez por ano.</li><li><strong>Premium mensal</strong>: 24.95 CHF / mês, debitado todos os meses após a experiência de 14 dias.</li><li><strong>Premium anual</strong>: 249 CHF / ano (cerca de 20.75 CHF / mês, ≈ 50 CHF poupados face ao mensal), debitado uma vez por ano.</li></ul><p>Os preços são apresentados em francos suíços (CHF), com impostos incluídos. Sem custos ocultos. NÃO existe um plano gratuito permanente.</p>"
       },
       {
         "heading": "6. Cancelamento e direito de desistência",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Preços",
-      "description": "LIBERIA — {days} dias gratuitos depois 14.99 CHF/mês ou 119.99 CHF/ano. Cancela quando quiseres."
+      "description": "LIBERIA — {days} dias gratuitos (cartão exigido) depois Standard 14.95 CHF/mês (149 CHF/ano) ou Premium 24.95 CHF/mês (249 CHF/ano). Cancelável antes do fim da experiência."
     },
     "eyebrow": "Preços",
     "title": "Um preço claro. Sem armadilhas.",

@@ -173,7 +173,14 @@ function HeroSection() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Sans engagement · Annulation avant la fin de l&apos;essai · Standard et Premium disponibles
+              Carte requise à l&apos;inscription · Aucun prélèvement pendant 14 jours · Annulable avant la fin de l&apos;essai
+            </p>
+            <p style={{ marginTop: 6, fontSize: 12, color: C.textLight }}>
+              Pas envie de créer un compte tout de suite ?{" "}
+              <Link href="/demo" style={{ color: C.primary, textDecoration: "none", fontWeight: 500 }}>
+                Essayer la démo
+              </Link>
+              {" "}— les données saisies en démo ne sont pas sauvegardées.
             </p>
           </div>
           <div style={{ minWidth: 0 }}>
@@ -559,7 +566,7 @@ function PricingSection() {
               <span style={{ fontSize: 14, fontWeight: 600, opacity: 0.85 }}>CHF / mois</span>
             </div>
             <p style={{ margin: "4px 0 0 0", fontSize: 11.5, color: p.featured ? "rgba(255,255,255,0.7)" : C.textLight }}>
-              Après 14 jours d&apos;essai gratuit · sans engagement
+              Après 14 jours d&apos;essai gratuit · carte requise à l&apos;inscription
             </p>
             <ul style={{ margin: "18px 0 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
               {p.features.map((f) => (
@@ -675,7 +682,11 @@ function FaqSection() {
     },
     {
       q: "Puis-je annuler avant la fin de l'essai ?",
-      a: "Oui. L'essai dure 14 jours, sans engagement. Vous pouvez annuler à tout moment avant la fin pour ne pas être facturé.",
+      a: "Oui. L'essai dure 14 jours et une carte bancaire est requise à l'inscription pour le démarrer. Aucun prélèvement pendant ces 14 jours. Vous pouvez annuler à tout moment avant la fin de l'essai pour ne pas être facturé.",
+    },
+    {
+      q: "Puis-je essayer Liberia sans compte ?",
+      a: "Oui. Le mode démo est accessible sans inscription et sans carte. Les données saisies en démo ne sont pas sauvegardées — elles disparaissent quand vous quittez. Pour un suivi réel et persistant, il faut créer un compte (essai gratuit 14 jours, carte requise).",
     },
     {
       q: "Quelle différence entre Standard et Premium ?",

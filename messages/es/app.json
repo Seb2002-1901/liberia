@@ -1051,7 +1051,9 @@
     "ctaCheckoutYearly": "Iniciar prueba anual",
     "ctaCheckoutMonthly": "Iniciar prueba mensual",
     "ctaStartTrial": "Iniciar {days} días gratis",
-    "fineprint": "Tarjeta requerida para empezar. Facturación automática al final de los {days} días. Cancela cuando quieras.",
+    "fineprint": "Se requiere tarjeta para iniciar la prueba. Sin cargo durante {days} días. Cancela antes del fin de la prueba para no pagar nada.",
+    "intervalMonthly": "Mensual",
+    "intervalYearly": "Anual",
     "portal": "Gestionar mi suscripción",
     "errors": {
       "checkoutFallback": "No se pudo iniciar el pago.",
@@ -1059,34 +1061,43 @@
       "generic": "Algo salió mal."
     },
     "feedback": {
-      "successTitle": "Pago recibido. Bienvenida a Premium.",
+      "successTitle": "Pago recibido. Bienvenida a LIBERIA.",
       "successBody": "Tu acceso se está activando, puede tardar unos segundos.",
       "cancelled": "Pago cancelado. Puedes reintentar cuando quieras."
     },
     "plans": {
-      "monthly": {
-        "name": "Mensual",
-        "description": "Acceso completo a LIBERIA. Cancela cuando quieras desde tu cuenta.",
+      "recommendedBadge": "Recomendado",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 días gratis, sin compromiso",
-          "Coach IA conversacional",
-          "Plan financiero IA personalizado 30 / 60 / 90 días",
-          "Seguimiento completo del presupuesto (ingresos, gastos, metas)",
-          "Resumen semanal por email",
-          "Cancela cuando quieras"
-        ]
+          "Puntuación financiera y análisis completo",
+          "Seguimiento de ingresos, gastos, presupuesto",
+          "Coach IA semanal",
+          "Plan de acción personalizado",
+          "App móvil + escritorio"
+        ],
+        "monthly": {
+          "description": "La cabina financiera esencial. Cancelable antes del fin de la prueba."
+        },
+        "yearly": {
+          "description": "Standard facturado anualmente. Unos 30 CHF ahorrados frente al mensual."
+        }
       },
-      "yearly": {
-        "name": "Anual",
-        "description": "Son ~9.99 CHF/mes — unos 60 CHF ahorrados al año.",
-        "badge": "Recomendado",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 días gratis, sin compromiso",
-          "Todo del Mensual",
-          "Ahorra unos 60 CHF al año",
-          "Un cargo al año",
-          "Cancela cuando quieras"
-        ]
+          "Todo lo de Standard",
+          "Detección avanzada de oportunidades",
+          "Trayectoria patrimonial a 3 años",
+          "Resumen semanal IA personalizado",
+          "Soporte prioritario"
+        ],
+        "monthly": {
+          "description": "El copiloto IA completo. Cancelable antes del fin de la prueba."
+        },
+        "yearly": {
+          "description": "Premium facturado anualmente. Unos 50 CHF ahorrados frente al mensual."
+        }
       }
     }
   },

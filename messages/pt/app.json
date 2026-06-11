@@ -1051,7 +1051,9 @@
     "ctaCheckoutYearly": "Iniciar experiência anual",
     "ctaCheckoutMonthly": "Iniciar experiência mensal",
     "ctaStartTrial": "Iniciar {days} dias gratuitos",
-    "fineprint": "Cartão exigido para começar. Faturação automática no final dos {days} dias. Cancela quando quiseres.",
+    "fineprint": "Cartão exigido para iniciar a experiência. Sem cobrança durante {days} dias. Cancela antes do fim da experiência para não pagares nada.",
+    "intervalMonthly": "Mensal",
+    "intervalYearly": "Anual",
     "portal": "Gerir a minha subscrição",
     "errors": {
       "checkoutFallback": "Não foi possível iniciar o pagamento.",
@@ -1059,34 +1061,43 @@
       "generic": "Algo correu mal."
     },
     "feedback": {
-      "successTitle": "Pagamento recebido. Bem-vindo ao Premium.",
+      "successTitle": "Pagamento recebido. Bem-vindo à LIBERIA.",
       "successBody": "O teu acesso está a ser ativado, pode demorar alguns segundos.",
       "cancelled": "Pagamento cancelado. Podes tentar de novo quando quiseres."
     },
     "plans": {
-      "monthly": {
-        "name": "Mensal",
-        "description": "Acesso completo à LIBERIA. Cancela quando quiseres a partir da tua conta.",
+      "recommendedBadge": "Recomendado",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 dias gratuitos, sem compromisso",
-          "Coach IA conversacional",
-          "Plano financeiro IA personalizado 30 / 60 / 90 dias",
-          "Acompanhamento completo do orçamento (receitas, despesas, objetivos)",
-          "Resumo semanal por email",
-          "Cancela quando quiseres"
-        ]
+          "Pontuação financeira e análise completa",
+          "Acompanhamento de receitas, despesas, orçamento",
+          "Coach IA semanal",
+          "Plano de ação personalizado",
+          "App móvel + desktop"
+        ],
+        "monthly": {
+          "description": "O cockpit financeiro essencial. Cancelável antes do fim da experiência."
+        },
+        "yearly": {
+          "description": "Standard faturado anualmente. Cerca de 30 CHF poupados face ao mensal."
+        }
       },
-      "yearly": {
-        "name": "Anual",
-        "description": "São ~9.99 CHF/mês — cerca de 60 CHF poupados por ano.",
-        "badge": "Recomendado",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 dias gratuitos, sem compromisso",
-          "Tudo do Mensal",
-          "Poupa cerca de 60 CHF por ano",
-          "Uma cobrança por ano",
-          "Cancela quando quiseres"
-        ]
+          "Tudo do Standard",
+          "Deteção avançada de oportunidades",
+          "Trajetória patrimonial a 3 anos",
+          "Resumo semanal IA personalizado",
+          "Suporte prioritário"
+        ],
+        "monthly": {
+          "description": "O copiloto IA completo. Cancelável antes do fim da experiência."
+        },
+        "yearly": {
+          "description": "Premium faturado anualmente. Cerca de 50 CHF poupados face ao mensal."
+        }
       }
     }
   },

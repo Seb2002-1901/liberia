@@ -241,51 +241,94 @@ export const SPENDING_TRIGGERS = [
 export type SpendingTriggerId = (typeof SPENDING_TRIGGERS)[number]["id"];
 
 /**
- * Modèle business LIBERIA :
- *  - pas de plan gratuit permanent
- *  - essai gratuit 14 jours (carte requise à l'inscription)
- *  - puis prélèvement automatique mensuel ou annuel
+ * Modèle business LIBERIA — Phase 6 (mise à jour Q2 2026) :
  *
- * `PLANS` ici sert au rendu UI marketing/abonnement uniquement. La source
- * de vérité des prix Stripe est dans `lib/stripe/config.ts` (STRIPE_PLANS).
+ *  - PAS de plan gratuit permanent.
+ *  - DÉMO disponible sans compte (route /demo). Les données saisies en
+ *    démo NE SONT PAS sauvegardées et sont perdues à la sortie.
+ *  - Essai gratuit 14 jours : carte bancaire REQUISE à l'inscription
+ *    pour démarrer l'essai. Aucun prélèvement pendant l'essai. Le
+ *    plan choisi se déclenche automatiquement à J+14. L'utilisateur
+ *    peut annuler à tout moment AVANT la fin de l'essai pour ne rien
+ *    payer.
+ *
+ * Deux tiers : Standard et Premium. Chacun a 2 fréquences (mensuel /
+ * annuel). L'annuel est positionné comme l'offre attractive :
+ * équivalent mensuel ≈ 2 mois économisés par an.
+ *
+ * Standard : 14.95 CHF/mois — 149 CHF/an (≈ 12.42 CHF/mois — ~30 CHF
+ *   d'économie par rapport à 12 × mensuel).
+ * Premium  : 24.95 CHF/mois — 249 CHF/an (≈ 20.75 CHF/mois — ~50 CHF
+ *   d'économie par rapport à 12 × mensuel).
+ *
+ * `PLANS` ici sert au rendu UI marketing/abonnement uniquement. La
+ * source de vérité des prix Stripe est dans `lib/stripe/config.ts`
+ * (STRIPE_PLANS).
  */
 export const PLANS = {
-  monthly: {
-    id: "premium_monthly",
-    name: "Mensuel",
-    priceCHF: 14.99,
-    monthlyEquivalentCHF: 14.99,
-    interval: "month",
-    description:
-      "Accès complet à LIBERIA. Annule à tout moment depuis ton espace.",
+  standard: {
+    id: "standard",
+    name: "Standard",
+    tagline: "Le cockpit financier essentiel.",
+    monthly: {
+      id: "standard_monthly",
+      priceCHF: 14.95,
+      monthlyEquivalentCHF: 14.95,
+      interval: "month",
+    },
+    yearly: {
+      id: "standard_yearly",
+      // 14.95 × 12 = 179.40. Annuel à 149 → économie ≈ 30.40 CHF/an.
+      // Équivalent mensuel = 149 / 12 ≈ 12.42 CHF/mois.
+      priceCHF: 149,
+      monthlyEquivalentCHF: 12.42,
+      interval: "year",
+    },
     features: [
-      "14 jours gratuits, sans engagement",
-      "Coach IA conversationnel",
-      "Plan financier IA personnalisé 30 / 60 / 90 jours",
-      "Suivi budget complet (revenus, dépenses, objectifs)",
-      "Récap hebdo par email",
-      "Annulable à tout moment",
+      "Score financier et analyse complète",
+      "Suivi revenus, dépenses, budget",
+      "Coach IA hebdomadaire",
+      "Plan d'action personnalisé",
+      "Application mobile + desktop",
     ],
   },
-  yearly: {
-    id: "premium_yearly",
-    name: "Annuel",
-    priceCHF: 119.99,
-    monthlyEquivalentCHF: 9.99,
-    interval: "year",
-    description: "Soit ~9.99 CHF/mois — environ 60 CHF d'économie sur l'année.",
+  premium: {
+    id: "premium",
+    name: "Premium",
+    tagline: "Toute la puissance du copilote IA Liberia.",
+    monthly: {
+      id: "premium_monthly",
+      priceCHF: 24.95,
+      monthlyEquivalentCHF: 24.95,
+      interval: "month",
+    },
+    yearly: {
+      id: "premium_yearly",
+      // 24.95 × 12 = 299.40. Annuel à 249 → économie ≈ 50.40 CHF/an.
+      // Équivalent mensuel = 249 / 12 ≈ 20.75 CHF/mois.
+      priceCHF: 249,
+      monthlyEquivalentCHF: 20.75,
+      interval: "year",
+    },
     features: [
-      "14 jours gratuits, sans engagement",
-      "Tout ce qu'il y a dans le Mensuel",
-      "Économise environ 60 CHF par an",
-      "Facturation une seule fois par an",
-      "Annulable à tout moment",
+      "Tout Standard inclus",
+      "Détection avancée d'opportunités",
+      "Trajectoire patrimoniale à 3 ans",
+      "Résumé hebdomadaire IA personnalisé",
+      "Support prioritaire",
     ],
     badge: "Recommandé",
   },
 } as const;
 
-export type PlanId = keyof typeof PLANS;
+export type PlanTierId = keyof typeof PLANS;
+export type PlanIntervalId = "monthly" | "yearly";
+/** Identifiant complet d'un plan facturable (tier + intervalle). */
+export type PlanId =
+  | "standard_monthly"
+  | "standard_yearly"
+  | "premium_monthly"
+  | "premium_yearly";
 
 /**
  * Limite goals active appliquée UNIQUEMENT aux comptes qui n'ont plus

@@ -81,9 +81,9 @@
       "premiumActive": "Premium-Abo aktiv",
       "premiumThanks": "Danke für deine Unterstützung.",
       "trialCta": "Meine 14-tägige Testphase starten",
-      "trialBody": "14 Tage kostenlos, danach 14.99 CHF/Monat oder 119.99 CHF/Jahr. Jederzeit kündbar.",
+      "trialBody": "14 Tage gratis (Karte erforderlich). Danach Standard 14.95 CHF/Monat oder Premium 24.95 CHF/Monat. Vor Testende kündbar.",
       "resumeCta": "Mein Abo fortsetzen",
-      "resumeBody": "Dein Zugang ist pausiert. Setze dein Abo für 14.99 CHF/Monat oder 119.99 CHF/Jahr fort. Jederzeit kündbar."
+      "resumeBody": "Dein Zugang ist pausiert. Setze Standard (14.95 CHF/Monat) oder Premium (24.95 CHF/Monat) fort. Jederzeit kündbar."
     }
   },
   "errorPages": {

@@ -81,9 +81,9 @@
       "premiumActive": "Plano Premium ativo",
       "premiumThanks": "Obrigado pelo teu apoio.",
       "trialCta": "Iniciar a minha experiência de 14 dias",
-      "trialBody": "14 dias gratuitos, depois 14.99 CHF/mês ou 119.99 CHF/ano. Cancela quando quiseres.",
+      "trialBody": "14 dias gratuitos (cartão exigido). Depois Standard 14.95 CHF/mês ou Premium 24.95 CHF/mês. Cancelável antes do fim da experiência.",
       "resumeCta": "Retomar a minha subscrição",
-      "resumeBody": "O teu acesso está em pausa. Retoma a tua subscrição por 14.99 CHF/mês ou 119.99 CHF/ano. Cancela quando quiseres."
+      "resumeBody": "O teu acesso está em pausa. Retoma Standard (14.95 CHF/mês) ou Premium (24.95 CHF/mês). Cancela quando quiseres."
     }
   },
   "errorPages": {

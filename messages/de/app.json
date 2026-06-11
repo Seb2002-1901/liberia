@@ -1051,7 +1051,9 @@
     "ctaCheckoutYearly": "Jahres-Testphase starten",
     "ctaCheckoutMonthly": "Monats-Testphase starten",
     "ctaStartTrial": "{days} kostenlose Tage starten",
-    "fineprint": "Karte zum Start erforderlich. Automatische Abrechnung am Ende der {days} Tage. Jederzeit kündbar.",
+    "fineprint": "Karte zum Start der Testphase erforderlich. Keine Abbuchung während {days} Tagen. Vor Testende kündbar, um nichts zu zahlen.",
+    "intervalMonthly": "Monatlich",
+    "intervalYearly": "Jährlich",
     "portal": "Mein Abo verwalten",
     "errors": {
       "checkoutFallback": "Die Zahlung konnte nicht gestartet werden.",
@@ -1059,34 +1061,43 @@
       "generic": "Etwas ist schiefgegangen."
     },
     "feedback": {
-      "successTitle": "Zahlung empfangen. Willkommen bei Premium.",
+      "successTitle": "Zahlung empfangen. Willkommen bei LIBERIA.",
       "successBody": "Dein Zugang wird aktiviert, das kann ein paar Sekunden dauern.",
       "cancelled": "Zahlung abgebrochen. Du kannst jederzeit erneut versuchen."
     },
     "plans": {
-      "monthly": {
-        "name": "Monatlich",
-        "description": "Vollständiger LIBERIA-Zugang. Jederzeit über dein Konto kündbar.",
+      "recommendedBadge": "Empfohlen",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 Tage gratis, ohne Bindung",
-          "Konversations-KI-Coach",
-          "Personalisierter 30 / 60 / 90-Tage-KI-Finanzplan",
-          "Vollständiges Budget-Tracking (Einkommen, Ausgaben, Ziele)",
-          "Wöchentlicher Rückblick per E-Mail",
-          "Jederzeit kündbar"
-        ]
+          "Finanz-Score und vollständige Analyse",
+          "Einnahmen-, Ausgaben-, Budget-Tracking",
+          "Wöchentlicher KI-Coach",
+          "Personalisierter Aktionsplan",
+          "Mobile + Desktop-App"
+        ],
+        "monthly": {
+          "description": "Das essenzielle Finanz-Cockpit. Vor Testende kündbar."
+        },
+        "yearly": {
+          "description": "Standard jährlich abgerechnet. Etwa 30 CHF Ersparnis gegenüber monatlich."
+        }
       },
-      "yearly": {
-        "name": "Jährlich",
-        "description": "Das sind ~9.99 CHF/Monat — etwa 60 CHF Ersparnis pro Jahr.",
-        "badge": "Empfohlen",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 Tage gratis, ohne Bindung",
-          "Alles aus Monatlich",
-          "Spare rund 60 CHF pro Jahr",
-          "Eine Abbuchung pro Jahr",
-          "Jederzeit kündbar"
-        ]
+          "Alles aus Standard",
+          "Erweiterte Chancenerkennung",
+          "3-Jahres-Vermögenstrajektorie",
+          "Personalisierter wöchentlicher KI-Rückblick",
+          "Prioritäts-Support"
+        ],
+        "monthly": {
+          "description": "Der vollständige KI-Copilot. Vor Testende kündbar."
+        },
+        "yearly": {
+          "description": "Premium jährlich abgerechnet. Etwa 50 CHF Ersparnis gegenüber monatlich."
+        }
       }
     }
   },

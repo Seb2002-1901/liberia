@@ -1051,7 +1051,9 @@
     "ctaCheckoutYearly": "Start yearly trial",
     "ctaCheckoutMonthly": "Start monthly trial",
     "ctaStartTrial": "Start {days} free days",
-    "fineprint": "Card required to start. Automatic billing at the end of the {days} days. Cancel any time.",
+    "fineprint": "A card is required to start the trial. No charge during {days} days. Cancel before the trial ends to pay nothing.",
+    "intervalMonthly": "Monthly",
+    "intervalYearly": "Yearly",
     "portal": "Manage my subscription",
     "errors": {
       "checkoutFallback": "Couldn't start the payment.",
@@ -1059,34 +1061,43 @@
       "generic": "Something went wrong."
     },
     "feedback": {
-      "successTitle": "Payment received. Welcome to Premium.",
+      "successTitle": "Payment received. Welcome to LIBERIA.",
       "successBody": "Your access is being activated, this can take a few seconds.",
       "cancelled": "Payment cancelled. You can retry any time."
     },
     "plans": {
-      "monthly": {
-        "name": "Monthly",
-        "description": "Full LIBERIA access. Cancel any time from your account.",
+      "recommendedBadge": "Recommended",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 days free, no commitment",
-          "Conversational AI coach",
-          "Personalised 30 / 60 / 90-day AI financial plan",
-          "Full budget tracking (income, expenses, goals)",
-          "Weekly recap by email",
-          "Cancel any time"
-        ]
+          "Financial score and full analysis",
+          "Income, expense, budget tracking",
+          "Weekly AI coach",
+          "Personalised action plan",
+          "Mobile + desktop app"
+        ],
+        "monthly": {
+          "description": "The essential financial cockpit. Cancel before the trial ends."
+        },
+        "yearly": {
+          "description": "Standard, billed yearly. About 30 CHF saved vs monthly."
+        }
       },
-      "yearly": {
-        "name": "Yearly",
-        "description": "That's ~9.99 CHF/month — about 60 CHF saved per year.",
-        "badge": "Recommended",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 days free, no commitment",
-          "Everything in Monthly",
-          "Save around 60 CHF per year",
-          "One charge per year",
-          "Cancel any time"
-        ]
+          "Everything in Standard",
+          "Advanced opportunity detection",
+          "3-year wealth trajectory",
+          "Personalised weekly AI recap",
+          "Priority support"
+        ],
+        "monthly": {
+          "description": "The full AI copilot. Cancel before the trial ends."
+        },
+        "yearly": {
+          "description": "Premium, billed yearly. About 50 CHF saved vs monthly."
+        }
       }
     }
   },
