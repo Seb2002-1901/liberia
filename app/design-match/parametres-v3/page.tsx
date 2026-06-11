@@ -105,7 +105,7 @@ export default function DesignMatchParametresV3() {
             </div>
             <div data-par-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
               <SecuriteCard />
-              <IntegrationsCard />
+              <AutomatisationsIACard />
               <ConseilIACard />
             </div>
             <MissionFooter />
@@ -435,7 +435,7 @@ function HeroParametres() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              92 % optimisé
+              92 % configuré
             </p>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
               +6 %
@@ -656,80 +656,81 @@ function SecuriteCard() {
   );
 }
 
-function IntegrationsCard() {
-  const banks = [
-    { name: "BCV", sub: "Compte courant", status: "Sync. il y a 2 h", connected: true, color: C.success },
-    { name: "UBS", sub: "Compte épargne", status: "Sync. il y a 4 h", connected: true, color: C.success },
-    { name: "PostFinance", sub: "3e pilier", status: "Sync. il y a 1 j", connected: true, color: C.success },
-    { name: "Raiffeisen", sub: "Investissement", status: "Non synchronisé", connected: false, color: C.textLight },
+function AutomatisationsIACard() {
+  const items = [
+    { label: "Analyse hebdomadaire", iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
+    { label: "Détection d'opportunités", iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" },
+    { label: "Alertes objectifs", iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
+    { label: "Rapports automatiques", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Intégrations bancaires
-      </p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Automatisations IA
+        </p>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "1px 7px",
+            fontSize: 9,
+            fontWeight: 700,
+            color: C.success,
+            backgroundColor: C.successBg,
+            borderRadius: 999,
+            letterSpacing: "0.04em",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          <span style={{ width: 5, height: 5, borderRadius: 999, backgroundColor: C.success }} />
+          4 / 4 actives
+        </span>
+      </div>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Comptes connectés
+        Fonctionnalités intelligentes actives
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {banks.map((b) => (
-          <div key={b.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 24,
-                height: 24,
-                borderRadius: 6,
-                backgroundColor: C.cardBg,
-                fontSize: 8.5,
-                fontWeight: 700,
-                color: C.textDark,
-                fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "0.02em",
-                flexShrink: 0,
-                border: `1px solid ${C.borderGhost}`,
-              }}
-              aria-hidden
-            >
-              {b.name.slice(0, 2).toUpperCase()}
+        {items.map((it) => (
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.primaryBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+              </svg>
             </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {b.name}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {b.sub} · {b.status}
-              </p>
-            </div>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 18,
-                height: 18,
-                borderRadius: 999,
-                backgroundColor: b.connected ? C.successBg : C.borderGhost,
-                flexShrink: 0,
-              }}
-              aria-label={b.connected ? "Connecté" : "Non connecté"}
-            >
-              {b.connected ? (
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              ) : (
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              )}
+            <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: C.textDark, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {it.label}
+            </span>
+            <span style={{ fontSize: 9.5, fontWeight: 700, color: C.success, flexShrink: 0 }}>
+              Active
             </span>
           </div>
         ))}
       </div>
+      <button
+        style={{
+          marginTop: 6,
+          padding: "6px 12px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 5,
+          backgroundColor: C.primaryBg,
+          color: C.primary,
+          fontSize: 11,
+          fontWeight: 600,
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Voir les automatisations
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -835,7 +836,7 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Configuration optimisée à <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
+            Configuration complétée à <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
