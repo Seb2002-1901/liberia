@@ -106,7 +106,7 @@ export default function DesignMatchProfilV3() {
             <div data-prof-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
               <DocumentsCard />
               <SecuriteCard />
-              <ParametresRapidesCard />
+              <ActiviteRecenteCard />
             </div>
             <MissionFooter />
           </main>
@@ -797,7 +797,7 @@ function AbonnementCard() {
         }}
       >
         <span style={{ fontWeight: 700, color: C.textDark }}>
-          Découvrir les options d&apos;abonnement
+          Gérer mon abonnement
         </span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
@@ -823,7 +823,7 @@ function DocumentsCard() {
         Documents
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Documents personnels et analyses générées
+        Mes documents et rapports
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
         {docs.map((d) => (
@@ -936,58 +936,34 @@ function SecuriteCard() {
   );
 }
 
-function ParametresRapidesCard() {
-  const toggles = [
-    { label: "Alertes budget", sub: "Dépassement détecté", on: true },
-    { label: "Alertes opportunités", sub: "Nouvelles pistes IA", on: true },
-    { label: "Alertes objectifs", sub: "Jalons atteints", on: false },
-    { label: "Résumé hebdomadaire IA", sub: "Chaque dimanche", on: true },
+function ActiviteRecenteCard() {
+  const items = [
+    { label: "Profil mis à jour", when: "il y a 2 jours" },
+    { label: "Analyse générée", when: "il y a 5 jours" },
+    { label: "Objectif modifié", when: "il y a 1 semaine" },
+    { label: "Connexion sécurisée", when: "aujourd'hui" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Paramètres rapides
+        Activité récente
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        À portée de clic
+        Ce qui s&apos;est passé récemment sur votre compte
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {toggles.map((t) => (
-          <div key={t.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {t.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, lineHeight: 1.2 }}>
-                {t.sub}
-              </p>
-            </div>
-            <span
-              style={{
-                position: "relative",
-                width: 26,
-                height: 14,
-                borderRadius: 999,
-                backgroundColor: t.on ? C.success : C.borderGhost,
-                flexShrink: 0,
-                transition: "background-color 0.2s",
-              }}
-              aria-checked={t.on}
-              role="switch"
-            >
-              <span
-                style={{
-                  position: "absolute",
-                  top: 1,
-                  left: t.on ? 13 : 1,
-                  width: 12,
-                  height: 12,
-                  borderRadius: 999,
-                  backgroundColor: "white",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.18)",
-                  transition: "left 0.2s",
-                }}
-              />
+        {items.map((it) => (
+          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.successBg, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: C.textDark, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {it.label}
+            </span>
+            <span style={{ fontSize: 9, color: C.textLight, flexShrink: 0 }}>
+              {it.when}
             </span>
           </div>
         ))}
@@ -1009,7 +985,7 @@ function ParametresRapidesCard() {
           cursor: "pointer",
         }}
       >
-        Tous les paramètres
+        Voir l&apos;historique
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
