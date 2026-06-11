@@ -342,7 +342,7 @@ export default async function DesignMatchDashboardV3() {
     values?: Record<string, string | number>,
   ) => string;
   const tBands = (await getTranslations(
-    "dashboard.health.drawer.bands",
+    "dashboard.health.bands",
   )) as (key: string) => string;
   const tFirstMission = (await getTranslations(
     "dashboard.firstMission",
