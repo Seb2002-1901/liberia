@@ -144,31 +144,34 @@ export function AppShell({
   /* ------------------------------------------------------------------ */
 
   // Helper : resout l'href de chaque item — toujours la route prod
-  // depuis le nettoyage zéro-tolérance du 11 juin 2026.
+  // depuis le nettoyage zéro-tolérance du 11 juin 2026. Note : les
+  // SECTION_* arrays utilisent ROUTES.<x> directement (et non
+  // href(id)) pour rester analysable par tests/unit/sidebar-structure.
   const href = (id: NavId): string => NAV_V3[id].prod;
+  void href; // gardé pour usages tiers + cohérence sémantique
 
   const SECTION_PRINCIPAL: NavItem[] = [
-    { id: "dashboard", href: href("dashboard"), label: t("nav.dashboard"), icon: LayoutDashboard },
-    { id: "coach", href: href("coach"), label: t("nav.coach"), icon: MessageSquare },
-    { id: "plan", href: href("plan"), label: t("nav.plan"), icon: Map },
+    { id: "dashboard", href: ROUTES.dashboard, label: t("nav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: ROUTES.coach, label: t("nav.coach"), icon: MessageSquare },
+    { id: "plan", href: ROUTES.plan, label: t("nav.plan"), icon: Map },
   ];
 
   const SECTION_FINANCES: NavItem[] = [
-    { id: "incomes", href: href("incomes"), label: t("nav.incomes"), icon: ArrowUpCircle },
-    { id: "expenses", href: href("expenses"), label: t("nav.expenses"), icon: ArrowDownCircle },
-    { id: "budget", href: href("budget"), label: t("nav.budget"), icon: Wallet },
-    { id: "goals", href: href("goals"), label: t("nav.goals"), icon: Target },
+    { id: "incomes", href: ROUTES.incomes, label: t("nav.incomes"), icon: ArrowUpCircle },
+    { id: "expenses", href: ROUTES.expenses, label: t("nav.expenses"), icon: ArrowDownCircle },
+    { id: "budget", href: ROUTES.budget, label: t("nav.budget"), icon: Wallet },
+    { id: "goals", href: ROUTES.goals, label: t("nav.goals"), icon: Target },
   ];
 
   const SECTION_CROISSANCE: NavItem[] = [
-    { id: "savings", href: href("savings"), label: t("nav.savings"), icon: PiggyBank },
-    { id: "investments", href: href("investments"), label: t("nav.investments"), icon: LineChart },
-    { id: "opportunities", href: href("opportunities"), label: t("nav.opportunities"), icon: Compass },
+    { id: "savings", href: ROUTES.savings, label: t("nav.savings"), icon: PiggyBank },
+    { id: "investments", href: ROUTES.investments, label: t("nav.investments"), icon: LineChart },
+    { id: "opportunities", href: ROUTES.opportunities, label: t("nav.opportunities"), icon: Compass },
   ];
 
   const SECTION_PLUS: NavItem[] = [
-    { id: "settings", href: href("settings"), label: t("nav.settings"), icon: Settings },
-    { id: "profile", href: href("profile"), label: t("nav.profile"), icon: User },
+    { id: "settings", href: ROUTES.settings, label: t("nav.settings"), icon: Settings },
+    { id: "profile", href: ROUTES.profile, label: t("nav.profile"), icon: User },
   ];
 
   // Bottom nav mobile — inchangée S2 (D5 validé). 5 items max pour
@@ -176,11 +179,11 @@ export function AppShell({
   // nités ne sont pas mis en mobile faute de place ; ils seront
   // accessibles via la page Profil/menu plus tard si besoin.
   const MOBILE_NAV: NavItem[] = [
-    { id: "dashboard", href: href("dashboard"), label: t("mobileNav.dashboard"), icon: LayoutDashboard },
-    { id: "coach", href: href("coach"), label: t("mobileNav.coach"), icon: MessageSquare },
-    { id: "plan", href: href("plan"), label: t("mobileNav.plan"), icon: Map },
-    { id: "budget", href: href("budget"), label: t("mobileNav.budget"), icon: Wallet },
-    { id: "goals", href: href("goals"), label: t("mobileNav.goals"), icon: Target },
+    { id: "dashboard", href: ROUTES.dashboard, label: t("mobileNav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: ROUTES.coach, label: t("mobileNav.coach"), icon: MessageSquare },
+    { id: "plan", href: ROUTES.plan, label: t("mobileNav.plan"), icon: Map },
+    { id: "budget", href: ROUTES.budget, label: t("mobileNav.budget"), icon: Wallet },
+    { id: "goals", href: ROUTES.goals, label: t("mobileNav.goals"), icon: Target },
   ];
 
   // En démo, seul le Dashboard est cliquable (les autres redirigent
