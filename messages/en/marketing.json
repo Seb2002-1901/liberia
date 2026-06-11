@@ -166,7 +166,7 @@
     "items": {
       "free": {
         "q": "Is it really free?",
-        "a": "There is no permanent free plan. You can try the demo without an account (data entered in demo is not saved). To use LIBERIA for real, you start a 14-day free trial. A card is required at sign-up to activate the trial — no charge during those 14 days. At the end of the trial, the plan you picked kicks in automatically (Standard 14.95 CHF/month or 149 CHF/year, or Premium 24.95 CHF/month or 249 CHF/year). Cancel before the trial ends to pay nothing."
+        "a": "There is no permanent free plan. You can try the demo without an account (data entered in demo is not saved). To use LIBERIA for real, you start a 14-day free trial. A card is required at sign-up to activate the trial — no charge during those 14 days. At the end of the trial, the plan you picked kicks in automatically (Standard 14.95 CHF/month or 149 CHF/year, or Premium 19.95 CHF/month or 199 CHF/year). Cancel before the trial ends to pay nothing."
       },
       "cancelTrial": {
         "q": "What happens if I cancel during the trial?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Pricing",
-        "html": "<p>Two plans, each available monthly or yearly. The 14-day trial is included in all cases (card required at sign-up, no charge during the trial).</p><ul><li><strong>Standard monthly</strong>: 14.95 CHF / month, charged every month after the 14-day trial.</li><li><strong>Standard yearly</strong>: 149 CHF / year (around 12.42 CHF / month, ≈ 30 CHF saved vs monthly), charged once a year.</li><li><strong>Premium monthly</strong>: 24.95 CHF / month, charged every month after the 14-day trial.</li><li><strong>Premium yearly</strong>: 249 CHF / year (around 20.75 CHF / month, ≈ 50 CHF saved vs monthly), charged once a year.</li></ul><p>Prices are shown in Swiss francs (CHF), tax inclusive. No hidden fees. There is NO permanent free plan.</p>"
+        "html": "<p>Two plans, each available monthly or yearly. The 14-day trial is included in all cases (card required at sign-up, no charge during the trial).</p><ul><li><strong>Standard monthly</strong>: 14.95 CHF / month, charged every month after the 14-day trial.</li><li><strong>Standard yearly</strong>: 149 CHF / year (around 12.42 CHF / month, ≈ 30 CHF saved vs monthly), charged once a year.</li><li><strong>Premium monthly</strong>: 19.95 CHF / month, charged every month after the 14-day trial.</li><li><strong>Premium yearly</strong>: 199 CHF / year (around 16.58 CHF / month, ≈ 40 CHF saved vs monthly), charged once a year.</li></ul><p>Prices are shown in Swiss francs (CHF), tax inclusive. No hidden fees. There is NO permanent free plan.</p>"
       },
       {
         "heading": "6. Cancellation and withdrawal",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Pricing",
-      "description": "LIBERIA — {days} days free (card required) then Standard 14.95 CHF/month (149 CHF/year) or Premium 24.95 CHF/month (249 CHF/year). Cancel before the trial ends."
+      "description": "LIBERIA — {days} days free (card required) then Standard 14.95 CHF/month (149 CHF/year) or Premium 19.95 CHF/month (199 CHF/year). Cancel before the trial ends."
     },
     "eyebrow": "Pricing",
     "title": "A clear price. No traps.",

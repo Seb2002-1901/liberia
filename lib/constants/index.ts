@@ -258,7 +258,7 @@ export type SpendingTriggerId = (typeof SPENDING_TRIGGERS)[number]["id"];
  *
  * Standard : 14.95 CHF/mois — 149 CHF/an (≈ 12.42 CHF/mois — ~30 CHF
  *   d'économie par rapport à 12 × mensuel).
- * Premium  : 24.95 CHF/mois — 249 CHF/an (≈ 20.75 CHF/mois — ~50 CHF
+ * Premium  : 19.95 CHF/mois — 199 CHF/an (≈ 16.58 CHF/mois — ~40 CHF
  *   d'économie par rapport à 12 × mensuel).
  *
  * `PLANS` ici sert au rendu UI marketing/abonnement uniquement. La
@@ -298,16 +298,16 @@ export const PLANS = {
     tagline: "Toute la puissance du copilote IA Liberia.",
     monthly: {
       id: "premium_monthly",
-      priceCHF: 24.95,
-      monthlyEquivalentCHF: 24.95,
+      priceCHF: 19.95,
+      monthlyEquivalentCHF: 19.95,
       interval: "month",
     },
     yearly: {
       id: "premium_yearly",
-      // 24.95 × 12 = 299.40. Annuel à 249 → économie ≈ 50.40 CHF/an.
-      // Équivalent mensuel = 249 / 12 ≈ 20.75 CHF/mois.
-      priceCHF: 249,
-      monthlyEquivalentCHF: 20.75,
+      // 19.95 × 12 = 239.40. Annuel à 199 → économie ≈ 40.40 CHF/an.
+      // Équivalent mensuel = 199 / 12 ≈ 16.58 CHF/mois.
+      priceCHF: 199,
+      monthlyEquivalentCHF: 16.58,
       interval: "year",
     },
     features: [

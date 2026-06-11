@@ -81,9 +81,9 @@
       "premiumActive": "Plan Premium activo",
       "premiumThanks": "Gracias por tu apoyo.",
       "trialCta": "Iniciar mi prueba de 14 días",
-      "trialBody": "14 días gratis (tarjeta requerida). Luego Standard 14.95 CHF/mes o Premium 24.95 CHF/mes. Cancelable antes del fin de la prueba.",
+      "trialBody": "14 días gratis (tarjeta requerida). Luego Standard 14.95 CHF/mes o Premium 19.95 CHF/mes. Cancelable antes del fin de la prueba.",
       "resumeCta": "Reanudar mi suscripción",
-      "resumeBody": "Tu acceso está en pausa. Reanuda Standard (14.95 CHF/mes) o Premium (24.95 CHF/mes). Cancela cuando quieras."
+      "resumeBody": "Tu acceso está en pausa. Reanuda Standard (14.95 CHF/mes) o Premium (19.95 CHF/mes). Cancela cuando quieras."
     }
   },
   "errorPages": {

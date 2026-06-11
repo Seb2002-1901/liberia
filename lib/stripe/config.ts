@@ -8,8 +8,8 @@
  *
  *  - standard_monthly : 14.95 CHF/mois
  *  - standard_yearly  : 149 CHF/an (≈ 12.42 CHF/mois — économie ~30 CHF/an)
- *  - premium_monthly  : 24.95 CHF/mois
- *  - premium_yearly   : 249 CHF/an (≈ 20.75 CHF/mois — économie ~50 CHF/an)
+ *  - premium_monthly  : 19.95 CHF/mois
+ *  - premium_yearly   : 199 CHF/an (≈ 16.58 CHF/mois — économie ~40 CHF/an)
  *
  * Les `priceId` sont créés dans le dashboard Stripe (Products →
  * Standard + Premium → 2 prices CHF chacun). On les pointe via env,
@@ -17,7 +17,7 @@
  *
  * ⚠ Setup Stripe Dashboard nécessaire avant le go-live :
  *   - Produit "Standard" + 2 prices (monthly 14.95 CHF, yearly 149 CHF)
- *   - Produit "Premium"  + 2 prices (monthly 24.95 CHF, yearly 249 CHF)
+ *   - Produit "Premium"  + 2 prices (monthly 19.95 CHF, yearly 199 CHF)
  *   - 4 env vars NEXT_PUBLIC_STRIPE_PRICE_* renseignées.
  */
 
@@ -43,19 +43,19 @@ export const STRIPE_PLANS = {
   },
   premium_monthly: {
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY ?? "",
-    amount: 24.95,
+    amount: 19.95,
     interval: "month" as const,
     tier: "premium" as const,
     label: "Premium — mensuel",
-    monthlyEquivalent: 24.95,
+    monthlyEquivalent: 19.95,
   },
   premium_yearly: {
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY ?? "",
-    amount: 249,
+    amount: 199,
     interval: "year" as const,
     tier: "premium" as const,
     label: "Premium — annuel",
-    monthlyEquivalent: 20.75,
+    monthlyEquivalent: 16.58,
   },
 } as const;
 

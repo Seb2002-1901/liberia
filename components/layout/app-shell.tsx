@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Activity,
   ArrowDownCircle,
   ArrowUpCircle,
   Compass,
@@ -89,7 +88,6 @@ interface NavItem {
 type NavId =
   | "dashboard"
   | "coach"
-  | "analyse"
   | "plan"
   | "incomes"
   | "expenses"
@@ -102,32 +100,37 @@ type NavId =
   | "profile";
 
 /**
- * Phase 6.0 — Mapping menu sidebar → pages cockpit V3 design-match.
+ * Phase 6.0 — Mapping menu sidebar.
  *
- * Les 13 pages V3 lockées vivent sous /design-match/*-v3. La sidebar
- * authentifiée pointe directement vers ces URLs (pas de redirect, pas
- * de copie dans (app)/). Les routes prod (/dashboard, /budget, etc.)
- * existent toujours mais ne sont plus accessibles via la sidebar :
- * elles restent jointes par URL directe pour rollback rapide.
+ * Stratégie post-nettoyage routes doublées :
+ *   - SEUL le Dashboard utilise encore une page V3 (`dashboard-v3` est
+ *     branché aux vraies données, commit 61791cf).
+ *   - Les 11 autres items pointent directement vers leur route prod
+ *     pour éviter le double-hop (sidebar → V3 → redirect → prod).
+ *   - L'entrée "Mon analyse" a été retirée : aucune page prod dédiée
+ *     n'existe et /design-match/mon-analyse-v3 redirige déjà vers
+ *     /dashboard qui est déjà accessible via "Tableau de bord".
  *
- * Pour conserver l'état actif quand l'utilisateur est sur l'ancienne
- * route prod (par exemple après refresh ou lien externe), on garde la
- * correspondance prod ↔ V3 dans NAV_V3 et on l'utilise dans isActive.
+ * `prod` est conservé sur chaque NavItem pour piloter l'état actif
+ * (un utilisateur peut atterrir via une URL directe — la sidebar
+ * doit allumer le bon item).
  */
-const NAV_V3: Record<NavId, { v3: string; prod: string }> = {
+const NAV_V3: Record<NavId, { v3: string | null; prod: string }> = {
   dashboard: { v3: "/design-match/dashboard-v3", prod: ROUTES.dashboard },
-  coach: { v3: "/design-match/coach-v3", prod: ROUTES.coach },
-  analyse: { v3: "/design-match/mon-analyse-v3", prod: "/analysis" },
-  plan: { v3: "/design-match/plan-v3", prod: ROUTES.plan },
-  incomes: { v3: "/design-match/revenus-v3", prod: ROUTES.incomes },
-  expenses: { v3: "/design-match/depenses-v3", prod: ROUTES.expenses },
-  budget: { v3: "/design-match/budget-v3", prod: ROUTES.budget },
-  goals: { v3: "/design-match/objectifs-v3", prod: ROUTES.goals },
-  savings: { v3: "/design-match/epargne-v3", prod: ROUTES.savings },
-  investments: { v3: "/design-match/investissements-v3", prod: ROUTES.investments },
-  opportunities: { v3: "/design-match/opportunites-v3", prod: ROUTES.opportunities },
-  settings: { v3: "/design-match/parametres-v3", prod: ROUTES.settings },
-  profile: { v3: "/design-match/profil-v3", prod: ROUTES.profile },
+  // Les V3 ci-dessous existent encore mais en mode "redirect → prod"
+  // (cf. app/design-match/<slug>-v3/page.tsx). On garde v3=null ici
+  // pour signaler qu'on NE LES UTILISE PLUS comme href dans la sidebar.
+  coach: { v3: null, prod: ROUTES.coach },
+  plan: { v3: null, prod: ROUTES.plan },
+  incomes: { v3: null, prod: ROUTES.incomes },
+  expenses: { v3: null, prod: ROUTES.expenses },
+  budget: { v3: null, prod: ROUTES.budget },
+  goals: { v3: null, prod: ROUTES.goals },
+  savings: { v3: null, prod: ROUTES.savings },
+  investments: { v3: null, prod: ROUTES.investments },
+  opportunities: { v3: null, prod: ROUTES.opportunities },
+  settings: { v3: null, prod: ROUTES.settings },
+  profile: { v3: null, prod: ROUTES.profile },
 };
 
 export function AppShell({
@@ -147,44 +150,46 @@ export function AppShell({
   /*  Navigation par sections (alignée maquette Phase 5.0)              */
   /* ------------------------------------------------------------------ */
 
+  // Helper : resout l'href effectif d'un item.
+  //   - dashboard → V3 (seule V3 live)
+  //   - autres → route prod directe (les V3 redirigent toutes vers
+  //     prod, mais autant éviter le double-hop)
+  const href = (id: NavId): string => NAV_V3[id].v3 ?? NAV_V3[id].prod;
+
   const SECTION_PRINCIPAL: NavItem[] = [
-    { id: "dashboard", href: NAV_V3.dashboard.v3, label: t("nav.dashboard"), icon: LayoutDashboard },
-    { id: "coach", href: NAV_V3.coach.v3, label: t("nav.coach"), icon: MessageSquare },
-    // Phase 6.0 — nouvel item entre Coach IA et Plan d'action.
-    // Pointe directement sur la page V3 lockée /design-match/mon-analyse-v3.
-    { id: "analyse", href: NAV_V3.analyse.v3, label: "Mon analyse", icon: Activity },
-    { id: "plan", href: NAV_V3.plan.v3, label: t("nav.plan"), icon: Map },
+    { id: "dashboard", href: href("dashboard"), label: t("nav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: href("coach"), label: t("nav.coach"), icon: MessageSquare },
+    { id: "plan", href: href("plan"), label: t("nav.plan"), icon: Map },
   ];
 
   const SECTION_FINANCES: NavItem[] = [
-    { id: "incomes", href: NAV_V3.incomes.v3, label: t("nav.incomes"), icon: ArrowUpCircle },
-    { id: "expenses", href: NAV_V3.expenses.v3, label: t("nav.expenses"), icon: ArrowDownCircle },
-    { id: "budget", href: NAV_V3.budget.v3, label: t("nav.budget"), icon: Wallet },
-    { id: "goals", href: NAV_V3.goals.v3, label: t("nav.goals"), icon: Target },
+    { id: "incomes", href: href("incomes"), label: t("nav.incomes"), icon: ArrowUpCircle },
+    { id: "expenses", href: href("expenses"), label: t("nav.expenses"), icon: ArrowDownCircle },
+    { id: "budget", href: href("budget"), label: t("nav.budget"), icon: Wallet },
+    { id: "goals", href: href("goals"), label: t("nav.goals"), icon: Target },
   ];
 
   const SECTION_CROISSANCE: NavItem[] = [
-    { id: "savings", href: NAV_V3.savings.v3, label: t("nav.savings"), icon: PiggyBank },
-    { id: "investments", href: NAV_V3.investments.v3, label: t("nav.investments"), icon: LineChart },
-    { id: "opportunities", href: NAV_V3.opportunities.v3, label: t("nav.opportunities"), icon: Compass },
+    { id: "savings", href: href("savings"), label: t("nav.savings"), icon: PiggyBank },
+    { id: "investments", href: href("investments"), label: t("nav.investments"), icon: LineChart },
+    { id: "opportunities", href: href("opportunities"), label: t("nav.opportunities"), icon: Compass },
   ];
 
   const SECTION_PLUS: NavItem[] = [
-    { id: "settings", href: NAV_V3.settings.v3, label: t("nav.settings"), icon: Settings },
-    { id: "profile", href: NAV_V3.profile.v3, label: t("nav.profile"), icon: User },
+    { id: "settings", href: href("settings"), label: t("nav.settings"), icon: Settings },
+    { id: "profile", href: href("profile"), label: t("nav.profile"), icon: User },
   ];
 
   // Bottom nav mobile — inchangée S2 (D5 validé). 5 items max pour
   // tenir confortablement la largeur d'écran. Épargne/Invest/Opportu-
   // nités ne sont pas mis en mobile faute de place ; ils seront
   // accessibles via la page Profil/menu plus tard si besoin.
-  // Phase 6.0 — hrefs branchés sur les pages V3 design-match.
   const MOBILE_NAV: NavItem[] = [
-    { id: "dashboard", href: NAV_V3.dashboard.v3, label: t("mobileNav.dashboard"), icon: LayoutDashboard },
-    { id: "coach", href: NAV_V3.coach.v3, label: t("mobileNav.coach"), icon: MessageSquare },
-    { id: "plan", href: NAV_V3.plan.v3, label: t("mobileNav.plan"), icon: Map },
-    { id: "budget", href: NAV_V3.budget.v3, label: t("mobileNav.budget"), icon: Wallet },
-    { id: "goals", href: NAV_V3.goals.v3, label: t("mobileNav.goals"), icon: Target },
+    { id: "dashboard", href: href("dashboard"), label: t("mobileNav.dashboard"), icon: LayoutDashboard },
+    { id: "coach", href: href("coach"), label: t("mobileNav.coach"), icon: MessageSquare },
+    { id: "plan", href: href("plan"), label: t("mobileNav.plan"), icon: Map },
+    { id: "budget", href: href("budget"), label: t("mobileNav.budget"), icon: Wallet },
+    { id: "goals", href: href("goals"), label: t("mobileNav.goals"), icon: Target },
   ];
 
   // En démo, seul le Dashboard est cliquable (les autres redirigent

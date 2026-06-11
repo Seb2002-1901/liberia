@@ -14,7 +14,7 @@
  *   2. Bénéfices (3 cards)
  *   3. Fonctionnement (3 étapes)
  *   4. Modules cockpit (4 modules + mini-preview)
- *   5. Pricing preview (Standard 14.95 + Premium 24.95)
+ *   5. Pricing preview (Standard 14.95 + Premium 19.95)
  *   6. Sécurité / confidentialité (4 messages)
  *   7. FAQ courte (5 questions)
  *   8. CTA final (démarrer essai)
@@ -169,18 +169,19 @@ function HeroSection() {
                 Voir les tarifs
               </Link>
             </div>
+            {/* Message officiel essai — verbatim de la politique produit Q2 2026. */}
             <p style={{ marginTop: 18, fontSize: 12, color: C.textLight, display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              Carte requise à l&apos;inscription · Aucun prélèvement pendant 14 jours · Annulable avant la fin de l&apos;essai
+              Démarrez votre essai gratuit de 14 jours. Carte bancaire requise. Aucun prélèvement avant la fin de l&apos;essai.
             </p>
+            {/* Message officiel démo — verbatim. */}
             <p style={{ marginTop: 6, fontSize: 12, color: C.textLight }}>
-              Pas envie de créer un compte tout de suite ?{" "}
               <Link href="/demo" style={{ color: C.primary, textDecoration: "none", fontWeight: 500 }}>
-                Essayer la démo
+                Essayez LIBERIA gratuitement avec la démo
               </Link>
-              {" "}— les données saisies en démo ne sont pas sauvegardées.
+              . Aucune inscription requise. Les données de démonstration ne sont pas sauvegardées.
             </p>
           </div>
           <div style={{ minWidth: 0 }}>
@@ -507,7 +508,7 @@ function PricingSection() {
     },
     {
       name: "Premium",
-      price: "24.95",
+      price: "19.95",
       tagline: "Toute la puissance du copilote IA Liberia.",
       features: [
         "Tout Standard inclus",

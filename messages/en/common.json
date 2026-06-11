@@ -81,9 +81,9 @@
       "premiumActive": "Premium plan active",
       "premiumThanks": "Thanks for the support.",
       "trialCta": "Start my 14-day trial",
-      "trialBody": "14 days free (card required). Then Standard 14.95 CHF/month or Premium 24.95 CHF/month. Cancel before the trial ends.",
+      "trialBody": "14 days free (card required). Then Standard 14.95 CHF/month or Premium 19.95 CHF/month. Cancel before the trial ends.",
       "resumeCta": "Resume my subscription",
-      "resumeBody": "Your access is paused. Resume Standard (14.95 CHF/month) or Premium (24.95 CHF/month). Cancel any time."
+      "resumeBody": "Your access is paused. Resume Standard (14.95 CHF/month) or Premium (19.95 CHF/month). Cancel any time."
     }
   },
   "errorPages": {

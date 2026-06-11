@@ -166,7 +166,7 @@
     "items": {
       "free": {
         "q": "È davvero gratis?",
-        "a": "Non esiste un piano gratuito permanente. Puoi provare la demo senza account (i dati inseriti in demo non vengono salvati). Per usare LIBERIA davvero, inizi una prova gratuita di 14 giorni. Una carta è richiesta all'iscrizione per attivare la prova — nessun addebito durante questi 14 giorni. Alla fine della prova, il piano scelto si attiva automaticamente (Standard 14.95 CHF/mese o 149 CHF/anno, oppure Premium 24.95 CHF/mese o 249 CHF/anno). Disdici prima della fine della prova per non pagare nulla."
+        "a": "Non esiste un piano gratuito permanente. Puoi provare la demo senza account (i dati inseriti in demo non vengono salvati). Per usare LIBERIA davvero, inizi una prova gratuita di 14 giorni. Una carta è richiesta all'iscrizione per attivare la prova — nessun addebito durante questi 14 giorni. Alla fine della prova, il piano scelto si attiva automaticamente (Standard 14.95 CHF/mese o 149 CHF/anno, oppure Premium 19.95 CHF/mese o 199 CHF/anno). Disdici prima della fine della prova per non pagare nulla."
       },
       "cancelTrial": {
         "q": "Cosa succede se disdico durante la prova?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Prezzi",
-        "html": "<p>Due piani, ciascuno disponibile mensilmente o annualmente. La prova di 14 giorni è inclusa in tutti i casi (carta richiesta all'iscrizione, nessun addebito durante la prova).</p><ul><li><strong>Standard mensile</strong>: 14.95 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li><strong>Standard annuale</strong>: 149 CHF / anno (circa 12.42 CHF / mese, ≈ 30 CHF risparmiati rispetto al mensile), addebitato una volta all'anno.</li><li><strong>Premium mensile</strong>: 24.95 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li><strong>Premium annuale</strong>: 249 CHF / anno (circa 20.75 CHF / mese, ≈ 50 CHF risparmiati rispetto al mensile), addebitato una volta all'anno.</li></ul><p>I prezzi sono indicati in franchi svizzeri (CHF), tasse incluse. Nessuna spesa nascosta. NON esiste un piano gratuito permanente.</p>"
+        "html": "<p>Due piani, ciascuno disponibile mensilmente o annualmente. La prova di 14 giorni è inclusa in tutti i casi (carta richiesta all'iscrizione, nessun addebito durante la prova).</p><ul><li><strong>Standard mensile</strong>: 14.95 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li><strong>Standard annuale</strong>: 149 CHF / anno (circa 12.42 CHF / mese, ≈ 30 CHF risparmiati rispetto al mensile), addebitato una volta all'anno.</li><li><strong>Premium mensile</strong>: 19.95 CHF / mese, addebitato ogni mese dopo la prova di 14 giorni.</li><li><strong>Premium annuale</strong>: 199 CHF / anno (circa 16.58 CHF / mese, ≈ 40 CHF risparmiati rispetto al mensile), addebitato una volta all'anno.</li></ul><p>I prezzi sono indicati in franchi svizzeri (CHF), tasse incluse. Nessuna spesa nascosta. NON esiste un piano gratuito permanente.</p>"
       },
       {
         "heading": "6. Disdetta e recesso",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Prezzi",
-      "description": "LIBERIA — {days} giorni gratuiti (carta richiesta) poi Standard 14.95 CHF/mese (149 CHF/anno) o Premium 24.95 CHF/mese (249 CHF/anno). Disdicibile prima della fine della prova."
+      "description": "LIBERIA — {days} giorni gratuiti (carta richiesta) poi Standard 14.95 CHF/mese (149 CHF/anno) o Premium 19.95 CHF/mese (199 CHF/anno). Disdicibile prima della fine della prova."
     },
     "eyebrow": "Prezzi",
     "title": "Un prezzo chiaro. Senza trappole.",
