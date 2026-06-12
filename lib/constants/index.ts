@@ -33,6 +33,7 @@ export const ROUTES = {
   investments: "/investments",
   opportunities: "/opportunities",
   coach: "/coach",
+  monAnalyse: "/mon-analyse",
   plan: "/plan",
   profile: "/profile",
   settings: "/settings",
