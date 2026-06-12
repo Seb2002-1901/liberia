@@ -17,12 +17,36 @@
  */
 
 import Link from "next/link";
-import { getFinanceData } from "@/lib/services/finance";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { createClient } from "@/lib/supabase/server";
+import {
+  gatherExtraSignals,
+  getOrSealDrawerData,
+} from "@/lib/services/health-writer";
+import {
+  buildBudgetStatus,
+  buildCategoryBreakdown,
+} from "@/lib/calculations/analytics";
+import {
+  detectOpportunities,
+  type Opportunity,
+  type OpportunityKind,
+  type OpportunityPriority,
+} from "@/lib/calculations/opportunities";
+import {
+  calculateNetCashflow,
+  calculateRunway,
+} from "@/lib/calculations/finance";
+import { formatUserCurrency } from "@/lib/utils";
+import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import type { DrawerData } from "@/lib/calculations/health/types";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Design Match v3 — Opportunités",
   robots: { index: false, follow: false },
 };
@@ -58,11 +82,286 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ HELPERS & TYPES ═══════════════ */
+
+async function getCurrentAuthUser(): Promise<{
+  id: string;
+  created_at: string | null;
+} | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    return { id: user.id, created_at: user.created_at ?? null };
+  } catch {
+    return null;
+  }
+}
+
+function expenseCategoryLabel(id: string): string {
+  return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
+}
+
+/** Famille thématique d'une opportunité — pour la CategoriesCard. */
+type OpportunityFamily =
+  | "depenses"
+  | "couts_fixes"
+  | "epargne"
+  | "securite";
+
+function familyOf(kind: OpportunityKind): OpportunityFamily {
+  switch (kind) {
+    case "budget_over":
+    case "high_variable_share":
+    case "audit_top_variable_category":
+    case "dominant_category":
+      return "depenses";
+    case "high_fixed_ratio":
+    case "high_insurance_share":
+    case "high_subscriptions_share":
+      return "couts_fixes";
+    case "low_savings_rate":
+      return "epargne";
+    case "low_emergency_fund":
+      return "securite";
+  }
+}
+
+const FAMILY_META: Record<OpportunityFamily, { label: string; color: string; bg: string }> = {
+  depenses: { label: "Dépenses", color: "#F97757", bg: "#FFF1EC" },
+  couts_fixes: { label: "Coûts fixes", color: "#F59E0B", bg: "#FEF3C7" },
+  epargne: { label: "Épargne", color: "#10A37F", bg: "#ECFDF5" },
+  securite: { label: "Sécurité", color: "#9061F9", bg: "#F4EBFF" },
+};
+
+const PRIORITY_TAG: Record<OpportunityPriority, string> = {
+  high: "IMMÉDIAT",
+  medium: "RAPIDE",
+  low: "AUDIT",
+};
+
+const PRIORITY_STYLE: Record<OpportunityPriority, { color: string; bg: string }> = {
+  high: { color: "#F97757", bg: "#FFF1EC" },
+  medium: { color: "#F59E0B", bg: "#FEF3C7" },
+  low: { color: "#2563EB", bg: "#EDF2FD" },
+};
+
+type ResolvedOpportunity = {
+  kind: OpportunityKind;
+  priority: OpportunityPriority;
+  title: string;
+  body: string;
+  monthlyImpact: number;
+  yearlyImpact: number;
+  family: OpportunityFamily;
+};
+
+type OppWiredProps = {
+  resolved: ResolvedOpportunity[];
+  totalCount: number;
+  highCount: number;
+  totalMonthlyImpact: number;
+  totalYearlyImpact: number;
+  familyDistribution: {
+    family: OpportunityFamily;
+    pct: number;
+    sum: number;
+    count: number;
+  }[];
+  fhsScore: number | null;
+  formatMoney: (n: number) => string;
+};
+
 export default async function DesignMatchOpportunitesV3() {
-  const data = await getFinanceData();
+  /* ------------------------------------------------------------------ */
+  /*  Data fetch                                                         */
+  /* ------------------------------------------------------------------ */
+
+  const [data, authedUser] = await Promise.all([
+    getFinanceData(),
+    getCurrentAuthUser(),
+  ]);
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Agrégats finance (alignés dashboard-v3 / plan-v3)                  */
+  /* ------------------------------------------------------------------ */
+
+  const monthlyIncome =
+    totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
+  const fixedExpenses =
+    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
+  const variableExpenses = data.expenseBuckets.variable;
+  const monthlyExpenses = fixedExpenses + variableExpenses;
+  const currentSavings = data.financialProfile?.current_savings ?? 0;
+  const cashflow = calculateNetCashflow({
+    monthlyIncome,
+    monthlyExpenses,
+  });
+  const runwayRaw = calculateRunway({
+    currentSavings,
+    monthlyExpenses,
+  });
+  const runwayMonths = Number.isFinite(runwayRaw) ? runwayRaw : 999;
+  // Eslint silencieux : cashflow gardé pour cohérence inter-pages V3.
+  void cashflow;
+
+  const monthBreakdown = buildCategoryBreakdown(
+    data.expenses,
+    "month",
+    EXPENSE_CATEGORIES.map((c) => c.id),
+  );
+  const monthBudgetStatus = buildBudgetStatus(
+    data.expenses,
+    data.categoryBudgets.map((b) => ({
+      category: b.category,
+      monthly_limit: b.monthly_limit,
+    })),
+  );
+  const savingsRate =
+    monthlyIncome > 0 ? (monthlyIncome - fixedExpenses) / monthlyIncome : 0;
+
+  /* ------------------------------------------------------------------ */
+  /*  Moteur opportunités — la SOURCE de cette page                      */
+  /* ------------------------------------------------------------------ */
+
+  const opportunities: Opportunity[] = detectOpportunities({
+    expenseBuckets: data.expenseBuckets,
+    budgetStatus: monthBudgetStatus,
+    categoryBreakdown: monthBreakdown,
+    monthlyIncome,
+    runwayMonths,
+    savingsRate,
+  });
+
+  /* ------------------------------------------------------------------ */
+  /*  FHS score (utilisé par ScoreCard "Score IA")                       */
+  /* ------------------------------------------------------------------ */
+
+  let drawerData: DrawerData | null = null;
+  if (!data.isDemo && authedUser?.id) {
+    try {
+      const extras = await gatherExtraSignals({
+        userId: authedUser.id,
+        financeData: data,
+        accountCreatedAt: authedUser.created_at ?? null,
+      });
+      drawerData = await getOrSealDrawerData({
+        userId: authedUser.id,
+        financeData: data,
+        extras,
+      });
+    } catch (err) {
+      console.error("[opportunites-v3] FHS drawer compute failed", err);
+    }
+  }
+  const fhsScore = drawerData?.score.display ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  i18n — résolutions côté serveur                                    */
+  /* ------------------------------------------------------------------ */
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const tKind = (await getTranslations(
+    "app.finance.analytics.opportunities.kind",
+  )) as (key: string, values?: Record<string, string | number>) => string;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+
+  const profile = {
+    currency: data.profile.currency,
+    locale: data.profile.locale ?? null,
+    country: data.profile.country ?? null,
+  };
+  const formatMoney = (n: number) => formatUserCurrency(n, profile);
+
+  // Le moteur émet des payloads avec `amount`, `limit`, `variable`,
+  // `share`, `category`, etc. On rend les `category` en label FR
+  // localisé et on formate les montants AVANT i18n.
+  const resolveOpp = (o: Opportunity): ResolvedOpportunity => {
+    const payload: Record<string, string | number> = {};
+    for (const [k, v] of Object.entries(o.payload)) {
+      if (k === "category" && typeof v === "string") {
+        payload[k] = expenseCategoryLabel(v);
+      } else if (
+        (k === "amount" || k === "limit" || k === "variable" || k === "fixed") &&
+        typeof v === "number"
+      ) {
+        payload[k] = formatMoney(v);
+      } else {
+        payload[k] = v;
+      }
+    }
+    return {
+      kind: o.kind,
+      priority: o.priority,
+      title: tKind(`${o.kind}.title`, payload),
+      body: tKind(`${o.kind}.body`, payload),
+      monthlyImpact: o.monthlyImpact,
+      yearlyImpact: o.yearlyImpact,
+      family: familyOf(o.kind),
+    };
+  };
+  const resolved: ResolvedOpportunity[] = opportunities.map(resolveOpp);
+
+  /* ------------------------------------------------------------------ */
+  /*  Agrégats opportunités                                              */
+  /* ------------------------------------------------------------------ */
+
+  const totalCount = resolved.length;
+  const highCount = resolved.filter((o) => o.priority === "high").length;
+  const totalMonthlyImpact = resolved.reduce(
+    (acc, o) => acc + o.monthlyImpact,
+    0,
+  );
+  const totalYearlyImpact = resolved.reduce(
+    (acc, o) => acc + o.yearlyImpact,
+    0,
+  );
+
+  // Distribution par famille (somme monthlyImpact, % du total).
+  const familyTotals: Record<OpportunityFamily, number> = {
+    depenses: 0,
+    couts_fixes: 0,
+    epargne: 0,
+    securite: 0,
+  };
+  for (const o of resolved) {
+    familyTotals[o.family] += o.monthlyImpact;
+  }
+  const familyDenom =
+    totalMonthlyImpact > 0
+      ? totalMonthlyImpact
+      : resolved.length; // si tous impact=0 (low_emergency_fund seul), on
+                         // pondère par le nombre d'entrées de la famille
+  const familyDistribution = (Object.keys(familyTotals) as OpportunityFamily[])
+    .map((f) => {
+      const sum = familyTotals[f];
+      const fallbackCount = resolved.filter((o) => o.family === f).length;
+      const denom =
+        totalMonthlyImpact > 0 ? totalMonthlyImpact : familyDenom || 1;
+      const pct =
+        totalMonthlyImpact > 0
+          ? Math.round((sum / denom) * 100)
+          : Math.round((fallbackCount / denom) * 100);
+      return { family: f, pct, sum, count: fallbackCount };
+    })
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.pct - a.pct);
+
+  const wired: OppWiredProps = {
+    resolved,
+    totalCount,
+    highCount,
+    totalMonthlyImpact,
+    totalYearlyImpact,
+    familyDistribution,
+    fhsScore,
+    formatMoney,
+  };
 
   return (
     <>
@@ -104,20 +403,20 @@ export default async function DesignMatchOpportunitesV3() {
             }}
           >
             <div data-opp-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
-              <HeroOpportunites />
-              <ScoreCard />
+              <HeroOpportunites wired={wired} />
+              <ScoreCard wired={wired} />
             </div>
             <div data-opp-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
-              <TopOpportunitesCard />
-              <GainsFutursCard />
-              <PrioritesCard />
+              <TopOpportunitesCard wired={wired} />
+              <GainsFutursCard wired={wired} />
+              <PrioritesCard wired={wired} />
             </div>
             <div data-opp-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
               <EvolutionCard />
-              <CategoriesCard />
-              <ConseilIACard />
+              <CategoriesCard wired={wired} />
+              <ConseilIACard wired={wired} />
             </div>
-            <MissionFooter />
+            <MissionFooter wired={wired} />
           </main>
         </div>
       </div>
@@ -414,7 +713,15 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function HeroOpportunites() {
+function HeroOpportunites({ wired }: { wired: OppWiredProps }) {
+  const { totalCount, totalMonthlyImpact, highCount, formatMoney } = wired;
+  const hasImpact = totalMonthlyImpact > 0;
+  const noun =
+    totalCount === 0
+      ? "Aucune opportunité"
+      : totalCount === 1
+        ? "1 opportunité"
+        : `${totalCount} opportunités`;
   return (
     <div
       style={{
@@ -458,27 +765,42 @@ function HeroOpportunites() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              18 opportunités
+              {noun}
             </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +3
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette semaine</span>
+            {highCount > 0 && (
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.78)" }}>
+                dont <span style={{ color: "#5EEAD4", fontWeight: 700 }}>{highCount}</span> haute priorité
+              </span>
+            )}
           </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
-            2 480 CHF / mois
-          </p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
-            Potentiel identifié
-          </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "74%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              74%
-            </span>
-          </div>
+          {hasImpact ? (
+            <>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
+                {formatMoney(totalMonthlyImpact)} / mois
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
+                Impact mensuel estimé par le moteur
+              </p>
+            </>
+          ) : totalCount > 0 ? (
+            <>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.9)", lineHeight: 1.3 }}>
+                Impact chiffré non calculable
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
+                Audit qualitatif uniquement pour ce mois
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.9)", lineHeight: 1.3 }}>
+                Tout est sous contrôle ce mois-ci
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
+                Continuez comme ça
+              </p>
+            </>
+          )}
         </div>
         <div
           style={{
@@ -502,12 +824,25 @@ function HeroOpportunites() {
   );
 }
 
-function ScoreCard() {
+function ScoreCard({ wired }: { wired: OppWiredProps }) {
+  const { totalCount, highCount, totalYearlyImpact, fhsScore, formatMoney } = wired;
   const stats = [
-    { label: "Actives", value: "18", color: C.primary },
-    { label: "Fort impact", value: "6", color: C.success },
-    { label: "Gain potentiel", value: "29 760 CHF", color: C.success },
-    { label: "Score IA", value: "94 / 100", color: C.primary },
+    { label: "Actives", value: String(totalCount), color: C.primary },
+    {
+      label: "Haute priorité",
+      value: String(highCount),
+      color: highCount > 0 ? C.coral : C.textMuted,
+    },
+    {
+      label: "Gain annuel",
+      value: totalYearlyImpact > 0 ? formatMoney(totalYearlyImpact) : "—",
+      color: totalYearlyImpact > 0 ? C.success : C.textMuted,
+    },
+    {
+      label: "Score FHS",
+      value: fhsScore !== null ? `${fhsScore} / 100` : "—",
+      color: fhsScore !== null ? C.primary : C.textMuted,
+    },
   ];
   return (
     <div
@@ -543,7 +878,8 @@ function ScoreCard() {
           </div>
         ))}
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           marginTop: 6,
           padding: "6px 12px",
@@ -556,181 +892,257 @@ function ScoreCard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Voir toutes les opportunités
+        En parler au coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 2 ═══════════════ */
 
-function TopOpportunitesCard() {
-  const items = [
-    { label: "Optimisation abonnements", gain: "+180 CHF/mois", impact: "Rapide", color: C.amber, bg: C.amberBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Réduction assurances", gain: "+240 CHF/mois", impact: "Immédiat", color: C.coral, bg: C.coralBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-    { label: "Placement épargne", gain: "+310 CHF/mois", impact: "Stable", color: C.primary, bg: C.primaryBg, iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
-    { label: "Revenus passifs", gain: "+420 CHF/mois", impact: "Long terme", color: C.success, bg: C.successBg, iconPath: "M12 1v22|M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
-  ];
+function TopOpportunitesCard({ wired }: { wired: OppWiredProps }) {
+  const items = wired.resolved.slice(0, 4);
+  const formatMoney = wired.formatMoney;
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Top opportunités
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Sélectionnées par votre coach IA
+        Détectées sur vos données réelles
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
-                {it.gain}
-              </p>
-            </div>
-            <span
-              style={{
-                padding: "2px 7px",
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: it.color,
-                backgroundColor: it.bg,
-                borderRadius: 999,
-                flexShrink: 0,
-              }}
-            >
-              {it.impact}
-            </span>
-          </div>
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <div
+          style={{
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "10px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Aucune opportunité détectée
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
+            Le moteur n&apos;a rien trouvé à optimiser ce mois-ci. Complétez vos données pour affiner l&apos;analyse.
+          </p>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {items.map((it) => {
+            const fam = FAMILY_META[it.family];
+            return (
+              <div key={`${it.kind}-${it.title}`} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: fam.bg, flexShrink: 0 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={fam.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: C.textDark,
+                      lineHeight: 1.2,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {it.title}
+                  </p>
+                  <p style={{ margin: "1px 0 0 0", fontSize: 10.5, fontWeight: 700, color: it.monthlyImpact > 0 ? C.success : C.textMuted, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums", lineHeight: 1.2 }}>
+                    {it.monthlyImpact > 0
+                      ? `+${formatMoney(it.monthlyImpact)}/mois`
+                      : "Audit qualitatif"}
+                  </p>
+                </div>
+                <span
+                  style={{
+                    padding: "2px 7px",
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    color: PRIORITY_STYLE[it.priority].color,
+                    backgroundColor: PRIORITY_STYLE[it.priority].bg,
+                    borderRadius: 999,
+                    flexShrink: 0,
+                  }}
+                >
+                  {PRIORITY_TAG[it.priority]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
-function GainsFutursCard() {
+function GainsFutursCard({ wired }: { wired: OppWiredProps }) {
+  const { totalYearlyImpact, formatMoney } = wired;
+  // Le moteur d'opportunités ne projette PAS de gains cumulés sur 5 ans
+  // (pas de modèle de rendement composé, pas de simulateur calibré).
+  // On affiche uniquement le gain ANNUEL identifié (chiffre réel du
+  // moteur) sans extrapoler 3 ou 5 ans (= invention de rendement).
+  const hasImpact = totalYearlyImpact > 0;
   return (
     <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Gains futurs
+        Gain annuel
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Projection IA
+        Estimé par le moteur
       </p>
-      <div style={{ marginTop: 8, padding: "8px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Gains cumulés dans 5 ans
-        </p>
-        <p
+      {hasImpact ? (
+        <>
+          <div style={{ marginTop: 8, padding: "10px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              Si vous appliquez tout
+            </p>
+            <p
+              style={{
+                margin: "4px 0 0 0",
+                fontSize: 20,
+                fontWeight: 700,
+                color: C.success,
+                fontFamily: "Outfit, Inter, system-ui",
+                letterSpacing: "-0.025em",
+                lineHeight: 1,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {formatMoney(totalYearlyImpact)}
+            </p>
+            <p style={{ margin: "4px 0 0 0", fontSize: 9.5, color: C.success, fontWeight: 600 }}>
+              par an, hors rendement
+            </p>
+          </div>
+          <p style={{ margin: "10px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+            Projection 3 / 5 ans non affichée : aucun moteur de rendement composé fiable n&apos;existe encore.
+          </p>
+        </>
+      ) : (
+        <div
           style={{
-            margin: "2px 0 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            color: C.success,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
-            fontVariantNumeric: "tabular-nums",
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "12px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
           }}
         >
-          165 000 CHF
-        </p>
-      </div>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>1 an</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "21%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            35 000 CHF
-          </span>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Pas de gain chiffré
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
+            Le moteur n&apos;a identifié aucun gain mensuel à ce stade.
+          </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>3 ans</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "56%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            92 000 CHF
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38 }}>5 ans</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "100%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            165 000 CHF
-          </span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function PrioritesCard() {
-  const items = [
-    { tag: "IMMÉDIAT", label: "Réduire assurances", sub: "Économie 240 CHF/mois", color: C.coral, bg: C.coralBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-    { tag: "RAPIDE", label: "Optimiser abonnements", sub: "Économie 180 CHF/mois", color: C.amber, bg: C.amberBg, iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" },
-    { tag: "LONG TERME", label: "Investir 500 CHF/mois", sub: "+62 000 CHF en 5 ans", color: C.success, bg: C.successBg, iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
-  ];
+function PrioritesCard({ wired }: { wired: OppWiredProps }) {
+  const items = wired.resolved.slice(0, 3);
+  const formatMoney = wired.formatMoney;
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Priorités IA
+        Priorités
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Actions à enclencher
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "1px 6px",
-                  fontSize: 8.5,
-                  fontWeight: 700,
-                  color: it.color,
-                  backgroundColor: it.bg,
-                  borderRadius: 4,
-                  letterSpacing: "0.06em",
-                }}
-              >
-                {it.tag}
-              </span>
-              <p style={{ margin: "2px 0 0 0", fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {it.sub}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <div
+          style={{
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "10px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Rien à enclencher
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
+            Aucune action prioritaire détectée ce mois.
+          </p>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+          {items.map((it) => {
+            const tagStyle = PRIORITY_STYLE[it.priority];
+            const sub =
+              it.monthlyImpact > 0
+                ? `Économie ${formatMoney(it.monthlyImpact)}/mois`
+                : it.body;
+            return (
+              <div key={`${it.kind}-${it.title}`} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, backgroundColor: tagStyle.bg, flexShrink: 0, marginTop: 1 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={tagStyle.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: "1px 6px",
+                      fontSize: 8.5,
+                      fontWeight: 700,
+                      color: tagStyle.color,
+                      backgroundColor: tagStyle.bg,
+                      borderRadius: 4,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    {PRIORITY_TAG[it.priority]}
+                  </span>
+                  <p style={{ margin: "2px 0 0 0", fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.25 }}>
+                    {it.title}
+                  </p>
+                  <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                    {sub}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -738,38 +1150,9 @@ function PrioritesCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function EvolutionCard() {
-  const points = [
-    { label: "Nov.", value: 900 },
-    { label: "Déc.", value: 1050 },
-    { label: "Janv.", value: 1180 },
-    { label: "Févr.", value: 1310 },
-    { label: "Mars", value: 1470 },
-    { label: "Avr.", value: 1620 },
-    { label: "Mai", value: 1780 },
-    { label: "Juin", value: 1920 },
-    { label: "Juil.", value: 2080 },
-    { label: "Août", value: 2220 },
-    { label: "Sept.", value: 2360 },
-    { label: "Oct.", value: 2480 },
-  ];
-  const W = 360;
-  const HH = 108;
-  const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 800;
-  const maxV = 2600;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [1000, 1500, 2000, 2500];
-  const last = scaled[scaled.length - 1];
+  // Empty state honnête : aucun historique d'opportunités détectées
+  // n'est tracé en base. Le moteur recalcule à chaque chargement sur
+  // le snapshot courant — pas de série temporelle 12 mois disponible.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -778,76 +1161,57 @@ function EvolutionCard() {
             Évolution
           </p>
           <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Potentiel détecté sur 12 mois
+            Historique 12 mois
           </p>
         </div>
+      </div>
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
             borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
           }}
         >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
           </svg>
-          +1 580 CHF
         </span>
-      </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="opp-evo-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.success} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.success} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v}
-                </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#opp-evo-grad)" />
-          <path d={pathD} stroke={C.success} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.success} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.success} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.success} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            2 480 CHF
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Historique non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 280 }}>
+          Le moteur d&apos;opportunités recalcule à chaque visite sur votre snapshot courant. Aucune série temporelle n&apos;est encore archivée.
+        </p>
       </div>
     </div>
   );
 }
 
-function CategoriesCard() {
-  const cats = [
-    { label: "Dépenses", pct: 35, color: C.coral, bg: C.coralBg },
-    { label: "Investissements", pct: 25, color: C.primary, bg: C.primaryBg },
-    { label: "Fiscalité", pct: 20, color: C.violet, bg: C.violetBg },
-    { label: "Épargne", pct: 15, color: C.success, bg: C.successBg },
-    { label: "Revenus passifs", pct: 5, color: C.amber, bg: C.amberBg },
-  ];
+function CategoriesCard({ wired }: { wired: OppWiredProps }) {
+  const cats = wired.familyDistribution.map((r) => {
+    const meta = FAMILY_META[r.family];
+    return { label: meta.label, pct: r.pct, color: meta.color, bg: meta.bg };
+  });
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -856,39 +1220,65 @@ function CategoriesCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Répartition détectée
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-        {cats.map((c) => (
-          <div key={c.label}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
-              <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {c.label}
-              </span>
-              <span
-                style={{
-                  padding: "1px 6px",
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: c.color,
-                  backgroundColor: c.bg,
-                  borderRadius: 999,
-                  fontVariantNumeric: "tabular-nums",
-                  flexShrink: 0,
-                }}
-              >
-                {c.pct}%
-              </span>
+      {cats.length === 0 ? (
+        <div
+          style={{
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "10px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Pas de répartition
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
+            Aucune opportunité à répartir ce mois-ci.
+          </p>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+          {cats.map((c) => (
+            <div key={c.label}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+                <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {c.label}
+                </span>
+                <span
+                  style={{
+                    padding: "1px 6px",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: c.color,
+                    backgroundColor: c.bg,
+                    borderRadius: 999,
+                    fontVariantNumeric: "tabular-nums",
+                    flexShrink: 0,
+                  }}
+                >
+                  {c.pct}%
+                </span>
+              </div>
+              <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ width: `${c.pct}%`, height: "100%", backgroundColor: c.color, borderRadius: 999 }} />
+              </div>
             </div>
-            <div style={{ height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-              <div style={{ width: `${c.pct}%`, height: "100%", backgroundColor: c.color, borderRadius: 999 }} />
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ConseilIACard() {
+function ConseilIACard({ wired }: { wired: OppWiredProps }) {
+  const { totalMonthlyImpact, totalYearlyImpact, totalCount, formatMoney } = wired;
+  const hasImpact = totalMonthlyImpact > 0;
   return (
     <div
       style={{
@@ -921,13 +1311,36 @@ function ConseilIACard() {
           Conseil IA
         </p>
       </div>
-      <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        2 480 CHF/mois de potentiel inexploité.
-      </p>
-      <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        En appliquant les recommandations prioritaires, vous pourriez générer près de <span style={{ color: C.primary, fontWeight: 700 }}>30 000 CHF</span> supplémentaires par an.
-      </p>
-      <button
+      {hasImpact ? (
+        <>
+          <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
+            {formatMoney(totalMonthlyImpact)}/mois de potentiel identifié.
+          </p>
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+            En appliquant ces opportunités, vous pourriez économiser environ <span style={{ color: C.primary, fontWeight: 700 }}>{formatMoney(totalYearlyImpact)}</span> par an (hors rendement composé).
+          </p>
+        </>
+      ) : totalCount > 0 ? (
+        <>
+          <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
+            Audit qualitatif uniquement
+          </p>
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+            Le moteur a détecté {totalCount} signal{totalCount > 1 ? "s" : ""} à étudier, sans gain chiffré pour l&apos;instant.
+          </p>
+        </>
+      ) : (
+        <>
+          <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
+            Tout est sous contrôle ce mois-ci
+          </p>
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+            Le moteur n&apos;a rien détecté à optimiser sur vos données actuelles. Continuez comme ça.
+          </p>
+        </>
+      )}
+      <Link
+        href="/coach"
         style={{
           marginTop: 8,
           padding: "7px 12px",
@@ -940,8 +1353,7 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Parler à mon conseiller
@@ -949,14 +1361,18 @@ function ConseilIACard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 4 — MISSION FOOTER ═══════════════ */
 
-function MissionFooter() {
+function MissionFooter({ wired }: { wired: OppWiredProps }) {
+  const { totalCount, highCount, totalYearlyImpact, formatMoney } = wired;
+  const hasImpact = totalYearlyImpact > 0;
+  // Pas de notion "exploité" trackée → on remplace la barre par un
+  // headline honnête (impact annuel OU compte d'opportunités).
   return (
     <div
       style={{
@@ -989,22 +1405,39 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Potentiel annuel identifié <span style={{ fontVariantNumeric: "tabular-nums" }}>29 760 CHF / an</span>
+            {hasImpact ? (
+              <>
+                Potentiel annuel identifié{" "}
+                <span style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {formatMoney(totalYearlyImpact)} / an
+                </span>
+              </>
+            ) : totalCount > 0 ? (
+              <>
+                {totalCount} opportunité{totalCount > 1 ? "s" : ""} détectée
+                {totalCount > 1 ? "s" : ""} — audit qualitatif
+              </>
+            ) : (
+              <>Aucune opportunité détectée ce mois-ci</>
+            )}
           </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
-              <div style={{ width: "74%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              74 % exploité
-            </span>
-          </div>
-          <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
-            Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>6 opportunités majeures</span> à exploiter.
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.3 }}>
+            {totalCount === 0 ? (
+              <>Le moteur n&apos;a rien trouvé à optimiser. Complétez vos données pour affiner l&apos;analyse.</>
+            ) : highCount > 0 ? (
+              <>
+                <span style={{ fontVariantNumeric: "tabular-nums" }}>{highCount}</span>{" "}
+                opportunité{highCount > 1 ? "s" : ""} en haute priorité — à enclencher
+                en premier.
+              </>
+            ) : (
+              <>Toutes les opportunités sont de priorité moyenne ou basse — pas d&apos;urgence.</>
+            )}
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "9px 14px",
           display: "inline-flex",
@@ -1015,17 +1448,16 @@ function MissionFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
           flexShrink: 0,
+          textDecoration: "none",
         }}
       >
-        Activer mes opportunités
+        En parler au coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
