@@ -1,255 +1,33 @@
 /**
- * Phase 5.0 — /design-match/coach-v3
- * Phase 6.0 — branchement données live + composer/chips fonctionnels.
+ * /design-match/coach-v3 — Coach IA premium.
  *
- * Coach IA premium, langage visuel strictement aligné sur dashboard-v3.
- * Cette page sert de WELCOME / landing pour le coach :
- *   - si l'utilisateur a déjà une conversation → redirect vers
- *     /coach/{firstConversationId} (cohérent avec le comportement prod
- *     préservé dans app/(app)/coach/page.tsx avant cette migration).
- *   - sinon → rendu V3 avec composer + suggestions qui CRÉENT une
- *     nouvelle conversation (server action), puis redirect vers
- *     /coach/{newId} où l'utilisateur tape sa première question.
+ * Base visuelle = commit f6b2c6f du 9 juin 2026 (passe finition
+ * fintech premium) qui correspond exactement à la maquette validée
+ * (chat thread visible avec messages mockés, donut score, résumé
+ * financier, priorité du moment, actions rapides).
  *
- * Right rail branché aux vraies données : score FHS, agrégats finance,
- * priorité du moment (buildFirstMission).
+ * Harmonisations préservées des commits ultérieurs :
+ *   - Sidebar V3 (8ede7db) : 280 px, "Mon analyse" en PRINCIPAL,
+ *     Link prod, Premium card avec <Link href="/settings/subscription">
+ *   - Topbar V3 (cae4964)  : height 68, padding 0 42px, h1 22 px,
+ *     notif visible, avatar <Link href="/profile">
+ *   - Responsive (cae4964) : @media < 1199 + < 999 avec attrs
+ *     data-coach-sidebar/content/main/topbar
  *
- * NB : les éléments du chat thread V3 (5 messages mockés avec score
- * 46/100, reste 9 107 CHF…) ont été remplacés par un empty state pour
- * ne JAMAIS afficher du fake data comme du réel.
+ * Le chat /coach/[id] est inchangé. Aucun redirect automatique
+ * depuis cette page vers /coach/{id} (la page d'accueil Coach IA
+ * s'affiche toujours).
  */
 
-import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { getFinanceData, totalMonthly } from "@/lib/services/finance";
-import {
-  calculateNetCashflow,
-  calculateRunway,
-} from "@/lib/calculations/finance";
-import { buildFirstMission } from "@/lib/calculations/first-mission";
-import { computeFinancialCompleteness } from "@/lib/calculations/completeness";
-import { formatUserCurrency } from "@/lib/utils";
-import { listConversations } from "@/lib/services/coach";
-import { createClient } from "@/lib/supabase/server";
-import {
-  gatherExtraSignals,
-  getOrSealDrawerData,
-} from "@/lib/services/health-writer";
-import type { DrawerData } from "@/lib/calculations/health/types";
-import { createConversation } from "@/app/actions/conversations";
+import type { Metadata } from "next";
+
+// Auth via cookies Supabase — pas de prerender possible.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Coach IA — LIBERIA",
 };
-
-export const dynamic = "force-dynamic";
-
-/* ═══════════════ HELPERS ═══════════════ */
-
-async function getCurrentAuthUser(): Promise<{
-  id: string;
-  created_at: string | null;
-} | null> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return null;
-    return { id: user.id, created_at: user.created_at ?? null };
-  } catch {
-    return null;
-  }
-}
-
-/** Server action exécutée par le composer + chaque suggestion chip.
- *  Crée une conversation vide puis redirige vers /coach/{id}.
- *  Le texte tapé est perdu (limitation MVP — cohérente avec la page
- *  welcome prod /coach/page.tsx historique). */
-async function startConversationAction() {
-  "use server";
-  const res = await createConversation();
-  if (res.ok) redirect(`/coach/${res.data.id}`);
-  redirect("/coach");
-}
-
-/* ═══════════════ DEFAULT EXPORT ═══════════════ */
-
-export default async function DesignMatchCoachV3() {
-  const [data, authedUser] = await Promise.all([
-    getFinanceData(),
-    getCurrentAuthUser(),
-  ]);
-
-  // Si l'utilisateur a déjà une conversation, on saute directement
-  // dessus (comportement prod préservé).
-  if (!data.isDemo) {
-    const conversations = await listConversations();
-    if (conversations.length > 0) {
-      redirect(`/coach/${conversations[0].id}`);
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  Agrégats finance pour le right rail                                */
-  /* ------------------------------------------------------------------ */
-
-  const monthlyIncome =
-    totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
-  const fixedExpenses =
-    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
-  const variableExpenses = data.expenseBuckets.variable;
-  const totalExpenses = fixedExpenses + variableExpenses;
-  const currentSavings = data.financialProfile?.current_savings ?? 0;
-  const cashflow = calculateNetCashflow({
-    monthlyIncome,
-    monthlyExpenses: totalExpenses,
-  });
-  const runway = calculateRunway({
-    currentSavings,
-    monthlyExpenses: totalExpenses,
-  });
-
-  /* ------------------------------------------------------------------ */
-  /*  FHS drawer (pour SituationCard)                                    */
-  /* ------------------------------------------------------------------ */
-
-  let drawerData: DrawerData | null = null;
-  if (authedUser?.id) {
-    try {
-      const extras = await gatherExtraSignals({
-        userId: authedUser.id,
-        financeData: data,
-        accountCreatedAt: authedUser.created_at ?? null,
-      });
-      drawerData = await getOrSealDrawerData({
-        userId: authedUser.id,
-        financeData: data,
-        extras,
-      });
-    } catch (err) {
-      console.error("[coach-v3] FHS drawer compute failed", err);
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  First mission (priority + payload pour PrioriteMomentCard)         */
-  /* ------------------------------------------------------------------ */
-
-  const completeness = computeFinancialCompleteness({
-    incomes: data.incomes,
-    expenses: data.expenses,
-    goals: data.goals,
-    categoryBudgets: data.categoryBudgets,
-  });
-  const MAJOR_AREAS = [
-    "income",
-    "housing",
-    "insurance",
-    "food",
-    "transport",
-  ] as const;
-  const filledMajorSet = new Set<string>(completeness.detected);
-  const filledMajorAreasCount = MAJOR_AREAS.filter((a) =>
-    filledMajorSet.has(a),
-  ).length;
-  const firstMissingMajor =
-    MAJOR_AREAS.find((a) => !filledMajorSet.has(a)) ?? null;
-  const activeGoalsCount = data.goals.filter((g) => !g.is_completed).length;
-  const firstMission = buildFirstMission({
-    goalsCount: activeGoalsCount,
-    runwayMonths: Number.isFinite(runway) ? runway : 999,
-    hasCurrentSavings: currentSavings > 0,
-    filledMajorAreasCount,
-    missingMajorArea: firstMissingMajor,
-    monthlyIncome,
-    recommendation: drawerData?.recommendation ?? null,
-  });
-
-  /* ------------------------------------------------------------------ */
-  /*  i18n strings — résolus côté serveur                                */
-  /* ------------------------------------------------------------------ */
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const tFirstMission = (await getTranslations(
-    "dashboard.firstMission",
-  )) as (key: string, values?: Record<string, string | number>) => string;
-  const tBands = (await getTranslations(
-    "dashboard.health.bands",
-  )) as (key: string) => string;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
-
-  const firstName =
-    data.profile.full_name?.split(" ")[0]?.trim() || null;
-  const fullName = data.profile.full_name ?? null;
-  const score = drawerData?.score.display ?? null;
-  const scoreDelta = drawerData?.delta?.netDelta ?? null;
-  const tierLabel = drawerData ? tBands(drawerData.score.band) : "—";
-  const priorityTitle = tFirstMission(
-    `${firstMission.priority}.title`,
-    firstMission.payload,
-  );
-
-  return (
-    <>
-      <style>{`
-        @media (max-width: 999px) {
-          [data-coach-sidebar] { display: none !important; }
-          [data-coach-content] { margin-left: 0 !important; }
-          [data-coach-main] { grid-template-columns: 1fr !important; padding: 0 16px 16px 16px !important; }
-          [data-coach-topbar] { padding: 0 16px !important; }
-        }
-      `}</style>
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden",
-        backgroundColor: C.pageBg,
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-      }}
-    >
-      <div data-coach-sidebar><Sidebar /></div>
-      <div data-coach-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-        <Topbar firstName={firstName} fullName={fullName} />
-        <main
-          data-coach-main
-          style={{
-            flex: 1,
-            minHeight: 0,
-            padding: "0 32px 16px 32px",
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) 320px",
-            gridTemplateRows: "1fr",
-            gap: 24,
-            maxWidth: 1440,
-            margin: "0 auto",
-            width: "100%",
-          }}
-        >
-          <ChatColumn firstName={firstName} />
-          <RightRail
-            score={score}
-            scoreDelta={scoreDelta}
-            tierLabel={tierLabel}
-            priorityTitle={priorityTitle}
-            runway={runway}
-            monthlyIncome={monthlyIncome}
-            totalExpenses={totalExpenses}
-            cashflow={cashflow}
-            currentSavings={currentSavings}
-            currency={data.profile.currency}
-            profile={data.profile}
-          />
-        </main>
-      </div>
-    </div>
-    </>
-  );
-}
-
 
 const C = {
   navy: "#011E5F",
@@ -289,6 +67,53 @@ const H = {
   privacy: 24,
   rightCardGap: 12,
 };
+
+export default function DesignMatchCoachV3() {
+  return (
+    <>
+      <style>{`
+        @media (max-width: 999px) {
+          [data-coach-sidebar] { display: none !important; }
+          [data-coach-content] { margin-left: 0 !important; }
+          [data-coach-main] { grid-template-columns: 1fr !important; padding: 0 16px 16px 16px !important; }
+          [data-coach-topbar] { padding: 0 16px !important; }
+        }
+      `}</style>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          overflow: "hidden",
+          backgroundColor: C.pageBg,
+          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        }}
+      >
+        <div data-coach-sidebar><Sidebar /></div>
+        <div data-coach-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <Topbar />
+          <main
+            data-coach-main
+            style={{
+              flex: 1,
+              minHeight: 0,
+              padding: "0 32px 16px 32px",
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) 320px",
+              gridTemplateRows: "1fr",
+              gap: 24,
+              maxWidth: 1440,
+              margin: "0 auto",
+              width: "100%",
+            }}
+          >
+            <ChatColumn />
+            <RightRail />
+          </main>
+        </div>
+      </div>
+    </>
+  );
+}
 
 /* ═══════════════ SIDEBAR — identique dashboard-v3 ═══════════════ */
 
@@ -472,17 +297,11 @@ function NavItem({
     </Link>
   );
 }
+
 /* ═══════════════ TOPBAR ═══════════════ */
 
-function Topbar({
-  firstName,
-  fullName,
-}: {
-  firstName: string | null;
-  fullName: string | null;
-}) {
-  const displayName = firstName ?? "explorer";
-  const pillName = fullName ?? "Mon profil";
+function Topbar() {
+  const subtitle = "Votre conseiller IA est prêt à répondre à vos questions.";
   return (
     <header
       data-coach-topbar
@@ -497,10 +316,10 @@ function Topbar({
     >
       <div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
-          Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
+          Bonjour Sébastien <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
         <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
-          Votre conseiller IA est prêt à répondre à vos questions.
+          {subtitle}
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -567,7 +386,7 @@ function Topbar({
             }}
           />
           <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
-            {pillName}
+            Sébastien Golay
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
@@ -577,13 +396,14 @@ function Topbar({
     </header>
   );
 }
+
 /* ═══════════════ CHAT COLUMN ═══════════════ */
 
-function ChatColumn({ firstName }: { firstName: string | null }) {
+function ChatColumn() {
   return (
     <div style={{ display: "flex", flexDirection: "column", minWidth: 0, minHeight: 0, gap: 12 }}>
       <CoachHero />
-      <EmptyChatWelcome firstName={firstName} />
+      <ChatThread />
       <SuggestionChips />
       <Composer />
       <PrivacyFooter />
@@ -667,101 +487,55 @@ function CoachHero() {
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <form action={startConversationAction}>
-          <button
-            type="submit"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "7px 12px",
-              backgroundColor: C.primaryBg,
-              color: C.primary,
-              fontSize: 12.5,
-              fontWeight: 600,
-              borderRadius: 8,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Nouvelle conversation
-          </button>
-        </form>
+        <button
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 12.5,
+            fontWeight: 500,
+            color: C.textMuted,
+            background: "none",
+            border: "none",
+            padding: "6px 8px",
+            cursor: "pointer",
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          Historique
+        </button>
+        <button
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "7px 12px",
+            backgroundColor: C.primaryBg,
+            color: C.primary,
+            fontSize: 12.5,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Nouvelle conversation
+        </button>
       </div>
     </div>
   );
 }
 
-/* ═══════════════ EMPTY CHAT WELCOME (remplace ChatThread mock) ═══════════════ */
+/* ═══════════════ CHAT THREAD ═══════════════ */
 
-/** Audit zéro-tolérance : le ChatThread V3 original affichait 5 messages
- *  mockés ("Salut Sébastien", "46/100", "9 107 CHF/mois", etc.). On
- *  remplace par un empty state propre — le vrai chat vit sous
- *  /coach/[conversationId] et est rejoint dès que l'utilisateur démarre
- *  une conversation via le composer / chips ci-dessous. */
-function EmptyChatWelcome({ firstName }: { firstName: string | null }) {
-  const greet = firstName ?? "explorer";
-  return (
-    <div
-      style={{
-        flex: 1,
-        minHeight: 0,
-        padding: "32px 22px",
-        backgroundColor: C.cardBg,
-        borderRadius: 18,
-        boxShadow: SHADOW.card,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 16,
-        textAlign: "center",
-      }}
-    >
-      <span
-        style={{
-          display: "inline-flex",
-          width: 52,
-          height: 52,
-          borderRadius: 16,
-          backgroundColor: C.primaryBg,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      </span>
-      <h2
-        style={{
-          margin: 0,
-          fontSize: 18,
-          fontWeight: 700,
-          color: C.textDark,
-          fontFamily: "Outfit, Inter, system-ui",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        Bonjour {greet}, prêt à démarrer&nbsp;?
-      </h2>
-      <p style={{ margin: 0, maxWidth: 480, fontSize: 13, color: C.textMuted, lineHeight: 1.55 }}>
-        Posez une question dans le composer ci-dessous ou choisissez une
-        suggestion pour démarrer votre première conversation avec le
-        Coach IA. Vos échanges sont privés et basés sur vos données.
-      </p>
-    </div>
-  );
-}
-
-/* ═══════════════ ANCIEN CHAT THREAD (référence design — non utilisé) ═══════════════ */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _ChatThreadReference() {
+function ChatThread() {
   return (
     <div
       style={{
@@ -1096,47 +870,40 @@ function LeverRow({
 /* ═══════════════ SUGGESTION CHIPS ═══════════════ */
 
 function SuggestionChips() {
-  // Audit zéro-tolérance : chaque suggestion devient un form qui crée
-  // une vraie conversation (server action) et redirige vers /coach/{id}.
-  // Le texte de la suggestion n'est pas (encore) injecté comme premier
-  // message — l'utilisateur retape sa question sur la page enfant.
-  // Limitation documentée, à améliorer dans une phase ultérieure.
   const suggestions = [
-    "Comment augmenter mon épargne ?",
+    "Détailler la renégociation assurances",
+    "Simuler 500 CHF/mois pendant 12 mois",
     "Quels postes je dépense le plus ?",
-    "Quelle est ma priorité financière ?",
-    "Simuler un effort d'épargne",
+    "Optimiser mes impôts",
   ];
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textLight, letterSpacing: "0.14em", textTransform: "uppercase", alignSelf: "center", marginRight: 4 }}>
         Suggestions
       </span>
       {suggestions.map((s) => (
-        <form key={s} action={startConversationAction}>
-          <button
-            type="submit"
-            style={{
-              padding: "7px 12px",
-              borderRadius: 999,
-              border: `1px solid ${C.borderGhost}`,
-              backgroundColor: C.cardBg,
-              fontSize: 12,
-              fontWeight: 500,
-              color: C.textDark,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              boxShadow: SHADOW.flat,
-            }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-            {s}
-          </button>
-        </form>
+        <button
+          key={s}
+          style={{
+            padding: "7px 12px",
+            borderRadius: 999,
+            border: `1px solid ${C.borderGhost}`,
+            backgroundColor: C.cardBg,
+            fontSize: 12,
+            fontWeight: 500,
+            color: C.textDark,
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            boxShadow: SHADOW.flat,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          {s}
+        </button>
       ))}
     </div>
   );
@@ -1145,14 +912,8 @@ function SuggestionChips() {
 /* ═══════════════ COMPOSER ═══════════════ */
 
 function Composer() {
-  // Audit zéro-tolérance : le composer est un vrai <form> qui crée
-  // une conversation (server action) et redirige vers /coach/{id}.
-  // Le textarea garde le placeholder explicite. Le texte n'est pas
-  // injecté comme premier message (limitation MVP, cohérente avec la
-  // page welcome prod historique app/(app)/coach/page.tsx).
   return (
-    <form
-      action={startConversationAction}
+    <div
       style={{
         backgroundColor: C.cardBg,
         borderRadius: 16,
@@ -1163,10 +924,9 @@ function Composer() {
         gap: 8,
       }}
     >
-      <textarea
-        name="message"
-        rows={1}
-        placeholder="Posez une question à votre conseiller…"
+      <div
+        contentEditable
+        suppressContentEditableWarning
         style={{
           fontSize: 13.5,
           color: C.textDark,
@@ -1175,16 +935,29 @@ function Composer() {
           minHeight: 24,
           outline: "none",
           fontFamily: "inherit",
-          border: "none",
-          resize: "none",
-          width: "100%",
-          backgroundColor: "transparent",
         }}
         aria-label="Saisir un message"
-      />
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
+      >
+        <span style={{ color: C.textLight, userSelect: "none" }}>
+          Posez une question à votre conseiller…
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <ComposerAction
+            iconPath="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+            label="Joindre un fichier"
+          />
+          <ComposerAction
+            iconPath="M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3"
+            label="Analyser mes données"
+          />
+          <ComposerAction
+            iconPath="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z|M19 10v2a7 7 0 0 1-14 0v-2|M12 19v4|M8 23h8"
+            label="Dicter un message"
+          />
+        </div>
         <button
-          type="submit"
           aria-label="Envoyer"
           style={{
             display: "inline-flex",
@@ -1201,19 +974,18 @@ function Composer() {
             cursor: "pointer",
           }}
         >
-          Démarrer la conversation
+          Envoyer
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
         </button>
       </div>
-    </form>
+    </div>
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _ComposerActionReference({ iconPath, label }: { iconPath: string; label: string }) {
+function ComposerAction({ iconPath, label }: { iconPath: string; label: string }) {
   const paths = iconPath.split("|");
   return (
     <button
@@ -1265,21 +1037,7 @@ function PrivacyFooter() {
 
 /* ═══════════════ RIGHT RAIL ═══════════════ */
 
-interface RightRailProps {
-  score: number | null;
-  scoreDelta: number | null;
-  tierLabel: string;
-  priorityTitle: string;
-  runway: number;
-  monthlyIncome: number;
-  totalExpenses: number;
-  cashflow: number;
-  currentSavings: number;
-  currency: string;
-  profile: { currency: string; locale?: string | null; country?: string | null };
-}
-
-function RightRail(props: RightRailProps) {
+function RightRail() {
   return (
     <aside
       style={{
@@ -1291,58 +1049,21 @@ function RightRail(props: RightRailProps) {
         overflowY: "auto",
       }}
     >
-      <SituationCard
-        score={props.score}
-        scoreDelta={props.scoreDelta}
-        tierLabel={props.tierLabel}
-      />
-      <ResumeFinancierCard
-        monthlyIncome={props.monthlyIncome}
-        totalExpenses={props.totalExpenses}
-        cashflow={props.cashflow}
-        runway={props.runway}
-        currentSavings={props.currentSavings}
-        profile={props.profile}
-      />
-      <PrioriteMomentCard
-        priorityTitle={props.priorityTitle}
-        runway={props.runway}
-      />
+      <SituationCard />
+      <ResumeFinancierCard />
+      <PrioriteMomentCard />
       <InsightsRapidesCard />
     </aside>
   );
 }
 
-function SituationCard({
-  score,
-  scoreDelta,
-  tierLabel,
-}: {
-  score: number | null;
-  scoreDelta: number | null;
-  tierLabel: string;
-}) {
-  // Mini-ring : circumference 2π × 32 ≈ 201.06.
-  // Ring 80 px, strokeWidth 7, glow drop-shadow alignés strictement sur
-  // le ScoreCard du dashboard-v3.
+function SituationCard() {
+  // Mini-ring : circumference 2π × 32 ≈ 201.06. Score 46 → offset = c * (1 − 0.46).
+  // Ring 80 px (vs 72 ≈ +11 %), strokeWidth 7 et glow drop-shadow alignés
+  // strictement sur le ScoreCard du dashboard-v3.
   const r = 32;
   const c = 2 * Math.PI * r;
-  const fraction = score !== null ? Math.max(0, Math.min(1, score / 100)) : 0;
-  const offset = c * (1 - fraction);
-  const deltaSign =
-    scoreDelta === null
-      ? "none"
-      : scoreDelta === 0
-        ? "flat"
-        : scoreDelta > 0
-          ? "up"
-          : "down";
-  const deltaBadge =
-    deltaSign === "up"
-      ? { label: `+${Math.round(scoreDelta!)} pts`, color: "#5EEAD4", bg: "rgba(16, 163, 127, 0.18)" }
-      : deltaSign === "down"
-        ? { label: `${Math.round(scoreDelta!)} pts`, color: "#FBBF24", bg: "rgba(251, 191, 36, 0.18)" }
-        : null;
+  const offset = c * (1 - 0.46);
   return (
     <div
       style={{
@@ -1409,107 +1130,57 @@ function SituationCard({
               style={{ filter: "drop-shadow(0 0 6px rgba(255,255,255,0.35))" }}
             />
             <text x="40" y="46" textAnchor="middle" fontSize="22" fontWeight="700" fill="white" fontFamily="Outfit, Inter, system-ui" letterSpacing="-0.025em">
-              {score ?? "—"}
+              46
             </text>
           </svg>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.7)" }}>{tierLabel}</p>
+          <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.7)" }}>Score actuel</p>
           <p style={{ margin: "2px 0 0 0", fontSize: 18, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em" }}>
-            {score !== null ? `${score} / 100` : "—"}
+            46 / 100
           </p>
-          {deltaBadge && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 3,
-                marginTop: 6,
-                padding: "2px 7px",
-                borderRadius: 999,
-                backgroundColor: deltaBadge.bg,
-                fontSize: 10,
-                fontWeight: 700,
-                color: deltaBadge.color,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-              }}
-            >
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="17 6 23 6 23 12" />
-                <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-              </svg>
-              {deltaBadge.label}
-            </span>
-          )}
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              marginTop: 6,
+              padding: "2px 7px",
+              borderRadius: 999,
+              backgroundColor: "rgba(16, 163, 127, 0.18)",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#5EEAD4",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+            }}
+          >
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="17 6 23 6 23 12" />
+              <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+            </svg>
+            +6 pts
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
-function ResumeFinancierCard({
-  monthlyIncome,
-  totalExpenses,
-  cashflow,
-  runway,
-  currentSavings,
-  profile,
-}: {
-  monthlyIncome: number;
-  totalExpenses: number;
-  cashflow: number;
-  runway: number;
-  currentSavings: number;
-  profile: { currency: string; locale?: string | null; country?: string | null };
-}) {
-  // Audit zéro-tolérance : 4 lignes branchées aux vraies données.
-  // Si aucun revenu/dépense renseigné, on affiche "—" plutôt qu'une
-  // valeur factice (cohérent avec KpiCard du dashboard-v3).
-  const fmt = (v: number) => formatUserCurrency(v, profile);
-  const runwayFinite = Number.isFinite(runway);
+function ResumeFinancierCard() {
   const rows = [
-    {
-      label: "Revenus mensuels",
-      value: monthlyIncome > 0 ? fmt(monthlyIncome) : "—",
-      color: C.success,
-      bg: C.successBg,
-      iconPath: "M12 5v14|M5 12l7-7 7 7",
-    },
-    {
-      label: "Dépenses mensuelles",
-      value: totalExpenses > 0 ? fmt(totalExpenses) : "—",
-      color: "#DC2626",
-      bg: "#FEE2E2",
-      iconPath: "M12 19V5|M5 12l7 7 7-7",
-    },
-    {
-      label: "Reste à vivre",
-      value:
-        monthlyIncome > 0 || totalExpenses > 0 ? fmt(cashflow) : "—",
-      color: C.primary,
-      bg: C.primaryBg,
-      iconPath: "M21 12h-7|M14 8l7 4-7 4",
-    },
+    { label: "Revenus mensuels", value: "25 000 CHF", color: C.success, bg: C.successBg, iconPath: "M12 5v14|M5 12l7-7 7 7" },
+    { label: "Dépenses mensuelles", value: "15 893 CHF", color: "#DC2626", bg: "#FEE2E2", iconPath: "M12 19V5|M5 12l7 7 7-7" },
+    { label: "Reste à vivre", value: "9 107 CHF", color: C.primary, bg: C.primaryBg, iconPath: "M21 12h-7|M14 8l7 4-7 4" },
     {
       label: "Fonds d'urgence",
-      value: runwayFinite ? `${Math.max(0, runway).toFixed(1)} mois` : "∞",
-      sub:
-        currentSavings > 0
-          ? `${fmt(currentSavings)} disponibles`
-          : "0 disponibles",
+      value: "0.0 mois",
+      sub: "500 CHF disponibles",
       color: C.amber,
       bg: C.amberBg,
       iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
     },
-  ] as Array<{
-    label: string;
-    value: string;
-    sub?: string;
-    color: string;
-    bg: string;
-    iconPath: string;
-  }>;
+  ];
   return (
     <div
       style={{
@@ -1561,20 +1232,7 @@ function ResumeFinancierCard({
   );
 }
 
-function PrioriteMomentCard({
-  priorityTitle,
-  runway,
-}: {
-  priorityTitle: string;
-  runway: number;
-}) {
-  // Audit zéro-tolérance : titre depuis dashboard.firstMission.<priority>.title
-  // (résolu côté serveur). Runway en mois sur 3 mois cible.
-  const TARGET = 3;
-  const runwayFinite = Number.isFinite(runway);
-  const runwayValue = runwayFinite ? Math.max(0, runway) : Infinity;
-  const ratio = runwayFinite ? Math.min(1, runwayValue / TARGET) : 1;
-  const pct = Math.max(2, Math.round(ratio * 100));
+function PrioriteMomentCard() {
   return (
     <div
       style={{
@@ -1616,8 +1274,11 @@ function PrioriteMomentCard({
           letterSpacing: "-0.01em",
         }}
       >
-        {priorityTitle}
+        Construire votre fonds d&apos;urgence
       </h3>
+      {/* Hiérarchie progression :
+          0.0 (massif coral) / 3.0 (textLight) mois  →  2 % atteint
+          → chiffre dominant + dénominateur lisible + chip pourcentage. */}
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: 10, gap: 8 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
           <span
@@ -1630,10 +1291,10 @@ function PrioriteMomentCard({
               lineHeight: 1,
             }}
           >
-            {runwayFinite ? runwayValue.toFixed(1) : "∞"}
+            0.0
           </span>
           <span style={{ fontSize: 13, color: C.textLight, fontWeight: 500, fontFamily: "Outfit, Inter, system-ui" }}>
-            / {TARGET}.0
+            / 3.0
           </span>
           <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 3 }}>mois</span>
         </div>
@@ -1651,7 +1312,7 @@ function PrioriteMomentCard({
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          {pct} % atteint
+          2 % atteint
         </span>
       </div>
       <div
@@ -1663,14 +1324,17 @@ function PrioriteMomentCard({
           overflow: "hidden",
         }}
         role="progressbar"
-        aria-valuenow={runwayFinite ? Math.round(runwayValue * 10) / 10 : TARGET}
+        aria-valuenow={0}
         aria-valuemin={0}
-        aria-valuemax={TARGET}
+        aria-valuemax={3}
       >
-        <div style={{ width: `${pct}%`, height: "100%", backgroundColor: C.coral, borderRadius: 999 }} />
+        <div style={{ width: "2%", height: "100%", backgroundColor: C.coral, borderRadius: 999 }} />
       </div>
-      <Link
-        href="/plan"
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10.5, color: C.textLight }}>
+        <span>500 CHF</span>
+        <span>Cible 47 679 CHF</span>
+      </div>
+      <button
         style={{
           marginTop: 10,
           padding: 0,
@@ -1680,7 +1344,9 @@ function PrioriteMomentCard({
           fontSize: 12.5,
           fontWeight: 500,
           color: C.primary,
-          textDecoration: "none",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
         }}
       >
         Planifier avec le coach
@@ -1688,27 +1354,23 @@ function PrioriteMomentCard({
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </Link>
+      </button>
     </div>
   );
 }
 
 function InsightsRapidesCard() {
-  // Audit zéro-tolérance : chaque action devient un vrai Link vers une
-  // page prod fonctionnelle (plan, dashboard, goals).
   const insights = [
     {
-      title: "Voir mon plan d'action",
-      detail: "30/60/90 jours personnalisés",
-      href: "/plan",
+      title: "Simuler un scénario",
+      detail: "Voir l'impact d'une décision",
       bg: C.primaryBg,
       color: C.primary,
       iconPath: "M22 7L13.5 15.5 8.5 10.5 2 17|M17 7 22 7 22 12",
     },
     {
-      title: "Analyser mes dépenses",
-      detail: "Vue détaillée par catégorie",
-      href: "/expenses",
+      title: "Analyser une dépense",
+      detail: "Comprendre et optimiser",
       bg: C.violetBg,
       color: C.violet,
       iconPath: "M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3",
@@ -1716,7 +1378,6 @@ function InsightsRapidesCard() {
     {
       title: "Définir un objectif",
       detail: "Fixer un nouvel horizon",
-      href: "/goals",
       bg: C.successBg,
       color: C.success,
       iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M12 6v6l4 2",
@@ -1736,17 +1397,18 @@ function InsightsRapidesCard() {
       </p>
       <div style={{ marginTop: 12, display: "flex", flexDirection: "column" }}>
         {insights.map((it, idx) => (
-          <Link
+          <button
             key={it.title}
-            href={it.href}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 12,
               padding: "10px 0",
+              background: "none",
+              border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
+              cursor: "pointer",
               textAlign: "left",
-              textDecoration: "none",
             }}
           >
             <span
@@ -1776,7 +1438,7 @@ function InsightsRapidesCard() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-          </Link>
+          </button>
         ))}
       </div>
     </div>
