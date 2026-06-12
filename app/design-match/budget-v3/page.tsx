@@ -15,14 +15,21 @@
  */
 
 import Link from "next/link";
-import { getFinanceData } from "@/lib/services/finance";
+import type { Metadata } from "next";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { EXPENSE_CATEGORIES } from "@/lib/constants";
+import { formatUserCurrency } from "@/lib/utils";
+import {
+  computeBudgetProgress,
+  computeGoalAchievementScore,
+  type BudgetProgress,
+} from "@/lib/calculations/budget-goals";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Design Match v3 — Budget",
-  robots: { index: false, follow: false },
+export const metadata: Metadata = {
+  title: "Budget — LIBERIA",
 };
 
 const C = {
@@ -57,11 +64,176 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ TYPES & HELPERS ═══════════════ */
+
+type Profile = Parameters<typeof formatUserCurrency>[1];
+
+interface CategoryRow {
+  id: string;
+  label: string;
+  prevu: number;
+  reel: number;
+  pct: number;
+  color: string;
+  status: "ok" | "warn" | "over";
+}
+
+const CATEGORY_COLORS_BUDGET: string[] = [
+  "#2563EB", // primary
+  "#10A37F", // success
+  "#F59E0B", // amber
+  "#9061F9", // violet
+  "#F97757", // coral
+  "#CBD5E1", // donutGrey
+];
+
+function getExpenseLabel(id: string): string {
+  return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? "Autre";
+}
+
+function isEssentialCategory(id: string): boolean {
+  return EXPENSE_CATEGORIES.find((c) => c.id === id)?.essential ?? false;
+}
+
+function statusFromProgress(p: BudgetProgress): "ok" | "warn" | "over" {
+  if (p.status === "SUCCESS") return "ok";
+  if (p.status === "WARNING") return "warn";
+  return "over";
+}
+
+/* ═══════════════ DEFAULT EXPORT ═══════════════ */
+
 export default async function DesignMatchBudgetV3() {
   const data = await getFinanceData();
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Agrégats budget                                                   */
+  /* ------------------------------------------------------------------ */
+
+  const budgets = data.categoryBudgets;
+  const hasBudgets = budgets.length > 0;
+
+  // Progression par catégorie (prévu vs réel ce mois)
+  const progressList = hasBudgets
+    ? computeBudgetProgress(
+        budgets.map((b) => ({
+          category: b.category,
+          monthly_limit: b.monthly_limit,
+        })),
+        data.expenses,
+      )
+    : [];
+
+  // Totaux
+  const totalBudget = budgets.reduce((s, b) => s + (b.monthly_limit || 0), 0);
+  const totalSpentBudgeted = progressList.reduce(
+    (s, p) => s + p.currentSpent,
+    0,
+  );
+  const remaining = totalBudget - totalSpentBudgeted;
+  const utilizationPct =
+    totalBudget > 0
+      ? Math.max(0, Math.round((totalSpentBudgeted / totalBudget) * 100))
+      : null;
+
+  // Revenus prévus = totalMonthly(data.incomes) ou financialProfile
+  const monthlyIncome =
+    totalMonthly(data.incomes) ||
+    data.financialProfile?.monthly_income ||
+    0;
+  const hasIncome = monthlyIncome > 0;
+  const expectedSavings = monthlyIncome - totalBudget;
+
+  // Rows pour le tableau / donut Budget par catégorie
+  const sortedProgress = [...progressList].sort(
+    (a, b) => b.targetAmount - a.targetAmount,
+  );
+  const TOP_N = 5;
+  const topRows = sortedProgress.slice(0, TOP_N);
+  const restRows = sortedProgress.slice(TOP_N);
+  const categoryRows: CategoryRow[] = topRows.map((p, idx) => ({
+    id: p.category,
+    label: getExpenseLabel(p.category),
+    prevu: p.targetAmount,
+    reel: p.currentSpent,
+    pct:
+      totalBudget > 0
+        ? Math.round((p.targetAmount / totalBudget) * 100)
+        : 0,
+    color: CATEGORY_COLORS_BUDGET[idx % CATEGORY_COLORS_BUDGET.length],
+    status: statusFromProgress(p),
+  }));
+  if (restRows.length > 0) {
+    const restPrevu = restRows.reduce((s, p) => s + p.targetAmount, 0);
+    const restReel = restRows.reduce((s, p) => s + p.currentSpent, 0);
+    const restOverrun = restRows.some((p) => p.status !== "SUCCESS");
+    categoryRows.push({
+      id: "autres",
+      label: "Autres",
+      prevu: restPrevu,
+      reel: restReel,
+      pct:
+        totalBudget > 0
+          ? Math.round((restPrevu / totalBudget) * 100)
+          : 0,
+      color: "#CBD5E1",
+      status: restOverrun ? "warn" : "ok",
+    });
+  }
+
+  // Santé du budget — score sur 100
+  const achievement = computeGoalAchievementScore(progressList);
+  const healthScore = hasBudgets
+    ? Math.round(achievement.score * 100)
+    : null;
+
+  // Alerte budgétaire — première catégorie en overrun (puis warning sinon)
+  const overrunCandidate =
+    progressList.find((p) => p.status === "OVER_LIMIT") ??
+    progressList.find((p) => p.status === "WARNING") ??
+    null;
+  const overBudgetCount = progressList.filter(
+    (p) => p.status === "OVER_LIMIT",
+  ).length;
+
+  // Répartition 50/30/20 — basée sur les budgets configurés
+  const besoinsBudget = budgets
+    .filter((b) => isEssentialCategory(b.category))
+    .reduce((s, b) => s + b.monthly_limit, 0);
+  const enviesBudget = budgets
+    .filter((b) => !isEssentialCategory(b.category))
+    .reduce((s, b) => s + b.monthly_limit, 0);
+  const epargneBudget = Math.max(0, monthlyIncome - totalBudget);
+  const splitBase = besoinsBudget + enviesBudget + epargneBudget;
+  const splitRows =
+    splitBase > 0 && hasIncome
+      ? [
+          {
+            tag: "50%",
+            label: "Besoins",
+            amount: besoinsBudget,
+            pct: Math.round((besoinsBudget / splitBase) * 100),
+            color: "#2563EB",
+          },
+          {
+            tag: "30%",
+            label: "Envies",
+            amount: enviesBudget,
+            pct: Math.round((enviesBudget / splitBase) * 100),
+            color: "#F97757",
+          },
+          {
+            tag: "20%",
+            label: "Épargne",
+            amount: epargneBudget,
+            pct: Math.round((epargneBudget / splitBase) * 100),
+            color: "#CBD5E1",
+          },
+        ]
+      : [];
 
   return (
     <>
@@ -103,22 +275,56 @@ export default async function DesignMatchBudgetV3() {
             }}
           >
             <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              <BudgetHero />
-              <AperçuRapideCard />
+              <BudgetHero
+                remaining={remaining}
+                totalBudget={totalBudget}
+                utilizationPct={utilizationPct}
+                profile={data.profile}
+              />
+              <AperçuRapideCard
+                monthlyIncome={monthlyIncome}
+                totalBudget={totalBudget}
+                expectedSavings={expectedSavings}
+                hasIncome={hasIncome}
+                hasBudgets={hasBudgets}
+                profile={data.profile}
+              />
             </div>
             <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
-              <BudgetCategorieCard />
-              <SanteBudgetCard />
-              <AlerteBudgetaireCard />
+              <BudgetCategorieCard
+                rows={categoryRows}
+                totalBudget={totalBudget}
+                profile={data.profile}
+              />
+              <SanteBudgetCard
+                score={healthScore}
+                respected={achievement.respected}
+                total={achievement.total}
+              />
+              <AlerteBudgetaireCard
+                candidate={overrunCandidate}
+                overrunCount={overBudgetCount}
+                hasBudgets={hasBudgets}
+                profile={data.profile}
+              />
             </div>
             <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 8 }}>
               <EvolutionBudgetCard />
-              <ProjectionEpargneCard />
-              <RepartitionIdealeCard />
+              <ProjectionEpargneCard
+                expectedSavings={expectedSavings}
+                hasIncome={hasIncome}
+                hasBudgets={hasBudgets}
+                profile={data.profile}
+              />
+              <RepartitionIdealeCard rows={splitRows} profile={data.profile} />
             </div>
             <div data-bud-row style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 8 }}>
               <ActionsRapidesCard />
-              <ConseilIACard />
+              <ConseilIACard
+                hasBudgets={hasBudgets}
+                healthScore={healthScore}
+                overrunCount={overBudgetCount}
+              />
             </div>
           </main>
         </div>
@@ -416,7 +622,60 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function BudgetHero() {
+function BudgetHero({
+  remaining,
+  totalBudget,
+  utilizationPct,
+  profile,
+}: {
+  remaining: number;
+  totalBudget: number;
+  utilizationPct: number | null;
+  profile: Profile;
+}) {
+  const hasBudget = totalBudget > 0;
+  const isOver = remaining < 0;
+  const amountText = hasBudget
+    ? formatUserCurrency(Math.abs(remaining), profile)
+    : "À configurer";
+  const amountSubline = hasBudget
+    ? isOver
+      ? `dépassement sur ${formatUserCurrency(totalBudget, profile)}`
+      : `restants sur ${formatUserCurrency(totalBudget, profile)}`
+    : "Définis tes budgets par catégorie";
+  const pct = utilizationPct ?? 0;
+  const barWidth = `${Math.min(100, pct)}%`;
+  const badgeKind: "success" | "warning" | "danger" | null = hasBudget
+    ? pct > 100
+      ? "danger"
+      : pct >= 80
+        ? "warning"
+        : "success"
+    : null;
+  const badgeText =
+    badgeKind === "success"
+      ? "Sur la bonne voie"
+      : badgeKind === "warning"
+        ? "Vigilance"
+        : badgeKind === "danger"
+          ? "Dépassement"
+          : "";
+  const badgeBg =
+    badgeKind === "success"
+      ? "rgba(16, 163, 127, 0.20)"
+      : badgeKind === "warning"
+        ? "rgba(245, 158, 11, 0.22)"
+        : badgeKind === "danger"
+          ? "rgba(249, 119, 87, 0.22)"
+          : "rgba(255,255,255,0.12)";
+  const badgeColor =
+    badgeKind === "success"
+      ? "#5EEAD4"
+      : badgeKind === "warning"
+        ? "#FCD34D"
+        : badgeKind === "danger"
+          ? "#FCA5A5"
+          : "rgba(255,255,255,0.7)";
   return (
     <div
       style={{
@@ -449,7 +708,7 @@ function BudgetHero() {
         <p
           style={{
             margin: "4px 0 0 0",
-            fontSize: 28,
+            fontSize: hasBudget ? 28 : 22,
             fontWeight: 700,
             color: "white",
             lineHeight: 1,
@@ -458,47 +717,74 @@ function BudgetHero() {
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          2 340 CHF
+          {amountText}
         </p>
         <p style={{ margin: "3px 0 0 0", fontSize: 11, color: "rgba(255,255,255,0.7)" }}>
-          restants sur 18 000 CHF
+          {amountSubline}
         </p>
         <div style={{ marginTop: 8, height: 6, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden" }}>
-          <div style={{ width: "86%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+          <div style={{ width: barWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
           <span style={{ fontSize: 10.5, fontWeight: 600, color: "rgba(255,255,255,0.78)" }}>
-            86 % utilisé
+            {hasBudget ? `${pct} % utilisé` : "Aucun budget défini"}
           </span>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              padding: "2px 8px",
-              borderRadius: 999,
-              backgroundColor: "rgba(16, 163, 127, 0.20)",
-              fontSize: 10,
-              fontWeight: 700,
-              color: "#5EEAD4",
-            }}
-          >
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Sur la bonne voie
-          </span>
+          {badgeKind && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "2px 8px",
+                borderRadius: 999,
+                backgroundColor: badgeBg,
+                fontSize: 10,
+                fontWeight: 700,
+                color: badgeColor,
+              }}
+            >
+              {badgeText}
+            </span>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function AperçuRapideCard() {
+function AperçuRapideCard({
+  monthlyIncome,
+  totalBudget,
+  expectedSavings,
+  hasIncome,
+  hasBudgets,
+  profile,
+}: {
+  monthlyIncome: number;
+  totalBudget: number;
+  expectedSavings: number;
+  hasIncome: boolean;
+  hasBudgets: boolean;
+  profile: Profile;
+}) {
+  // Note : "vs mois dernier" supprimé — aucun historique mensuel
+  // n'est tracké pour ces 3 indicateurs.
   const rows = [
-    { label: "Revenus prévus", value: "25 000 CHF", delta: "+4.2%", deltaColor: C.success },
-    { label: "Dépenses prévues", value: "18 000 CHF", delta: "−3.6%", deltaColor: C.success },
-    { label: "Épargne prévue", value: "7 000 CHF", delta: "+8.1%", deltaColor: C.success },
+    {
+      label: "Revenus prévus",
+      value: hasIncome ? formatUserCurrency(monthlyIncome, profile) : "—",
+    },
+    {
+      label: "Dépenses prévues",
+      value: hasBudgets ? formatUserCurrency(totalBudget, profile) : "—",
+    },
+    {
+      label: "Épargne prévue",
+      value:
+        hasIncome && hasBudgets
+          ? formatUserCurrency(expectedSavings, profile)
+          : "—",
+    },
   ];
   return (
     <div
@@ -526,7 +812,7 @@ function AperçuRapideCard() {
                 margin: "3px 0 0 0",
                 fontSize: 16,
                 fontWeight: 700,
-                color: C.textDark,
+                color: r.value === "—" ? C.textMuted : C.textDark,
                 fontFamily: "Outfit, Inter, system-ui",
                 letterSpacing: "-0.02em",
                 lineHeight: 1,
@@ -534,10 +820,6 @@ function AperçuRapideCard() {
               }}
             >
               {r.value}
-            </p>
-            <p style={{ margin: "4px 0 0 0", fontSize: 10.5, fontWeight: 600 }}>
-              <span style={{ color: r.deltaColor, fontVariantNumeric: "tabular-nums" }}>{r.delta}</span>
-              <span style={{ color: C.textMuted, marginLeft: 4, fontWeight: 500 }}>vs mois dernier</span>
             </p>
           </div>
         ))}
@@ -548,20 +830,20 @@ function AperçuRapideCard() {
 
 /* ═══════════════ ROW 2 ═══════════════ */
 
-function BudgetCategorieCard() {
-  const slices = [
-    { id: "logement", label: "Logement", prevu: "6 200", reel: "5 850", pct: 39, color: C.primary, status: "ok" as const },
-    { id: "alimentation", label: "Alimentation", prevu: "2 850", reel: "2 620", pct: 18, color: C.success, status: "ok" as const },
-    { id: "transports", label: "Transports", prevu: "1 920", reel: "2 150", pct: 12, color: C.amber, status: "warn" as const },
-    { id: "loisirs", label: "Loisirs", prevu: "1 680", reel: "1 750", pct: 11, color: C.violet, status: "warn" as const },
-    { id: "assurances", label: "Assurances", prevu: "1 120", reel: "1 020", pct: 7, color: C.coral, status: "ok" as const },
-    { id: "autres", label: "Autres", prevu: "2 230", reel: "2 610", pct: 13, color: C.donutGrey, status: "warn" as const },
-  ];
+function BudgetCategorieCard({
+  rows,
+  totalBudget,
+  profile,
+}: {
+  rows: CategoryRow[];
+  totalBudget: number;
+  profile: Profile;
+}) {
   let cursor = -90;
   const gap = 1;
-  const usableDeg = 360 - gap * slices.length;
-  const total = slices.reduce((s, x) => s + x.pct, 0);
-  const slicesWithPaths = slices.map((s) => {
+  const usableDeg = 360 - gap * Math.max(rows.length, 1);
+  const total = rows.reduce((s, x) => s + x.pct, 0) || 1;
+  const slicesWithPaths = rows.map((s) => {
     const sweep = (s.pct / total) * usableDeg;
     const startDeg = cursor;
     const endDeg = cursor + sweep;
@@ -569,6 +851,15 @@ function BudgetCategorieCard() {
     cursor = endDeg + gap;
     return { ...s, path };
   });
+  // Centre du donut : total budget compact (5K, 18K, etc.) ou —
+  const centerAmount = (() => {
+    if (totalBudget <= 0) return "—";
+    if (totalBudget >= 1_000_000)
+      return `${(totalBudget / 1_000_000).toFixed(1)}M`;
+    if (totalBudget >= 1_000) return `${Math.round(totalBudget / 1_000)}K`;
+    return `${Math.round(totalBudget)}`;
+  })();
+  const currencyLabel = profile?.currency ?? "CHF";
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -577,53 +868,67 @@ function BudgetCategorieCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Prévu vs Réel
       </p>
-      <div style={{ display: "flex", gap: 12, marginTop: 6, alignItems: "center" }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 90, height: 90 }}>
-          <svg viewBox="0 0 100 100" width={90} height={90}>
-            {slicesWithPaths.map((s) => (
-              <path key={s.id} d={s.path} fill={s.color} />
-            ))}
-          </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-              18 000
-            </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em" }}>
-              CHF
-            </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted }}>
-              Dépenses
-            </p>
+      {rows.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Aucun budget par catégorie défini. Demande à ton coach pour structurer ton premier budget.
+        </p>
+      ) : (
+        <div style={{ display: "flex", gap: 12, marginTop: 6, alignItems: "center" }}>
+          <div style={{ position: "relative", flexShrink: 0, width: 90, height: 90 }}>
+            <svg viewBox="0 0 100 100" width={90} height={90}>
+              {slicesWithPaths.map((s) => (
+                <path key={s.id} d={s.path} fill={s.color} />
+              ))}
+            </svg>
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+                {centerAmount}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em" }}>
+                {currencyLabel}
+              </p>
+              <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted }}>
+                Budget
+              </p>
+            </div>
           </div>
-        </div>
-        <table style={{ flex: 1, borderCollapse: "collapse", fontSize: 10 }}>
-          <thead>
-            <tr style={{ borderBottom: `1px solid ${C.borderGhost}` }}>
-              <th style={{ textAlign: "left", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>CATÉGORIE</th>
-              <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>PRÉVU</th>
-              <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>RÉEL</th>
-              <th style={{ width: 22, textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>✓</th>
-            </tr>
-          </thead>
-          <tbody>
-            {slicesWithPaths.map((s, i) => (
-              <tr key={s.id} style={{ borderBottom: i === slicesWithPaths.length - 1 ? "none" : `1px solid ${C.borderGhost}` }}>
-                <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 500 }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: 999, backgroundColor: s.color }} />
-                    {s.label}
-                  </span>
-                </td>
-                <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.prevu}</td>
-                <td style={{ padding: "3px 0", color: s.status === "ok" ? C.textDark : C.amber, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{s.reel}</td>
-                <td style={{ padding: "3px 0", textAlign: "right" }}>
-                  <StatusIcon ok={s.status === "ok"} />
-                </td>
+          <table style={{ flex: 1, borderCollapse: "collapse", fontSize: 10 }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${C.borderGhost}` }}>
+                <th style={{ textAlign: "left", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>CATÉGORIE</th>
+                <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>PRÉVU</th>
+                <th style={{ textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>RÉEL</th>
+                <th style={{ width: 22, textAlign: "right", padding: "2px 0", fontWeight: 600, color: C.textLight, fontSize: 8.5, letterSpacing: "0.06em" }}>✓</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {slicesWithPaths.map((s, i) => {
+                const reelColor =
+                  s.status === "ok"
+                    ? C.textDark
+                    : s.status === "warn"
+                      ? C.amber
+                      : C.danger;
+                return (
+                  <tr key={s.id} style={{ borderBottom: i === slicesWithPaths.length - 1 ? "none" : `1px solid ${C.borderGhost}` }}>
+                    <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 500 }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: 999, backgroundColor: s.color }} />
+                        {s.label}
+                      </span>
+                    </td>
+                    <td style={{ padding: "3px 0", color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatUserCurrency(s.prevu, profile)}</td>
+                    <td style={{ padding: "3px 0", color: reelColor, fontWeight: 600, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>{formatUserCurrency(s.reel, profile)}</td>
+                    <td style={{ padding: "3px 0", textAlign: "right" }}>
+                      <StatusIcon ok={s.status === "ok"} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -655,19 +960,62 @@ function StatusIcon({ ok }: { ok: boolean }) {
   );
 }
 
-function SanteBudgetCard() {
-  const score = 78;
+function SanteBudgetCard({
+  score,
+  respected,
+  total,
+}: {
+  score: number | null;
+  respected: number;
+  total: number;
+}) {
+  const hasScore = score !== null;
   // Semi-circle gauge : arc top half (-180 to 0 deg)
   const r = 38;
   const cx = 50;
   const cy = 50;
-  // Score 78/100 → fraction 0.78
   const startAngle = -180;
-  const endAngle = startAngle + 180 * (score / 100);
+  const endAngle = hasScore
+    ? startAngle + 180 * (score / 100)
+    : startAngle;
   const arcPath = gaugeArcD(cx, cy, r, startAngle, endAngle);
   const trackPath = gaugeArcD(cx, cy, r, -180, 0);
-  // Color zones : red 0-50, amber 50-75, green 75-100
-  const scoreColor = score >= 75 ? C.success : score >= 50 ? C.amber : C.danger;
+  const scoreColor = !hasScore
+    ? C.textLight
+    : score >= 75
+      ? C.success
+      : score >= 50
+        ? C.amber
+        : C.danger;
+  // Texte adaptatif selon score
+  const banner: { title: string; body: string; bg: string; fg: string } =
+    !hasScore
+      ? {
+          title: "À configurer",
+          body: "Définis tes budgets par catégorie pour calculer ton score.",
+          bg: C.pageBg,
+          fg: C.textMuted,
+        }
+      : score >= 75
+        ? {
+            title: "Excellent !",
+            body: `Tu respectes ${respected} budget${respected > 1 ? "s" : ""} sur ${total}.`,
+            bg: C.successBg,
+            fg: C.success,
+          }
+        : score >= 50
+          ? {
+              title: "Vigilance",
+              body: `${respected}/${total} budgets respectés ce mois.`,
+              bg: C.amberBg,
+              fg: C.amber,
+            }
+          : {
+              title: "Attention",
+              body: `${respected}/${total} budgets respectés. Plusieurs dépassements.`,
+              bg: C.coralBg,
+              fg: C.danger,
+            };
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -676,27 +1024,29 @@ function SanteBudgetCard() {
       <div style={{ position: "relative", width: 110, height: 62, margin: "4px auto 0 auto" }}>
         <svg viewBox="0 0 100 60" width={110} height={62}>
           <path d={trackPath} fill="none" stroke={C.borderGhost} strokeWidth="8" strokeLinecap="round" />
-          <path d={arcPath} fill="none" stroke={scoreColor} strokeWidth="8" strokeLinecap="round" />
+          {hasScore && (
+            <path d={arcPath} fill="none" stroke={scoreColor} strokeWidth="8" strokeLinecap="round" />
+          )}
         </svg>
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end" }}>
-          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.025em", lineHeight: 1 }}>
-            {score}<span style={{ fontSize: 10.5, color: C.textMuted, fontWeight: 500 }}>/100</span>
+          <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: hasScore ? C.textDark : C.textMuted, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.025em", lineHeight: 1 }}>
+            {hasScore ? score : "—"}<span style={{ fontSize: 10.5, color: C.textMuted, fontWeight: 500 }}>/100</span>
           </p>
           <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted, letterSpacing: "0.04em" }}>
             Score budget
           </p>
         </div>
       </div>
-      <div style={{ marginTop: 6, padding: "5px 8px", backgroundColor: C.successBg, borderRadius: 7, display: "flex", alignItems: "flex-start", gap: 6 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: C.success, flexShrink: 0, marginTop: 1 }}>
+      <div style={{ marginTop: 6, padding: "5px 8px", backgroundColor: banner.bg, borderRadius: 7, display: "flex", alignItems: "flex-start", gap: 6 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: banner.fg, flexShrink: 0, marginTop: 1 }}>
           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 10.5, fontWeight: 700, color: C.success }}>Excellent !</p>
+          <p style={{ margin: 0, fontSize: 10.5, fontWeight: 700, color: banner.fg }}>{banner.title}</p>
           <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textDark, lineHeight: 1.3 }}>
-            Vous respectez votre budget et épargnez plus que la moyenne.
+            {banner.body}
           </p>
         </div>
       </div>
@@ -707,32 +1057,9 @@ function SanteBudgetCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function EvolutionBudgetCard() {
-  // Bars = dépenses réelles, Line dashed = budget prévu
-  const points = [
-    { label: "Mai", reel: 16000, prevu: 18000 },
-    { label: "Juin", reel: 17500, prevu: 18000 },
-    { label: "Juil.", reel: 16800, prevu: 18000 },
-    { label: "Août", reel: 16500, prevu: 18000 },
-    { label: "Sept.", reel: 17000, prevu: 18000 },
-    { label: "Oct.", reel: 15893, prevu: 18000 },
-  ];
-  const W = 360;
-  const HH = 105;
-  const PAD = { top: 10, right: 12, bottom: 18, left: 32 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 0;
-  const maxV = 22000;
-  const range = maxV - minV;
-  const barW = innerW / points.length / 1.6;
-  const scaled = points.map((p, i) => {
-    const xCenter = PAD.left + (i + 0.5) * (innerW / points.length);
-    const reelY = PAD.top + innerH - ((p.reel - minV) / range) * innerH;
-    const prevuY = PAD.top + innerH - ((p.prevu - minV) / range) * innerH;
-    return { ...p, xCenter, reelY, prevuY };
-  });
-  const prevuPath = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.xCenter.toFixed(2)} ${p.prevuY.toFixed(2)}`).join(" ");
-  const yTicks = [5000, 10000, 15000, 20000];
+  // Historique mensuel (bars dépenses réelles + line budget prévu)
+  // pas encore matérialisé : aucune table de snapshot budget_history
+  // n'existe. Empty state premium.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -743,117 +1070,127 @@ function EvolutionBudgetCard() {
           <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
             Sur les 6 derniers mois
           </p>
-          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9.5, color: C.textMuted }}>
-              <span style={{ display: "inline-block", width: 9, height: 7, borderRadius: 2, backgroundColor: C.primary, opacity: 0.6 }} />
-              Dépenses réelles
-            </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9.5, color: C.textMuted }}>
-              <span style={{ display: "inline-block", width: 14, height: 1.5, backgroundColor: C.primary, marginTop: 1, position: "relative" }} aria-hidden>
-                <span style={{ position: "absolute", top: -1, left: 3, width: 3, height: 1.5, backgroundColor: "white" }} />
-                <span style={{ position: "absolute", top: -1, left: 8, width: 3, height: 1.5, backgroundColor: "white" }} />
-              </span>
-              Budget prévu
-            </span>
-          </div>
         </div>
-        <button
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "3px 7px",
-            backgroundColor: C.pageBg,
-            border: `1px solid ${C.borderGhost}`,
-            fontSize: 10.5,
-            fontWeight: 500,
-            color: C.textDark,
-            borderRadius: 6,
-            cursor: "pointer",
-          }}
-        >
-          6 mois
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
       </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v / 1000}K CHF
-                </text>
-              </g>
-            );
-          })}
-          {scaled.map((p) => (
-            <rect
-              key={`bar-${p.label}`}
-              x={p.xCenter - barW / 2}
-              y={p.reelY}
-              width={barW}
-              height={PAD.top + innerH - p.reelY}
-              fill={C.primary}
-              fillOpacity={0.6}
-              rx={2}
-            />
-          ))}
-          <path d={prevuPath} stroke={C.primary} strokeWidth="1.6" strokeDasharray="4 3" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p) => (
-            <circle key={`pt-${p.label}`} cx={p.xCenter} cy={p.prevuY} r={2} fill={C.primary} />
-          ))}
-          {scaled.map((p) => (
-            <text key={`x-${p.label}`} x={p.xCenter} y={HH - 6} fontSize="8" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
+      <div
+        style={{
+          marginTop: 10,
+          flex: 1,
+          minHeight: 105,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 8px",
+          textAlign: "center",
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M3 3v18h18" />
+          <path d="M7 14l4-4 4 4 5-5" />
         </svg>
+        <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Historique non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
+          L&apos;évolution mois après mois de tes dépenses réelles vs ton budget prévu arrive bientôt.
+        </p>
       </div>
     </div>
   );
 }
 
-function AlerteBudgetaireCard() {
+function AlerteBudgetaireCard({
+  candidate,
+  overrunCount,
+  hasBudgets,
+  profile,
+}: {
+  candidate: BudgetProgress | null;
+  overrunCount: number;
+  hasBudgets: boolean;
+  profile: Profile;
+}) {
+  const isOver = candidate?.status === "OVER_LIMIT";
+  const isWarn = candidate?.status === "WARNING";
+  const accent = isOver ? C.coral : isWarn ? C.amber : C.success;
+  const accentBg = isOver ? C.coralBg : isWarn ? C.amberBg : C.successBg;
+  const accentBorder = isOver
+    ? "rgba(249, 119, 87, 0.2)"
+    : isWarn
+      ? "rgba(245, 158, 11, 0.2)"
+      : "rgba(16, 163, 127, 0.2)";
+  const title = !hasBudgets
+    ? "Aucune alerte"
+    : !candidate
+      ? "Aucun dépassement"
+      : "Alerte budgétaire";
+  const headline = !hasBudgets
+    ? "Définis tes budgets pour activer les alertes."
+    : !candidate
+      ? "Tous tes budgets sont sous contrôle."
+      : isOver
+        ? `Dépenses ${getExpenseLabel(candidate.category)} au-dessus du budget`
+        : `Dépenses ${getExpenseLabel(candidate.category)} proches du plafond`;
+  const subline = !hasBudgets || !candidate
+    ? null
+    : isOver
+      ? `Tu as dépassé de ${formatUserCurrency(candidate.overrun, profile)} ce mois-ci.`
+      : `Tu en es à ${Math.round(candidate.percentage * 100)} % du budget ce mois-ci.`;
+  const otherCount = overrunCount > 1 ? overrunCount - 1 : 0;
   return (
     <div
       style={{
         padding: "12px 14px",
-        backgroundColor: C.coralBg,
+        backgroundColor: accentBg,
         borderRadius: 14,
         boxShadow: SHADOW.card,
         display: "flex",
         flexDirection: "column",
-        border: `1px solid rgba(249, 119, 87, 0.2)`,
+        border: `1px solid ${accentBorder}`,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.coral} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-          <line x1="12" y1="9" x2="12" y2="13" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+          {isOver || isWarn ? (
+            <>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </>
+          ) : (
+            <polyline points="20 6 9 17 4 12" strokeWidth="3" />
+          )}
         </svg>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-          Alerte budgétaire
+          {title}
         </p>
       </div>
       <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-        Dépenses de loisirs au-dessus du budget
+        {headline}
       </p>
-      <p style={{ margin: "3px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.3 }}>
-        Vous avez dépassé de 70 CHF ce mois-ci.
-      </p>
-      <p style={{ margin: "8px 0 0 0", fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.04em" }}>
-        Impact sur votre budget
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.danger, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-        −70 CHF<span style={{ fontSize: 10, color: C.textMuted, fontWeight: 500, marginLeft: 5 }}>sur votre épargne prévue</span>
-      </p>
-      <button
+      {subline && (
+        <p style={{ margin: "3px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.3 }}>
+          {subline}
+        </p>
+      )}
+      {isOver && candidate && (
+        <>
+          <p style={{ margin: "8px 0 0 0", fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.04em" }}>
+            Impact sur ton budget
+          </p>
+          <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.danger, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
+            −{formatUserCurrency(candidate.overrun, profile)}
+            <span style={{ fontSize: 10, color: C.textMuted, fontWeight: 500, marginLeft: 5 }}>
+              {otherCount > 0
+                ? `+ ${otherCount} autre${otherCount > 1 ? "s" : ""} dépassement${otherCount > 1 ? "s" : ""}`
+                : "sur ton épargne prévue"}
+            </span>
+          </p>
+        </>
+      )}
+      <Link
+        href="/coach"
         style={{
           marginTop: "auto",
           width: "100%",
@@ -863,102 +1200,156 @@ function AlerteBudgetaireCard() {
           justifyContent: "center",
           gap: 5,
           backgroundColor: "white",
-          color: C.danger,
+          color: isOver ? C.danger : isWarn ? C.amber : C.success,
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Voir comment ajuster
+        {!hasBudgets
+          ? "Configurer mes budgets"
+          : isOver || isWarn
+            ? "Voir comment ajuster"
+            : "Continuer comme ça"}
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 4 ═══════════════ */
 
-function ProjectionEpargneCard() {
-  const points = [
-    { label: "Ce mois", value: 7000 },
-    { label: "Dans 3 mois", value: 21500 },
-    { label: "Dans 6 mois", value: 44000 },
-    { label: "Dans 12 mois", value: 95000 },
-  ];
+function ProjectionEpargneCard({
+  expectedSavings,
+  hasIncome,
+  hasBudgets,
+  profile,
+}: {
+  expectedSavings: number;
+  hasIncome: boolean;
+  hasBudgets: boolean;
+  profile: Profile;
+}) {
+  // Projection HONNÊTE : extrapolation linéaire de l'épargne mensuelle
+  // attendue (revenus - dépenses prévues). Aucune hypothèse de
+  // rendement ou de croissance. Si manque d'inputs → empty state.
+  const canProject =
+    hasIncome && hasBudgets && Number.isFinite(expectedSavings);
+  const points = canProject
+    ? [
+        { label: "Ce mois", value: expectedSavings },
+        { label: "Dans 3 mois", value: expectedSavings * 3 },
+        { label: "Dans 6 mois", value: expectedSavings * 6 },
+        { label: "Dans 12 mois", value: expectedSavings * 12 },
+      ]
+    : [];
+  const isPositive = expectedSavings > 0;
+  const lineColor = isPositive ? C.success : C.danger;
+  const gradStopColor = isPositive ? C.success : C.danger;
   const W = 240;
   const HH = 95;
   const PAD = { top: 16, right: 12, bottom: 18, left: 12 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
+  const absMax = Math.max(
+    ...points.map((p) => Math.abs(p.value)),
+    1,
+  );
   const minV = 0;
-  const maxV = 100000;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
+  const maxV = absMax;
+  const range = maxV - minV || 1;
+  const scaled = points.map((p, i) => {
+    const x =
+      PAD.left + (i / (points.length - 1 || 1)) * innerW;
+    const y =
+      PAD.top + innerH - ((Math.abs(p.value) - minV) / range) * innerH;
+    return { ...p, x, y };
+  });
+  const pathD = scaled
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+    .join(" ");
   const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
+  const areaD =
+    scaled.length > 0
+      ? `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`
+      : "";
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Projection d&apos;épargne
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Selon votre budget actuel
+        Au rythme de ton budget
       </p>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="bud-proj-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.success} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.success} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d={areaD} fill="url(#bud-proj-grad)" />
-          <path d={pathD} stroke={C.success} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <g key={i}>
-              <circle cx={p.x} cy={p.y} r={2.5} fill="white" stroke={C.success} strokeWidth={1.5} />
-              <text x={p.x} y={p.y - 6} fontSize="8.5" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" textAnchor="middle">
-                {(p.value / 1000).toFixed(p.value < 10000 ? 0 : 0)}{p.value >= 1000 && p.value < 10000 ? " 000" : ""} CHF
-              </text>
-            </g>
-          ))}
-          {scaled.map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 8} fontSize="7.5" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", backgroundColor: C.successBg, borderRadius: 7, marginTop: 2 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: C.success, flexShrink: 0 }}>
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.textDark, lineHeight: 1.3 }}>
-          Vous êtes sur la bonne trajectoire !
+      {!canProject ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          {!hasBudgets
+            ? "Configure ton budget pour voir ta projection."
+            : "Renseigne tes revenus pour projeter ton épargne."}
         </p>
-      </div>
+      ) : (
+        <>
+          <div style={{ marginTop: 4, flex: 1 }}>
+            <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
+              <defs>
+                <linearGradient id="bud-proj-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={gradStopColor} stopOpacity="0.22" />
+                  <stop offset="100%" stopColor={gradStopColor} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={areaD} fill="url(#bud-proj-grad)" />
+              <path d={pathD} stroke={lineColor} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+              {scaled.map((p, i) => (
+                <g key={i}>
+                  <circle cx={p.x} cy={p.y} r={2.5} fill="white" stroke={lineColor} strokeWidth={1.5} />
+                  <text x={p.x} y={p.y - 6} fontSize="8.5" fontWeight="700" fill={C.textDark} fontFamily="Outfit, Inter, system-ui" textAnchor="middle">
+                    {formatUserCurrency(p.value, profile)}
+                  </text>
+                </g>
+              ))}
+              {scaled.map((p) => (
+                <text key={`x-${p.label}`} x={p.x} y={HH - 8} fontSize="7.5" fill={C.textLight} textAnchor="middle">
+                  {p.label}
+                </text>
+              ))}
+            </svg>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 8px", backgroundColor: isPositive ? C.successBg : C.coralBg, borderRadius: 7, marginTop: 2 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: 4, backgroundColor: lineColor, flexShrink: 0 }}>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                {isPositive ? (
+                  <polyline points="20 6 9 17 4 12" />
+                ) : (
+                  <>
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </>
+                )}
+              </svg>
+            </span>
+            <p style={{ margin: 0, fontSize: 9.5, color: C.textDark, lineHeight: 1.3 }}>
+              {isPositive
+                ? "Tu es sur une trajectoire d'épargne positive."
+                : "Ton budget dépasse tes revenus prévus."}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function RepartitionIdealeCard() {
-  const rows = [
-    { tag: "50%", label: "Besoins", amount: "9 000", pct: 55, color: C.primary },
-    { tag: "30%", label: "Envies", amount: "5 400", pct: 28, color: C.coral },
-    { tag: "20%", label: "Épargne", amount: "3 600", pct: 17, color: C.donutGrey },
-  ];
+function RepartitionIdealeCard({
+  rows,
+  profile,
+}: {
+  rows: Array<{ tag: string; label: string; amount: number; pct: number; color: string }>;
+  profile: Profile;
+}) {
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -967,70 +1358,84 @@ function RepartitionIdealeCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Règle 50/30/20
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1, justifyContent: "center" }}>
-        {rows.map((r) => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <span
-              style={{
-                width: 28,
-                fontSize: 13,
-                fontWeight: 700,
-                color: C.textDark,
-                fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "-0.02em",
-                flexShrink: 0,
-              }}
-            >
-              {r.tag}
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
-                <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 500 }}>{r.label}</span>
-                <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-                  {r.amount} CHF
+      {rows.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Configure tes revenus et tes budgets par catégorie pour comparer ta répartition à la règle 50/30/20.
+        </p>
+      ) : (
+        <>
+          <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1, justifyContent: "center" }}>
+            {rows.map((r) => (
+              <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                <span
+                  style={{
+                    width: 28,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.textDark,
+                    fontFamily: "Outfit, Inter, system-ui",
+                    letterSpacing: "-0.02em",
+                    flexShrink: 0,
+                  }}
+                >
+                  {r.tag}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                    <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 500 }}>{r.label}</span>
+                    <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                      {formatUserCurrency(r.amount, profile)}
+                    </span>
+                  </div>
+                  <div style={{ height: 3, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{ width: `${Math.min(100, r.pct * 1.5)}%`, height: "100%", backgroundColor: r.color, borderRadius: 999 }} />
+                  </div>
+                </div>
+                <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 22, textAlign: "right" }}>
+                  {r.pct}%
                 </span>
               </div>
-              <div style={{ height: 3, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-                <div style={{ width: `${r.pct * 1.5}%`, height: "100%", backgroundColor: r.color, borderRadius: 999 }} />
-              </div>
-            </div>
-            <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0, minWidth: 22, textAlign: "right" }}>
-              {r.pct}%
-            </span>
+            ))}
           </div>
-        ))}
-      </div>
-      <button
-        style={{
-          marginTop: 4,
-          padding: "4px 0",
-          alignSelf: "flex-start",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          fontSize: 10.5,
-          fontWeight: 600,
-          color: C.primary,
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        En savoir plus
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+          <Link
+            href="/coach"
+            style={{
+              marginTop: 4,
+              padding: "4px 0",
+              alignSelf: "flex-start",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: C.primary,
+              textDecoration: "none",
+            }}
+          >
+            En savoir plus
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </Link>
+        </>
+      )}
     </div>
   );
 }
 
 function ActionsRapidesCard() {
+  // Toutes les actions de configuration / création / export budget
+  // se font aujourd'hui via le coach (pas de form ni d'export câblés
+  // sur cette page V3). Liens vers les destinations logiques :
+  //   - configuration / création de catégorie → /coach
+  //   - abonnements récurrents → /design-match/depenses-v3
+  //   - export rapport → /coach (pas encore implémenté)
   const items = [
     {
       title: "Ajuster mon budget",
       sub: "Modifier mes montants",
+      href: "/coach",
       bg: C.primaryBg,
       color: C.primary,
       iconPath: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7|M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",
@@ -1038,20 +1443,23 @@ function ActionsRapidesCard() {
     {
       title: "Créer une catégorie",
       sub: "Ajouter une nouvelle catégorie",
+      href: "/coach",
       bg: C.successBg,
       color: C.success,
       iconPath: "M20 7h-3V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM12 11v6|M9 14h6",
     },
     {
-      title: "Voir mes abonnements",
-      sub: "Gérer mes paiements récurrents",
+      title: "Voir mes dépenses",
+      sub: "Détail des sorties par catégorie",
+      href: "/design-match/depenses-v3",
       bg: C.violetBg,
       color: C.violet,
-      iconPath: "M12 1v22|M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
+      iconPath: "M12 19V5|M5 12l7 7 7-7",
     },
     {
-      title: "Télécharger le rapport",
-      sub: "PDF / Excel",
+      title: "Demander un rapport",
+      sub: "Discute avec ton coach",
+      href: "/coach",
       bg: C.amberBg,
       color: C.amber,
       iconPath: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M7 10l5 5 5-5|M12 15V3",
@@ -1064,18 +1472,16 @@ function ActionsRapidesCard() {
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", flex: 1 }}>
         {items.map((it, idx) => (
-          <button
+          <Link
             key={it.title}
+            href={it.href}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 8,
               padding: "3px 0",
-              background: "none",
-              border: "none",
               borderTop: idx === 0 ? "none" : `1px solid ${C.borderGhost}`,
-              cursor: "pointer",
-              textAlign: "left",
+              textDecoration: "none",
             }}
           >
             <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
@@ -1094,7 +1500,7 @@ function ActionsRapidesCard() {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
@@ -1103,7 +1509,31 @@ function ActionsRapidesCard() {
 
 /* ═══════════════ ROW 5 — CONSEIL IA BANDEAU ═══════════════ */
 
-function ConseilIACard() {
+function ConseilIACard({
+  hasBudgets,
+  healthScore,
+  overrunCount,
+}: {
+  hasBudgets: boolean;
+  healthScore: number | null;
+  overrunCount: number;
+}) {
+  const headline = !hasBudgets
+    ? "Configure ton premier budget"
+    : healthScore === null
+      ? "Conseil personnalisé bientôt disponible"
+      : overrunCount > 0
+        ? `${overrunCount} dépassement${overrunCount > 1 ? "s" : ""} ce mois`
+        : healthScore >= 75
+          ? "Conseil de ton coach IA"
+          : "Quelques ajustements à faire";
+  const body = !hasBudgets
+    ? "Un budget par catégorie te permet de comparer tes dépenses à ce que tu avais prévu."
+    : overrunCount > 0
+      ? "Identifie avec ton coach les leviers pour rester dans tes plafonds."
+      : healthScore !== null && healthScore >= 75
+        ? "Tu respectes la majorité de tes budgets. Demande à ton coach les prochains leviers."
+        : "Demande à ton coach quelles catégories serrer en priorité.";
   return (
     <div
       style={{
@@ -1136,14 +1566,15 @@ function ConseilIACard() {
         </span>
         <div style={{ minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Conseil de votre coach IA
+            {headline}
           </p>
           <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textDark, lineHeight: 1.3 }}>
-            En automatisant 500 CHF de plus vers votre épargne chaque mois, vous pourriez atteindre la liberté financière 2 ans plus tôt.
+            {body}
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "8px 14px",
           display: "inline-flex",
@@ -1154,17 +1585,16 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
           flexShrink: 0,
         }}
       >
-        Parler à mon conseiller
+        Parler à mon coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
