@@ -16,14 +16,17 @@
  */
 
 import Link from "next/link";
+import type { Metadata } from "next";
+import type { Goal } from "@/types/database";
 import { getFinanceData } from "@/lib/services/finance";
+import { GOAL_TYPES } from "@/lib/constants";
+import { formatUserCurrency } from "@/lib/utils";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Design Match v3 — Objectifs",
-  robots: { index: false, follow: false },
+export const metadata: Metadata = {
+  title: "Objectifs — LIBERIA",
 };
 
 const C = {
@@ -57,11 +60,169 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ TYPES & HELPERS ═══════════════ */
+
+type Profile = Parameters<typeof formatUserCurrency>[1];
+
+interface ActiveGoalView {
+  id: string;
+  title: string;
+  typeLabel: string;
+  current: number;
+  target: number;
+  pct: number;
+  color: string;
+  iconBg: string;
+}
+
+interface MilestoneView {
+  id: string;
+  title: string;
+  typeLabel: string;
+  deadline: Date;
+  day: string;
+  month: string;
+  delayLabel: string;
+  delayColor: string;
+}
+
+const GOAL_PALETTE: Array<{ color: string; bg: string }> = [
+  { color: "#2563EB", bg: "#EDF2FD" }, // primary
+  { color: "#10A37F", bg: "#ECFDF5" }, // success
+  { color: "#9061F9", bg: "#F4EBFF" }, // violet
+  { color: "#F59E0B", bg: "#FEF3C7" }, // amber
+  { color: "#F97757", bg: "#FFF1EC" }, // coral
+];
+
+function getGoalTypeLabel(id: string): string {
+  return GOAL_TYPES.find((t) => t.id === id)?.label ?? "Autre";
+}
+
+const MONTH_LABELS_FR = [
+  "JANV.",
+  "FÉVR.",
+  "MARS",
+  "AVR.",
+  "MAI",
+  "JUIN",
+  "JUIL.",
+  "AOÛT",
+  "SEPT.",
+  "OCT.",
+  "NOV.",
+  "DÉC.",
+];
+
+function buildMilestoneView(
+  goal: Goal,
+  index: number,
+  now: Date,
+): MilestoneView | null {
+  if (!goal.deadline) return null;
+  const deadline = new Date(goal.deadline);
+  if (Number.isNaN(deadline.getTime())) return null;
+  const day = String(deadline.getUTCDate()).padStart(2, "0");
+  const month = MONTH_LABELS_FR[deadline.getUTCMonth()] ?? "";
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diffDays = Math.round(
+    (deadline.getTime() - now.getTime()) / msPerDay,
+  );
+  let delayLabel = "";
+  let delayColor = "#64748B"; // textMuted
+  if (diffDays < 0) {
+    delayLabel = "Échue";
+    delayColor = "#F97757"; // coral
+  } else if (diffDays === 0) {
+    delayLabel = "Aujourd'hui";
+    delayColor = "#F97757"; // coral
+  } else if (diffDays === 1) {
+    delayLabel = "Demain";
+    delayColor = "#F97757"; // coral
+  } else if (diffDays < 7) {
+    delayLabel = `Dans ${diffDays} jours`;
+    delayColor = "#F97757"; // coral
+  } else if (diffDays < 30) {
+    const w = Math.round(diffDays / 7);
+    delayLabel = w === 1 ? "Dans 1 semaine" : `Dans ${w} semaines`;
+    delayColor = "#F59E0B"; // amber
+  } else if (diffDays < 365) {
+    const m = Math.round(diffDays / 30);
+    delayLabel = m === 1 ? "Dans 1 mois" : `Dans ${m} mois`;
+    delayColor = "#64748B"; // textMuted
+  } else {
+    const y = Math.floor(diffDays / 365);
+    delayLabel = y === 1 ? "Dans 1 an" : `Dans ${y} ans`;
+    delayColor = "#64748B";
+  }
+  void index;
+  return {
+    id: goal.id,
+    title: goal.title,
+    typeLabel: getGoalTypeLabel(goal.type),
+    deadline,
+    day,
+    month,
+    delayLabel,
+    delayColor,
+  };
+}
+
+/* ═══════════════ DEFAULT EXPORT ═══════════════ */
+
 export default async function DesignMatchObjectifsV3() {
   const data = await getFinanceData();
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Agrégats objectifs                                                */
+  /* ------------------------------------------------------------------ */
+
+  const goals = data.goals;
+  const activeGoals = goals.filter((g) => !g.is_completed);
+  const completedGoals = goals.filter((g) => g.is_completed);
+  const totalTarget = goals.reduce((s, g) => s + (g.target_amount || 0), 0);
+  const totalSaved = goals.reduce((s, g) => s + (g.current_amount || 0), 0);
+  const progressPct =
+    totalTarget > 0
+      ? Math.max(0, Math.min(100, Math.round((totalSaved / totalTarget) * 100)))
+      : null;
+
+  const hasGoals = goals.length > 0;
+  const hasActive = activeGoals.length > 0;
+
+  // Cartes "Vos objectifs actifs" — top 4 par progression % desc
+  const activeGoalViews: ActiveGoalView[] = activeGoals
+    .map((g, idx): ActiveGoalView => {
+      const palette = GOAL_PALETTE[idx % GOAL_PALETTE.length];
+      const target = g.target_amount || 0;
+      const current = g.current_amount || 0;
+      const pct =
+        target > 0
+          ? Math.max(0, Math.min(100, Math.round((current / target) * 100)))
+          : 0;
+      return {
+        id: g.id,
+        title: g.title,
+        typeLabel: getGoalTypeLabel(g.type),
+        current,
+        target,
+        pct,
+        color: palette.color,
+        iconBg: palette.bg,
+      };
+    })
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, 4);
+
+  // Jalons à venir — goals avec deadline, triés par deadline asc, top 3
+  const now = new Date();
+  const milestoneViews: MilestoneView[] = activeGoals
+    .map((g, idx) => buildMilestoneView(g, idx, now))
+    .filter((m): m is MilestoneView => m !== null)
+    .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
+    .slice(0, 3);
 
   return (
     <>
@@ -103,20 +264,41 @@ export default async function DesignMatchObjectifsV3() {
             }}
           >
             <div data-obj-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 6 }}>
-              <ObjectifsHero />
-              <ResumeCard />
+              <ObjectifsHero
+                progressPct={progressPct}
+                activeCount={activeGoals.length}
+              />
+              <ResumeCard
+                activeCount={activeGoals.length}
+                completedCount={completedGoals.length}
+                totalTarget={totalTarget}
+                totalSaved={totalSaved}
+                profile={data.profile}
+              />
             </div>
             <div data-obj-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 6 }}>
-              <ObjectifsActifsCard />
-              <PrioritesIACard />
-              <GainsFutursCard />
+              <ObjectifsActifsCard
+                goals={activeGoalViews}
+                totalActive={activeGoals.length}
+                profile={data.profile}
+              />
+              <PrioritesIACard hasGoals={hasGoals} />
+              <GainsFutursCard hasGoals={hasGoals} />
             </div>
             <div data-obj-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 6 }}>
               <ProgressionMensuelleCard />
-              <JalonsCard />
-              <ConseilIACard />
+              <JalonsCard milestones={milestoneViews} hasActive={hasActive} />
+              <ConseilIACard
+                progressPct={progressPct}
+                hasGoals={hasGoals}
+              />
             </div>
-            <MissionFooter />
+            <MissionFooter
+              totalSaved={totalSaved}
+              progressPct={progressPct}
+              hasGoals={hasGoals}
+              profile={data.profile}
+            />
           </main>
         </div>
       </div>
@@ -413,7 +595,21 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function ObjectifsHero() {
+function ObjectifsHero({
+  progressPct,
+  activeCount,
+}: {
+  progressPct: number | null;
+  activeCount: number;
+}) {
+  const hasPct = progressPct !== null;
+  const pctText = hasPct ? `${progressPct} %` : "—";
+  const barWidth = hasPct ? `${progressPct}%` : "0%";
+  const subline = !hasPct
+    ? "Aucun objectif défini"
+    : activeCount === 0
+      ? "Tous tes objectifs sont atteints"
+      : `${activeCount} objectif${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}`;
   return (
     <div
       style={{
@@ -457,17 +653,19 @@ function ObjectifsHero() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              62 %
+              {pctText}
             </p>
-            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.78)", fontWeight: 500 }}>
-              de vos objectifs atteints
-            </p>
+            {hasPct && (
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.78)", fontWeight: 500 }}>
+                de vos objectifs atteints
+              </p>
+            )}
           </div>
           <div style={{ marginTop: 8, height: 6, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 380 }}>
-            <div style={{ width: "62%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+            <div style={{ width: barWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
           </div>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            4 objectifs actifs
+            {subline}
           </p>
         </div>
         <div
@@ -496,12 +694,41 @@ function ObjectifsHero() {
   );
 }
 
-function ResumeCard() {
+function ResumeCard({
+  activeCount,
+  completedCount,
+  totalTarget,
+  totalSaved,
+  profile,
+}: {
+  activeCount: number;
+  completedCount: number;
+  totalTarget: number;
+  totalSaved: number;
+  profile: Profile;
+}) {
+  const hasAnyGoal = activeCount + completedCount > 0;
   const rows = [
-    { label: "Objectifs actifs", value: "4", color: C.textDark },
-    { label: "Objectifs atteints", value: "2", color: C.success },
-    { label: "Montant cible", value: "155 000 CHF", color: C.textDark },
-    { label: "Montant épargné", value: "96 200 CHF", color: C.primary },
+    {
+      label: "Objectifs actifs",
+      value: hasAnyGoal ? String(activeCount) : "—",
+      color: C.textDark,
+    },
+    {
+      label: "Objectifs atteints",
+      value: hasAnyGoal ? String(completedCount) : "—",
+      color: completedCount > 0 ? C.success : C.textMuted,
+    },
+    {
+      label: "Montant cible",
+      value: totalTarget > 0 ? formatUserCurrency(totalTarget, profile) : "—",
+      color: C.textDark,
+    },
+    {
+      label: "Montant épargné",
+      value: totalSaved > 0 ? formatUserCurrency(totalSaved, profile) : "—",
+      color: totalSaved > 0 ? C.primary : C.textMuted,
+    },
   ];
   return (
     <div
@@ -545,73 +772,65 @@ function ResumeCard() {
 
 /* ═══════════════ ROW 2 ═══════════════ */
 
-function ObjectifsActifsCard() {
-  const goals = [
-    { label: "Achat maison", sub: "Lausanne", pct: 75, amount: "75 000 / 100 000", color: C.primary, iconBg: C.primaryBg },
-    { label: "Voyage famille", sub: "Maldives", pct: 40, amount: "4 000 / 10 000", color: C.success, iconBg: C.successBg },
-    { label: "Retraite anticipée", sub: "Liberté financière", pct: 28, amount: "17 200 / 60 000", color: C.violet, iconBg: C.violetBg },
-    { label: "Indépendance fin.", sub: "Revenus passifs", pct: 15, amount: "0 / 35 000", color: C.amber, iconBg: C.amberBg },
-  ];
+function ObjectifsActifsCard({
+  goals,
+  totalActive,
+  profile,
+}: {
+  goals: ActiveGoalView[];
+  totalActive: number;
+  profile: Profile;
+}) {
+  const headline =
+    totalActive === 0
+      ? "Aucun objectif"
+      : `${totalActive} en cours`;
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Vos objectifs actifs
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        4 en cours
+        {headline}
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {goals.map((g) => (
-          <div key={g.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
-                <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {g.label}
-                </span>
-                <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
-                  {g.amount}
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-                  <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+      {goals.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Aucun objectif actif. Demande à ton coach pour structurer ton premier objectif.
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {goals.map((g) => (
+            <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                  <span style={{ fontSize: 10.5, color: C.textDark, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {g.title}
+                  </span>
+                  <span style={{ fontSize: 10, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                    {formatUserCurrency(g.current, profile)} / {formatUserCurrency(g.target, profile)}
+                  </span>
                 </div>
-                <span style={{ fontSize: 10, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 24, textAlign: "right" }}>
-                  {g.pct}%
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+                  </div>
+                  <span style={{ fontSize: 10, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 24, textAlign: "right" }}>
+                    {g.pct}%
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function PrioritesIACard() {
-  const items = [
-    {
-      tag: "ÉPARGNE",
-      tagColor: C.success,
-      tagBg: C.successBg,
-      title: "Épargner +300 CHF/mois",
-      impact: "+1 an d'avance",
-    },
-    {
-      tag: "DÉPENSES",
-      tagColor: C.coral,
-      tagBg: C.coralBg,
-      title: "Réduire 200 CHF de plus",
-      impact: "+5% progression",
-    },
-    {
-      tag: "INVEST",
-      tagColor: C.violet,
-      tagBg: C.violetBg,
-      title: "Investir 500 CHF/mois",
-      impact: "+2 ans d'avance",
-    },
-  ];
+function PrioritesIACard({ hasGoals }: { hasGoals: boolean }) {
+  // Moteur de priorisation d'actions par objectif (épargne/dépenses/
+  // invest avec impact estimé) pas encore branché. Empty state honnête
+  // + CTA vers le coach pour identifier les leviers personnalisés.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -620,33 +839,47 @@ function PrioritesIACard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Actions à fort impact
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.title} style={{ padding: "6px 8px", borderRadius: 7, backgroundColor: C.pageBg, display: "flex", flexDirection: "column", gap: 2 }}>
-            <span style={{ display: "inline-flex", alignSelf: "flex-start", padding: "1px 5px", borderRadius: 999, backgroundColor: it.tagBg, color: it.tagColor, fontSize: 8.5, fontWeight: 700, letterSpacing: "0.1em" }}>
-              {it.tag}
-            </span>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.title}
-              </span>
-              <span style={{ fontSize: 10, fontWeight: 700, color: C.success, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
-                {it.impact}
-              </span>
-            </div>
-          </div>
-        ))}
+      <div style={{ marginTop: 8, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: 6, padding: "8px 4px" }}>
+        <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.35 }}>
+          {hasGoals
+            ? "Analyse IA en préparation"
+            : "Aucune priorité identifiée"}
+        </p>
+        <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.45 }}>
+          {hasGoals
+            ? "Demande à ton coach quelles actions accélèrent le plus tes objectifs."
+            : "Définis ton premier objectif pour identifier les leviers à activer."}
+        </p>
       </div>
+      <Link
+        href="/coach"
+        style={{
+          marginTop: 6,
+          alignSelf: "flex-start",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          fontSize: 11,
+          fontWeight: 500,
+          color: C.primary,
+          textDecoration: "none",
+        }}
+      >
+        Demander au coach
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </Link>
     </div>
   );
 }
 
-function GainsFutursCard() {
-  const rows = [
-    { label: "Dans 1 an", value: "120 000", delta: "+24K" },
-    { label: "Dans 3 ans", value: "165 000", delta: "+69K" },
-    { label: "Dans 5 ans", value: "220 000", delta: "+124K" },
-  ];
+function GainsFutursCard({ hasGoals }: { hasGoals: boolean }) {
+  // Projection patrimoine fiable nécessite une combinaison de
+  // current_savings + rendement attendu + cashflow net stable. Tant
+  // que ce moteur n'est pas validé produit, on n'affiche pas de
+  // chiffres extrapolés — empty state premium.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -655,24 +888,13 @@ function GainsFutursCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Projection patrimoine
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {rows.map((r) => (
-          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.successBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                <polyline points="17 6 23 6 23 12" />
-              </svg>
-            </span>
-            <span style={{ flex: 1, fontSize: 11, color: C.textMuted }}>{r.label}</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.textDark, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-              {r.value}
-            </span>
-            <span style={{ fontSize: 10, color: C.success, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-              {r.delta}
-            </span>
-          </div>
-        ))}
+      <div style={{ marginTop: 8, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: 6, padding: "8px 4px" }}>
+        <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.35 }}>
+          {hasGoals ? "Projection bientôt disponible" : "Aucune projection disponible"}
+        </p>
+        <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.45 }}>
+          La projection patrimoine prendra en compte ton épargne actuelle, tes objectifs et tes flux mensuels une fois le moteur calibré.
+        </p>
       </div>
     </div>
   );
@@ -681,38 +903,9 @@ function GainsFutursCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function ProgressionMensuelleCard() {
-  const points = [
-    { label: "Nov.", value: 25000 },
-    { label: "Déc.", value: 32000 },
-    { label: "Janv.", value: 38000 },
-    { label: "Févr.", value: 44000 },
-    { label: "Mars", value: 51000 },
-    { label: "Avr.", value: 58000 },
-    { label: "Mai", value: 65000 },
-    { label: "Juin", value: 72000 },
-    { label: "Juil.", value: 79000 },
-    { label: "Août", value: 85000 },
-    { label: "Sept.", value: 91000 },
-    { label: "Oct.", value: 96200 },
-  ];
-  const W = 360;
-  const HH = 95;
-  const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 0;
-  const maxV = 100000;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [20000, 60000, 100000];
-  const last = scaled[scaled.length - 1];
+  // Historique mensuel de l'épargne agrégée par objectif pas encore
+  // stocké (pas de snapshot mensuel goal_history). Empty state propre
+  // tant que la table n'existe pas.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -724,92 +917,42 @@ function ProgressionMensuelleCard() {
             12 derniers mois
           </p>
         </div>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
-            borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-          </svg>
-          +18 700 CHF
-        </span>
       </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="obj-prog-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v / 1000}K
-                </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#obj-prog-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            96 200 CHF
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 4} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
+      <div
+        style={{
+          marginTop: 10,
+          flex: 1,
+          minHeight: 95,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 8px",
+          textAlign: "center",
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M3 3v18h18" />
+          <path d="M7 14l4-4 4 4 5-5" />
         </svg>
+        <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Historique non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
+          Ta progression mensuelle apparaîtra ici dès que ton épargne sera agrégée mois après mois.
+        </p>
       </div>
     </div>
   );
 }
 
-function JalonsCard() {
-  const items = [
-    {
-      month: "JUIN",
-      day: "15",
-      label: "Voyage en famille",
-      sub: "Épargner 1 000 CHF",
-      delay: "Dans 3 jours",
-      delayColor: C.coral,
-    },
-    {
-      month: "JUIL.",
-      day: "01",
-      label: "Achat maison",
-      sub: "Épargner 2 500 CHF",
-      delay: "Dans 2 semaines",
-      delayColor: C.amber,
-    },
-    {
-      month: "AOÛT",
-      day: "01",
-      label: "Retraite anticipée",
-      sub: "Investir 800 CHF",
-      delay: "Dans 1 mois",
-      delayColor: C.textMuted,
-    },
-  ];
+function JalonsCard({
+  milestones,
+  hasActive,
+}: {
+  milestones: MilestoneView[];
+  hasActive: boolean;
+}) {
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -818,45 +961,75 @@ function JalonsCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Prochaines échéances
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 9, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <div
-              style={{
-                width: 32,
-                textAlign: "center",
-                flexShrink: 0,
-                padding: "3px 0",
-                borderRadius: 5,
-                backgroundColor: C.cardBg,
-              }}
-            >
-              <p style={{ margin: 0, fontSize: 8, fontWeight: 700, color: C.textMuted, letterSpacing: "0.06em" }}>
-                {it.month}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", lineHeight: 1, letterSpacing: "-0.025em" }}>
-                {it.day}
-              </p>
+      {milestones.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          {hasActive
+            ? "Aucune échéance définie sur tes objectifs actifs."
+            : "Définis tes objectifs pour voir tes échéances à venir."}
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {milestones.map((it) => (
+            <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 9, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <div
+                style={{
+                  width: 32,
+                  textAlign: "center",
+                  flexShrink: 0,
+                  padding: "3px 0",
+                  borderRadius: 5,
+                  backgroundColor: C.cardBg,
+                }}
+              >
+                <p style={{ margin: 0, fontSize: 8, fontWeight: 700, color: C.textMuted, letterSpacing: "0.06em" }}>
+                  {it.month}
+                </p>
+                <p style={{ margin: "1px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", lineHeight: 1, letterSpacing: "-0.025em" }}>
+                  {it.day}
+                </p>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
+                  {it.title}
+                </p>
+                <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
+                  {it.typeLabel}
+                </p>
+                <p style={{ margin: "1px 0 0 0", fontSize: 9.5, fontWeight: 700, color: it.delayColor }}>
+                  {it.delayLabel}
+                </p>
+              </div>
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {it.sub}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, fontWeight: 700, color: it.delayColor }}>
-                {it.delay}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ConseilIACard() {
+function ConseilIACard({
+  progressPct,
+  hasGoals,
+}: {
+  progressPct: number | null;
+  hasGoals: boolean;
+}) {
+  const headline = !hasGoals
+    ? "Définis ton premier objectif"
+    : progressPct === null
+      ? "Active des montants cibles"
+      : progressPct >= 75
+        ? "Tu es sur la bonne voie !"
+        : progressPct >= 40
+          ? "Bonne progression à maintenir"
+          : "Continue ton effort";
+  const body = !hasGoals
+    ? "Un objectif clair structure ton effort d'épargne mois après mois."
+    : progressPct === null
+      ? "Renseigne un montant cible sur chacun de tes objectifs pour suivre ta progression."
+      : progressPct >= 75
+        ? "Tu atteins bientôt tes objectifs. Identifie le prochain palier avec ton coach."
+        : "Identifie avec ton coach les leviers qui accélèrent le plus tes objectifs.";
   return (
     <div
       style={{
@@ -890,12 +1063,13 @@ function ConseilIACard() {
         </p>
       </div>
       <p style={{ margin: "6px 0 0 0", fontSize: 11.5, color: C.textDark, fontWeight: 700, lineHeight: 1.3 }}>
-        Vous êtes sur la bonne voie !
+        {headline}
       </p>
       <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textDark, lineHeight: 1.35 }}>
-        En épargnant 300 CHF de plus par mois, vous atteindrez vos objectifs 1 an plus tôt et économiserez 6 200 CHF d&apos;intérêts.
+        {body}
       </p>
-      <button
+      <Link
+        href="/coach"
         style={{
           marginTop: "auto",
           width: "100%",
@@ -909,22 +1083,42 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
-        Parler à mon conseiller
-      </button>
+        Parler à mon coach
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 4 — MISSION FOOTER ═══════════════ */
 
-function MissionFooter() {
+function MissionFooter({
+  totalSaved,
+  progressPct,
+  hasGoals,
+  profile,
+}: {
+  totalSaved: number;
+  progressPct: number | null;
+  hasGoals: boolean;
+  profile: Profile;
+}) {
+  const headline = !hasGoals
+    ? "Définis ton premier objectif"
+    : totalSaved > 0
+      ? `Tu as déjà épargné ${formatUserCurrency(totalSaved, profile)} au total.`
+      : "Active tes premiers montants pour démarrer ton suivi";
+  const subline =
+    !hasGoals
+      ? "Commence en parlant à ton coach des montants et échéances qui comptent."
+      : progressPct === null
+        ? "Renseigne tes montants cibles pour suivre ta progression."
+        : `Progression globale : ${progressPct} %`;
   return (
     <div
       style={{
@@ -962,16 +1156,15 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Félicitations ! Vous avez épargné 96 200 CHF au total.
+            {headline}
           </p>
           <p style={{ margin: "1px 0 0 0", fontSize: 10.5, color: C.textMuted }}>
-            Continuez comme ça, vous construisez votre avenir.
-            {" • "}
-            <span style={{ color: C.success, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>62 % de l&apos;objectif global atteint</span>
+            {subline}
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "7px 14px",
           display: "inline-flex",
@@ -982,17 +1175,16 @@ function MissionFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
           flexShrink: 0,
         }}
       >
-        Créer un nouvel objectif
+        Discuter avec mon coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
