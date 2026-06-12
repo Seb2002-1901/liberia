@@ -87,7 +87,7 @@ export default async function DesignMatchDepensesV3() {
         <div data-dep-sidebar>
           <Sidebar />
         </div>
-        <div data-dep-content style={{ marginLeft: 248, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div data-dep-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
           <Topbar firstName={firstName} fullName={fullName} />
           <main
             data-dep-main
@@ -133,39 +133,40 @@ function Sidebar() {
         top: 0,
         left: 0,
         bottom: 0,
-        width: 248,
+        width: 280,
         backgroundColor: C.cardBg,
         borderRight: `1px solid ${C.borderGhost}`,
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "16px 20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "20px 24px 20px 24px" }}>
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 26,
-            height: 26,
+            width: 30,
+            height: 30,
             backgroundColor: C.navy,
-            borderRadius: 7,
+            borderRadius: 8,
           }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 20V6" />
             <path d="M4 20h14" />
             <path d="M8 14l4-4 3 3 5-6" />
           </svg>
         </span>
-        <span style={{ color: C.navy, letterSpacing: "0.16em", fontSize: 14, fontWeight: 700 }}>
+        <span style={{ color: C.navy, letterSpacing: "0.16em", fontSize: 15, fontWeight: 700 }}>
           LIBERIA
         </span>
       </div>
-      <nav style={{ flex: 1, overflowY: "auto", padding: "0 10px" }}>
+      <nav style={{ flex: 1, overflowY: "auto", padding: "0 12px" }}>
         <NavSection title="PRINCIPAL">
           <NavItem label="Tableau de bord" href="/design-match/dashboard-v3" iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" />
           <NavItem label="Coach IA" href="/design-match/coach-v3" iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <NavItem label="Mon analyse" href="/design-match/mon-analyse-v3" iconPath="M22 12h-4l-3 9L9 3l-3 9H2" />
           <NavItem label="Plan d'action" href="/design-match/plan-v3" iconPath="M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </NavSection>
         <NavSection title="FINANCES">
@@ -184,42 +185,45 @@ function Sidebar() {
           <NavItem label="Profil" href="/design-match/profil-v3" iconPath="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
         </NavSection>
       </nav>
-      <div style={{ padding: 10 }}>
+      <div style={{ padding: 12 }}>
         <div
           style={{
-            padding: 12,
-            backgroundColor: C.navy,
-            borderRadius: 11,
+            padding: 16,
+            backgroundColor: C.cardBg,
+            borderRadius: 12,
             boxShadow: SHADOW.kpi,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill={C.gold}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={C.gold}>
               <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
             </svg>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: "white", letterSpacing: "0.04em" }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.textDark, letterSpacing: "0.04em" }}>
               LIBERIA PREMIUM
             </span>
           </div>
-          <p style={{ marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.78)", lineHeight: 1.4 }}>
+          <p style={{ marginTop: 8, fontSize: 11.5, color: C.textMuted, lineHeight: 1.45 }}>
             Débloquez tout le potentiel de votre conseiller financier.
           </p>
-          <button
+          <Link
+            href="/settings/subscription"
             style={{
+              display: "block",
+              textAlign: "center",
               width: "100%",
-              marginTop: 8,
-              padding: "6px 10px",
+              marginTop: 12,
+              padding: "8px 12px",
               border: "none",
-              backgroundColor: "white",
-              fontSize: 11.5,
+              backgroundColor: C.pageBg,
+              fontSize: 12,
               fontWeight: 500,
-              color: C.navy,
-              borderRadius: 7,
-              cursor: "pointer",
+              color: C.textDark,
+              borderRadius: 8,
+              textDecoration: "none",
             }}
           >
             Gérer mon abonnement
-          </button>
+          </Link>
         </div>
       </div>
     </aside>
@@ -228,15 +232,14 @@ function Sidebar() {
 
 function NavSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 8 }}>
+    <div style={{ marginBottom: 12 }}>
       <p
         style={{
-          padding: "6px 10px 4px 10px",
-          fontSize: 10,
+          padding: "8px 12px 6px 12px",
+          fontSize: 10.5,
           fontWeight: 600,
           color: C.textLight,
           letterSpacing: "0.16em",
-          margin: 0,
         }}
       >
         {title}
@@ -302,7 +305,6 @@ function NavItem({
     </Link>
   );
 }
-
 /* ═══════════════ TOPBAR ═══════════════ */
 
 function Topbar({

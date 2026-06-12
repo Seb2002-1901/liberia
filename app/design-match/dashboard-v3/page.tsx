@@ -506,7 +506,6 @@ function Sidebar() {
         bottom: 0,
         width: 280,
         backgroundColor: C.cardBg,
-        // Bordure ultra-subtile (quasi-invisible)
         borderRight: `1px solid ${C.borderGhost}`,
         display: "flex",
         flexDirection: "column",
@@ -534,11 +533,11 @@ function Sidebar() {
           LIBERIA
         </span>
       </div>
-
       <nav style={{ flex: 1, overflowY: "auto", padding: "0 12px" }}>
         <NavSection title="PRINCIPAL">
           <NavItem label="Tableau de bord" href="/design-match/dashboard-v3" iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" active />
           <NavItem label="Coach IA" href="/design-match/coach-v3" iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <NavItem label="Mon analyse" href="/design-match/mon-analyse-v3" iconPath="M22 12h-4l-3 9L9 3l-3 9H2" />
           <NavItem label="Plan d'action" href="/design-match/plan-v3" iconPath="M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </NavSection>
         <NavSection title="FINANCES">
@@ -557,15 +556,12 @@ function Sidebar() {
           <NavItem label="Profil" href="/design-match/profil-v3" iconPath="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
         </NavSection>
       </nav>
-
-      {/* Premium card — SURFACE flottante, pas bordée */}
       <div style={{ padding: 12 }}>
         <div
           style={{
             padding: 16,
             backgroundColor: C.cardBg,
             borderRadius: 12,
-            // Pas de border. Juste shadow ultra-subtle.
             boxShadow: SHADOW.kpi,
           }}
         >
@@ -580,8 +576,11 @@ function Sidebar() {
           <p style={{ marginTop: 8, fontSize: 11.5, color: C.textMuted, lineHeight: 1.45 }}>
             Débloquez tout le potentiel de votre conseiller financier.
           </p>
-          <button
+          <Link
+            href="/settings/subscription"
             style={{
+              display: "block",
+              textAlign: "center",
               width: "100%",
               marginTop: 12,
               padding: "8px 12px",
@@ -591,11 +590,11 @@ function Sidebar() {
               fontWeight: 500,
               color: C.textDark,
               borderRadius: 8,
-              cursor: "pointer",
+              textDecoration: "none",
             }}
           >
-            Découvrir Premium
-          </button>
+            Gérer mon abonnement
+          </Link>
         </div>
       </div>
     </aside>
@@ -677,7 +676,6 @@ function NavItem({
     </Link>
   );
 }
-
 /* ═══════════════ TOPBAR ═══════════════ */
 
 function Topbar({

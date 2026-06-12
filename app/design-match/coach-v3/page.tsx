@@ -75,22 +75,6 @@ async function startConversationAction() {
   redirect("/coach");
 }
 
-/** Routes prod pour la sidebar V3 (NavItem → Link). */
-const NAV_HREFS = {
-  dashboard: "/dashboard",
-  coach: "/design-match/coach-v3",
-  plan: "/plan",
-  incomes: "/incomes",
-  expenses: "/expenses",
-  budget: "/budget",
-  goals: "/goals",
-  savings: "/savings",
-  investments: "/investments",
-  opportunities: "/opportunities",
-  settings: "/settings",
-  profile: "/profile",
-} as const;
-
 /* ═══════════════ DEFAULT EXPORT ═══════════════ */
 
 export default async function DesignMatchCoachV3() {
@@ -312,7 +296,7 @@ function Sidebar() {
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "20px 24px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "20px 24px 20px 24px" }}>
         <span
           style={{
             display: "inline-flex",
@@ -336,24 +320,25 @@ function Sidebar() {
       </div>
       <nav style={{ flex: 1, overflowY: "auto", padding: "0 12px" }}>
         <NavSection title="PRINCIPAL">
-          <NavItem label="Tableau de bord" href={NAV_HREFS.dashboard} iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" />
-          <NavItem label="Coach IA" href={NAV_HREFS.coach} iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" active />
-          <NavItem label="Plan d'action" href={NAV_HREFS.plan} iconPath="M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          <NavItem label="Tableau de bord" href="/design-match/dashboard-v3" iconPath="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" />
+          <NavItem label="Coach IA" href="/design-match/coach-v3" iconPath="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" active />
+          <NavItem label="Mon analyse" href="/design-match/mon-analyse-v3" iconPath="M22 12h-4l-3 9L9 3l-3 9H2" />
+          <NavItem label="Plan d'action" href="/design-match/plan-v3" iconPath="M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </NavSection>
         <NavSection title="FINANCES">
-          <NavItem label="Revenus" href={NAV_HREFS.incomes} iconCircle iconPath="M12 5v14|M5 12l7-7 7 7" />
-          <NavItem label="Dépenses" href={NAV_HREFS.expenses} iconCircle iconPath="M12 19V5|M5 12l7 7 7-7" />
-          <NavItem label="Budget" href={NAV_HREFS.budget} iconPath="M21.21 15.89A10 10 0 1 1 8 2.83|M22 12A10 10 0 0 0 12 2v10z" />
-          <NavItem label="Objectifs" href={NAV_HREFS.goals} iconPath="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" />
+          <NavItem label="Revenus" href="/design-match/revenus-v3" iconCircle iconPath="M12 5v14|M5 12l7-7 7 7" />
+          <NavItem label="Dépenses" href="/design-match/depenses-v3" iconCircle iconPath="M12 19V5|M5 12l7 7 7-7" />
+          <NavItem label="Budget" href="/design-match/budget-v3" iconPath="M21.21 15.89A10 10 0 1 1 8 2.83|M22 12A10 10 0 0 0 12 2v10z" />
+          <NavItem label="Objectifs" href="/design-match/objectifs-v3" iconPath="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" />
         </NavSection>
         <NavSection title="CROISSANCE">
-          <NavItem label="Épargne" href={NAV_HREFS.savings} iconPath="M21 11h-1a4 4 0 0 0-4-4h-4a8 8 0 0 0-8 8 6 6 0 0 0 6 6h2v-3h4v3h2a6 6 0 0 0 4-2v-2h2v-6z" />
-          <NavItem label="Investissements" href={NAV_HREFS.investments} iconPath="M22 12L18 7l-5 5-4-3-7 7|M22 7V12 17H22Z" />
-          <NavItem label="Opportunités" href={NAV_HREFS.opportunities} iconPath="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" />
+          <NavItem label="Épargne" href="/design-match/epargne-v3" iconPath="M21 11h-1a4 4 0 0 0-4-4h-4a8 8 0 0 0-8 8 6 6 0 0 0 6 6h2v-3h4v3h2a6 6 0 0 0 4-2v-2h2v-6z" />
+          <NavItem label="Investissements" href="/design-match/investissements-v3" iconPath="M22 12L18 7l-5 5-4-3-7 7|M22 7V12 17H22Z" />
+          <NavItem label="Opportunités" href="/design-match/opportunites-v3" iconPath="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" />
         </NavSection>
         <NavSection title="PLUS">
-          <NavItem label="Paramètres" href={NAV_HREFS.settings} iconPath="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-          <NavItem label="Profil" href={NAV_HREFS.profile} iconPath="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+          <NavItem label="Paramètres" href="/design-match/parametres-v3" iconPath="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+          <NavItem label="Profil" href="/design-match/profil-v3" iconPath="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2|M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
         </NavSection>
       </nav>
       <div style={{ padding: 12 }}>
@@ -374,7 +359,7 @@ function Sidebar() {
             </span>
           </div>
           <p style={{ marginTop: 8, fontSize: 11.5, color: C.textMuted, lineHeight: 1.45 }}>
-            Standard 14.95/mois (149/an) · Premium 19.95/mois (199/an). 14 jours gratuits, carte requise.
+            Débloquez tout le potentiel de votre conseiller financier.
           </p>
           <Link
             href="/settings/subscription"
@@ -476,7 +461,6 @@ function NavItem({
     </Link>
   );
 }
-
 /* ═══════════════ TOPBAR ═══════════════ */
 
 function Topbar({
