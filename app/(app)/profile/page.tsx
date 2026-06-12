@@ -1,84 +1,12 @@
-import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/ui/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { LocaleForm } from "@/components/profile/locale-form";
-import { getFinanceData } from "@/lib/services/finance";
-import { getInitials } from "@/lib/utils";
+/**
+ * /profile → redirige vers /design-match/profil-v3.
+ *
+ * Pattern Dashboard (validé) : la VRAIE page V3 vit dans
+ * /design-match/profil-v3/page.tsx avec sa Sidebar et sa Topbar
+ * premium inline. La route prod /profile est un simple alias.
+ */
+import { redirect } from "next/navigation";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("app.profile.metadata");
-  return { title: t("title") };
-}
-
-export default async function ProfilePage() {
-  const t = await getTranslations("app.profile");
-  const data = await getFinanceData();
-  const name = data.profile.full_name ?? t("fallbackName");
-
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        eyebrow={t("header.eyebrow")}
-        title={t("header.title")}
-        description={t("header.description")}
-      />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("infoCard")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarFallback className="bg-gradient-to-br from-[hsl(var(--gold)/0.4)] to-[hsl(var(--gold-muted)/0.2)] text-base text-[hsl(var(--gold))]">
-                {getInitials(name)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{name}</p>
-              <p className="text-sm text-muted-foreground">{data.profile.email}</p>
-              <Badge variant={data.subscription.plan === "premium" ? "gold" : "secondary"} className="mt-1">
-                {data.subscription.plan === "premium" ? t("planActive") : t("planInactive")}
-              </Badge>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormRow label={t("fields.fullName")} value={name} />
-            <FormRow label={t("fields.email")} value={data.profile.email} />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("regionCard")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LocaleForm
-            initialCountry={data.profile.country ?? "CH"}
-            initialCurrency={data.profile.currency ?? "CHF"}
-            initialLocale={data.profile.locale ?? "fr-CH"}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function FormRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      <Input value={value} readOnly className="cursor-default" />
-    </div>
-  );
+export default function ProfileIndexRedirect(): never {
+  redirect("/design-match/profil-v3");
 }
