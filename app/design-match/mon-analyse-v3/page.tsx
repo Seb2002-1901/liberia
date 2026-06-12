@@ -19,14 +19,29 @@
  */
 
 import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData } from "@/lib/services/finance";
+import { createClient } from "@/lib/supabase/server";
+import {
+  gatherExtraSignals,
+  getOrSealDrawerData,
+} from "@/lib/services/health-writer";
+import { listMyRecentSnapshots } from "@/lib/services/health-snapshots";
+import { FINANCIAL_SITUATIONS } from "@/lib/constants";
+import type {
+  DrawerData,
+  AxisId,
+  AxisResult,
+  Band,
+  SealedSnapshot,
+} from "@/lib/calculations/health/types";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Design Match v3 — Mon analyse",
-  robots: { index: false, follow: false },
+export const metadata: Metadata = {
+  title: "Mon analyse — LIBERIA",
 };
 
 const C = {
@@ -60,11 +75,292 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ TYPES & HELPERS ═══════════════ */
+
+// Seuils canoniques FHS (lib/calculations/health/constants.ts) :
+//   rose < 40, ambre [40, 65), or [65, 85), emeraude ≥ 85
+const BAND_THRESHOLD: Record<Band, number> = {
+  rose: 0,
+  ambre: 40,
+  or: 65,
+  emeraude: 85,
+};
+
+const NEXT_BAND: Record<Band, Band | null> = {
+  rose: "ambre",
+  ambre: "or",
+  or: "emeraude",
+  emeraude: null,
+};
+
+// Tous les axes FHS dans leur ordre canonique
+const AXIS_ORDER: AxisId[] = [
+  "discipline",
+  "resilience",
+  "trajectoire",
+  "couverture",
+  "objectifs",
+  "comportement",
+];
+
+function initialsFrom(fullName: string | null): string | null {
+  if (!fullName) return null;
+  const parts = fullName
+    .split(/\s+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length === 0) return null;
+  const first = parts[0][0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] ?? "" : "";
+  return (first + last).toUpperCase() || null;
+}
+
+async function getCurrentAuthUser(): Promise<{
+  id: string;
+  created_at: string | null;
+} | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    return { id: user.id, created_at: user.created_at ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/** "2026-W23" → "S23". */
+function weekToShortLabel(week: string): string {
+  const m = /-W(\d{1,2})$/.exec(week);
+  return m ? `S${parseInt(m[1], 10)}` : week;
+}
+
+/* ═══════════════ DEFAULT EXPORT ═══════════════ */
+
 export default async function DesignMatchMonAnalyseV3() {
-  const data = await getFinanceData();
+  const [data, authedUser] = await Promise.all([
+    getFinanceData(),
+    getCurrentAuthUser(),
+  ]);
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+  const initials = initialsFrom(fullName);
+
+  /* ------------------------------------------------------------------ */
+  /*  FHS drawer + snapshots                                            */
+  /* ------------------------------------------------------------------ */
+
+  let drawerData: DrawerData | null = null;
+  let snapshots: SealedSnapshot[] = [];
+  if (!data.isDemo && authedUser?.id) {
+    try {
+      const extras = await gatherExtraSignals({
+        userId: authedUser.id,
+        financeData: data,
+        accountCreatedAt: authedUser.created_at ?? null,
+      });
+      drawerData = await getOrSealDrawerData({
+        userId: authedUser.id,
+        financeData: data,
+        extras,
+      });
+      snapshots = await listMyRecentSnapshots(12);
+    } catch (err) {
+      console.error("[mon-analyse] FHS compute failed", err);
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  i18n — résolus côté serveur                                       */
+  /* ------------------------------------------------------------------ */
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const tAxes = (await getTranslations(
+    "dashboard.health.axes.labels",
+  )) as (key: string) => string;
+  const tBands = (await getTranslations(
+    "dashboard.health.bands",
+  )) as (key: string) => string;
+  const tReco = (await getTranslations(
+    "dashboard.health.recommendation",
+  )) as (
+    key: string,
+    values?: Record<string, string | number>,
+  ) => string;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+
+  const score = drawerData?.score.display ?? null;
+  const band = drawerData?.score.band ?? null;
+  const bandLabel = band ? tBands(band) : null;
+  const netDelta = drawerData?.delta?.netDelta ?? null;
+  const momentum = drawerData?.momentum ?? null;
+
+  // Phrase "Niveau {Band} en progression/stable/repli" — adaptatif et
+  // honnête, basé sur la combinaison band + momentum.direction. Si l'un
+  // des deux manque, on omet la moitié correspondante.
+  const tagline = (() => {
+    if (!bandLabel) return null;
+    if (!momentum) return `Niveau ${bandLabel}`;
+    const dir =
+      momentum.direction === "UP"
+        ? "en progression"
+        : momentum.direction === "DOWN"
+          ? "en recul léger"
+          : "stable";
+    return `Niveau ${bandLabel} · ${dir}`;
+  })();
+
+  // Décomposition pour ScoreGlobalCard : Score global + 3 axes
+  // (discipline, couverture, trajectoire) avec confidence !== UNKNOWN.
+  const axisColor = (v: number): string =>
+    v >= 75 ? C.success : v >= 55 ? C.primary : v >= 40 ? C.amber : C.coral;
+  const scoreStats: { label: string; value: string; color: string }[] = [];
+  if (score !== null) {
+    scoreStats.push({
+      label: "Score global",
+      value: `${score} / 100`,
+      color: axisColor(score),
+    });
+  }
+  if (drawerData?.score.axes) {
+    for (const id of ["discipline", "couverture", "trajectoire"] as AxisId[]) {
+      const a = drawerData.score.axes[id];
+      if (a && a.confidence !== "UNKNOWN") {
+        scoreStats.push({
+          label: tAxes(id),
+          value: `${a.score} %`,
+          color: axisColor(a.score),
+        });
+      }
+    }
+  }
+
+  // Forces et axes de progrès depuis les 6 axes FHS
+  const allAxes: { id: AxisId; label: string; score: number }[] = [];
+  if (drawerData?.score.axes) {
+    for (const id of AXIS_ORDER) {
+      const a: AxisResult | undefined = drawerData.score.axes[id];
+      if (a && a.confidence !== "UNKNOWN") {
+        allAxes.push({ id, label: tAxes(id), score: a.score });
+      }
+    }
+  }
+  const forces = allAxes
+    .filter((a) => a.score >= 70)
+    .sort((b, a) => a.score - b.score)
+    .slice(0, 4);
+  const lowAxes = allAxes
+    .filter((a) => a.score < 70)
+    .sort((a, b) => a.score - b.score);
+  // Mettre l'axe ciblé par la reco en tête s'il est dans les lowAxes
+  const targetAxis = drawerData?.recommendation?.targetAxis ?? null;
+  const axesToWork = targetAxis
+    ? [
+        ...lowAxes.filter((a) => a.id === targetAxis),
+        ...lowAxes.filter((a) => a.id !== targetAxis),
+      ].slice(0, 4)
+    : lowAxes.slice(0, 4);
+
+  // ProfilAnalyseCard — uniquement les vraies signatures
+  const situationLabel = data.financialProfile
+    ? FINANCIAL_SITUATIONS.find(
+        (s) => s.id === data.financialProfile?.situation,
+      )?.label ?? null
+    : null;
+  const profileTraits: { label: string; value: string; color: string }[] = [];
+  if (bandLabel) {
+    profileTraits.push({
+      label: "Niveau",
+      value: bandLabel,
+      color: score !== null && score >= 65 ? C.success : C.primary,
+    });
+  }
+  if (situationLabel) {
+    profileTraits.push({
+      label: "Situation",
+      value: situationLabel,
+      color:
+        data.financialProfile?.situation === "comfortable"
+          ? C.success
+          : data.financialProfile?.situation === "stable"
+            ? C.primary
+            : data.financialProfile?.situation === "tight"
+              ? C.amber
+              : C.coral,
+    });
+  }
+  if (data.financialProfile?.main_goal?.trim()) {
+    profileTraits.push({
+      label: "Objectif principal",
+      value: data.financialProfile.main_goal,
+      color: C.primary,
+    });
+  }
+  if (drawerData?.recommendation && targetAxis) {
+    profileTraits.push({
+      label: "Priorité",
+      value: tAxes(targetAxis),
+      color: C.violet,
+    });
+  }
+  if (momentum) {
+    const momText =
+      momentum.direction === "UP"
+        ? "En progression"
+        : momentum.direction === "DOWN"
+          ? "En recul léger"
+          : "Stable";
+    const momColor =
+      momentum.direction === "UP"
+        ? C.success
+        : momentum.direction === "DOWN"
+          ? C.coral
+          : C.textMuted;
+    profileTraits.push({
+      label: "Momentum",
+      value: momText,
+      color: momColor,
+    });
+  }
+
+  // ProgressionCard — réutilise les snapshots si on en a au moins 2
+  const chronoSnapshots = [...snapshots].reverse();
+  const progressionPoints = chronoSnapshots.map((s) => ({
+    label: weekToShortLabel(s.week),
+    value: s.result.display,
+  }));
+  const hasProgression = progressionPoints.length >= 2;
+  const progressionDelta = hasProgression
+    ? progressionPoints[progressionPoints.length - 1].value -
+      progressionPoints[0].value
+    : null;
+
+  // ConseilIACard — issu de recommendation
+  const recommendationCopy = drawerData?.recommendation
+    ? {
+        title: tReco(
+          `${drawerData.recommendation.titleKey}.title`,
+          drawerData.recommendation.payload,
+        ),
+        desc: tReco(
+          `${drawerData.recommendation.titleKey}.desc`,
+          drawerData.recommendation.payload,
+        ),
+        estimatedGain: drawerData.recommendation.estimatedGain,
+      }
+    : null;
+
+  // MissionFooter — points pour atteindre le prochain palier
+  const nextBand = band ? NEXT_BAND[band] : null;
+  const nextBandLabel = nextBand ? tBands(nextBand) : null;
+  const nextThreshold = nextBand ? BAND_THRESHOLD[nextBand] : null;
+  const ptsToNext =
+    score !== null && nextThreshold !== null && score < nextThreshold
+      ? nextThreshold - score
+      : null;
 
   return (
     <>
@@ -106,20 +402,37 @@ export default async function DesignMatchMonAnalyseV3() {
             }}
           >
             <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
-              <AnalyseHero />
-              <ScoreGlobalCard />
+              <AnalyseHero
+                score={score}
+                netDelta={netDelta}
+                tagline={tagline}
+                initials={initials}
+              />
+              <ScoreGlobalCard stats={scoreStats} />
             </div>
             <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
-              <ProfilAnalyseCard />
-              <ForcesCard />
-              <AxesCard />
+              <ProfilAnalyseCard traits={profileTraits} />
+              <ForcesCard items={forces} />
+              <AxesCard items={axesToWork} />
             </div>
             <div data-pro-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
-              <ProgressionCard />
+              <ProgressionCard
+                points={progressionPoints}
+                latestScore={score}
+                delta={progressionDelta}
+              />
               <TrajectoireCard />
-              <ConseilIACard />
+              <ConseilIACard
+                recommendation={recommendationCopy}
+                hasScore={score !== null}
+              />
             </div>
-            <MissionFooter />
+            <MissionFooter
+              score={score}
+              bandLabel={bandLabel}
+              nextBandLabel={nextBandLabel}
+              ptsToNext={ptsToNext}
+            />
           </main>
         </div>
       </div>
@@ -416,7 +729,33 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function AnalyseHero() {
+function AnalyseHero({
+  score,
+  netDelta,
+  tagline,
+  initials,
+}: {
+  score: number | null;
+  netDelta: number | null;
+  tagline: string | null;
+  initials: string | null;
+}) {
+  const hasScore = score !== null;
+  const scoreText = hasScore ? `${score} / 100` : "—";
+  const progressWidth = hasScore
+    ? `${Math.max(0, Math.min(100, score))}%`
+    : "0%";
+  const progressLabel = hasScore ? `${score}%` : "—";
+  const deltaText =
+    netDelta !== null && netDelta !== 0
+      ? `${netDelta > 0 ? "+" : ""}${netDelta} pts`
+      : null;
+  const deltaColor =
+    netDelta !== null && netDelta > 0
+      ? "#5EEAD4"
+      : netDelta !== null && netDelta < 0
+        ? "#FCA5A5"
+        : "rgba(255,255,255,0.7)";
   return (
     <div
       style={{
@@ -460,30 +799,32 @@ function AnalyseHero() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              84 / 100
+              {scoreText}
             </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +22 pts
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette année</span>
+            {deltaText && (
+              <>
+                <span style={{ fontSize: 12, fontWeight: 700, color: deltaColor, fontVariantNumeric: "tabular-nums" }}>
+                  {deltaText}
+                </span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette semaine</span>
+              </>
+            )}
           </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.1 }}>
-            Profil discipliné en forte progression
-          </p>
-          <div style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 999, backgroundColor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)" }}>
-            <svg width="9" height="9" viewBox="0 0 24 24" fill={C.gold}>
-              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
-            </svg>
-            <span style={{ fontSize: 9.5, fontWeight: 700, color: "white", letterSpacing: "0.04em" }}>
-              Top 18 % des utilisateurs Liberia
-            </span>
-          </div>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
+          {tagline ? (
+            <p style={{ margin: "6px 0 0 0", fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.1 }}>
+              {tagline}
+            </p>
+          ) : !hasScore ? (
+            <p style={{ margin: "6px 0 0 0", fontSize: 11.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.3 }}>
+              Score pas encore calculé. Complète ton profil financier.
+            </p>
+          ) : null}
+          <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "84%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+              <div style={{ width: progressWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
             <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              84%
+              {progressLabel}
             </span>
           </div>
         </div>
@@ -506,20 +847,18 @@ function AnalyseHero() {
           }}
           aria-hidden
         >
-          SG
+          {initials ?? "—"}
         </div>
       </div>
     </div>
   );
 }
 
-function ScoreGlobalCard() {
-  const stats = [
-    { label: "Score financier", value: "84 / 100", color: C.primary },
-    { label: "Discipline", value: "91 %", color: C.success },
-    { label: "Épargne", value: "88 %", color: C.success },
-    { label: "Investissement", value: "74 %", color: C.primary },
-  ];
+function ScoreGlobalCard({
+  stats,
+}: {
+  stats: { label: string; value: string; color: string }[];
+}) {
   return (
     <div
       style={{
@@ -535,26 +874,33 @@ function ScoreGlobalCard() {
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Décomposition du score
       </p>
-      <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
-        {stats.map((s) => (
-          <div key={s.label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{s.label}</p>
-            <p
-              style={{
-                margin: "1px 0 0 0",
-                fontSize: 12,
-                fontWeight: 700,
-                color: s.color,
-                fontFamily: "Outfit, Inter, system-ui",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {s.value}
-            </p>
-          </div>
-        ))}
-      </div>
-      <button
+      {stats.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Score pas encore calculé.
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
+          {stats.map((s) => (
+            <div key={s.label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{s.label}</p>
+              <p
+                style={{
+                  margin: "1px 0 0 0",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: s.color,
+                  fontFamily: "Outfit, Inter, system-ui",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {s.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+      <Link
+        href="/dashboard"
         style={{
           marginTop: 6,
           padding: "6px 12px",
@@ -567,82 +913,61 @@ function ScoreGlobalCard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Voir mon analyse
+        Voir tous les axes
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 2 ═══════════════ */
 
-function ProfilAnalyseCard() {
-  const traits = [
-    { label: "Profil", value: "Investisseur équilibré", color: C.primary },
-    { label: "Niveau", value: "Confirmé", color: C.success },
-    { label: "Horizon", value: "Long terme", color: C.violet },
-    { label: "Risque", value: "Modéré", color: C.amber },
-    { label: "Objectif principal", value: "Liberté financière", color: C.success },
-  ];
+function ProfilAnalyseCard({
+  traits,
+}: {
+  traits: { label: string; value: string; color: string }[];
+}) {
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Signature financière
-        </p>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "1px 7px",
-            fontSize: 9,
-            fontWeight: 700,
-            color: C.gold,
-            backgroundColor: "#FFF8E1",
-            borderRadius: 999,
-            letterSpacing: "0.04em",
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" />
-          </svg>
-          Top 18 %
-        </span>
-      </div>
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Signature financière
+      </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Votre signature financière
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
-        {traits.map((t) => (
-          <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ fontSize: 10, color: C.textMuted, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {t.label}
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: t.color, fontFamily: "Outfit, Inter, system-ui", textAlign: "right", flexShrink: 0 }}>
-              {t.value}
-            </span>
-          </div>
-        ))}
-      </div>
+      {traits.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Complète ton profil financier pour voir ta signature.
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
+          {traits.map((t) => (
+            <div key={t.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "4px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <span style={{ fontSize: 10, color: C.textMuted, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {t.label}
+              </span>
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: t.color, fontFamily: "Outfit, Inter, system-ui", textAlign: "right", flexShrink: 0 }}>
+                {t.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ForcesCard() {
-  const items = [
-    "Épargne régulière",
-    "Budget maîtrisé",
-    "Objectifs définis",
-    "Progression constante",
-  ];
+function ForcesCard({
+  items,
+}: {
+  items: { id: AxisId; label: string; score: number }[];
+}) {
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -651,31 +976,38 @@ function ForcesCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Vos points forts
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.successBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
-              {it}
-            </span>
-          </div>
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Pas encore de point fort identifié. Avance d&apos;abord sur tes axes prioritaires.
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {items.map((it) => (
+            <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.successBg, flexShrink: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
+                {it.label}
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: C.success, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                {it.score} %
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function AxesCard() {
-  const items = [
-    "Revenus passifs",
-    "Diversification",
-    "Optimisation fiscale",
-    "Accélération investissement",
-  ];
+function AxesCard({
+  items,
+}: {
+  items: { id: AxisId; label: string; score: number }[];
+}) {
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -684,61 +1016,78 @@ function AxesCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         À travailler ensemble
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.amberBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12" y2="17" />
-              </svg>
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
-              {it}
-            </span>
-          </div>
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Tous tes axes sont au-dessus de 70 % — joli travail.
+        </p>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {items.map((it) => (
+            <div key={it.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, backgroundColor: C.amberBg, flexShrink: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.amber} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12" y2="17" />
+                </svg>
+              </span>
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2, flex: 1, minWidth: 0 }}>
+                {it.label}
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: C.amber, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                {it.score} %
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 /* ═══════════════ ROW 3 ═══════════════ */
 
-function ProgressionCard() {
-  const points = [
-    { label: "Nov.", value: 62 },
-    { label: "Déc.", value: 64 },
-    { label: "Janv.", value: 67 },
-    { label: "Févr.", value: 69 },
-    { label: "Mars", value: 72 },
-    { label: "Avr.", value: 74 },
-    { label: "Mai", value: 76 },
-    { label: "Juin", value: 78 },
-    { label: "Juil.", value: 80 },
-    { label: "Août", value: 81 },
-    { label: "Sept.", value: 83 },
-    { label: "Oct.", value: 84 },
-  ];
+function ProgressionCard({
+  points,
+  latestScore,
+  delta,
+}: {
+  points: { label: string; value: number }[];
+  latestScore: number | null;
+  delta: number | null;
+}) {
+  const hasChart = points.length >= 2;
   const W = 360;
   const HH = 108;
   const PAD = { top: 14, right: 14, bottom: 14, left: 32 };
   const innerW = W - PAD.left - PAD.right;
   const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 50;
+  const minV = 0;
   const maxV = 100;
   const range = maxV - minV;
   const scaled = points.map((p, i) => ({
     ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
+    x:
+      PAD.left +
+      (points.length === 1 ? innerW / 2 : (i / (points.length - 1)) * innerW),
     y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
   }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
+  const pathD = scaled
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+    .join(" ");
   const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [60, 70, 80, 90];
+  const areaD =
+    hasChart && scaled.length > 0
+      ? `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`
+      : "";
+  const yTicks = [25, 50, 75];
   const last = scaled[scaled.length - 1];
+  const deltaText =
+    delta !== null && delta !== 0
+      ? `${delta > 0 ? "+" : ""}${delta} pts`
+      : null;
+  const deltaBg = delta !== null && delta > 0 ? C.successBg : C.coralBg;
+  const deltaFg = delta !== null && delta > 0 ? C.success : C.coral;
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -747,69 +1096,82 @@ function ProgressionCard() {
             Progression
           </p>
           <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Score sur 12 derniers mois
+            Score sur 12 dernières semaines
           </p>
         </div>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
-            borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
-          }}
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
-          </svg>
-          +22 pts
-        </span>
+        {deltaText && (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "2px 7px",
+              borderRadius: 999,
+              backgroundColor: deltaBg,
+              fontSize: 10,
+              fontWeight: 700,
+              color: deltaFg,
+            }}
+          >
+            {deltaText}
+          </span>
+        )}
       </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="pro-prog-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v}
+      {!hasChart ? (
+        <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
+          Pas encore assez d&apos;historique. Ton score est figé chaque dimanche — reviens après un ou deux dimanches pour voir ta courbe.
+        </p>
+      ) : (
+        <div style={{ marginTop: 4, flex: 1 }}>
+          <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
+            <defs>
+              <linearGradient id="pro-prog-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
+                <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {yTicks.map((v) => {
+              const y = PAD.top + innerH - ((v - minV) / range) * innerH;
+              return (
+                <g key={v}>
+                  <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
+                  <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
+                    {v}
+                  </text>
+                </g>
+              );
+            })}
+            <path d={areaD} fill="url(#pro-prog-grad)" />
+            <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+            {scaled.map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
+            ))}
+            {last && (
+              <>
+                <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
+                <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
+                  {latestScore !== null ? `${latestScore} / 100` : `${last.value} / 100`}
                 </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#pro-prog-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            84 / 100
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
-      </div>
+              </>
+            )}
+            {scaled.filter((_, i) => i % 2 === 0).map((p, i) => (
+              <text key={`x-${i}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
+                {p.label}
+              </text>
+            ))}
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
 
 function TrajectoireCard() {
+  // Aucun moteur de projection FHS n'existe aujourd'hui : la
+  // projection à 3 ans demanderait au minimum un modèle d'évolution
+  // par axe (discipline / résilience / trajectoire / etc.) calibré
+  // produit. Tant que ce moteur n'est pas validé, on n'invente PAS
+  // de score futur. Empty state premium.
   return (
     <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -818,59 +1180,45 @@ function TrajectoireCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Votre évolution projetée
       </p>
-      <div style={{ marginTop: 8, padding: "8px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Score estimé dans 3 ans
+      <div
+        style={{
+          marginTop: 10,
+          flex: 1,
+          minHeight: 110,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 8px",
+          textAlign: "center",
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+          <polyline points="17 6 23 6 23 12" />
+        </svg>
+        <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Projection bientôt disponible
         </p>
-        <p
-          style={{
-            margin: "2px 0 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            color: C.success,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          95 / 100
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
+          Ta trajectoire à 1, 3 et 5 ans nécessite un moteur de projection FHS calibré. Disponible dans une prochaine phase.
         </p>
-      </div>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2027</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "88%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            88 / 100
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2028</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "91%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            91 / 100
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2029</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "95%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            95 / 100
-          </span>
-        </div>
       </div>
     </div>
   );
 }
 
-function ConseilIACard() {
+function ConseilIACard({
+  recommendation,
+  hasScore,
+}: {
+  recommendation: {
+    title: string;
+    desc: string;
+    estimatedGain: number | null;
+  } | null;
+  hasScore: boolean;
+}) {
   return (
     <div
       style={{
@@ -903,13 +1251,33 @@ function ConseilIACard() {
           Conseil IA
         </p>
       </div>
-      <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Vous progressez plus vite que 82 % des utilisateurs.
-      </p>
-      <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        En maintenant votre rythme actuel, vous pourriez atteindre le <span style={{ color: C.primary, fontWeight: 700 }}>niveau Expert</span> en moins de 3 ans.
-      </p>
-      <button
+      {recommendation ? (
+        <>
+          <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
+            {recommendation.title}
+          </p>
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+            {recommendation.desc}
+            {recommendation.estimatedGain !== null && recommendation.estimatedGain > 0 && (
+              <>
+                {" "}
+                <span style={{ color: C.primary, fontWeight: 700 }}>
+                  +{recommendation.estimatedGain} pts estimés
+                </span>
+                .
+              </>
+            )}
+          </p>
+        </>
+      ) : (
+        <p style={{ margin: "8px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+          {hasScore
+            ? "Pas de conseil prioritaire pour l'instant. Pose une question à ton coach pour avancer."
+            : "Complète ton profil financier pour recevoir un conseil personnalisé."}
+        </p>
+      )}
+      <Link
+        href="/coach"
         style={{
           marginTop: 8,
           padding: "7px 12px",
@@ -922,23 +1290,37 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Parler à mon conseiller
+        Parler à mon coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 4 — MISSION FOOTER ═══════════════ */
 
-function MissionFooter() {
+function MissionFooter({
+  score,
+  bandLabel,
+  nextBandLabel,
+  ptsToNext,
+}: {
+  score: number | null;
+  bandLabel: string | null;
+  nextBandLabel: string | null;
+  ptsToNext: number | null;
+}) {
+  const hasScore = score !== null;
+  const scoreText = hasScore ? `${score} / 100` : "—";
+  const barWidth = hasScore
+    ? `${Math.max(0, Math.min(100, score))}%`
+    : "0%";
   return (
     <div
       style={{
@@ -971,27 +1353,45 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Score financier <span style={{ fontVariantNumeric: "tabular-nums" }}>84 / 100</span>
+            Score financier{" "}
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>{scoreText}</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
-              <div style={{ width: "84%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+              <div style={{ width: barWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.1 }}>
-              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: "0.04em" }}>
-                Niveau Confirmé
-              </span>
-              <span style={{ marginTop: 1, fontSize: 11, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-                84 / 100
-              </span>
-            </div>
+            {bandLabel && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.1 }}>
+                <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", letterSpacing: "0.04em" }}>
+                  Niveau {bandLabel}
+                </span>
+                <span style={{ marginTop: 1, fontSize: 11, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
+                  {scoreText}
+                </span>
+              </div>
+            )}
           </div>
-          <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
-            Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>11 points</span> pour atteindre le niveau Expert.
-          </p>
+          {ptsToNext !== null && nextBandLabel ? (
+            <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
+              Encore{" "}
+              <span style={{ fontVariantNumeric: "tabular-nums" }}>
+                {ptsToNext} point{ptsToNext > 1 ? "s" : ""}
+              </span>{" "}
+              pour atteindre le niveau {nextBandLabel}.
+            </p>
+          ) : hasScore && !nextBandLabel ? (
+            <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
+              Niveau maximal atteint. Maintiens le rythme.
+            </p>
+          ) : !hasScore ? (
+            <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
+              Score pas encore calculé. Complète ton profil financier.
+            </p>
+          ) : null}
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "9px 14px",
           display: "inline-flex",
@@ -1002,17 +1402,18 @@ function MissionFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
           flexShrink: 0,
         }}
       >
-        Atteindre le niveau Expert
+        {nextBandLabel
+          ? `Atteindre le niveau ${nextBandLabel}`
+          : "Parler à mon coach"}
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
