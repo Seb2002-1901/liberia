@@ -16,12 +16,20 @@
  */
 
 import Link from "next/link";
-import { getFinanceData } from "@/lib/services/finance";
+import type { Metadata } from "next";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import {
+  calculateNetCashflow,
+  calculateRunway,
+} from "@/lib/calculations/finance";
+import { formatUserCurrency } from "@/lib/utils";
+import { GOAL_TYPES } from "@/lib/constants";
+import type { Goal } from "@/types/database";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Design Match v3 — Épargne",
   robots: { index: false, follow: false },
 };
@@ -57,11 +65,152 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ HELPERS & TYPES ═══════════════ */
+
+// Goal types considérés comme "épargne" pour cette page. Le pattern
+// est cohérent avec lib/constants/index.ts : on filtre par
+// emergency_fund + savings + purchase + travel (les types qui
+// alimentent typiquement un compte épargne).
+const SAVINGS_GOAL_TYPES = new Set<string>([
+  "emergency_fund",
+  "savings",
+  "purchase",
+  "travel",
+]);
+
+function goalTypeLabel(id: string): string {
+  return GOAL_TYPES.find((t) => t.id === id)?.label ?? "Autre";
+}
+
+type RateTone = "excellent" | "good" | "improve" | "negative";
+
+type SavingsWired = {
+  totalSavings: number;
+  hasSavings: boolean;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  monthlyCapacity: number;
+  capacityRate: number | null;
+  rateTone: RateTone;
+  runwayMonths: number | null;
+  emergencyTarget: number | null;
+  emergencyCoveragePct: number | null;
+  hasEmergencyFundFlag: boolean;
+  savingsGoals: Goal[];
+  primarySavingsGoal: Goal | null;
+  totalGoalsTarget: number;
+  globalGoalsCoveragePct: number | null;
+  formatMoney: (n: number) => string;
+};
+
 export default async function DesignMatchEpargneV3() {
+  /* ------------------------------------------------------------------ */
+  /*  Data fetch + agrégats finance                                      */
+  /* ------------------------------------------------------------------ */
+
   const data = await getFinanceData();
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  const monthlyIncome =
+    totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
+  const fixedExpenses =
+    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
+  const variableExpenses = data.expenseBuckets.variable;
+  const monthlyExpenses = fixedExpenses + variableExpenses;
+  // Capacité d'épargne mensuelle = cashflow positif. Source de vérité
+  // unique alignée sur Dashboard / Plan / Opportunités.
+  const cashflow = calculateNetCashflow({ monthlyIncome, monthlyExpenses });
+  const monthlyCapacity = Math.max(0, cashflow);
+  const capacityRate =
+    monthlyIncome > 0 ? monthlyCapacity / monthlyIncome : null;
+  const rateTone: RateTone =
+    capacityRate === null
+      ? "improve"
+      : capacityRate >= 0.2
+        ? "excellent"
+        : capacityRate >= 0.1
+          ? "good"
+          : cashflow >= 0
+            ? "improve"
+            : "negative";
+
+  const totalSavings = data.financialProfile?.current_savings ?? 0;
+  const hasSavings = totalSavings > 0;
+  const runwayRaw = calculateRunway({
+    currentSavings: totalSavings,
+    monthlyExpenses,
+  });
+  const runwayMonths =
+    Number.isFinite(runwayRaw) && monthlyExpenses > 0 ? runwayRaw : null;
+  const emergencyTarget =
+    monthlyExpenses > 0 ? monthlyExpenses * 3 : null;
+  const emergencyCoveragePct =
+    emergencyTarget !== null && emergencyTarget > 0
+      ? Math.min(100, Math.round((totalSavings / emergencyTarget) * 100))
+      : null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Goals — filtrés type "épargne"                                     */
+  /* ------------------------------------------------------------------ */
+
+  const savingsGoals = data.goals.filter(
+    (g) => !g.is_completed && SAVINGS_GOAL_TYPES.has(g.type),
+  );
+  // Goal "primaire" pour le hero : un emergency_fund actif en priorité,
+  // sinon le goal d'épargne avec la plus grande target_amount.
+  const emergencyGoal =
+    savingsGoals.find((g) => g.type === "emergency_fund") ?? null;
+  const primarySavingsGoal =
+    emergencyGoal ??
+    [...savingsGoals].sort((a, b) => b.target_amount - a.target_amount)[0] ??
+    null;
+  const totalGoalsTarget = savingsGoals.reduce(
+    (acc, g) => acc + g.target_amount,
+    0,
+  );
+  const totalGoalsCurrent = savingsGoals.reduce(
+    (acc, g) => acc + g.current_amount,
+    0,
+  );
+  const globalGoalsCoveragePct =
+    totalGoalsTarget > 0
+      ? Math.min(100, Math.round((totalGoalsCurrent / totalGoalsTarget) * 100))
+      : null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Format helper                                                       */
+  /* ------------------------------------------------------------------ */
+
+  const profile = {
+    currency: data.profile.currency,
+    locale: data.profile.locale ?? null,
+    country: data.profile.country ?? null,
+  };
+  const formatMoney = (n: number) => formatUserCurrency(n, profile);
+
+  // Eslint silencieux : cashflow gardé pour cohérence inter-pages V3.
+  void cashflow;
+
+  const wired: SavingsWired = {
+    totalSavings,
+    hasSavings,
+    monthlyIncome,
+    monthlyExpenses,
+    monthlyCapacity,
+    capacityRate,
+    rateTone,
+    runwayMonths,
+    emergencyTarget,
+    emergencyCoveragePct,
+    hasEmergencyFundFlag: data.financialProfile?.has_emergency_fund ?? false,
+    savingsGoals,
+    primarySavingsGoal,
+    totalGoalsTarget,
+    globalGoalsCoveragePct,
+    formatMoney,
+  };
 
   return (
     <>
@@ -103,20 +252,20 @@ export default async function DesignMatchEpargneV3() {
             }}
           >
             <div data-epa-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 6 }}>
-              <EpargneHero />
-              <RythmeEpargneCard />
+              <EpargneHero wired={wired} />
+              <RythmeEpargneCard wired={wired} />
             </div>
             <div data-epa-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 6 }}>
-              <RepartitionCard />
-              <ObjectifsEpargneCard />
-              <RecommandationsCard />
+              <RepartitionCard wired={wired} />
+              <ObjectifsEpargneCard wired={wired} />
+              <RecommandationsCard wired={wired} />
             </div>
             <div data-epa-row style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 6 }}>
               <EvolutionCard />
-              <SimulateurCard />
+              <SimulateurCard wired={wired} />
               <ProduitsCard />
             </div>
-            <ConseilIAFooter />
+            <ConseilIAFooter wired={wired} />
           </main>
         </div>
       </div>
@@ -413,7 +562,24 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function EpargneHero() {
+function EpargneHero({ wired }: { wired: SavingsWired }) {
+  const {
+    totalSavings,
+    hasSavings,
+    primarySavingsGoal,
+    formatMoney,
+  } = wired;
+  const target =
+    primarySavingsGoal?.target_amount && primarySavingsGoal.target_amount > 0
+      ? primarySavingsGoal.target_amount
+      : null;
+  const pct =
+    target !== null
+      ? Math.min(100, Math.max(0, Math.round((totalSavings / target) * 100)))
+      : null;
+  const goalLabel =
+    primarySavingsGoal?.title?.trim() ||
+    (primarySavingsGoal ? goalTypeLabel(primarySavingsGoal.type) : null);
   return (
     <div
       style={{
@@ -457,24 +623,33 @@ function EpargneHero() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              14 500 CHF
+              {hasSavings ? formatMoney(totalSavings) : "Non renseignée"}
             </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +8.7%
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>ce mois-ci</span>
           </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            Objectif&nbsp;: <span style={{ fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums" }}>50 000 CHF</span>
-          </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "29%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              29%
-            </span>
-          </div>
+          {target !== null && goalLabel ? (
+            <>
+              <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
+                {goalLabel}&nbsp;:{" "}
+                <span style={{ fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums" }}>
+                  {formatMoney(target)}
+                </span>
+              </p>
+              <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
+                  <div style={{ width: `${pct}%`, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+                </div>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
+                  {pct}%
+                </span>
+              </div>
+            </>
+          ) : (
+            <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.4, maxWidth: 360 }}>
+              {hasSavings
+                ? "Définissez un objectif d'épargne pour suivre votre progression."
+                : "Renseignez votre épargne actuelle dans votre profil financier."}
+            </p>
+          )}
         </div>
         <div
           style={{
@@ -500,21 +675,16 @@ function EpargneHero() {
   );
 }
 
-function RythmeEpargneCard() {
-  // Mini sparkline rising
-  const points = [10, 12, 13, 14, 16, 18, 19, 22, 24, 26, 28, 32];
-  const W = 100;
-  const HH = 38;
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const range = max - min || 1;
-  const coords = points.map((v, i) => {
-    const x = (i / (points.length - 1)) * (W - 2) + 1;
-    const y = HH - 2 - ((v - min) / range) * (HH - 4);
-    return { x, y };
-  });
-  const pathD = coords.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const last = coords[coords.length - 1];
+function RythmeEpargneCard({ wired }: { wired: SavingsWired }) {
+  const { monthlyCapacity, capacityRate, rateTone, formatMoney } = wired;
+  const tones: Record<RateTone, { label: string; color: string; bg: string }> = {
+    excellent: { label: "Excellent rythme", color: C.success, bg: C.successBg },
+    good: { label: "Bon rythme", color: C.primary, bg: C.primaryBg },
+    improve: { label: "Marge à améliorer", color: C.amber, bg: C.amberBg },
+    negative: { label: "Cashflow négatif", color: C.coral, bg: C.coralBg },
+  };
+  const tone = tones[rateTone];
+  const hasData = wired.monthlyIncome > 0 || wired.monthlyExpenses > 0;
   return (
     <div
       style={{
@@ -528,54 +698,69 @@ function RythmeEpargneCard() {
       }}
     >
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Votre rythme d&apos;épargne
+        Votre capacité d&apos;épargne
       </p>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 4 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p
+      {hasData ? (
+        <>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 4 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: C.textDark,
+                  fontFamily: "Outfit, Inter, system-ui",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {formatMoney(monthlyCapacity)}
+                <span style={{ fontSize: 11, color: C.textMuted, fontWeight: 500 }}> /mois</span>
+              </p>
+              <p style={{ margin: "3px 0 0 0", fontSize: 10.5, color: C.textMuted }}>
+                {capacityRate !== null ? (
+                  <>
+                    <span style={{ color: C.textDark, fontWeight: 600 }}>
+                      {Math.round(capacityRate * 100)}%
+                    </span>{" "}
+                    de vos revenus
+                  </>
+                ) : (
+                  <>Revenus non renseignés</>
+                )}
+              </p>
+            </div>
+          </div>
+          <span
             style={{
-              margin: 0,
-              fontSize: 18,
+              display: "inline-flex",
+              alignSelf: "flex-start",
+              alignItems: "center",
+              gap: 4,
+              marginTop: 6,
+              padding: "2px 7px",
+              borderRadius: 999,
+              backgroundColor: tone.bg,
+              fontSize: 10,
               fontWeight: 700,
-              color: C.textDark,
-              fontFamily: "Outfit, Inter, system-ui",
-              letterSpacing: "-0.02em",
-              lineHeight: 1,
-              fontVariantNumeric: "tabular-nums",
+              color: tone.color,
             }}
           >
-            1 200 CHF<span style={{ fontSize: 11, color: C.textMuted, fontWeight: 500 }}> /mois</span>
-          </p>
-          <p style={{ margin: "3px 0 0 0", fontSize: 10.5, color: C.textMuted }}>
-            <span style={{ color: C.textDark, fontWeight: 600 }}>24%</span> de vos revenus
-          </p>
-        </div>
-        <svg viewBox={`0 0 ${W} ${HH}`} width={100} height={38} style={{ flexShrink: 0 }}>
-          <path d={pathD} stroke={C.success} strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx={last.x} cy={last.y} r={2} fill={C.success} />
-        </svg>
-      </div>
-      <span
-        style={{
-          display: "inline-flex",
-          alignSelf: "flex-start",
-          alignItems: "center",
-          gap: 4,
-          marginTop: 6,
-          padding: "2px 7px",
-          borderRadius: 999,
-          backgroundColor: C.successBg,
-          fontSize: 10,
-          fontWeight: 700,
-          color: C.success,
-        }}
-      >
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-        Excellent rythme
-      </span>
-      <button
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {tone.label}
+          </span>
+        </>
+      ) : (
+        <p style={{ margin: "8px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
+          Renseignez vos revenus et dépenses pour révéler votre capacité d&apos;épargne mensuelle.
+        </p>
+      )}
+      <Link
+        href="/coach"
         style={{
           marginTop: "auto",
           padding: "6px 12px",
@@ -588,8 +773,7 @@ function RythmeEpargneCard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Voir mes recommandations
@@ -597,33 +781,18 @@ function RythmeEpargneCard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 2 ═══════════════ */
 
-function RepartitionCard() {
-  const slices = [
-    { id: "urgence", label: "Fonds d'urgence", amount: "3 500", pct: 24, color: C.success },
-    { id: "projets", label: "Épargne projets", amount: "4 200", pct: 29, color: C.primary },
-    { id: "retraite", label: "Épargne retraite", amount: "3 800", pct: 26, color: C.violet },
-    { id: "libre", label: "Épargne libre", amount: "2 500", pct: 17, color: C.amber },
-    { id: "autres", label: "Autres", amount: "500", pct: 4, color: C.donutGrey },
-  ];
-  let cursor = -90;
-  const gap = 1;
-  const usableDeg = 360 - gap * slices.length;
-  const total = slices.reduce((s, x) => s + x.pct, 0);
-  const slicesWithPaths = slices.map((s) => {
-    const sweep = (s.pct / total) * usableDeg;
-    const startDeg = cursor;
-    const endDeg = cursor + sweep;
-    const path = donutSliceD(50, 50, 42, 28, startDeg, endDeg);
-    cursor = endDeg + gap;
-    return { ...s, path };
-  });
+function RepartitionCard({ wired }: { wired: SavingsWired }) {
+  // Le modèle de données stocke un total unique (current_savings) :
+  // aucune ventilation par type (fonds d'urgence / projets / retraite /
+  // libre) n'est trackée. Empty state honnête + total centré.
+  const { totalSavings, hasSavings, formatMoney } = wired;
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -632,48 +801,53 @@ function RepartitionCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Par type d&apos;épargne
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flex: 1 }}>
         <div style={{ position: "relative", flexShrink: 0, width: 104, height: 104 }}>
           <svg viewBox="0 0 100 100" width={104} height={104}>
-            {slicesWithPaths.map((s) => (
-              <path key={s.id} d={s.path} fill={s.color} />
-            ))}
+            <circle cx={50} cy={50} r={42} fill={C.pageBg} />
+            <circle cx={50} cy={50} r={28} fill={C.cardBg} />
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-              14 500
-            </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em" }}>
-              CHF
-            </p>
+            {hasSavings ? (
+              <>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+                  {formatMoney(totalSavings)}
+                </p>
+                <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                  Total
+                </p>
+              </>
+            ) : (
+              <p style={{ margin: 0, fontSize: 9, color: C.textMuted, textAlign: "center", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                Non<br />renseigné
+              </p>
+            )}
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3 }}>
-          {slicesWithPaths.map((s) => (
-            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10 }}>
-              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 999, backgroundColor: s.color, flexShrink: 0 }} />
-              <span style={{ flex: 1, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {s.label}
-              </span>
-              <span style={{ color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                {s.amount}
-              </span>
-              <span style={{ color: C.textMuted, fontWeight: 500, fontVariantNumeric: "tabular-nums", minWidth: 24, textAlign: "right" }}>
-                {s.pct}%
-              </span>
-            </div>
-          ))}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Ventilation non disponible
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.4 }}>
+            Votre épargne est stockée comme un total unique. La répartition par type (fonds d&apos;urgence, projets, retraite, libre) n&apos;est pas encore trackée.
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-function ObjectifsEpargneCard() {
-  const goals = [
-    { label: "Fonds d'urgence", amount: "3 500 / 15 000", pct: 23, color: C.success, iconBg: C.successBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-    { label: "Apport maison", amount: "10 000 / 50 000", pct: 20, color: C.primary, iconBg: C.primaryBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Voyage en famille", amount: "1 000 / 5 000", pct: 20, color: C.violet, iconBg: C.violetBg, iconPath: "M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" },
+function ObjectifsEpargneCard({ wired }: { wired: SavingsWired }) {
+  const { savingsGoals, formatMoney } = wired;
+  // Top 3 par target_amount desc — pour mettre en avant les goals
+  // structurants.
+  const goals = [...savingsGoals]
+    .sort((a, b) => b.target_amount - a.target_amount)
+    .slice(0, 3);
+  const palette = [
+    { color: C.success, bg: C.successBg },
+    { color: C.primary, bg: C.primaryBg },
+    { color: C.violet, bg: C.violetBg },
   ];
   return (
     <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -683,45 +857,159 @@ function ObjectifsEpargneCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Suivi de vos objectifs
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-        {goals.map((g) => (
-          <div key={g.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, backgroundColor: g.iconBg, flexShrink: 0 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={g.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {g.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
-                <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {g.label}
+      {goals.length === 0 ? (
+        <div
+          style={{
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "10px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Aucun objectif d&apos;épargne
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
+            Définissez un fonds d&apos;urgence ou un objectif d&apos;épargne pour suivre votre progression.
+          </p>
+          <Link
+            href="/goals"
+            style={{
+              marginTop: 8,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 600,
+              color: C.primary,
+              textDecoration: "none",
+            }}
+          >
+            Définir un objectif
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </Link>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+          {goals.map((g, i) => {
+            const target = g.target_amount;
+            const current = g.current_amount;
+            const pct =
+              target > 0
+                ? Math.min(100, Math.max(0, Math.round((current / target) * 100)))
+                : 0;
+            const tone = palette[i % palette.length];
+            const label = g.title?.trim() || goalTypeLabel(g.type);
+            return (
+              <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, backgroundColor: tone.bg, flexShrink: 0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={tone.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
                 </span>
-                <span style={{ fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
-                  {g.amount}
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-                  <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {label}
+                    </span>
+                    <span style={{ fontSize: 9.5, color: C.textMuted, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
+                      {formatMoney(current)} / {formatMoney(target)}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", backgroundColor: tone.color, borderRadius: 999 }} />
+                    </div>
+                    <span style={{ fontSize: 9.5, color: tone.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right" }}>
+                      {pct}%
+                    </span>
+                  </div>
                 </div>
-                <span style={{ fontSize: 9.5, color: g.color, fontWeight: 700, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right" }}>
-                  {g.pct}%
-                </span>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
-function RecommandationsCard() {
-  const items = [
-    { label: "Fonds d'urgence", sub: "Continuer à alimenter", action: "Alimenter", color: C.success, bg: C.successBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-    { label: "Épargne projets", sub: "Sur la bonne voie", action: "Planifier", color: C.primary, bg: C.primaryBg, iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
-    { label: "Épargne retraite", sub: "Optimisez votre 3e pilier", action: "Optimiser", color: C.violet, bg: C.violetBg, iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
-  ];
+function RecommandationsCard({ wired }: { wired: SavingsWired }) {
+  // Recommandations dérivées des métriques réelles uniquement — pas
+  // de catalogue mocké. Chaque item s'affiche seulement si la
+  // condition factuelle est vraie.
+  const items: {
+    label: string;
+    sub: string;
+    action: string;
+    href: string;
+    color: string;
+    bg: string;
+    iconPath: string;
+  }[] = [];
+  if (wired.runwayMonths !== null && wired.runwayMonths < 3) {
+    items.push({
+      label: "Constituer un fonds d'urgence",
+      sub: `Vous avez ${wired.runwayMonths.toFixed(1)} mois de sécurité. Cible : 3 mois.`,
+      action: "Alimenter",
+      href: "/coach",
+      color: C.coral,
+      bg: C.coralBg,
+      iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+    });
+  }
+  if (wired.savingsGoals.length === 0) {
+    items.push({
+      label: "Définir un objectif d'épargne",
+      sub: "Aucun objectif d'épargne actif aujourd'hui.",
+      action: "Définir",
+      href: "/goals",
+      color: C.primary,
+      bg: C.primaryBg,
+      iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11",
+    });
+  }
+  if (wired.monthlyCapacity > 0 && wired.capacityRate !== null && wired.capacityRate < 0.1) {
+    items.push({
+      label: "Augmenter votre taux d'épargne",
+      sub: `${Math.round(wired.capacityRate * 100)}% aujourd'hui. Cible de démarrage : 10%.`,
+      action: "Voir comment",
+      href: "/coach",
+      color: C.amber,
+      bg: C.amberBg,
+      iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5",
+    });
+  }
+  if (wired.monthlyCapacity <= 0 && wired.monthlyIncome > 0) {
+    items.push({
+      label: "Cashflow à équilibrer",
+      sub: "Vos dépenses dépassent vos revenus mensuels.",
+      action: "Auditer",
+      href: "/design-match/depenses-v3",
+      color: C.coral,
+      bg: C.coralBg,
+      iconPath: "M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3",
+    });
+  }
+  if (wired.runwayMonths !== null && wired.runwayMonths >= 3 && wired.monthlyCapacity > 0) {
+    items.push({
+      label: "Continuer ce rythme",
+      sub: "Votre fonds d'urgence est constitué — restez régulier.",
+      action: "Voir le plan",
+      href: "/plan",
+      color: C.success,
+      bg: C.successBg,
+      iconPath: "M9 11 12 14 22 4",
+    });
+  }
   return (
     <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -730,40 +1018,65 @@ function RecommandationsCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Que faire avec mon épargne
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {it.sub}
-              </p>
+      {items.length === 0 ? (
+        <div
+          style={{
+            marginTop: 8,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "10px 8px",
+            backgroundColor: C.pageBg,
+            borderRadius: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Aucune recommandation
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
+            Complétez vos revenus, dépenses et objectifs pour révéler des actions concrètes.
+          </p>
+        </div>
+      ) : (
+        <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
+          {items.slice(0, 3).map((it) => (
+            <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+                </svg>
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
+                  {it.label}
+                </p>
+                <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                  {it.sub}
+                </p>
+              </div>
+              <Link
+                href={it.href}
+                style={{
+                  padding: "3px 8px",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: it.color,
+                  backgroundColor: "white",
+                  border: `1px solid ${C.borderGhost}`,
+                  borderRadius: 6,
+                  textDecoration: "none",
+                  flexShrink: 0,
+                }}
+              >
+                {it.action}
+              </Link>
             </div>
-            <button
-              style={{
-                padding: "3px 8px",
-                fontSize: 10,
-                fontWeight: 600,
-                color: it.color,
-                backgroundColor: "white",
-                border: `1px solid ${C.borderGhost}`,
-                borderRadius: 6,
-                cursor: "pointer",
-                flexShrink: 0,
-              }}
-            >
-              {it.action}
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -771,38 +1084,9 @@ function RecommandationsCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function EvolutionCard() {
-  const points = [
-    { label: "Nov.", value: 5000 },
-    { label: "Déc.", value: 6200 },
-    { label: "Janv.", value: 7500 },
-    { label: "Févr.", value: 8800 },
-    { label: "Mars", value: 9800 },
-    { label: "Avr.", value: 10800 },
-    { label: "Mai", value: 11500 },
-    { label: "Juin", value: 12200 },
-    { label: "Juil.", value: 12900 },
-    { label: "Août", value: 13400 },
-    { label: "Sept.", value: 13900 },
-    { label: "Oct.", value: 14500 },
-  ];
-  const W = 360;
-  const HH = 108;
-  const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 0;
-  const maxV = 20000;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [5000, 10000, 15000, 20000];
-  const last = scaled[scaled.length - 1];
+  // Empty state honnête : la base ne stocke qu'une snapshot
+  // (current_savings) sans série temporelle. Aucune courbe 12 mois
+  // ne peut être reconstituée sans inventer les valeurs.
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -811,119 +1095,91 @@ function EvolutionCard() {
             Évolution
           </p>
           <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Sur 12 derniers mois
+            Historique 12 mois
           </p>
         </div>
+      </div>
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
             borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
           }}
         >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
           </svg>
-          +2 150 CHF
         </span>
-      </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="epa-evo-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v / 1000}K
-                </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#epa-evo-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            14 500 CHF
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Historique non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 280 }}>
+          Seul votre solde d&apos;épargne actuel est stocké. La série temporelle 12 mois sera tracée dès la mise en place du suivi mensuel.
+        </p>
       </div>
     </div>
   );
 }
 
-function SimulateurCard() {
+function SimulateurCard({ wired }: { wired: SavingsWired }) {
+  const { totalSavings, monthlyCapacity, runwayMonths, formatMoney } = wired;
+  // Aucun moteur de rendement composé fiable n'existe (pas de taux
+  // calibré, pas de scénarios). On affiche uniquement les faits
+  // observables : épargne actuelle, capacité mensuelle, autonomie.
   return (
     <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Simulateur d&apos;épargne
+        Vos chiffres réels
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Projection à 10 ans
+        Pas de projection 10 ans
       </p>
-      <div style={{ marginTop: 8, padding: "8px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Épargne estimée dans 10 ans
-        </p>
-        <p
-          style={{
-            margin: "2px 0 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            color: C.success,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          172 592 CHF
-        </p>
-      </div>
-      <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
+      <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4 }}>
+        Aucun moteur de rendement composé fiable. Voici uniquement les chiffres observés aujourd&apos;hui :
+      </p>
+      <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Mensuel</p>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Épargne actuelle</p>
           <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            1 200 CHF
+            {totalSavings > 0 ? formatMoney(totalSavings) : "—"}
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Rendement</p>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Capacité / mois</p>
           <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            2.5 % / an
+            {monthlyCapacity > 0 ? formatMoney(monthlyCapacity) : "—"}
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Total versé</p>
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Autonomie</p>
           <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            144 000 CHF
+            {runwayMonths !== null ? `${runwayMonths.toFixed(1)} mois` : "—"}
           </p>
         </div>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Intérêts</p>
-          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            +28 592 CHF
+          <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>Cible urgence</p>
+          <p style={{ margin: "1px 0 0 0", fontSize: 11.5, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
+            {wired.emergencyTarget !== null ? formatMoney(wired.emergencyTarget) : "—"}
           </p>
         </div>
       </div>
@@ -932,52 +1188,54 @@ function SimulateurCard() {
 }
 
 function ProduitsCard() {
-  const products = [
-    { label: "Compte épargne", sub: "Haute rémunération", rate: "1.25 %", rateNote: "Taux annuel", color: C.success, bg: C.successBg, featured: true, iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
-    { label: "3e pilier bancaire", sub: "Profil fiscal optimisé", rate: "Optimisé", rateNote: "Avantage fiscal", color: C.amber, bg: C.amberBg, featured: false, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Compte à terme", sub: "12 mois", rate: "1.60 %", rateNote: "Taux fixe", color: C.violet, bg: C.violetBg, featured: false, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M12 6v6l4 2" },
-  ];
+  // Empty state honnête : aucun catalogue de produits financiers
+  // (taux, partenaires, avantages fiscaux) n'est intégré. Afficher
+  // des taux comme 1.25% / 1.60% serait inventer des données.
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Produits recommandés
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Sélectionnés pour vous
+        Catalogue à venir
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {products.map((p) => (
-          <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: p.bg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {p.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                  {p.label}
-                </p>
-                {p.featured && (
-                  <span style={{ padding: "1px 5px", fontSize: 8.5, fontWeight: 700, color: C.success, backgroundColor: C.successBg, borderRadius: 4, letterSpacing: "0.04em" }}>
-                    Recommandé
-                  </span>
-                )}
-              </div>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {p.sub}
-              </p>
-            </div>
-            <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: p.color, fontVariantNumeric: "tabular-nums", fontFamily: "Outfit, Inter, system-ui" }}>
-                {p.rate}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9, color: C.textMuted }}>
-                {p.rateNote}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: 999,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+        </span>
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Aucun produit à recommander
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 260 }}>
+          Le catalogue de produits d&apos;épargne (comptes, 3e pilier, comptes à terme) sera disponible une fois les partenariats intégrés.
+        </p>
       </div>
     </div>
   );
@@ -985,7 +1243,31 @@ function ProduitsCard() {
 
 /* ═══════════════ ROW 4 — CONSEIL IA FOOTER ═══════════════ */
 
-function ConseilIAFooter() {
+function ConseilIAFooter({ wired }: { wired: SavingsWired }) {
+  const { runwayMonths, monthlyCapacity, formatMoney, savingsGoals } = wired;
+  // Copie adaptative pilotée par les faits :
+  //  1. cashflow négatif → priorité équilibre budget
+  //  2. runway < 3 mois → priorité constitution coussin
+  //  3. aucun goal d'épargne → priorité définition objectif
+  //  4. cas favorable → encouragement régularité
+  const copy = (() => {
+    if (monthlyCapacity <= 0 && wired.monthlyIncome > 0) {
+      return "Vos dépenses dépassent vos revenus ce mois-ci. Auditons d'abord vos charges avant de viser une cible d'épargne.";
+    }
+    if (runwayMonths !== null && runwayMonths < 1) {
+      return `Vous avez moins d'un mois de coussin. Construire un fonds d'urgence est votre priorité absolue avant tout autre objectif.`;
+    }
+    if (runwayMonths !== null && runwayMonths < 3) {
+      return `Vous couvrez ${runwayMonths.toFixed(1)} mois de dépenses. La cible canonique est 3 mois — c'est votre prochain palier.`;
+    }
+    if (savingsGoals.length === 0) {
+      return "Votre fonds de sécurité est en place. Définissez un objectif d'épargne pour donner une direction à votre capacité mensuelle.";
+    }
+    if (monthlyCapacity > 0) {
+      return `Vous dégagez ${formatMoney(monthlyCapacity)} d'épargne mensuelle. Restez régulier — c'est votre meilleur levier.`;
+    }
+    return "Complétez vos revenus, dépenses et objectifs pour révéler votre prochaine action.";
+  })();
   return (
     <div
       style={{
@@ -1021,11 +1303,12 @@ function ConseilIAFooter() {
             Conseil de votre coach IA
           </p>
           <p style={{ margin: "1px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            Vous êtes sur la bonne voie ! En épargnant 1 200 CHF par mois, vous atteindrez vos objectifs 1 an plus tôt.
+            {copy}
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "9px 14px",
           display: "inline-flex",
@@ -1036,9 +1319,8 @@ function ConseilIAFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
           flexShrink: 0,
+          textDecoration: "none",
         }}
       >
         Parler à mon conseiller
@@ -1046,29 +1328,8 @@ function ConseilIAFooter() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
-/* ═══════════════ DONUT HELPERS ═══════════════ */
-
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-function donutSliceD(cx: number, cy: number, outerR: number, innerR: number, startDeg: number, endDeg: number) {
-  const largeArc = endDeg - startDeg > 180 ? 1 : 0;
-  const s = polarToCartesian(cx, cy, outerR, startDeg);
-  const e = polarToCartesian(cx, cy, outerR, endDeg);
-  const si = polarToCartesian(cx, cy, innerR, endDeg);
-  const ei = polarToCartesian(cx, cy, innerR, startDeg);
-  return [
-    `M ${s.x.toFixed(3)} ${s.y.toFixed(3)}`,
-    `A ${outerR} ${outerR} 0 ${largeArc} 1 ${e.x.toFixed(3)} ${e.y.toFixed(3)}`,
-    `L ${si.x.toFixed(3)} ${si.y.toFixed(3)}`,
-    `A ${innerR} ${innerR} 0 ${largeArc} 0 ${ei.x.toFixed(3)} ${ei.y.toFixed(3)}`,
-    "Z",
-  ].join(" ");
-}
