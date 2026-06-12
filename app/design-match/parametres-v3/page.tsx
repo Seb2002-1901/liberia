@@ -19,14 +19,17 @@
  */
 
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getFinanceData } from "@/lib/services/finance";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getMyUserMemory } from "@/lib/services/memory";
+import { COACHING_TONES } from "@/lib/constants";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Design Match v3 — Paramètres",
-  robots: { index: false, follow: false },
+export const metadata: Metadata = {
+  title: "Paramètres — LIBERIA",
 };
 
 const C = {
@@ -60,11 +63,252 @@ const SHADOW = {
   flat: "0 1px 2px rgb(15 23 42 / 0.03)",
 };
 
+/* ═══════════════ DATA FETCH ═══════════════ */
+
+/** Toggles persistés dans la table `user_settings`. Identique à
+ *  l'ensemble exposé par les server actions setEmail* / setNotificationAlerts. */
+const SETTINGS_COLS = [
+  "email_weekly_summary",
+  "notification_alerts",
+  "email_encouragement",
+  "email_trial_reminders",
+  "email_goal_milestones",
+  "email_inactivity_followup",
+  "analytics_opt_out",
+] as const;
+
+type SettingsRow = Partial<Record<(typeof SETTINGS_COLS)[number], boolean>>;
+
+async function loadAccountData(): Promise<{
+  settings: SettingsRow | null;
+  accountCreatedAt: string | null;
+  lastSignInAt: string | null;
+}> {
+  if (!isSupabaseConfigured()) {
+    return { settings: null, accountCreatedAt: null, lastSignInAt: null };
+  }
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { settings: null, accountCreatedAt: null, lastSignInAt: null };
+    }
+    const { data } = await supabase
+      .from("user_settings")
+      .select(SETTINGS_COLS.join(","))
+      .eq("user_id", user.id)
+      .maybeSingle();
+    return {
+      settings: (data as SettingsRow | null) ?? null,
+      accountCreatedAt: user.created_at ?? null,
+      lastSignInAt: user.last_sign_in_at ?? null,
+    };
+  } catch (err) {
+    console.error("[parametres-v3] loadAccountData failed", err);
+    return { settings: null, accountCreatedAt: null, lastSignInAt: null };
+  }
+}
+
+/* ═══════════════ DEFAULT EXPORT ═══════════════ */
+
 export default async function DesignMatchParametresV3() {
-  const data = await getFinanceData();
+  const [data, account, memory] = await Promise.all([
+    getFinanceData(),
+    loadAccountData(),
+    getMyUserMemory(),
+  ]);
+
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  /* ------------------------------------------------------------------ */
+  /*  Calculs dérivés                                                    */
+  /* ------------------------------------------------------------------ */
+
+  const settings = account.settings;
+  const hasSettings = !!settings;
+
+  // Préférences mémoire IA — 6 champs possibles
+  const memoryFlags: boolean[] = memory
+    ? [
+        !!memory.coaching_tone,
+        !!memory.financial_personality,
+        !!memory.preferred_motivation_style,
+        memory.recurring_challenges.length > 0,
+        memory.spending_triggers.length > 0,
+        !!memory.progress_notes,
+      ]
+    : [];
+  const memoryFilled = memoryFlags.filter(Boolean).length;
+  const memoryTotal = 6;
+
+  // Notifications — 6 toggles (analytics_opt_out exclu, c'est un consentement)
+  const NOTIF_KEYS = [
+    "email_weekly_summary",
+    "notification_alerts",
+    "email_encouragement",
+    "email_trial_reminders",
+    "email_goal_milestones",
+    "email_inactivity_followup",
+  ] as const;
+  const notifActiveCount = settings
+    ? NOTIF_KEYS.filter((k) => settings[k] === true).length
+    : 0;
+  const notifTotal = NOTIF_KEYS.length;
+
+  // % global de configuration : (notifs activées + mémoire renseignée) / total
+  const totalConfigFields = notifTotal + memoryTotal;
+  const filledConfigFields = notifActiveCount + memoryFilled;
+  const configPct = hasSettings || memory
+    ? Math.round((filledConfigFields / totalConfigFields) * 100)
+    : null;
+
+  const coachingToneLabel = memory?.coaching_tone
+    ? COACHING_TONES.find((t) => t.id === memory.coaching_tone)?.label ?? null
+    : null;
+
+  // Étiquettes ternaires pour un toggle bool|null
+  const labelToggle = (
+    v: boolean | undefined,
+    onTrue: string,
+    onFalse: string,
+  ): { value: string; tone: "success" | "primary" | "muted" } => {
+    if (v === true) return { value: onTrue, tone: "success" };
+    if (v === false) return { value: onFalse, tone: "muted" };
+    return { value: "Non configuré", tone: "muted" };
+  };
+
+  const notifBudget = labelToggle(
+    settings?.notification_alerts,
+    "Activées",
+    "Désactivées",
+  );
+  const notifOpportunites = labelToggle(
+    settings?.notification_alerts,
+    "Activées",
+    "Désactivées",
+  );
+  const notifObjectifs = labelToggle(
+    settings?.email_goal_milestones,
+    "Activées",
+    "Désactivées",
+  );
+  const notifWeekly = labelToggle(
+    settings?.email_weekly_summary,
+    "Dimanche",
+    "Désactivé",
+  );
+
+  // Cartes Préférences IA
+  const prefRecommandations = coachingToneLabel
+    ? { value: coachingToneLabel, tone: "primary" as const }
+    : { value: "Non configuré", tone: "muted" as const };
+  const personalizationLevel = (() => {
+    if (memoryFilled === 0) return { value: "Non configuré", tone: "muted" as const };
+    if (memoryFilled <= 2) return { value: "Basique", tone: "primary" as const };
+    if (memoryFilled <= 4) return { value: "Standard", tone: "primary" as const };
+    return { value: "Avancé", tone: "success" as const };
+  })();
+  const prefResumes = labelToggle(
+    settings?.email_weekly_summary,
+    "Activés",
+    "Désactivés",
+  );
+  const prefAnalyse = labelToggle(
+    settings?.notification_alerts,
+    "Activée",
+    "Désactivée",
+  );
+
+  // Cartes Confidentialité
+  const histIA = memory
+    ? { value: "Activé", tone: "success" as const }
+    : { value: "Non configuré", tone: "muted" as const };
+  const consentement =
+    settings === null
+      ? { value: "Non configuré", tone: "muted" as const }
+      : settings?.analytics_opt_out === true
+        ? { value: "Refusé", tone: "primary" as const }
+        : { value: "Accepté", tone: "success" as const };
+
+  // Score global Notifications / Sécurité / Confidentialité / Automatisations
+  const scoreNotif = !hasSettings
+    ? { value: "Non configuré", color: C.textMuted }
+    : notifActiveCount === 0
+      ? { value: "Désactivées", color: C.textMuted }
+      : notifActiveCount === notifTotal
+        ? { value: "Activées", color: C.success }
+        : { value: "Partielles", color: C.primary };
+  const scoreSecurite = { value: "À compléter", color: C.amber };
+  const scoreConfid = !hasSettings
+    ? { value: "Non configuré", color: C.textMuted }
+    : settings?.analytics_opt_out === true
+      ? { value: "Renforcée", color: C.success }
+      : { value: "Standard", color: C.primary };
+  const scoreAuto = hasSettings
+    ? {
+        value: `${notifActiveCount} / ${notifTotal} actives`,
+        color: notifActiveCount === notifTotal ? C.success : C.primary,
+      }
+    : { value: "Non configuré", color: C.textMuted };
+
+  const autoItems = [
+    {
+      label: "Analyse hebdomadaire",
+      iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5",
+      ...labelToggle(settings?.email_weekly_summary, "Active", "Désactivée"),
+    },
+    {
+      label: "Détection d'opportunités",
+      iconPath:
+        "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z",
+      ...labelToggle(settings?.notification_alerts, "Active", "Désactivée"),
+    },
+    {
+      label: "Alertes objectifs",
+      iconPath:
+        "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15",
+      ...labelToggle(settings?.email_goal_milestones, "Active", "Désactivée"),
+    },
+    {
+      label: "Rapports automatiques",
+      iconPath:
+        "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+      ...labelToggle(
+        settings?.email_inactivity_followup,
+        "Active",
+        "Désactivée",
+      ),
+    },
+  ];
+
+  const conseilState = (() => {
+    if (configPct === null) {
+      return {
+        title: "Configuration à compléter.",
+        body: "Activez vos préférences IA et vos notifications pour profiter pleinement de Liberia.",
+      };
+    }
+    if (configPct >= 80) {
+      return {
+        title: `Configuration optimisée à ${configPct} %.`,
+        body: "Vos préférences IA sont enregistrées et vos notifications sont actives.",
+      };
+    }
+    if (!coachingToneLabel) {
+      return {
+        title: `Configuration à ${configPct} %.`,
+        body: "Définissez votre ton de coaching IA pour des recommandations sur-mesure.",
+      };
+    }
+    return {
+      title: `Configuration à ${configPct} %.`,
+      body: "Quelques préférences restent à activer pour profiter pleinement de Liberia.",
+    };
+  })();
 
   return (
     <>
@@ -106,20 +350,42 @@ export default async function DesignMatchParametresV3() {
             }}
           >
             <div data-par-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
-              <HeroParametres />
-              <ScoreParametresCard />
+              <HeroParametres configPct={configPct} />
+              <ScoreParametresCard
+                scoreNotif={scoreNotif}
+                scoreSecurite={scoreSecurite}
+                scoreConfid={scoreConfid}
+                scoreAuto={scoreAuto}
+              />
             </div>
             <div data-par-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
-              <PreferencesIACard />
-              <NotificationsCard />
-              <ConfidentialiteCard />
+              <PreferencesIACard
+                prefRecommandations={prefRecommandations}
+                personalizationLevel={personalizationLevel}
+                prefResumes={prefResumes}
+                prefAnalyse={prefAnalyse}
+              />
+              <NotificationsCard
+                notifBudget={notifBudget}
+                notifOpportunites={notifOpportunites}
+                notifObjectifs={notifObjectifs}
+                notifWeekly={notifWeekly}
+              />
+              <ConfidentialiteCard
+                histIA={histIA}
+                consentement={consentement}
+              />
             </div>
             <div data-par-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
               <SecuriteCard />
-              <AutomatisationsIACard />
-              <ConseilIACard />
+              <AutomatisationsIACard
+                items={autoItems}
+                activeCount={hasSettings ? notifActiveCount : null}
+                total={notifTotal}
+              />
+              <ConseilIACard title={conseilState.title} body={conseilState.body} />
             </div>
-            <MissionFooter />
+            <MissionFooter configPct={configPct} />
           </main>
         </div>
       </div>
@@ -416,7 +682,14 @@ function Topbar({
 }
 /* ═══════════════ ROW 1 ═══════════════ */
 
-function HeroParametres() {
+function HeroParametres({ configPct }: { configPct: number | null }) {
+  const hasPct = configPct !== null;
+  const pctText = hasPct ? `${configPct} % configuré` : "À compléter";
+  const barWidth = hasPct ? `${Math.max(0, Math.min(100, configPct))}%` : "0%";
+  const pctBadge = hasPct ? `${configPct}%` : "—";
+  const subtitle = hasPct
+    ? "Votre environnement Liberia est configuré pour une expérience personnalisée."
+    : "Activez vos préférences pour personnaliser votre expérience Liberia.";
   return (
     <div
       style={{
@@ -460,22 +733,18 @@ function HeroParametres() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              92 % configuré
+              {pctText}
             </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +6 %
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>ce mois-ci</span>
           </div>
           <p style={{ margin: "6px 0 0 0", fontSize: 11, color: "rgba(255,255,255,0.78)", lineHeight: 1.3 }}>
-            Votre environnement Liberia est configuré pour une expérience personnalisée.
+            {subtitle}
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "92%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+              <div style={{ width: barWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
             <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              92%
+              {pctBadge}
             </span>
           </div>
         </div>
@@ -501,12 +770,22 @@ function HeroParametres() {
   );
 }
 
-function ScoreParametresCard() {
+function ScoreParametresCard({
+  scoreNotif,
+  scoreSecurite,
+  scoreConfid,
+  scoreAuto,
+}: {
+  scoreNotif: { value: string; color: string };
+  scoreSecurite: { value: string; color: string };
+  scoreConfid: { value: string; color: string };
+  scoreAuto: { value: string; color: string };
+}) {
   const stats = [
-    { label: "Notifications", value: "Activées", color: C.success },
-    { label: "Sécurité", value: "Élevée", color: C.success },
-    { label: "Confidentialité", value: "Optimale", color: C.primary },
-    { label: "Automatisations", value: "4 / 4 actives", color: C.success },
+    { label: "Notifications", value: scoreNotif.value, color: scoreNotif.color },
+    { label: "Sécurité", value: scoreSecurite.value, color: scoreSecurite.color },
+    { label: "Confidentialité", value: scoreConfid.value, color: scoreConfid.color },
+    { label: "Automatisations", value: scoreAuto.value, color: scoreAuto.color },
   ];
   return (
     <div
@@ -541,7 +820,8 @@ function ScoreParametresCard() {
           </div>
         ))}
       </div>
-      <button
+      <Link
+        href="/settings/memory"
         style={{
           marginTop: 6,
           padding: "6px 12px",
@@ -554,16 +834,15 @@ function ScoreParametresCard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Voir tous les réglages
+        Gérer mes préférences IA
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
@@ -599,12 +878,22 @@ function SettingsList({ items, accent, accentBg }: { items: SettingRow[]; accent
   );
 }
 
-function PreferencesIACard() {
+function PreferencesIACard({
+  prefRecommandations,
+  personalizationLevel,
+  prefResumes,
+  prefAnalyse,
+}: {
+  prefRecommandations: { value: string; tone: "success" | "primary" | "muted" };
+  personalizationLevel: { value: string; tone: "success" | "primary" | "muted" };
+  prefResumes: { value: string; tone: "success" | "primary" | "muted" };
+  prefAnalyse: { value: string; tone: "success" | "primary" | "muted" };
+}) {
   const items: SettingRow[] = [
-    { label: "Recommandations IA", value: "Hebdomadaire", tone: "primary", iconPath: "M12 8v4l3 3|M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
-    { label: "Niveau de personnalisation", value: "Avancé", tone: "primary", iconPath: "M3 12h18|M3 6h18|M3 18h12" },
-    { label: "Résumés automatiques", value: "Activés", tone: "success", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-    { label: "Analyse proactive", value: "Maximum", tone: "success", iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" },
+    { label: "Ton de coaching IA", value: prefRecommandations.value, tone: prefRecommandations.tone, iconPath: "M12 8v4l3 3|M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
+    { label: "Niveau de personnalisation", value: personalizationLevel.value, tone: personalizationLevel.tone, iconPath: "M3 12h18|M3 6h18|M3 18h12" },
+    { label: "Résumés automatiques", value: prefResumes.value, tone: prefResumes.tone, iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
+    { label: "Alertes proactives", value: prefAnalyse.value, tone: prefAnalyse.tone, iconPath: "M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -619,12 +908,22 @@ function PreferencesIACard() {
   );
 }
 
-function NotificationsCard() {
+function NotificationsCard({
+  notifBudget,
+  notifOpportunites,
+  notifObjectifs,
+  notifWeekly,
+}: {
+  notifBudget: { value: string; tone: "success" | "primary" | "muted" };
+  notifOpportunites: { value: string; tone: "success" | "primary" | "muted" };
+  notifObjectifs: { value: string; tone: "success" | "primary" | "muted" };
+  notifWeekly: { value: string; tone: "success" | "primary" | "muted" };
+}) {
   const items: SettingRow[] = [
-    { label: "Alertes budget", value: "Activées", tone: "success", iconPath: "M21.21 15.89A10 10 0 1 1 8 2.83|M22 12A10 10 0 0 0 12 2v10z" },
-    { label: "Alertes opportunités", value: "Activées", tone: "success", iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" },
-    { label: "Alertes objectifs", value: "Désactivées", tone: "muted", iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
-    { label: "Résumé hebdomadaire IA", value: "Dimanche", tone: "primary", iconPath: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z|M16 2v4|M8 2v4|M3 10h18" },
+    { label: "Alertes budget", value: notifBudget.value, tone: notifBudget.tone, iconPath: "M21.21 15.89A10 10 0 1 1 8 2.83|M22 12A10 10 0 0 0 12 2v10z" },
+    { label: "Alertes opportunités", value: notifOpportunites.value, tone: notifOpportunites.tone, iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" },
+    { label: "Alertes objectifs", value: notifObjectifs.value, tone: notifObjectifs.tone, iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
+    { label: "Résumé hebdomadaire IA", value: notifWeekly.value, tone: notifWeekly.tone, iconPath: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z|M16 2v4|M8 2v4|M3 10h18" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -639,12 +938,18 @@ function NotificationsCard() {
   );
 }
 
-function ConfidentialiteCard() {
+function ConfidentialiteCard({
+  histIA,
+  consentement,
+}: {
+  histIA: { value: string; tone: "success" | "primary" | "muted" };
+  consentement: { value: string; tone: "success" | "primary" | "muted" };
+}) {
   const items: SettingRow[] = [
-    { label: "Historique IA", value: "Conservé 90 j", tone: "primary", iconPath: "M3 12a9 9 0 1 0 9-9|M3 4v5h5|M12 8v4l3 2" },
-    { label: "Données chiffrées", value: "AES-256", tone: "success", iconPath: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z|M7 11V7a5 5 0 0 1 10 0v4" },
-    { label: "Export des données", value: "Disponible", tone: "success", iconPath: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M7 10l5 5 5-5|M12 15V3" },
-    { label: "Gestion du consentement", value: "À jour", tone: "success", iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
+    { label: "Mémoire IA", value: histIA.value, tone: histIA.tone, iconPath: "M3 12a9 9 0 1 0 9-9|M3 4v5h5|M12 8v4l3 2" },
+    { label: "Chiffrement", value: "AES-256 (Supabase)", tone: "success", iconPath: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z|M7 11V7a5 5 0 0 1 10 0v4" },
+    { label: "Export des données", value: "Sur demande", tone: "primary", iconPath: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M7 10l5 5 5-5|M12 15V3" },
+    { label: "Consentement analytique", value: consentement.value, tone: consentement.tone, iconPath: "M9 11 12 14 22 4|M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -662,11 +967,14 @@ function ConfidentialiteCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function SecuriteCard() {
+  // Sécurité : 4 indicateurs qui requièrent l'admin Supabase (MFA factors,
+  // sessions, devices). En attendant cette intégration, on affiche un
+  // empty state honnête sur les 4 lignes pour ne pas mentir.
   const items: SettingRow[] = [
-    { label: "Mot de passe", value: "Modifié il y a 2 mois", tone: "muted", iconPath: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z|M7 11V7a5 5 0 0 1 10 0v4" },
-    { label: "Double authentification", value: "Activée", tone: "success", iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z|M9 12l2 2 4-4" },
-    { label: "Sessions actives", value: "2 appareils", tone: "primary", iconPath: "M2 3h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z|M8 21h8|M12 17v4" },
-    { label: "Appareils connectés", value: "3 appareils", tone: "primary", iconPath: "M5 2h14a2 2 0 0 1 2 2v16l-4-2-3 2-4-2-3 2-4-2V4a2 2 0 0 1 2-2z" },
+    { label: "Mot de passe", value: "Non disponible", tone: "muted", iconPath: "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z|M7 11V7a5 5 0 0 1 10 0v4" },
+    { label: "Double authentification", value: "Non configurée", tone: "muted", iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z|M9 12l2 2 4-4" },
+    { label: "Sessions actives", value: "Non disponible", tone: "muted", iconPath: "M2 3h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z|M8 21h8|M12 17v4" },
+    { label: "Appareils connectés", value: "Non disponible", tone: "muted", iconPath: "M5 2h14a2 2 0 0 1 2 2v16l-4-2-3 2-4-2-3 2-4-2V4a2 2 0 0 1 2-2z" },
   ];
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
@@ -681,13 +989,34 @@ function SecuriteCard() {
   );
 }
 
-function AutomatisationsIACard() {
-  const items = [
-    { label: "Analyse hebdomadaire", iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
-    { label: "Détection d'opportunités", iconPath: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" },
-    { label: "Alertes objectifs", iconPath: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z|M4 22V15" },
-    { label: "Rapports automatiques", iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-  ];
+function AutomatisationsIACard({
+  items,
+  activeCount,
+  total,
+}: {
+  items: Array<{
+    label: string;
+    iconPath: string;
+    value: string;
+    tone: "success" | "primary" | "muted";
+  }>;
+  activeCount: number | null;
+  total: number;
+}) {
+  const badgeText =
+    activeCount === null ? "Non configuré" : `${activeCount} / ${total} actives`;
+  const badgeColor =
+    activeCount === null
+      ? C.textMuted
+      : activeCount === total
+        ? C.success
+        : C.primary;
+  const badgeBg =
+    activeCount === null
+      ? C.pageBg
+      : activeCount === total
+        ? C.successBg
+        : C.primaryBg;
   return (
     <div style={{ padding: "13px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
@@ -702,38 +1031,47 @@ function AutomatisationsIACard() {
             padding: "1px 7px",
             fontSize: 9,
             fontWeight: 700,
-            color: C.success,
-            backgroundColor: C.successBg,
+            color: badgeColor,
+            backgroundColor: badgeBg,
             borderRadius: 999,
             letterSpacing: "0.04em",
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          <span style={{ width: 5, height: 5, borderRadius: 999, backgroundColor: C.success }} />
-          4 / 4 actives
+          <span style={{ width: 5, height: 5, borderRadius: 999, backgroundColor: badgeColor }} />
+          {badgeText}
         </span>
       </div>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Fonctionnalités intelligentes actives
       </p>
       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.primaryBg, flexShrink: 0 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: C.textDark, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {it.label}
-            </span>
-            <span style={{ fontSize: 9.5, fontWeight: 700, color: C.success, flexShrink: 0 }}>
-              Active
-            </span>
-          </div>
-        ))}
+        {items.map((it) => {
+          const itemColor =
+            it.tone === "success"
+              ? C.success
+              : it.tone === "primary"
+                ? C.primary
+                : C.textMuted;
+          return (
+            <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 6, backgroundColor: C.primaryBg, flexShrink: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
+                </svg>
+              </span>
+              <span style={{ flex: 1, fontSize: 10.5, fontWeight: 600, color: C.textDark, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {it.label}
+              </span>
+              <span style={{ fontSize: 9.5, fontWeight: 700, color: itemColor, flexShrink: 0 }}>
+                {it.value}
+              </span>
+            </div>
+          );
+        })}
       </div>
-      <button
+      <Link
+        href="/settings/memory"
         style={{
           marginTop: 6,
           padding: "6px 12px",
@@ -746,21 +1084,20 @@ function AutomatisationsIACard() {
           fontSize: 11,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
-        Voir les automatisations
+        Gérer les automatisations
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
-function ConseilIACard() {
+function ConseilIACard({ title, body }: { title: string; body: string }) {
   return (
     <div
       style={{
@@ -794,12 +1131,13 @@ function ConseilIACard() {
         </p>
       </div>
       <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Configuration optimisée à 92 %.
+        {title}
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        Personnalisez davantage vos <span style={{ color: C.primary, fontWeight: 700 }}>préférences IA</span> pour tirer le meilleur parti de Liberia.
+        {body}
       </p>
-      <button
+      <Link
+        href="/settings/memory"
         style={{
           marginTop: 8,
           padding: "7px 12px",
@@ -812,8 +1150,7 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Optimiser mes paramètres
@@ -821,14 +1158,22 @@ function ConseilIACard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
 /* ═══════════════ ROW 4 — MISSION FOOTER ═══════════════ */
 
-function MissionFooter() {
+function MissionFooter({ configPct }: { configPct: number | null }) {
+  const hasPct = configPct !== null;
+  const pctText = hasPct ? `${configPct} %` : "À compléter";
+  const barWidth = hasPct ? `${Math.max(0, Math.min(100, configPct))}%` : "0%";
+  const subtitle = !hasPct
+    ? "Activez vos préférences pour exploiter pleinement Liberia."
+    : configPct >= 80
+      ? "Votre compte est prêt à exploiter l'ensemble des fonctionnalités Liberia."
+      : "Quelques réglages restent à activer pour profiter pleinement de Liberia.";
   return (
     <div
       style={{
@@ -861,22 +1206,23 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Configuration du compte&nbsp;: <span style={{ fontVariantNumeric: "tabular-nums" }}>92 %</span>
+            Configuration du compte&nbsp;: <span style={{ fontVariantNumeric: "tabular-nums" }}>{pctText}</span>
           </p>
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
-              <div style={{ width: "92%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
+              <div style={{ width: barWidth, height: "100%", backgroundColor: "white", borderRadius: 999 }} />
             </div>
             <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              92 %
+              {pctText}
             </span>
           </div>
           <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
-            Votre compte est prêt à exploiter l&apos;ensemble des fonctionnalités Liberia.
+            {subtitle}
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/settings/memory"
         style={{
           padding: "9px 14px",
           display: "inline-flex",
@@ -887,8 +1233,7 @@ function MissionFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
           flexShrink: 0,
         }}
       >
@@ -897,7 +1242,7 @@ function MissionFooter() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
