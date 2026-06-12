@@ -193,6 +193,15 @@ export default async function DesignMatchCoachV3() {
   );
 
   return (
+    <>
+      <style>{`
+        @media (max-width: 999px) {
+          [data-coach-sidebar] { display: none !important; }
+          [data-coach-content] { margin-left: 0 !important; }
+          [data-coach-main] { grid-template-columns: 1fr !important; padding: 0 16px 16px 16px !important; }
+          [data-coach-topbar] { padding: 0 16px !important; }
+        }
+      `}</style>
     <div
       style={{
         display: "flex",
@@ -202,10 +211,11 @@ export default async function DesignMatchCoachV3() {
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
-      <Sidebar />
-      <div style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <div data-coach-sidebar><Sidebar /></div>
+      <div data-coach-content style={{ marginLeft: 280, flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
         <Topbar firstName={firstName} fullName={fullName} />
         <main
+          data-coach-main
           style={{
             flex: 1,
             minHeight: 0,
@@ -236,6 +246,7 @@ export default async function DesignMatchCoachV3() {
         </main>
       </div>
     </div>
+    </>
   );
 }
 
@@ -474,9 +485,10 @@ function Topbar({
   const pillName = fullName ?? "Mon profil";
   return (
     <header
+      data-coach-topbar
       style={{
-        height: H.topbar,
-        padding: "0 32px",
+        height: 68,
+        padding: "0 42px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -484,7 +496,7 @@ function Topbar({
       }}
     >
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
           Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
         <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
@@ -492,6 +504,46 @@ function Topbar({
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button
+          aria-label="Notifications"
+          style={{
+            position: "relative",
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            border: "none",
+            backgroundColor: C.cardBg,
+            boxShadow: SHADOW.kpi,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+          </svg>
+          <span
+            style={{
+              position: "absolute",
+              top: -2,
+              right: -2,
+              width: 16,
+              height: 16,
+              borderRadius: 999,
+              backgroundColor: C.notifBadge,
+              color: "white",
+              fontSize: 10,
+              fontWeight: 700,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            2
+          </span>
+        </button>
         <Link
           href="/profile"
           aria-label="Mon profil"
@@ -518,14 +570,13 @@ function Topbar({
             {pillName}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </Link>
       </div>
     </header>
   );
 }
-
 /* ═══════════════ CHAT COLUMN ═══════════════ */
 
 function ChatColumn({ firstName }: { firstName: string | null }) {

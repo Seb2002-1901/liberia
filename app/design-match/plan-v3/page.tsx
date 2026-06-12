@@ -341,8 +341,8 @@ function Topbar({
     <header
       data-plan-topbar
       style={{
-        height: H.topbar,
-        padding: "0 32px",
+        height: 68,
+        padding: "0 42px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -350,7 +350,7 @@ function Topbar({
       }}
     >
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
           Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
         <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
@@ -398,7 +398,9 @@ function Topbar({
             2
           </span>
         </button>
-        <div
+        <Link
+          href="/profile"
+          aria-label="Mon profil"
           style={{
             display: "flex",
             alignItems: "center",
@@ -407,6 +409,7 @@ function Topbar({
             borderRadius: 999,
             backgroundColor: C.cardBg,
             boxShadow: SHADOW.kpi,
+            textDecoration: "none",
           }}
         >
           <div
@@ -423,12 +426,11 @@ function Topbar({
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
-        </div>
+        </Link>
       </div>
     </header>
   );
 }
-
 /* ═══════════════ MAIN COLUMN ═══════════════ */
 
 function MainColumn() {

@@ -318,14 +318,14 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  void firstName; // greeting custom: profil-v3 n'affiche pas "Bonjour {prénom}"
+  const displayName = firstName ?? "explorer";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
       data-prof-topbar
       style={{
-        height: 60,
-        padding: "0 24px",
+        height: 68,
+        padding: "0 42px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -333,20 +333,20 @@ function Topbar({
       }}
     >
       <div>
-        <h1 style={{ fontSize: 19, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-          Mon profil
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
+          Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
-        <p style={{ marginTop: 2, fontSize: 11.5, color: C.textMuted, margin: "2px 0 0 0" }}>
+        <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
           Gérez vos informations personnelles, vos préférences et votre sécurité.
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <button
           aria-label="Notifications"
           style={{
             position: "relative",
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             borderRadius: 999,
             border: "none",
             backgroundColor: C.cardBg,
@@ -357,7 +357,7 @@ function Topbar({
             cursor: "pointer",
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
           </svg>
@@ -366,12 +366,12 @@ function Topbar({
               position: "absolute",
               top: -2,
               right: -2,
-              width: 14,
-              height: 14,
+              width: 16,
+              height: 16,
               borderRadius: 999,
               backgroundColor: C.notifBadge,
               color: "white",
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: 700,
               display: "inline-flex",
               alignItems: "center",
@@ -381,37 +381,39 @@ function Topbar({
             2
           </span>
         </button>
-        <div
+        <Link
+          href="/profile"
+          aria-label="Mon profil"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 7,
-            padding: "3px 10px 3px 3px",
+            gap: 8,
+            padding: "4px 12px 4px 4px",
             borderRadius: 999,
             backgroundColor: C.cardBg,
             boxShadow: SHADOW.kpi,
+            textDecoration: "none",
           }}
         >
           <div
             style={{
-              width: 26,
-              height: 26,
+              width: 32,
+              height: 32,
               borderRadius: 999,
               background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
             }}
           />
-          <span style={{ fontSize: 12, fontWeight: 500, color: C.textDark }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
             {pillName}
           </span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
-        </div>
+        </Link>
       </div>
     </header>
   );
 }
-
 /* ═══════════════ ROW 1 ═══════════════ */
 
 function ProfilHero() {

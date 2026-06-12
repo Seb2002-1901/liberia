@@ -416,6 +416,15 @@ export default async function DesignMatchDashboardV3() {
   /* ------------------------------------------------------------------ */
 
   return (
+    <>
+      <style>{`
+        @media (max-width: 999px) {
+          [data-dash-sidebar] { display: none !important; }
+          [data-dash-content] { margin-left: 0 !important; }
+          [data-dash-main] { padding: 0 16px 16px 16px !important; }
+          [data-dash-topbar] { padding: 0 16px !important; }
+        }
+      `}</style>
     <div
       style={{
         display: "flex",
@@ -424,8 +433,9 @@ export default async function DesignMatchDashboardV3() {
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
-      <Sidebar />
+      <div data-dash-sidebar><Sidebar /></div>
       <div
+        data-dash-content
         style={{
           marginLeft: 280,
           flex: 1,
@@ -434,7 +444,7 @@ export default async function DesignMatchDashboardV3() {
         }}
       >
         <Topbar firstName={firstName} fullName={data.profile.full_name ?? null} />
-        <main style={{ flex: 1, padding: "0 42px 16px 42px" }}>
+        <main data-dash-main style={{ flex: 1, padding: "0 42px 16px 42px" }}>
           <div style={{ maxWidth: 1176, margin: "0 auto" }}>
             <Hero
               score={score}
@@ -480,6 +490,7 @@ export default async function DesignMatchDashboardV3() {
         </main>
       </div>
     </div>
+    </>
   );
 }
 
@@ -685,15 +696,13 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  // Greeting branché sur le full_name réel (split sur l'espace, prénom
-  // uniquement, comme le composant Greeting prod). Fallback "explorer"
-  // si le profil n'a pas de nom (démo ou onboarding incomplet).
   const displayName = firstName ?? "explorer";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
+      data-dash-topbar
       style={{
-        height: H.topbar,
+        height: 68,
         padding: "0 42px",
         display: "flex",
         alignItems: "center",
@@ -705,7 +714,7 @@ function Topbar({
         <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textDark, lineHeight: 1.1, margin: 0 }}>
           Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
-        <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted }}>
+        <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
           Voici votre situation mise à jour aujourd&apos;hui.
         </p>
       </div>
@@ -730,7 +739,6 @@ function Topbar({
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
           </svg>
-          {/* Badge corrigé : couleur #7FA2E6 (mesurée) */}
           <span
             style={{
               position: "absolute",
@@ -751,7 +759,9 @@ function Topbar({
             2
           </span>
         </button>
-        <div
+        <Link
+          href="/profile"
+          aria-label="Mon profil"
           style={{
             display: "flex",
             alignItems: "center",
@@ -760,6 +770,7 @@ function Topbar({
             borderRadius: 999,
             backgroundColor: C.cardBg,
             boxShadow: SHADOW.kpi,
+            textDecoration: "none",
           }}
         >
           <div
@@ -776,12 +787,11 @@ function Topbar({
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9" />
           </svg>
-        </div>
+        </Link>
       </div>
     </header>
   );
 }
-
 /* ═══════════════ HERO — 3 surfaces flottantes ═══════════════ */
 
 interface HeroProps {
