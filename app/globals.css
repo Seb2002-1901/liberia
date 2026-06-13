@@ -292,6 +292,117 @@
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Vague A bis — forcer single-column sur les grids inline                  */
+/*                                                                            */
+/*  Toutes les pages V3 utilisent des styles INLINE avec gridTemplate-       */
+/*  Columns. Les @media des pages ne ciblent que les *-row de premier        */
+/*  niveau, pas les sub-grids des cards. Sur iPhone <= 767 px ça donne :     */
+/*    - Dashboard Hero : grid-template-columns: repeat(3, 1fr)               */
+/*      → 3 cards côte à côte ≈ 120 px chacune → texte coupé                 */
+/*    - Dashboard KPI : repeat(4, 1fr) → 4 cards ≈ 90 px → débord            */
+/*    - Plan Roadmap : repeat(4, 1fr) → 4 phases écrasées                    */
+/*    - Coach landing/conversation : 1fr 320 px → main < 100 px              */
+/*                                                                            */
+/*  La règle ci-dessous cible les éléments avec `style*="grid-template-     */
+/*  columns"` descendants de tous les data-*-main des pages V3 et les force  */
+/*  à 1fr. Risque : un grid délibérément multi-colonne (badge layout)        */
+/*  devient vertical. Acceptable en mobile car single-column est la norme.  */
+/*                                                                            */
+/*  Pages couvertes (16 préfixes data-*-main) :                              */
+/*    dash, coach, coachid, plan, sub, par, profil, pro (mon-analyse),       */
+/*    opp, inv, epa, rev, dep, bud (budget), obj, v3 (V3Shell générique).   */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  [data-dash-main] [style*="grid-template-columns"],
+  [data-coach-main] [style*="grid-template-columns"],
+  [data-coachid-main] [style*="grid-template-columns"],
+  [data-plan-main] [style*="grid-template-columns"],
+  [data-sub-main] [style*="grid-template-columns"],
+  [data-par-main] [style*="grid-template-columns"],
+  [data-pro-main] [style*="grid-template-columns"],
+  [data-profil-main] [style*="grid-template-columns"],
+  [data-opp-main] [style*="grid-template-columns"],
+  [data-inv-main] [style*="grid-template-columns"],
+  [data-epa-main] [style*="grid-template-columns"],
+  [data-rev-main] [style*="grid-template-columns"],
+  [data-dep-main] [style*="grid-template-columns"],
+  [data-budget-main] [style*="grid-template-columns"],
+  [data-obj-main] [style*="grid-template-columns"],
+  [data-v3-main] [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  /* Coach landing + /coach/[id] : main 2-col → stack ChatColumn + Rail */
+  [data-coach-main],
+  [data-coachid-main] {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+  }
+  /* Plan d'action : main right rail width auto en mobile */
+  [data-plan-right] {
+    width: auto !important;
+  }
+  /* Coach landing : right rail caché < 768 (déjà géré sur /coach/[id]
+     via data-coachid-rail). La landing n'a pas le même attribute,
+     donc on cible le data-coach-main > aside par défaut. */
+  [data-coach-main] > aside {
+    display: none !important;
+  }
+  /* Flex avec gap large → wrap sur mobile (KPI rows, hero rows, etc.) */
+  [data-dash-main] [style*="display: flex"][style*="gap: 22"],
+  [data-dash-main] [style*="display: flex"][style*="gap: 16"],
+  [data-plan-main] [style*="display: flex"][style*="gap: 26"],
+  [data-plan-main] [style*="display: flex"][style*="gap: 20"] {
+    flex-wrap: wrap !important;
+  }
+  /* SVG charts : ne peuvent jamais dépasser 100 % du parent */
+  [data-dash-main] svg,
+  [data-coach-main] svg,
+  [data-coachid-main] svg,
+  [data-plan-main] svg,
+  [data-pro-main] svg,
+  [data-opp-main] svg,
+  [data-epa-main] svg,
+  [data-rev-main] svg,
+  [data-dep-main] svg {
+    max-width: 100% !important;
+    height: auto;
+  }
+  /* Cards génériques : largeur 100 % garantie + min-width 0 pour
+     respecter flex shrink. Évite qu'un word-break long pousse la
+     card au-delà du viewport. */
+  [data-dash-main] > div,
+  [data-coach-main] > div,
+  [data-coachid-main] > div,
+  [data-plan-main] > div,
+  [data-pro-main] > div,
+  [data-opp-main] > div,
+  [data-epa-main] > div,
+  [data-rev-main] > div,
+  [data-dep-main] > div,
+  [data-budget-main] > div,
+  [data-obj-main] > div,
+  [data-par-main] > div,
+  [data-profil-main] > div,
+  [data-inv-main] > div,
+  [data-sub-main] > div,
+  [data-v3-main] > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  /* Tableau / longues lignes : word-wrap pour éviter overflow */
+  [data-dash-main],
+  [data-coach-main],
+  [data-coachid-main],
+  [data-plan-main],
+  [data-pro-main] {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
 /* Sous-768 (mobile portrait) : padding latéral réduit pour gagner de la
    largeur. Les pages qui ont déjà ce breakpoint ne sont pas affectées
    (leur règle locale gagne). */
