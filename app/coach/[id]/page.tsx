@@ -52,6 +52,7 @@ import {
 } from "@/lib/coach/quick-prompts";
 import { formatUserCurrency } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { startNewConversationAction } from "@/app/actions/coach-landing";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { CoachConversationV3Client } from "@/components/coach/v3-conversation-client";
 import type { DrawerData } from "@/lib/calculations/health/types";
@@ -573,35 +574,39 @@ function CoachHero({
             )}
           </Link>
         )}
-        <Link
-          href="/design-match/coach-v3"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "7px 12px",
-            backgroundColor: C.primaryBg,
-            color: C.primary,
-            fontSize: 12.5,
-            fontWeight: 600,
-            borderRadius: 8,
-            textDecoration: "none",
-          }}
-        >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <form action={startNewConversationAction}>
+          <button
+            type="submit"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "7px 12px",
+              backgroundColor: C.primaryBg,
+              color: C.primary,
+              fontSize: 12.5,
+              fontWeight: 600,
+              borderRadius: 8,
+              border: "none",
+              cursor: "pointer",
+            }}
           >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Coach IA
-        </Link>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Nouvelle conversation
+          </button>
+        </form>
       </div>
     </div>
   );

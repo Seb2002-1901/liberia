@@ -20,6 +20,7 @@
  */
 
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -153,6 +154,21 @@ export default async function DesignMatchCoachV3() {
     getMyUserMemory(),
     listConversations(),
   ]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Auto-redirect vers la conversation la plus récente                 */
+  /* ------------------------------------------------------------------ */
+  // Pattern ChatGPT / Claude : si l'utilisateur a déjà au moins une
+  // conversation, on l'amène directement sur sa plus récente plutôt
+  // que sur l'aperçu maquette. Ce dernier ne sert que pour le tout
+  // premier accès (0 conversation), où il joue le rôle de welcome.
+  // Sans ce redirect, cliquer "Coach IA" depuis la sidebar ramène
+  // toujours sur la maquette avec composer non éditable, boutons
+  // disabled et badge "Aperçu personnalisé" — alors que l'utilisateur
+  // attend de retrouver sa conversation en cours.
+  if (conversations.length > 0) {
+    redirect(`/coach/${conversations[0].id}`);
+  }
 
   /* ------------------------------------------------------------------ */
   /*  Agrégats finance — alignés sur dashboard-v3 / plan-v3              */
