@@ -16,6 +16,7 @@
  */
 
 import Link from "next/link";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
 import type { Goal } from "@/types/database";
 import { getFinanceData } from "@/lib/services/finance";
@@ -238,6 +239,7 @@ export default async function DesignMatchObjectifsV3() {
           [data-obj-topbar] { padding: 0 16px !important; }
         }
       `}</style>
+      <MobileNav />
       <div
         style={{
           display: "flex",
@@ -520,46 +522,6 @@ function Topbar({
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <button
-          aria-label="Notifications"
-          style={{
-            position: "relative",
-            width: 36,
-            height: 36,
-            borderRadius: 999,
-            border: "none",
-            backgroundColor: C.cardBg,
-            boxShadow: SHADOW.kpi,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-          </svg>
-          <span
-            style={{
-              position: "absolute",
-              top: -2,
-              right: -2,
-              width: 16,
-              height: 16,
-              borderRadius: 999,
-              backgroundColor: C.notifBadge,
-              color: "white",
-              fontSize: 10,
-              fontWeight: 700,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            2
-          </span>
-        </button>
         <Link
           href="/profile"
           aria-label="Mon profil"
