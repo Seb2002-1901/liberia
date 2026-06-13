@@ -941,6 +941,12 @@ export function LandingV3Styles() {
         .lv3-h1 { font-size: 30px !important; }
         .lv3-h2 { font-size: 22px !important; }
       }
+      @media (max-width: 360px) {
+        /* Très petit écran : lv3-grid-4 reste en 2 col à 639 mais
+           à 360 et moins (iPhone SE 1) la largeur disponible ne
+           permet plus 2 col propres → single col. */
+        .lv3-grid-4 { grid-template-columns: 1fr !important; }
+      }
     `}</style>
   );
 }

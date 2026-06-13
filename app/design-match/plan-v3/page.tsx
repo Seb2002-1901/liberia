@@ -342,6 +342,28 @@ export default async function DesignMatchPlanV3() {
           [data-plan-bottom-row] { grid-template-columns: 1fr !important; }
           [data-plan-roadmap-grid] { grid-template-columns: 1fr 1fr !important; }
         }
+        @media (max-width: 480px) {
+          /* Très petit écran (iPhone SE 1 = 320 px) : le
+             PlanHeaderCard avec 3 HeaderMetric en flex-row ne tient
+             pas même avec wrap. PlanHeaderCard est à 2 niveaux
+             dans la hiérarchie (data-plan-main > MainColumn > Card).
+             On force la card entière en column. */
+          [data-plan-main] > div:first-of-type > div:first-of-type {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+          /* Le sub-flex des 3 HeaderMetric (2e enfant du
+             PlanHeaderCard, contenant les metrics avec gap:16
+             flex-shrink:0) passe aussi en column. */
+          [data-plan-main] > div:first-of-type > div:first-of-type > div:last-of-type {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100% !important;
+            gap: 8px !important;
+          }
+          [data-plan-roadmap-grid] { grid-template-columns: 1fr !important; }
+        }
       `}</style>
       <MobileNav />
       <div

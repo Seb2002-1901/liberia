@@ -466,6 +466,17 @@
   }
 }
 
+/* Très petit écran (≤ 360 px = iPhone SE 1 + Android compact) :
+   filet de sécurité supplémentaire pour les pages non-V3 (landing
+   marketing notamment). Force tous les éléments à respecter 100%
+   de leur container. SVG/path exclus pour préserver les icônes. */
+@media (max-width: 360px) {
+  main *:not(svg):not(svg *),
+  section *:not(svg):not(svg *) {
+    max-width: 100% !important;
+  }
+}
+
 /* Sous-768 (mobile portrait) : padding latéral réduit pour gagner de la
    largeur. Les pages qui ont déjà ce breakpoint ne sont pas affectées
    (leur règle locale gagne). */
