@@ -17,15 +17,32 @@
  */
 
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getFinanceData } from "@/lib/services/finance";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Design Match v3 — Investissements",
   robots: { index: false, follow: false },
 };
+
+/* ═══════════════ NOTE ARCHITECTURE ═══════════════
+ *
+ * Aucune table, aucun service, aucun moteur de calcul lié aux
+ * investissements n'existe en base aujourd'hui :
+ *  - pas de table portfolios / holdings / transactions
+ *  - pas de feed market data ou rendements indexés
+ *  - pas de catalogue d'instruments (ETF, actions, obligations)
+ *  - pas de moteur d'allocation, de projection, de performance
+ *
+ * La page V3 conserve donc sa structure de cockpit (4 rows × N
+ * colonnes, même langage visuel que dashboard-v3 / epargne-v3) mais
+ * toutes les cartes basculent en empty states premium honnêtes.
+ * Aucun montant, aucun rendement, aucune allocation, aucune
+ * performance n'est inventé. Tous les CTA pointent vers /coach.
+ * ═══════════════════════════════════════════════ */
 
 const C = {
   navy: "#011E5F",
@@ -443,39 +460,46 @@ function HeroPortefeuille() {
       <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.78)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
-            Portefeuille total
+            Portefeuille
           </p>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 30,
-                fontWeight: 700,
-                color: "white",
-                lineHeight: 1,
-                fontFamily: "Outfit, Inter, system-ui",
-                letterSpacing: "-0.025em",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              248 500 CHF
-            </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#5EEAD4", fontVariantNumeric: "tabular-nums" }}>
-              +12.4%
-            </span>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>cette année</span>
-          </div>
-          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)" }}>
-            Objectif patrimoine&nbsp;: <span style={{ fontWeight: 600, color: "white", fontVariantNumeric: "tabular-nums" }}>500 000 CHF</span>
+          <p
+            style={{
+              margin: "4px 0 0 0",
+              fontSize: 22,
+              fontWeight: 700,
+              color: "white",
+              lineHeight: 1.1,
+              fontFamily: "Outfit, Inter, system-ui",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Aucun portefeuille suivi
           </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 360 }}>
-              <div style={{ width: "49%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              49%
-            </span>
-          </div>
+          <p style={{ margin: "6px 0 0 0", fontSize: 11, color: "rgba(255,255,255,0.78)", lineHeight: 1.4, maxWidth: 420 }}>
+            Vos investissements ne sont pas encore connectés à LIBERIA. Le module sera disponible une fois les intégrations bancaires en place.
+          </p>
+          <Link
+            href="/coach"
+            style={{
+              marginTop: 8,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "5px 11px",
+              backgroundColor: "rgba(255,255,255,0.16)",
+              color: "white",
+              fontSize: 11,
+              fontWeight: 600,
+              borderRadius: 999,
+              textDecoration: "none",
+            }}
+          >
+            En parler au coach
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </Link>
         </div>
         <div
           style={{
@@ -501,12 +525,10 @@ function HeroPortefeuille() {
 }
 
 function PerformanceGlobaleCard() {
-  const stats = [
-    { label: "Rendement annuel", value: "+27 400 CHF", color: C.success },
-    { label: "Performance", value: "+12.4 %", color: C.success },
-    { label: "Volatilité", value: "Modérée", color: C.amber },
-    { label: "Score IA", value: "92 / 100", color: C.primary },
-  ];
+  // Empty state honnête : aucun rendement, aucune performance, aucune
+  // volatilité, aucun "Score IA" investissements n'est calculable sans
+  // portefeuille tracké.
+  const labels = ["Rendement", "Performance", "Volatilité", "Score IA"];
   return (
     <div
       style={{
@@ -523,47 +545,27 @@ function PerformanceGlobaleCard() {
         Performance globale
       </p>
       <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
-        {stats.map((s) => (
-          <div key={s.label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{s.label}</p>
+        {labels.map((label) => (
+          <div key={label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
+            <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{label}</p>
             <p
               style={{
                 margin: "1px 0 0 0",
                 fontSize: 12,
                 fontWeight: 700,
-                color: s.color,
+                color: C.textLight,
                 fontFamily: "Outfit, Inter, system-ui",
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              {s.value}
+              —
             </p>
           </div>
         ))}
       </div>
-      <button
-        style={{
-          marginTop: 6,
-          padding: "6px 12px",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 5,
-          backgroundColor: C.navy,
-          color: "white",
-          fontSize: 11.5,
-          fontWeight: 600,
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Voir les analyses
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+      <p style={{ margin: "6px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35 }}>
+        Aucune performance calculable sans portefeuille suivi.
+      </p>
     </div>
   );
 }
@@ -571,25 +573,9 @@ function PerformanceGlobaleCard() {
 /* ═══════════════ ROW 2 ═══════════════ */
 
 function AllocationCard() {
-  const slices = [
-    { id: "etf", label: "ETF Monde", amount: "87 000", pct: 35, color: C.primary },
-    { id: "actions", label: "Actions", amount: "75 000", pct: 30, color: C.success },
-    { id: "immo", label: "Immobilier", amount: "50 000", pct: 20, color: C.violet },
-    { id: "cash", label: "Cash", amount: "24 000", pct: 10, color: C.amber },
-    { id: "crypto", label: "Crypto", amount: "12 500", pct: 5, color: C.donutGrey },
-  ];
-  let cursor = -90;
-  const gap = 1;
-  const usableDeg = 360 - gap * slices.length;
-  const total = slices.reduce((s, x) => s + x.pct, 0);
-  const slicesWithPaths = slices.map((s) => {
-    const sweep = (s.pct / total) * usableDeg;
-    const startDeg = cursor;
-    const endDeg = cursor + sweep;
-    const path = donutSliceD(50, 50, 42, 28, startDeg, endDeg);
-    cursor = endDeg + gap;
-    return { ...s, path };
-  });
+  // Empty state honnête : aucune classe d'actifs (ETF, actions,
+  // immobilier, cash, crypto) n'est trackée. Ne pas afficher les
+  // 35/30/20/10/5 mockés serait inventer une répartition.
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -598,37 +584,25 @@ function AllocationCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Répartition de votre portefeuille
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flex: 1 }}>
         <div style={{ position: "relative", flexShrink: 0, width: 104, height: 104 }}>
           <svg viewBox="0 0 100 100" width={104} height={104}>
-            {slicesWithPaths.map((s) => (
-              <path key={s.id} d={s.path} fill={s.color} />
-            ))}
+            <circle cx={50} cy={50} r={42} fill={C.pageBg} />
+            <circle cx={50} cy={50} r={28} fill={C.cardBg} />
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-              248 500
-            </p>
-            <p style={{ margin: "1px 0 0 0", fontSize: 8, color: C.textMuted, letterSpacing: "0.14em" }}>
-              CHF
+            <p style={{ margin: 0, fontSize: 9, color: C.textMuted, textAlign: "center", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              Non<br />disponible
             </p>
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3 }}>
-          {slicesWithPaths.map((s) => (
-            <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10 }}>
-              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: 999, backgroundColor: s.color, flexShrink: 0 }} />
-              <span style={{ flex: 1, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {s.label}
-              </span>
-              <span style={{ color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                {s.amount}
-              </span>
-              <span style={{ color: C.textMuted, fontWeight: 500, fontVariantNumeric: "tabular-nums", minWidth: 24, textAlign: "right" }}>
-                {s.pct}%
-              </span>
-            </div>
-          ))}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Allocation non disponible
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.4 }}>
+            Aucune classe d&apos;actifs (ETF, actions, immobilier, cash) n&apos;est trackée. La répartition s&apos;affichera dès l&apos;intégration des comptes-titres.
+          </p>
         </div>
       </div>
     </div>
@@ -636,135 +610,130 @@ function AllocationCard() {
 }
 
 function OpportunitesCard() {
-  const items = [
-    { label: "ETF Monde", sub: "Potentiel long terme", potential: "+8 %", color: C.success, bg: C.successBg, iconPath: "M3 3v18h18|M7 14l4-4 4 4 5-5" },
-    { label: "Immobilier", sub: "Diversification patrimoniale", potential: "+6 %", color: C.primary, bg: C.primaryBg, iconPath: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z|M9 22 9 12 15 12 15 22" },
-    { label: "Obligations", sub: "Réduction de la volatilité", potential: "+3 %", color: C.violet, bg: C.violetBg, iconPath: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-  ];
+  // Empty state honnête : aucune logique de recommandation
+  // d'investissement n'est implémentée (pas de profil de risque, pas
+  // de catalogue, pas de moteur de scoring). Annoncer +8% ETF Monde
+  // serait inventer un rendement et conseiller un produit.
   return (
     <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Opportunités IA
+        Opportunités
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Sélectionnées pour vous
+        Recommandations à venir
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-        {items.map((it) => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, backgroundColor: it.bg, flexShrink: 0 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={it.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                {it.iconPath.split("|").map((d, i) => <path key={i} d={d} />)}
-              </svg>
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10.5, fontWeight: 600, color: C.textDark, lineHeight: 1.2 }}>
-                {it.label}
-              </p>
-              <p style={{ margin: "1px 0 0 0", fontSize: 9.5, color: C.textMuted, lineHeight: 1.2 }}>
-                {it.sub}
-              </p>
-            </div>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "2px 8px",
-                borderRadius: 999,
-                backgroundColor: it.bg,
-                color: it.color,
-                fontSize: 10,
-                fontWeight: 700,
-                fontVariantNumeric: "tabular-nums",
-                flexShrink: 0,
-              }}
-            >
-              {it.potential}
-            </span>
-          </div>
-        ))}
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: 999,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </span>
+        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Pas de recommandations
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
+          Aucun moteur de recommandation d&apos;investissement n&apos;est encore actif. LIBERIA ne suggère aucun produit financier nommé.
+        </p>
       </div>
     </div>
   );
 }
 
 function ObjectifsFinancesCard() {
-  const goals = [
-    { emoji: "🏠", label: "Maison", amount: "62 000 / 100 000 CHF", pct: 62, color: C.success },
-    { emoji: "🌍", label: "Voyage", amount: "15 000 / 30 000 CHF", pct: 50, color: C.primary },
-    { emoji: "🏖", label: "Retraite", amount: "72 000 / 300 000 CHF", pct: 24, color: C.violet },
-    { emoji: "💰", label: "Liberté financière", amount: "15 000 / 100 000 CHF", pct: 15, color: C.amber },
-  ];
+  // Empty state honnête : le lien "portefeuille → financement
+  // d'objectifs" n'existe pas. Même si des goals sont définis côté
+  // Objectifs, on ne peut pas afficher "votre portefeuille finance
+  // X" tant qu'aucun portefeuille n'est tracké.
   return (
     <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Objectifs financés
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Ce que votre portefeuille contribue à réaliser
+        Lien portefeuille ↔ objectifs
       </p>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        {goals.map((g) => (
-          <div key={g.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                backgroundColor: C.pageBg,
-                fontSize: 12,
-                flexShrink: 0,
-              }}
-              aria-hidden
-            >
-              {g.emoji}
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2, gap: 6 }}>
-                <span style={{ fontSize: 10.5, fontWeight: 600, color: C.textDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {g.label}
-                </span>
-                <span style={{ fontSize: 9.5, color: C.textDark, fontWeight: 600, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>
-                  {g.amount}
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ flex: 1, height: 4, backgroundColor: C.pageBg, borderRadius: 999, overflow: "hidden" }}>
-                  <div style={{ width: `${g.pct}%`, height: "100%", backgroundColor: g.color, borderRadius: 999 }} />
-                </div>
-                <span style={{ fontSize: 9.5, color: g.color, fontWeight: 600, fontVariantNumeric: "tabular-nums", minWidth: 22, textAlign: "right", opacity: 0.8 }}>
-                  {g.pct}%
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button
+      <div
         style={{
-          marginTop: 6,
-          padding: 0,
-          alignSelf: "flex-start",
-          display: "inline-flex",
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          gap: 4,
-          backgroundColor: "transparent",
-          color: C.primary,
-          fontSize: 10.5,
-          fontWeight: 600,
-          border: "none",
-          cursor: "pointer",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
         }}
       >
-        Voir tous les objectifs
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </button>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: 999,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+            <path d="M4 22V15" />
+          </svg>
+        </span>
+        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Lien non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
+          Aucun portefeuille n&apos;est tracké pour le moment. Vos objectifs restent gérés depuis la page Objectifs.
+        </p>
+        <Link
+          href="/goals"
+          style={{
+            marginTop: 8,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 11,
+            fontWeight: 600,
+            color: C.primary,
+            textDecoration: "none",
+          }}
+        >
+          Voir mes objectifs
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -772,38 +741,8 @@ function ObjectifsFinancesCard() {
 /* ═══════════════ ROW 3 ═══════════════ */
 
 function PerformanceChartCard() {
-  const points = [
-    { label: "Nov.", value: 150000 },
-    { label: "Déc.", value: 162000 },
-    { label: "Janv.", value: 175000 },
-    { label: "Févr.", value: 184000 },
-    { label: "Mars", value: 192000 },
-    { label: "Avr.", value: 201000 },
-    { label: "Mai", value: 212000 },
-    { label: "Juin", value: 221000 },
-    { label: "Juil.", value: 229000 },
-    { label: "Août", value: 236000 },
-    { label: "Sept.", value: 242500 },
-    { label: "Oct.", value: 248500 },
-  ];
-  const W = 360;
-  const HH = 108;
-  const PAD = { top: 14, right: 14, bottom: 14, left: 36 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = HH - PAD.top - PAD.bottom;
-  const minV = 140000;
-  const maxV = 260000;
-  const range = maxV - minV;
-  const scaled = points.map((p, i) => ({
-    ...p,
-    x: PAD.left + (i / (points.length - 1)) * innerW,
-    y: PAD.top + innerH - ((p.value - minV) / range) * innerH,
-  }));
-  const pathD = scaled.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" ");
-  const baselineY = PAD.top + innerH;
-  const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
-  const yTicks = [160000, 190000, 220000, 250000];
-  const last = scaled[scaled.length - 1];
+  // Empty state honnête : pas de série temporelle de valeur de
+  // portefeuille (pas de marquage mensuel, pas de flux historique).
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
@@ -812,69 +751,56 @@ function PerformanceChartCard() {
             Performance
           </p>
           <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Sur 12 derniers mois
+            Historique 12 mois
           </p>
         </div>
+      </div>
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
         <span
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 3,
-            padding: "2px 7px",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
             borderRadius: 999,
-            backgroundColor: C.successBg,
-            fontSize: 10,
-            fontWeight: 700,
-            color: C.success,
+            backgroundColor: C.primaryBg,
+            marginBottom: 6,
           }}
         >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="17 6 23 6 23 12" />
-            <polyline points="22 6 13.5 14.5 8.5 9.5 1 17" />
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
           </svg>
-          +27 400 CHF
         </span>
-      </div>
-      <div style={{ marginTop: 4, flex: 1 }}>
-        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
-          <defs>
-            <linearGradient id="inv-perf-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.primary} stopOpacity="0.22" />
-              <stop offset="100%" stopColor={C.primary} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {yTicks.map((v) => {
-            const y = PAD.top + innerH - ((v - minV) / range) * innerH;
-            return (
-              <g key={v}>
-                <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#EDF2F8" strokeWidth={0.5} />
-                <text x={PAD.left - 4} y={y + 2} fontSize="7.5" fill={C.textLight} textAnchor="end">
-                  {v / 1000}K
-                </text>
-              </g>
-            );
-          })}
-          <path d={areaD} fill="url(#inv-perf-grad)" />
-          <path d={pathD} stroke={C.primary} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {scaled.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r={1.8} fill="white" stroke={C.primary} strokeWidth={1.3} />
-          ))}
-          <circle cx={last.x} cy={last.y} r={3.5} fill={C.primary} />
-          <text x={last.x} y={last.y - 6} fontSize="8.5" fontWeight="700" fill={C.primary} fontFamily="Outfit, Inter, system-ui" textAnchor="end">
-            248 500 CHF
-          </text>
-          {scaled.filter((_, i) => i % 2 === 0).map((p) => (
-            <text key={`x-${p.label}`} x={p.x} y={HH - 3} fontSize="7" fill={C.textLight} textAnchor="middle">
-              {p.label}
-            </text>
-          ))}
-        </svg>
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Historique non disponible
+        </p>
+        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 280 }}>
+          Aucune valeur historique de portefeuille n&apos;est archivée. La courbe sera tracée dès l&apos;intégration des comptes-titres.
+        </p>
       </div>
     </div>
   );
 }
 
 function ProjectionCard() {
+  // Empty state honnête : projection patrimoine 5/10 ans = invention
+  // pure (pas de rendement attendu, pas de scénario économique, pas
+  // de moteur de simulation Monte Carlo calibré).
   return (
     <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -883,53 +809,26 @@ function ProjectionCard() {
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Patrimoine projeté
       </p>
-      <div style={{ marginTop: 8, padding: "8px 10px", backgroundColor: C.successBg, borderRadius: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: 9.5, color: C.success, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Patrimoine dans 5 ans
+      <div
+        style={{
+          marginTop: 8,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "12px 8px",
+          backgroundColor: C.pageBg,
+          borderRadius: 8,
+        }}
+      >
+        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          Aucune projection fiable
         </p>
-        <p
-          style={{
-            margin: "2px 0 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            color: C.success,
-            fontFamily: "Outfit, Inter, system-ui",
-            letterSpacing: "-0.025em",
-            lineHeight: 1,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          500 000 CHF
+        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
+          Aucun moteur de simulation patrimoniale (rendement composé, scénarios) n&apos;est calibré. Pas de chiffre 2027/2029/2031 inventé.
         </p>
-      </div>
-      <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2027</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "56%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            280 000
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2029</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "72%", height: "100%", backgroundColor: C.primary, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            360 000
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, minWidth: 38, fontVariantNumeric: "tabular-nums" }}>2031</span>
-          <div style={{ flex: 1, height: 4, backgroundColor: "white", borderRadius: 999, overflow: "hidden" }}>
-            <div style={{ width: "100%", height: "100%", backgroundColor: C.success, borderRadius: 999 }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.success, fontFamily: "Outfit, Inter, system-ui", fontVariantNumeric: "tabular-nums" }}>
-            500 000
-          </span>
-        </div>
       </div>
     </div>
   );
@@ -969,12 +868,13 @@ function ConseilIACard() {
         </p>
       </div>
       <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Vous êtes sur une excellente trajectoire.
+        Module Investissements à venir.
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        En investissant <span style={{ color: C.textDark, fontWeight: 700 }}>500 CHF/mois</span> supplémentaires, vous pourriez atteindre votre objectif patrimoine <span style={{ color: C.primary, fontWeight: 700 }}>14 mois plus tôt</span>.
+        LIBERIA n&apos;émet aucune recommandation d&apos;investissement aujourd&apos;hui. La priorité reste votre fonds d&apos;urgence et vos objectifs concrets — votre coach peut vous y accompagner.
       </p>
-      <button
+      <Link
+        href="/coach"
         style={{
           marginTop: 8,
           padding: "7px 12px",
@@ -987,8 +887,7 @@ function ConseilIACard() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
+          textDecoration: "none",
         }}
       >
         Parler à mon conseiller
@@ -996,7 +895,7 @@ function ConseilIACard() {
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
@@ -1036,22 +935,15 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Objectif patrimoine <span style={{ fontVariantNumeric: "tabular-nums" }}>500 000 CHF</span>
+            Module Investissements à venir
           </p>
-          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ flex: 1, height: 5, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.18)", overflow: "hidden", maxWidth: 420 }}>
-              <div style={{ width: "49%", height: "100%", backgroundColor: "white", borderRadius: 999 }} />
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums" }}>
-              49 % atteint
-            </span>
-          </div>
-          <p style={{ margin: "3px 0 0 0", fontSize: 10, color: "rgba(255,255,255,0.7)", lineHeight: 1.2 }}>
-            Encore <span style={{ fontVariantNumeric: "tabular-nums" }}>251 500 CHF</span> pour atteindre votre objectif patrimonial.
+          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.35 }}>
+            Aucun portefeuille suivi aujourd&apos;hui. Renforcez d&apos;abord votre fonds d&apos;urgence et vos objectifs — le module Investissements sera ouvert ensuite.
           </p>
         </div>
       </div>
-      <button
+      <Link
+        href="/coach"
         style={{
           padding: "9px 14px",
           display: "inline-flex",
@@ -1062,39 +954,17 @@ function MissionFooter() {
           fontSize: 11.5,
           fontWeight: 600,
           borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
           flexShrink: 0,
+          textDecoration: "none",
         }}
       >
-        Investir davantage
+        En parler au coach
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
 
-/* ═══════════════ DONUT HELPERS ═══════════════ */
-
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-function donutSliceD(cx: number, cy: number, outerR: number, innerR: number, startDeg: number, endDeg: number) {
-  const largeArc = endDeg - startDeg > 180 ? 1 : 0;
-  const s = polarToCartesian(cx, cy, outerR, startDeg);
-  const e = polarToCartesian(cx, cy, outerR, endDeg);
-  const si = polarToCartesian(cx, cy, innerR, endDeg);
-  const ei = polarToCartesian(cx, cy, innerR, startDeg);
-  return [
-    `M ${s.x.toFixed(3)} ${s.y.toFixed(3)}`,
-    `A ${outerR} ${outerR} 0 ${largeArc} 1 ${e.x.toFixed(3)} ${e.y.toFixed(3)}`,
-    `L ${si.x.toFixed(3)} ${si.y.toFixed(3)}`,
-    `A ${innerR} ${innerR} 0 ${largeArc} 0 ${ei.x.toFixed(3)} ${ei.y.toFixed(3)}`,
-    "Z",
-  ].join(" ");
-}
