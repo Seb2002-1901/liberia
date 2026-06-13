@@ -468,12 +468,27 @@
 
 /* Très petit écran (≤ 360 px = iPhone SE 1 + Android compact) :
    filet de sécurité supplémentaire pour les pages non-V3 (landing
-   marketing notamment). Force tous les éléments à respecter 100%
-   de leur container. SVG/path exclus pour préserver les icônes. */
+   marketing + demo public). Force tous les éléments à respecter
+   100% de leur container. SVG/path exclus pour préserver les
+   icônes. */
 @media (max-width: 360px) {
   main *:not(svg):not(svg *),
   section *:not(svg):not(svg *) {
     max-width: 100% !important;
+  }
+  /* Critique : items de grid doivent pouvoir shrink en dessous de
+     leur min-content. Sans ça, un grid Tailwind dont les cards ont
+     un Recharts ResponsiveContainer (min-content 334 px) force la
+     grille à 334 px alors que le viewport est 320. */
+  .grid > * {
+    min-width: 0 !important;
+  }
+  /* Recharts wrappers : largeur 100 % maximale obligatoire (force
+     la responsive du chart). */
+  .recharts-responsive-container,
+  .recharts-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
   }
 }
 
