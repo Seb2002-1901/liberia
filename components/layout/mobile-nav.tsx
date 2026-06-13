@@ -18,7 +18,7 @@
  * page V3. Aucun logique produit n'est ajoutée.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -168,6 +168,32 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname() ?? "";
 
+  // Lock body scroll quand le drawer est ouvert (sinon iOS Safari
+  // continue de scroller la page sous le drawer + le bounce gomme
+  // l'overlay backdrop).
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const original = document.body.style.overflow;
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = original || "";
+    }
+    return () => {
+      document.body.style.overflow = original || "";
+    };
+  }, [open]);
+
+  // Ferme le drawer sur ESC (accessibilité clavier).
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <>
       {/* Visible uniquement < 999 px, scopé à cet ID pour ne pas
@@ -186,10 +212,13 @@ export function MobileNav() {
         onClick={() => setOpen(true)}
         aria-label="Ouvrir le menu"
         aria-expanded={open}
+        aria-controls="liberia-mobile-drawer"
         style={{
           position: "fixed",
-          top: 14,
-          left: 14,
+          // safe-area-inset-top : pour les iPhones avec encoche, le
+          // hamburger reste sous le bord de l'écran physique.
+          top: "max(14px, env(safe-area-inset-top))",
+          left: "max(14px, env(safe-area-inset-left))",
           zIndex: 1100,
           width: 40,
           height: 40,
@@ -231,15 +260,22 @@ export function MobileNav() {
         aria-hidden={!open}
       />
       <aside
+        id="liberia-mobile-drawer"
         role="dialog"
+        aria-modal="true"
         aria-label="Menu de navigation"
         aria-hidden={!open}
         style={{
           position: "fixed",
           top: 0,
           left: 0,
-          bottom: 0,
-          width: 280,
+          // 100dvh : iOS Safari ajuste à la vraie hauteur disponible
+          // (barre d'adresse incluse ou non). Fallback 100vh pour les
+          // browsers sans support dvh.
+          height: "100vh",
+          maxHeight: "100dvh",
+          width: "min(280px, 88vw)",
+          maxWidth: "100vw",
           backgroundColor: C.cardBg,
           borderRight: `1px solid ${C.borderGhost}`,
           display: "flex",
@@ -249,6 +285,11 @@ export function MobileNav() {
           transition: "transform 0.22s ease",
           pointerEvents: open ? "auto" : "none",
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+          // safe-area-inset-top : header drawer sous l'encoche.
+          paddingTop: "env(safe-area-inset-top)",
+          // safe-area-inset-bottom : carte Premium sous le home indicator.
+          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "env(safe-area-inset-left)",
         }}
       >
         <div

@@ -325,6 +325,8 @@ export default async function DesignMatchCoachV3() {
         style={{
           display: "flex",
           height: "100vh",
+          minHeight: "100dvh",
+          maxHeight: "100dvh",
           overflow: "hidden",
           backgroundColor: C.pageBg,
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",

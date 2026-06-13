@@ -98,10 +98,55 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* iOS Safari : empêche l'élasticité horizontale qui révèle
+       parfois un fond gris derrière la page. */
+    overflow-x: hidden;
+    /* Couper toute marge système qui pourrait s'ajouter en
+       responsive sur certains UAs. */
+    width: 100%;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    /* Empêche tout scroll horizontal accidentel sur mobile —
+       cause typique : une card qui déborde de 1-2 px à cause
+       d'un padding mal calculé ou d'un long mot non cassé. */
+    overflow-x: hidden;
+    /* Largeur garantie 100 % du viewport (avant safe-area). */
+    width: 100%;
+    min-height: 100vh;
+    /* Phase Stabilisation responsive : iOS Safari recalcule le
+       viewport en fonction de la barre d'adresse. 100vh devient
+       trop grand quand la barre est visible. dvh corrige ça
+       (Safari 15.4+, Chrome 108+, support natif). Fallback 100vh
+       pour les browsers anciens. */
+    min-height: 100dvh;
+  }
+  /* iOS empêche le zoom au focus uniquement si la police fait
+     >= 16 px. On force tous les champs interactifs à respecter
+     ce seuil même quand le design demande plus petit visuellement
+     (le visuel peut être contrôlé via line-height + height fixe). */
+  textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"] {
+    font-size: max(16px, 1em);
+  }
+  /* Supprime le flash bleu iOS au tap sur boutons / Links. */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Tous les cliquables tactiles : tap immédiat, pas de
+     délai double-tap. */
+  a,
+  button {
+    touch-action: manipulation;
   }
   ::selection {
     background: hsl(var(--primary) / 0.2);
@@ -180,6 +225,154 @@
   }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
+  }
+  /* Lock body scroll when a drawer / modal is open. Posé en !important
+     pour battre les styles inline éventuels. */
+  .liberia-no-scroll {
+    overflow: hidden !important;
+    /* iOS Safari : empêche le scroll de continuer sous le drawer. */
+    position: fixed !important;
+    width: 100% !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Phase Stabilisation responsive — overrides spécifiques mobile pour le    */
+/*  shell V3 (sidebar + main content + topbar).                              */
+/*                                                                            */
+/*  Les pages V3 utilisent des `style` inline avec `marginLeft: 280` côté    */
+/*  desktop. Sur mobile (< 999 px) chaque page écrase ce margin via son      */
+/*  propre @media. Le block ci-dessous est un FILET de sécurité GLOBAL qui   */
+/*  s'applique à toutes les pages ayant un attribut `data-*-content` ou      */
+/*  `data-*-sidebar` ou `data-v3-content` ou `data-v3-sidebar`, pour le cas  */
+/*  où une page V3 oublierait son @media (ou pour les futures pages).        */
+/*                                                                            */
+/*  Aucune page V3 existante n'est CASSÉE par ce filet — il ne kick in que  */
+/*  sur les écrans étroits, là où les overrides per-page existent déjà.     */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 999px) {
+  /* Tous les containers shell V3 : margin-left forcé à 0 sur mobile. */
+  [data-v3-content],
+  [data-pro-content],
+  [data-coach-content],
+  [data-coachid-content],
+  [data-plan-content],
+  [data-sub-content],
+  [data-par-content],
+  [data-profil-content],
+  [data-opp-content],
+  [data-inv-content],
+  [data-epa-content],
+  [data-rev-content],
+  [data-dep-content],
+  [data-budget-content],
+  [data-obj-content],
+  [data-dash-content] {
+    margin-left: 0 !important;
+  }
+  /* Sidebar V3 cachée sur mobile (le drawer MobileNav prend le relais). */
+  [data-v3-sidebar],
+  [data-pro-sidebar],
+  [data-coach-sidebar],
+  [data-coachid-sidebar],
+  [data-plan-sidebar],
+  [data-sub-sidebar],
+  [data-par-sidebar],
+  [data-profil-sidebar],
+  [data-opp-sidebar],
+  [data-inv-sidebar],
+  [data-epa-sidebar],
+  [data-rev-sidebar],
+  [data-dep-sidebar],
+  [data-budget-sidebar],
+  [data-obj-sidebar],
+  [data-dash-sidebar] {
+    display: none !important;
+  }
+}
+
+/* Sous-768 (mobile portrait) : padding latéral réduit pour gagner de la
+   largeur. Les pages qui ont déjà ce breakpoint ne sont pas affectées
+   (leur règle locale gagne). */
+@media (max-width: 767px) {
+  [data-v3-main],
+  [data-pro-main],
+  [data-coach-main],
+  [data-coachid-main],
+  [data-plan-main],
+  [data-sub-main],
+  [data-par-main],
+  [data-profil-main],
+  [data-opp-main],
+  [data-inv-main],
+  [data-epa-main],
+  [data-rev-main],
+  [data-dep-main],
+  [data-budget-main],
+  [data-obj-main],
+  [data-dash-main] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  /* Topbar V3 : padding réduit < 768 (au-delà du breakpoint 999 px
+     déjà couvert). Le titre h1 peut être un peu plus petit pour
+     éviter le retour à la ligne sur petits écrans. */
+  [data-v3-topbar],
+  [data-pro-topbar],
+  [data-coach-topbar],
+  [data-coachid-topbar],
+  [data-plan-topbar],
+  [data-sub-topbar],
+  [data-par-topbar],
+  [data-profil-topbar],
+  [data-opp-topbar],
+  [data-inv-topbar],
+  [data-epa-topbar],
+  [data-rev-topbar],
+  [data-dep-topbar],
+  [data-budget-topbar],
+  [data-obj-topbar],
+  [data-dash-topbar] {
+    padding-left: 56px !important;
+    padding-right: 12px !important;
+  }
+  /* Topbar h1 : taille réduite sous 768 pour éviter overflow. */
+  [data-v3-topbar] h1,
+  [data-pro-topbar] h1,
+  [data-coach-topbar] h1,
+  [data-coachid-topbar] h1,
+  [data-plan-topbar] h1,
+  [data-sub-topbar] h1,
+  [data-par-topbar] h1,
+  [data-profil-topbar] h1,
+  [data-opp-topbar] h1,
+  [data-inv-topbar] h1,
+  [data-epa-topbar] h1,
+  [data-rev-topbar] h1,
+  [data-dep-topbar] h1,
+  [data-budget-topbar] h1,
+  [data-obj-topbar] h1,
+  [data-dash-topbar] h1 {
+    font-size: 18px !important;
+  }
+  [data-v3-topbar] h1 + p,
+  [data-pro-topbar] h1 + p,
+  [data-coach-topbar] h1 + p,
+  [data-coachid-topbar] h1 + p,
+  [data-plan-topbar] h1 + p,
+  [data-sub-topbar] h1 + p,
+  [data-par-topbar] h1 + p,
+  [data-profil-topbar] h1 + p,
+  [data-opp-topbar] h1 + p,
+  [data-inv-topbar] h1 + p,
+  [data-epa-topbar] h1 + p,
+  [data-rev-topbar] h1 + p,
+  [data-dep-topbar] h1 + p,
+  [data-budget-topbar] h1 + p,
+  [data-obj-topbar] h1 + p,
+  [data-dash-topbar] h1 + p {
+    display: none !important;
   }
 }
 

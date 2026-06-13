@@ -391,9 +391,11 @@ export function CoachConversationV3Client({
             border: "none",
             outline: "none",
             resize: "none",
-            fontSize: 13.5,
+            // iOS Safari : 16 px minimum pour empêcher le zoom au
+            // focus. Le rendu visuel reste compact via line-height.
+            fontSize: 16,
             color: C.textDark,
-            lineHeight: 1.5,
+            lineHeight: 1.4,
             padding: "6px 4px",
             minHeight: 24,
             maxHeight: 160,

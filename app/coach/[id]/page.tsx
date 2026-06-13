@@ -326,7 +326,11 @@ export default async function CoachConversationPage({ params }: PageProps) {
       <div
         style={{
           display: "flex",
+          // dvh : iOS Safari adapte à la hauteur réelle. Fallback
+          // 100vh pour browsers anciens (Safari < 15.4).
           height: "100vh",
+          minHeight: "100dvh",
+          maxHeight: "100dvh",
           overflow: "hidden",
           backgroundColor: C.pageBg,
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",
