@@ -24,7 +24,10 @@ export const ROUTES = {
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
   onboarding: "/onboarding",
-  dashboard: "/dashboard",
+  // Pointer directement sur la cockpit V3 pour éviter le flash
+  // AppShell entre /dashboard stub et /design-match/dashboard-v3
+  // après login / reset password / fin d'onboarding.
+  dashboard: "/design-match/dashboard-v3",
   budget: "/budget",
   incomes: "/incomes",
   expenses: "/expenses",
