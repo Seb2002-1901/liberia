@@ -222,26 +222,31 @@ describe("Phase 5.0 S2 — Greeting", () => {
   });
 });
 
-describe("Phase 5.0 S2 — Stubs Bientôt disponible (3 pages)", () => {
-  it("savings page rend <ComingSoonPage> avec icône PiggyBank", () => {
-    expect(savingsPageSource).toMatch(/<ComingSoonPage/);
-    expect(savingsPageSource).toMatch(/icon=\{PiggyBank\}/);
+describe("Phase 5.0 S2 — Redirects vers cockpits V3 (3 pages)", () => {
+  // Phase Stabilisation : les anciens stubs <ComingSoonPage>
+  // (savings/investments/opportunities) ont été convertis en
+  // simples redirects vers leur équivalent V3, pour éliminer la
+  // dernière surface AppShell visible côté utilisateur final.
+  // On verrouille désormais le fait qu'ils restent des redirects
+  // et qu'aucun chiffre fake n'apparaît dans leur source.
+  it("savings page redirige vers /design-match/epargne-v3", () => {
+    expect(savingsPageSource).toMatch(/redirect\(["']\/design-match\/epargne-v3["']\)/);
+    expect(savingsPageSource).not.toMatch(/<ComingSoonPage/);
   });
 
-  it("investments page rend <ComingSoonPage> avec icône LineChart", () => {
-    expect(investmentsPageSource).toMatch(/<ComingSoonPage/);
-    expect(investmentsPageSource).toMatch(/icon=\{LineChart\}/);
+  it("investments page redirige vers /design-match/investissements-v3", () => {
+    expect(investmentsPageSource).toMatch(/redirect\(["']\/design-match\/investissements-v3["']\)/);
+    expect(investmentsPageSource).not.toMatch(/<ComingSoonPage/);
   });
 
-  it("opportunities page rend <ComingSoonPage> avec icône Compass", () => {
-    expect(opportunitiesPageSource).toMatch(/<ComingSoonPage/);
-    expect(opportunitiesPageSource).toMatch(/icon=\{Compass\}/);
+  it("opportunities page redirige vers /design-match/opportunites-v3", () => {
+    expect(opportunitiesPageSource).toMatch(/redirect\(["']\/design-match\/opportunites-v3["']\)/);
+    expect(opportunitiesPageSource).not.toMatch(/<ComingSoonPage/);
   });
 
   it("aucun stub ne contient de KPI ou de chiffre fake", () => {
-    // Les stubs ne doivent montrer aucun chiffre, montant, ou
-    // pourcentage hardcodé qui pourrait passer pour une vraie
-    // donnée utilisateur (D2 + C3 validés).
+    // Les redirect stubs ne doivent contenir aucun chiffre,
+    // montant, ou pourcentage hardcodé (D2 + C3 validés).
     for (const src of [savingsPageSource, investmentsPageSource, opportunitiesPageSource]) {
       expect(src).not.toMatch(/CHF/);
       expect(src).not.toMatch(/\d+\s*%/);
