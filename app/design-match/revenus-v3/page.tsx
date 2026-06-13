@@ -16,6 +16,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import { normalizeToMonthly } from "@/lib/calculations/finance";
 import { frequencyMultiplier } from "@/lib/calculations/aggregate";
@@ -25,9 +26,10 @@ import { formatUserCurrency } from "@/lib/utils";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Revenus — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("revenus")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -421,7 +423,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -910,7 +912,7 @@ function OpportunitesCard() {
           Aucune opportunité identifiée
         </p>
         <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.45 }}>
-          La détection automatique d&apos;opportunités revenus arrive prochainement. En attendant, demande directement à ton coach.
+          Aucun levier de revenus identifié pour le moment. Demande à ton coach pour explorer des pistes.
         </p>
       </div>
       <Link

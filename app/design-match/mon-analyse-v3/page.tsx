@@ -41,9 +41,10 @@ import type {
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Mon analyse — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("monAnalyse")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -633,7 +634,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -1160,10 +1161,10 @@ function TrajectoireCard() {
           <polyline points="17 6 23 6 23 12" />
         </svg>
         <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Projection bientôt disponible
+          Projection en construction
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
-          Ta trajectoire à 1, 3 et 5 ans nécessite un moteur de projection FHS calibré. Disponible dans une prochaine phase.
+          Ta trajectoire à 1, 3 et 5 ans s&apos;affinera au fil de tes snapshots hebdomadaires.
         </p>
       </div>
     </div>

@@ -24,7 +24,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   getFinanceData,
   totalMonthly,
@@ -68,10 +68,13 @@ import type {
 } from "@/lib/calculations/health/types";
 import type { CategoryBreakdownRow } from "@/lib/calculations/analytics";
 
-export const metadata: Metadata = {
-  title: "Design Match v3 — Dashboard",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return {
+    title: `${t("dashboard")} — LIBERIA`,
+    robots: { index: false, follow: false },
+  };
+}
 
 // Per-request data via Supabase cookies — never prerender.
 export const dynamic = "force-dynamic";
@@ -170,27 +173,17 @@ function expenseCategoryLabel(id: string): string {
   return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
 }
 
-/** Mois courts FR pour les labels d'axe X de l'EvolutionCard.
- *  Mapping basé sur Date.getUTCMonth() (0-11). */
-const MONTHS_FR_SHORT = [
-  "janv.",
-  "févr.",
-  "mars",
-  "avr.",
-  "mai",
-  "juin",
-  "juil.",
-  "août",
-  "sept.",
-  "oct.",
-  "nov.",
-  "déc.",
-] as const;
-
-function formatWeekLabel(weekIso: string): string {
+/** Label "jour mois-court" localisé pour l'axe X de l'EvolutionCard.
+ *  Utilise `Intl.DateTimeFormat` pour respecter le locale courant. */
+function formatWeekLabel(weekIso: string, locale: string): string {
   const d = new Date(weekIso);
   if (Number.isNaN(d.getTime())) return weekIso;
-  return `${d.getUTCDate()} ${MONTHS_FR_SHORT[d.getUTCMonth()]}`;
+  const day = d.getUTCDate();
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    timeZone: "UTC",
+  }).format(d);
+  return `${day} ${month}`;
 }
 
 /* ═══════════════ DEFAULT EXPORT — Server Component ═══════════════ */
@@ -338,6 +331,7 @@ export default async function DesignMatchDashboardV3() {
   // donc next-intl ne peut pas les typer strictement. Pattern identique
   // à components/dashboard/roadmap-timeline.tsx qui fait `t(milestone.eyebrowKey)`.
   /* eslint-disable @typescript-eslint/no-explicit-any */
+  const locale = await getLocale();
   const tRoadmap = (await getTranslations("dashboard.roadmap")) as (
     key: string,
     values?: Record<string, string | number>,
@@ -485,6 +479,7 @@ export default async function DesignMatchDashboardV3() {
               profile={data.profile}
               snapshots={recentSnapshots}
               currentScore={score}
+              locale={locale}
             />
             <div style={{ height: H.gapBC }} />
             <CoachCta />
@@ -698,7 +693,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -1829,6 +1824,7 @@ interface BottomRowProps {
   profile: { currency: string; locale?: string | null; country?: string | null };
   snapshots: SealedSnapshot[];
   currentScore: number | null;
+  locale: string;
 }
 
 function BottomRow(props: BottomRowProps) {
@@ -1848,6 +1844,7 @@ function BottomRow(props: BottomRowProps) {
       <EvolutionCard
         snapshots={props.snapshots}
         currentScore={props.currentScore}
+        locale={props.locale}
       />
     </div>
   );
@@ -2202,9 +2199,11 @@ function RepartitionCard({
 function EvolutionCard({
   snapshots,
   currentScore,
+  locale,
 }: {
   snapshots: SealedSnapshot[];
   currentScore: number | null;
+  locale: string;
 }) {
   // snapshots arrivent triés DESC par week (le plus récent en 0). On
   // les remet en ordre chronologique pour le tracé. Si moins de 2
@@ -2243,9 +2242,16 @@ function EvolutionCard({
           (slot * (sortedChrono.length - 1)) / 4,
         );
         const snap = sortedChrono[Math.min(idx, sortedChrono.length - 1)];
-        return formatWeekLabel(snap.week);
+        return formatWeekLabel(snap.week, locale);
       })
-    : ["1 avr", "15 avr", "1 mai", "15 mai", "1 juin"];
+    : // Pas encore d'historique : 5 jalons sur les 8 dernières semaines,
+      // formatés selon la langue de l'utilisateur. Évite d'afficher des
+      // dates inventées en français à un user non francophone.
+      [0, 1, 2, 3, 4].map((slot) => {
+        const d = new Date();
+        d.setUTCDate(d.getUTCDate() - (4 - slot) * 14);
+        return formatWeekLabel(d.toISOString(), locale);
+      });
 
   // Badge "+N pts (60j)" — delta entre 1er et dernier point réel.
   // Fenêtre 60j ≈ 8-9 snapshots hebdo, mais on utilise toute la

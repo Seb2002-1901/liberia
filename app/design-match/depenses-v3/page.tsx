@@ -16,6 +16,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData } from "@/lib/services/finance";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import { formatUserCurrency } from "@/lib/utils";
@@ -29,9 +30,10 @@ import {
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Dépenses — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("depenses")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -533,7 +535,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header

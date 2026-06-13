@@ -18,6 +18,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import type { Goal } from "@/types/database";
 import { getFinanceData } from "@/lib/services/finance";
 import { GOAL_TYPES } from "@/lib/constants";
@@ -26,9 +27,10 @@ import { formatUserCurrency } from "@/lib/utils";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Objectifs — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("objectifs")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -499,7 +501,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -852,10 +854,10 @@ function GainsFutursCard({ hasGoals }: { hasGoals: boolean }) {
       </p>
       <div style={{ marginTop: 8, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: 6, padding: "8px 4px" }}>
         <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.35 }}>
-          {hasGoals ? "Projection bientôt disponible" : "Aucune projection disponible"}
+          {hasGoals ? "Projection en construction" : "Aucune projection disponible"}
         </p>
         <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.45 }}>
-          La projection patrimoine prendra en compte ton épargne actuelle, tes objectifs et tes flux mensuels une fois le moteur calibré.
+          La projection patrimoine s&apos;affinera avec ton épargne actuelle, tes objectifs et tes flux mensuels au fil de tes snapshots hebdomadaires.
         </p>
       </div>
     </div>
@@ -918,7 +920,7 @@ function JalonsCard({
   return (
     <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Jalons à venir
+        Échéances
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
         Prochaines échéances
@@ -927,7 +929,7 @@ function JalonsCard({
         <p style={{ margin: "10px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.5, flex: 1 }}>
           {hasActive
             ? "Aucune échéance définie sur tes objectifs actifs."
-            : "Définis tes objectifs pour voir tes échéances à venir."}
+            : "Définis tes objectifs pour voir tes prochaines échéances."}
         </p>
       ) : (
         <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 5, flex: 1 }}>

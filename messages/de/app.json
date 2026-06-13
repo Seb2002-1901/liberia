@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Übersicht",
+    "coach": "KI-Coach",
+    "monAnalyse": "Meine Analyse",
+    "plan": "Aktionsplan",
+    "revenus": "Einkünfte",
+    "depenses": "Ausgaben",
+    "budget": "Budget",
+    "objectifs": "Ziele",
+    "epargne": "Sparen",
+    "investissements": "Investitionen",
+    "opportunites": "Chancen",
+    "parametres": "Einstellungen",
+    "profil": "Profil"
+  },
   "savings": {
     "metadata": { "title": "Sparen" },
     "eyebrow": "Wachstum",

@@ -42,9 +42,10 @@ import type { FinancialPlanStep } from "@/types/database";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Plan d'action — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("plan")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -594,7 +595,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -1447,7 +1448,7 @@ function ProjectionCard({ wired }: { wired: PlanWiredProps }) {
   // n'existe encore (pas de modèle Monte Carlo, pas de simulateur calibré).
   // On affiche le score actuel sans inventer une trajectoire 46→78.
   const scoreLabel =
-    wired.scoreDisplay !== null ? `${wired.scoreDisplay} / 100` : "Score à venir";
+    wired.scoreDisplay !== null ? `${wired.scoreDisplay} / 100` : "Score en construction";
   return (
     <div
       style={{

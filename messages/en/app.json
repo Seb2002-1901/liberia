@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Dashboard",
+    "coach": "AI coach",
+    "monAnalyse": "My analysis",
+    "plan": "Action plan",
+    "revenus": "Income",
+    "depenses": "Expenses",
+    "budget": "Budget",
+    "objectifs": "Goals",
+    "epargne": "Savings",
+    "investissements": "Investments",
+    "opportunites": "Opportunities",
+    "parametres": "Settings",
+    "profil": "Profile"
+  },
   "savings": {
     "metadata": { "title": "Savings" },
     "eyebrow": "Growth",

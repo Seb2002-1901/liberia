@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Tableau de bord",
+    "coach": "Coach IA",
+    "monAnalyse": "Mon analyse",
+    "plan": "Plan d'action",
+    "revenus": "Revenus",
+    "depenses": "Dépenses",
+    "budget": "Budget",
+    "objectifs": "Objectifs",
+    "epargne": "Épargne",
+    "investissements": "Investissements",
+    "opportunites": "Opportunités",
+    "parametres": "Paramètres",
+    "profil": "Profil"
+  },
   "savings": {
     "metadata": { "title": "Épargne" },
     "eyebrow": "Croissance",

@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Panel",
+    "coach": "Coach IA",
+    "monAnalyse": "Mi análisis",
+    "plan": "Plan de acción",
+    "revenus": "Ingresos",
+    "depenses": "Gastos",
+    "budget": "Presupuesto",
+    "objectifs": "Objetivos",
+    "epargne": "Ahorro",
+    "investissements": "Inversiones",
+    "opportunites": "Oportunidades",
+    "parametres": "Ajustes",
+    "profil": "Perfil"
+  },
   "savings": {
     "metadata": { "title": "Ahorro" },
     "eyebrow": "Crecimiento",

@@ -19,15 +19,19 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData } from "@/lib/services/finance";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Design Match v3 — Investissements",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return {
+    title: `${t("investissements")} — LIBERIA`,
+    robots: { index: false, follow: false },
+  };
+}
 
 /* ═══════════════ NOTE ARCHITECTURE ═══════════════
  *
@@ -335,7 +339,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -582,7 +586,7 @@ function OpportunitesCard() {
         Opportunités
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Recommandations à venir
+        Aucune opportunité ciblée
       </p>
       <div
         style={{
@@ -620,7 +624,7 @@ function OpportunitesCard() {
           Pas de recommandations
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-          Aucun moteur de recommandation d&apos;investissement n&apos;est encore actif. LIBERIA ne suggère aucun produit financier nommé.
+          LIBERIA ne suggère aucun produit financier nommé. Ton coach peut t&apos;orienter sur les principes selon ta situation.
         </p>
       </div>
     </div>
@@ -789,7 +793,7 @@ function ProjectionCard() {
           Aucune projection fiable
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-          Aucun moteur de simulation patrimoniale (rendement composé, scénarios) n&apos;est calibré. Pas de chiffre 2027/2029/2031 inventé.
+          LIBERIA n&apos;extrapole pas de projection patrimoniale tant qu&apos;aucune donnée fiable n&apos;est disponible.
         </p>
       </div>
     </div>
@@ -830,7 +834,7 @@ function ConseilIACard() {
         </p>
       </div>
       <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Module Investissements à venir.
+        Pas encore de portefeuille suivi.
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
         LIBERIA n&apos;émet aucune recommandation d&apos;investissement aujourd&apos;hui. La priorité reste votre fonds d&apos;urgence et vos objectifs concrets — votre coach peut vous y accompagner.
@@ -897,10 +901,10 @@ function MissionFooter() {
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Module Investissements à venir
+            Renforce d&apos;abord les bases
           </p>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.35 }}>
-            Aucun portefeuille suivi aujourd&apos;hui. Renforcez d&apos;abord votre fonds d&apos;urgence et vos objectifs — le module Investissements sera ouvert ensuite.
+            Aucun portefeuille suivi aujourd&apos;hui. Consolide ton fonds d&apos;urgence et tes objectifs — ton coach peut t&apos;orienter.
           </p>
         </div>
       </div>

@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Pannello",
+    "coach": "Coach IA",
+    "monAnalyse": "La mia analisi",
+    "plan": "Piano d'azione",
+    "revenus": "Entrate",
+    "depenses": "Spese",
+    "budget": "Bilancio",
+    "objectifs": "Obiettivi",
+    "epargne": "Risparmio",
+    "investissements": "Investimenti",
+    "opportunites": "Opportunità",
+    "parametres": "Impostazioni",
+    "profil": "Profilo"
+  },
   "savings": {
     "metadata": { "title": "Risparmio" },
     "eyebrow": "Crescita",

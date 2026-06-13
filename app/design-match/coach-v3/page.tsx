@@ -49,9 +49,10 @@ import type { DrawerData } from "@/lib/calculations/health/types";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Coach IA — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("coach")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -558,7 +559,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const subtitle = "Votre conseiller IA est prêt à répondre à vos questions.";
   return (
     <header
@@ -1250,15 +1251,15 @@ function Composer() {
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <ComposerAction
             iconPath="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
-            label="Joindre un fichier (bientôt)"
+            label="Joindre un fichier"
           />
           <ComposerAction
             iconPath="M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3"
-            label="Analyser mes données (bientôt)"
+            label="Analyser mes données"
           />
           <ComposerAction
             iconPath="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z|M19 10v2a7 7 0 0 1-14 0v-2|M12 19v4|M8 23h8"
-            label="Dicter un message (bientôt)"
+            label="Dicter un message"
           />
         </div>
         <button
@@ -1379,7 +1380,7 @@ function SituationCard({ wired }: { wired: CoachWired }) {
     wired.scoreDisplay !== null ? Math.min(1, Math.max(0, wired.scoreDisplay / 100)) : 0;
   const offset = c * (1 - scoreRatio);
   const scoreText = wired.scoreDisplay !== null ? String(wired.scoreDisplay) : "—";
-  const scoreLabel = wired.scoreDisplay !== null ? `${wired.scoreDisplay} / 100` : "Score à venir";
+  const scoreLabel = wired.scoreDisplay !== null ? `${wired.scoreDisplay} / 100` : "Score en construction";
   const delta = wired.scoreDelta;
   return (
     <div

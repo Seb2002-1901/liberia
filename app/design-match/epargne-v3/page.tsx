@@ -18,6 +18,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import {
   calculateNetCashflow,
@@ -30,10 +31,13 @@ import type { Goal } from "@/types/database";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Design Match v3 — Épargne",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return {
+    title: `${t("epargne")} — LIBERIA`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const C = {
   navy: "#011E5F",
@@ -466,7 +470,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -1117,7 +1121,7 @@ function SimulateurCard({ wired }: { wired: SavingsWired }) {
         Pas de projection 10 ans
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4 }}>
-        Aucun moteur de rendement composé fiable. Voici uniquement les chiffres observés aujourd&apos;hui :
+        LIBERIA n&apos;invente pas de rendement futur. Tes chiffres réels :
       </p>
       <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
         <div style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
@@ -1159,7 +1163,7 @@ function ProduitsCard() {
         Produits recommandés
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Catalogue à venir
+        Sélection personnalisée
       </p>
       <div
         style={{
@@ -1196,7 +1200,7 @@ function ProduitsCard() {
           Aucun produit à recommander
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 260 }}>
-          Le catalogue de produits d&apos;épargne (comptes, 3e pilier, comptes à terme) sera disponible une fois les partenariats intégrés.
+          LIBERIA ne recommande aucun produit d&apos;épargne nommé. Ton coach peut t&apos;orienter sur les principes (comptes, 3e pilier, comptes à terme).
         </p>
       </div>
     </div>

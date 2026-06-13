@@ -47,10 +47,13 @@ import type { DrawerData } from "@/lib/calculations/health/types";
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Design Match v3 — Opportunités",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return {
+    title: `${t("opportunites")} — LIBERIA`,
+    robots: { index: false, follow: false },
+  };
+}
 
 const C = {
   navy: "#011E5F",
@@ -617,7 +620,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -741,7 +744,7 @@ function HeroOpportunites({ wired }: { wired: OppWiredProps }) {
                 {formatMoney(totalMonthlyImpact)} / mois
               </p>
               <p style={{ margin: "1px 0 0 0", fontSize: 9, color: "rgba(255,255,255,0.6)", letterSpacing: "0.04em" }}>
-                Impact mensuel estimé par le moteur
+                Impact mensuel estimé
               </p>
             </>
           ) : totalCount > 0 ? (
@@ -899,7 +902,7 @@ function TopOpportunitesCard({ wired }: { wired: OppWiredProps }) {
             Aucune opportunité détectée
           </p>
           <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-            Le moteur n&apos;a rien trouvé à optimiser ce mois-ci. Complétez vos données pour affiner l&apos;analyse.
+            Rien à optimiser ce mois-ci. Complète tes données pour affiner l&apos;analyse.
           </p>
         </div>
       ) : (
@@ -971,7 +974,7 @@ function GainsFutursCard({ wired }: { wired: OppWiredProps }) {
         Gain annuel
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Estimé par le moteur
+        Estimation prudente
       </p>
       {hasImpact ? (
         <>
@@ -998,7 +1001,7 @@ function GainsFutursCard({ wired }: { wired: OppWiredProps }) {
             </p>
           </div>
           <p style={{ margin: "10px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-            Projection 3 / 5 ans non affichée : aucun moteur de rendement composé fiable n&apos;existe encore.
+            Projection 3 / 5 ans masquée : LIBERIA n&apos;extrapole pas de rendement futur sans donnée fiable.
           </p>
         </>
       ) : (
@@ -1020,7 +1023,7 @@ function GainsFutursCard({ wired }: { wired: OppWiredProps }) {
             Pas de gain chiffré
           </p>
           <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 200 }}>
-            Le moteur n&apos;a identifié aucun gain mensuel à ce stade.
+            Aucun gain mensuel identifié à ce stade.
           </p>
         </div>
       )}
@@ -1162,7 +1165,7 @@ function EvolutionCard() {
           Historique non disponible
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 280 }}>
-          Le moteur d&apos;opportunités recalcule à chaque visite sur votre snapshot courant. Aucune série temporelle n&apos;est encore archivée.
+          Les opportunités sont recalculées à chaque visite sur ton snapshot actuel. L&apos;historique se construira semaine après semaine.
         </p>
       </div>
     </div>
@@ -1288,7 +1291,7 @@ function ConseilIACard({ wired }: { wired: OppWiredProps }) {
             Audit qualitatif uniquement
           </p>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-            Le moteur a détecté {totalCount} signal{totalCount > 1 ? "s" : ""} à étudier, sans gain chiffré pour l&apos;instant.
+            {totalCount} signal{totalCount > 1 ? "s" : ""} identifié{totalCount > 1 ? "s" : ""} à étudier, sans gain chiffré pour l&apos;instant.
           </p>
         </>
       ) : (
@@ -1297,7 +1300,7 @@ function ConseilIACard({ wired }: { wired: OppWiredProps }) {
             Tout est sous contrôle ce mois-ci
           </p>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-            Le moteur n&apos;a rien détecté à optimiser sur vos données actuelles. Continuez comme ça.
+            Rien à optimiser sur tes données actuelles. Continue comme ça.
           </p>
         </>
       )}
@@ -1385,7 +1388,7 @@ function MissionFooter({ wired }: { wired: OppWiredProps }) {
           </p>
           <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.3 }}>
             {totalCount === 0 ? (
-              <>Le moteur n&apos;a rien trouvé à optimiser. Complétez vos données pour affiner l&apos;analyse.</>
+              <>Rien à optimiser pour le moment. Complète tes données pour affiner l&apos;analyse.</>
             ) : highCount > 0 ? (
               <>
                 <span style={{ fontVariantNumeric: "tabular-nums" }}>{highCount}</span>{" "}

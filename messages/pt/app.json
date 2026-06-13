@@ -1,4 +1,19 @@
 {
+  "pageTitles": {
+    "dashboard": "Painel",
+    "coach": "Coach IA",
+    "monAnalyse": "Minha análise",
+    "plan": "Plano de ação",
+    "revenus": "Receitas",
+    "depenses": "Despesas",
+    "budget": "Orçamento",
+    "objectifs": "Objetivos",
+    "epargne": "Poupança",
+    "investissements": "Investimentos",
+    "opportunites": "Oportunidades",
+    "parametres": "Configurações",
+    "profil": "Perfil"
+  },
   "savings": {
     "metadata": { "title": "Poupança" },
     "eyebrow": "Crescimento",

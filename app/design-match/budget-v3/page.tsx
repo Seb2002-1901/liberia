@@ -17,6 +17,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import { formatUserCurrency } from "@/lib/utils";
@@ -29,9 +30,10 @@ import {
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Budget — LIBERIA",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app.pageTitles");
+  return { title: `${t("budget")} — LIBERIA` };
+}
 
 const C = {
   navy: "#011E5F",
@@ -526,7 +528,7 @@ function Topbar({
   firstName: string | null;
   fullName: string | null;
 }) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
   return (
     <header
@@ -1055,7 +1057,7 @@ function EvolutionBudgetCard() {
           Historique non disponible
         </p>
         <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
-          L&apos;évolution mois après mois de tes dépenses réelles vs ton budget prévu arrive bientôt.
+          L&apos;évolution mois après mois de tes dépenses réelles vs ton budget prévu s&apos;affichera dès le deuxième cycle complet.
         </p>
       </div>
     </div>
@@ -1483,7 +1485,7 @@ function ConseilIACard({
   const headline = !hasBudgets
     ? "Configure ton premier budget"
     : healthScore === null
-      ? "Conseil personnalisé bientôt disponible"
+      ? "Conseil personnalisé en cours d'analyse"
       : overrunCount > 0
         ? `${overrunCount} dépassement${overrunCount > 1 ? "s" : ""} ce mois`
         : healthScore >= 75
