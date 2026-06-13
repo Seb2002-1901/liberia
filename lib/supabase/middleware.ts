@@ -19,6 +19,7 @@ const PROTECTED_PREFIXES = [
   "/profile",
   "/settings",
   "/onboarding",
+  "/design-match",
 ];
 
 export async function updateSession(request: NextRequest) {

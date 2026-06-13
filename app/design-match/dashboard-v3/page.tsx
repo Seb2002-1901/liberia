@@ -1257,7 +1257,8 @@ function Roadmap({ milestones }: { milestones: ResolvedMilestone[] }) {
             Projection sur 3 ans, mise à jour chaque mois
           </p>
         </div>
-        <button
+        <Link
+          href="/plan"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -1265,18 +1266,15 @@ function Roadmap({ milestones }: { milestones: ResolvedMilestone[] }) {
             fontSize: 12.5,
             fontWeight: 500,
             color: C.primary,
-            background: "none",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
+            textDecoration: "none",
           }}
         >
-          Voir toutes les projections
+          Voir ma feuille de route
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12" />
             <polyline points="12 5 19 12 12 19" />
           </svg>
-        </button>
+        </Link>
       </div>
       {/* Grille stricte : 4 colonnes 25% chacune, milestones centrés
           horizontalement dans leur colonne. Connecteurs en overlay
