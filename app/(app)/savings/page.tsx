@@ -1,31 +1,12 @@
-import type { Metadata } from "next";
-import { PiggyBank } from "lucide-react";
-import { getTranslations } from "next-intl/server";
-import { ComingSoonPage } from "@/components/layout/coming-soon-page";
-
 /**
- * Phase 5.0 S2 — stub Épargne. Livraison du contenu réel : S4.
+ * /savings → redirige vers /design-match/epargne-v3.
  *
- * Pas de données fake. Le stub garantit que le clic sur l'item
- * sidebar "Épargne" amène sur une page propre et cohérente avec
- * le reste du produit (D3 validé).
+ * Pattern Dashboard (validé) : la VRAIE page V3 vit dans
+ * /design-match/epargne-v3/page.tsx avec sa Sidebar et sa Topbar
+ * premium inline. La route prod /savings est un simple alias.
  */
+import { redirect } from "next/navigation";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("app.savings.metadata");
-  return { title: t("title") };
-}
-
-export default async function SavingsPage() {
-  const t = await getTranslations("app.savings");
-  return (
-    <ComingSoonPage
-      icon={PiggyBank}
-      eyebrow={t("eyebrow")}
-      title={t("title")}
-      description={t("description")}
-      teaser={t("teaser")}
-      coachCta={t("coachCta")}
-    />
-  );
+export default function SavingsIndexRedirect(): never {
+  redirect("/design-match/epargne-v3");
 }
