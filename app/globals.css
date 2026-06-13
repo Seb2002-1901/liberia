@@ -252,7 +252,13 @@
 /* -------------------------------------------------------------------------- */
 
 @media (max-width: 999px) {
-  /* Tous les containers shell V3 : margin-left forcé à 0 sur mobile. */
+  /* Tous les containers shell V3 : margin-left forcé à 0 sur mobile.
+     CRITIQUE : on ajoute min-width:0 + max-width:100vw pour empêcher
+     l'élément flex:1 de grossir au-delà du viewport quand un enfant
+     a un min-content > viewport. Sans ces deux contraintes, un grid
+     `repeat(4, 1fr)` interne avec 4 cards ≈ 100 px min force le
+     parent flex à 400+ px → débord horizontal masqué par overflow-
+     x:hidden mais le contenu reste tronqué visuellement. */
   [data-v3-content],
   [data-pro-content],
   [data-coach-content],
@@ -270,6 +276,33 @@
   [data-obj-content],
   [data-dash-content] {
     margin-left: 0 !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+  /* Idem pour les <main data-*-main> qui sont des flex items
+     enfants. Sans min-width:0 le main ne peut pas rétrécir et garde
+     son min-content. */
+  [data-v3-main],
+  [data-pro-main],
+  [data-coach-main],
+  [data-coachid-main],
+  [data-plan-main],
+  [data-sub-main],
+  [data-par-main],
+  [data-profil-main],
+  [data-opp-main],
+  [data-inv-main],
+  [data-epa-main],
+  [data-rev-main],
+  [data-dep-main],
+  [data-budget-main],
+  [data-obj-main],
+  [data-dash-main] {
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   /* Sidebar V3 cachée sur mobile (le drawer MobileNav prend le relais). */
   [data-v3-sidebar],
@@ -350,12 +383,35 @@
   [data-coach-main] > aside {
     display: none !important;
   }
-  /* Flex avec gap large → wrap sur mobile (KPI rows, hero rows, etc.) */
-  [data-dash-main] [style*="display: flex"][style*="gap: 22"],
-  [data-dash-main] [style*="display: flex"][style*="gap: 16"],
-  [data-plan-main] [style*="display: flex"][style*="gap: 26"],
-  [data-plan-main] [style*="display: flex"][style*="gap: 20"] {
+  /* Flex containers à gap : wrap + shrink autorisé sur mobile pour
+     éviter overflow (PlanHeaderCard, HeroRows, KPI rows). On cible
+     TOUS les flex avec un attribut style contenant "display: flex"
+     et "gap:" pour les pages V3 cockpit complexes. Les micro-flex
+     (boutons icon+texte avec gap:4/5/6) restent OK car ils tiennent
+     dans leur viewport mobile.
+     Critique : flex-shrink: 1 !important pour battre les
+     `flexShrink: 0` inline (ex: plan-v3 HeaderMetric container)
+     qui bloquent toute réduction. */
+  [data-dash-main] [style*="display: flex"][style*="gap:"],
+  [data-plan-main] [style*="display: flex"][style*="gap:"],
+  [data-coach-main] [style*="display: flex"][style*="gap:"],
+  [data-coachid-main] [style*="display: flex"][style*="gap:"] {
     flex-wrap: wrap !important;
+    flex-shrink: 1 !important;
+  }
+  /* flex-shrink: 0 inline → écrasé à 1 sur tous les flex-items
+     des pages V3 cockpit complexes pour permettre l'adaptation
+     mobile. React rend les styles inline sans espace après :,
+     donc on match les deux formes. */
+  [data-dash-main] [style*="flex-shrink:0"],
+  [data-dash-main] [style*="flex-shrink: 0"],
+  [data-plan-main] [style*="flex-shrink:0"],
+  [data-plan-main] [style*="flex-shrink: 0"],
+  [data-coach-main] [style*="flex-shrink:0"],
+  [data-coach-main] [style*="flex-shrink: 0"],
+  [data-coachid-main] [style*="flex-shrink:0"],
+  [data-coachid-main] [style*="flex-shrink: 0"] {
+    flex-shrink: 1 !important;
   }
   /* SVG charts : ne peuvent jamais dépasser 100 % du parent */
   [data-dash-main] svg,
@@ -400,6 +456,13 @@
   [data-pro-main] {
     word-wrap: break-word;
     overflow-wrap: break-word;
+  }
+  /* Cas particulier plan-v3 MissionCard : les spans "X CHF / Y CHF"
+     et "Z %" ont white-space:nowrap inline pour éviter le wrap sur
+     desktop. Sur mobile on relâche cette contrainte. */
+  [data-plan-main] [style*="white-space:nowrap"],
+  [data-plan-main] [style*="white-space: nowrap"] {
+    white-space: normal !important;
   }
 }
 
