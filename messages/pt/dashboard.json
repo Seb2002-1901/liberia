@@ -76,7 +76,9 @@
     },
     "steps": {
       "no_goal": {
-        "today": { "subtitle": "Põe bases sólidas" },
+        "today": {
+          "subtitle": "Põe bases sólidas"
+        },
         "fourMonths": {
           "title": "Primeiro objetivo definido",
           "subtitle": "Sabes para onde vais"
@@ -87,7 +89,9 @@
         }
       },
       "low_resilience": {
-        "today": { "subtitle": "Põe bases sólidas" },
+        "today": {
+          "subtitle": "Põe bases sólidas"
+        },
         "fourMonths": {
           "title": "Fundo de emergência completo",
           "subtitle": "3 meses de despesas cobertos"
@@ -98,7 +102,9 @@
         }
       },
       "incomplete_expenses": {
-        "today": { "subtitle": "Põe bases sólidas" },
+        "today": {
+          "subtitle": "Põe bases sólidas"
+        },
         "fourMonths": {
           "title": "Perfil completo",
           "subtitle": "A tua situação é clara e fiável"
@@ -109,7 +115,9 @@
         }
       },
       "fhs_recommendation": {
-        "today": { "subtitle": "Põe bases sólidas" },
+        "today": {
+          "subtitle": "Põe bases sólidas"
+        },
         "fourMonths": {
           "title": "Ação iniciada",
           "subtitle": "O teu ponto fraco está a ser tratado"
@@ -120,7 +128,9 @@
         }
       },
       "none": {
-        "today": { "subtitle": "As tuas bases estão prontas" },
+        "today": {
+          "subtitle": "As tuas bases estão prontas"
+        },
         "fourMonths": {
           "title": "Otimização contínua",
           "subtitle": "Afinas com calma"
@@ -998,5 +1008,8 @@
       "rental": "Rendas",
       "other": "Outro"
     }
+  },
+  "topbar": {
+    "subtitle": "Aqui está a tua situação, atualizada hoje."
   }
 }

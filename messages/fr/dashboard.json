@@ -76,7 +76,9 @@
     },
     "steps": {
       "no_goal": {
-        "today": { "subtitle": "Posez les bases solides" },
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
         "fourMonths": {
           "title": "Premier objectif fixé",
           "subtitle": "Vous savez où vous allez"
@@ -87,7 +89,9 @@
         }
       },
       "low_resilience": {
-        "today": { "subtitle": "Posez les bases solides" },
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
         "fourMonths": {
           "title": "Fonds d'urgence complet",
           "subtitle": "3 mois de dépenses couvertes"
@@ -98,7 +102,9 @@
         }
       },
       "incomplete_expenses": {
-        "today": { "subtitle": "Posez les bases solides" },
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
         "fourMonths": {
           "title": "Profil complet",
           "subtitle": "Votre situation est claire et fiable"
@@ -109,7 +115,9 @@
         }
       },
       "fhs_recommendation": {
-        "today": { "subtitle": "Posez les bases solides" },
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
         "fourMonths": {
           "title": "Action engagée",
           "subtitle": "Votre point faible est traité"
@@ -120,7 +128,9 @@
         }
       },
       "none": {
-        "today": { "subtitle": "Vos fondations sont en place" },
+        "today": {
+          "subtitle": "Vos fondations sont en place"
+        },
         "fourMonths": {
           "title": "Optimisation continue",
           "subtitle": "Vous affinez sereinement"
@@ -998,5 +1008,8 @@
       "rental": "Revenus locatifs",
       "other": "Autre"
     }
+  },
+  "topbar": {
+    "subtitle": "Voici votre situation mise à jour aujourd'hui."
   }
 }

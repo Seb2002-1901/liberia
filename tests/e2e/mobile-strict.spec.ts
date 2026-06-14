@@ -25,7 +25,7 @@ const ROUTES = [
   { name: "objectifs-v3", path: "/design-match/objectifs-v3" },
   { name: "epargne-v3", path: "/design-match/epargne-v3" },
   { name: "opportunites-v3", path: "/design-match/opportunites-v3" },
-  { name: "investissements-v3", path: "/design-match/investissements-v3" },
+  // investissements-v3 retiré (module masqué Sprint S1, redirect épargne)
   { name: "profil-v3", path: "/design-match/profil-v3" },
   { name: "parametres-v3", path: "/design-match/parametres-v3" },
   { name: "subscription", path: "/settings/subscription" },

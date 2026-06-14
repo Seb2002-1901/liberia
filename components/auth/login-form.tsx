@@ -11,6 +11,7 @@ import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
 import { safeRedirectPath } from "@/lib/utils/redirect";
+import { localizeAuthError } from "@/lib/auth/error-messages";
 
 /**
  * Refonte V3 — Phase Auth-V3.
@@ -74,7 +75,9 @@ export function LoginForm() {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword(values);
       if (error) {
-        toast.error(tForm("failedTitle"), { description: error.message });
+        toast.error(tForm("failedTitle"), {
+          description: localizeAuthError(error.message, tErr),
+        });
         return;
       }
       toast.success(tForm("successWelcome"));

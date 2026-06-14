@@ -76,7 +76,9 @@
     },
     "steps": {
       "no_goal": {
-        "today": { "subtitle": "Lay solid foundations" },
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
         "fourMonths": {
           "title": "First goal set",
           "subtitle": "You know where you're heading"
@@ -87,7 +89,9 @@
         }
       },
       "low_resilience": {
-        "today": { "subtitle": "Lay solid foundations" },
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
         "fourMonths": {
           "title": "Emergency fund complete",
           "subtitle": "3 months of expenses covered"
@@ -98,7 +102,9 @@
         }
       },
       "incomplete_expenses": {
-        "today": { "subtitle": "Lay solid foundations" },
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
         "fourMonths": {
           "title": "Complete profile",
           "subtitle": "Your situation is clear and reliable"
@@ -109,7 +115,9 @@
         }
       },
       "fhs_recommendation": {
-        "today": { "subtitle": "Lay solid foundations" },
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
         "fourMonths": {
           "title": "Action engaged",
           "subtitle": "Your weak point is being addressed"
@@ -120,7 +128,9 @@
         }
       },
       "none": {
-        "today": { "subtitle": "Your foundations are in place" },
+        "today": {
+          "subtitle": "Your foundations are in place"
+        },
         "fourMonths": {
           "title": "Continuous optimisation",
           "subtitle": "You're refining calmly"
@@ -998,5 +1008,8 @@
       "rental": "Rental income",
       "other": "Other"
     }
+  },
+  "topbar": {
+    "subtitle": "Here's your situation, updated today."
   }
 }

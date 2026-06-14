@@ -13,6 +13,7 @@ import {
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
 import { V3Field, V3Input, V3PrimaryButton } from "./login-form";
+import { localizeAuthError } from "@/lib/auth/error-messages";
 
 /**
  * Refonte V3 — Phase Auth-V3.
@@ -67,7 +68,9 @@ export function ForgotPasswordForm() {
         )}`,
       });
       if (error) {
-        toast.error(tForm("failedTitle"), { description: error.message });
+        toast.error(tForm("failedTitle"), {
+          description: localizeAuthError(error.message, tErr),
+        });
         return;
       }
       setSent(true);

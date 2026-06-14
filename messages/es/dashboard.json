@@ -76,7 +76,9 @@
     },
     "steps": {
       "no_goal": {
-        "today": { "subtitle": "Pon bases sólidas" },
+        "today": {
+          "subtitle": "Pon bases sólidas"
+        },
         "fourMonths": {
           "title": "Primera meta fijada",
           "subtitle": "Sabes hacia dónde vas"
@@ -87,7 +89,9 @@
         }
       },
       "low_resilience": {
-        "today": { "subtitle": "Pon bases sólidas" },
+        "today": {
+          "subtitle": "Pon bases sólidas"
+        },
         "fourMonths": {
           "title": "Fondo de emergencia completo",
           "subtitle": "3 meses de gastos cubiertos"
@@ -98,7 +102,9 @@
         }
       },
       "incomplete_expenses": {
-        "today": { "subtitle": "Pon bases sólidas" },
+        "today": {
+          "subtitle": "Pon bases sólidas"
+        },
         "fourMonths": {
           "title": "Perfil completo",
           "subtitle": "Tu situación es clara y fiable"
@@ -109,7 +115,9 @@
         }
       },
       "fhs_recommendation": {
-        "today": { "subtitle": "Pon bases sólidas" },
+        "today": {
+          "subtitle": "Pon bases sólidas"
+        },
         "fourMonths": {
           "title": "Acción iniciada",
           "subtitle": "Tu punto débil está siendo abordado"
@@ -120,7 +128,9 @@
         }
       },
       "none": {
-        "today": { "subtitle": "Tus bases están listas" },
+        "today": {
+          "subtitle": "Tus bases están listas"
+        },
         "fourMonths": {
           "title": "Optimización continua",
           "subtitle": "Afinas con calma"
@@ -998,5 +1008,8 @@
       "rental": "Ingresos por alquiler",
       "other": "Otro"
     }
+  },
+  "topbar": {
+    "subtitle": "Aquí está tu situación, actualizada hoy."
   }
 }

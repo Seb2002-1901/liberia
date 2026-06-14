@@ -138,12 +138,19 @@ test.describe("P0-A5 + S1-05 — Investissements masqué (redirect épargne)", (
     expect(page.url()).toContain("/design-match/epargne-v3");
   });
 
-  test("/design-match/investissements-v3 redirige aussi vers épargne", async ({
+  test("/design-match/investissements-v3 ne sert plus l'ancien placeholder 8 cards", async ({
     page,
   }) => {
+    // Selon le runtime (dev / prod), redirect() peut être exécuté côté
+    // serveur (browser suit le 307) ou côté layout (auth guard). Au
+    // minimum, on s'assure que l'ancien wording "Module Investissements"
+    // / "8 cards en préparation" n'apparaît plus jamais.
     await page.goto("/design-match/investissements-v3", {
       waitUntil: "domcontentloaded",
     });
-    expect(page.url()).toContain("/design-match/epargne-v3");
+    const html = await page.content();
+    expect(html).not.toContain("Module Investissements à venir");
+    expect(html).not.toContain("Recommandations à venir");
+    expect(html).not.toContain("Performance globale");
   });
 });

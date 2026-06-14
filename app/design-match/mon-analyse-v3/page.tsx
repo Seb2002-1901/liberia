@@ -22,7 +22,9 @@ import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { getFinanceData } from "@/lib/services/finance";
+import { getFinanceData, totalMonthly } from "@/lib/services/finance";
+import { calculateNetCashflow } from "@/lib/calculations/finance";
+import { formatUserCurrency } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import {
   gatherExtraSignals,
@@ -151,6 +153,16 @@ export default async function DesignMatchMonAnalyseV3() {
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
   const initials = initialsFrom(fullName);
+
+  // Agrégats finance pour la TrajectoireCard (projection 12m honnête)
+  const monthlyIncome =
+    totalMonthly(data.incomes) || data.financialProfile?.monthly_income || 0;
+  const fixedExpenses =
+    data.expenseBuckets.fixed || data.financialProfile?.monthly_expenses || 0;
+  const variableExpenses = data.expenseBuckets.variable;
+  const monthlyExpenses = fixedExpenses + variableExpenses;
+  const cashflow = calculateNetCashflow({ monthlyIncome, monthlyExpenses });
+  const currentSavings = data.financialProfile?.current_savings ?? 0;
 
   /* ------------------------------------------------------------------ */
   /*  FHS drawer + snapshots                                            */
@@ -425,7 +437,11 @@ export default async function DesignMatchMonAnalyseV3() {
                 latestScore={score}
                 delta={progressionDelta}
               />
-              <TrajectoireCard />
+              <TrajectoireCard
+                cashflowMonthly={cashflow}
+                currentSavings={currentSavings}
+                profile={data.profile}
+              />
               <ConseilIACard
                 recommendation={recommendationCopy}
                 hasScore={score !== null}
@@ -1100,44 +1116,154 @@ function ProgressionCard({
   );
 }
 
-function TrajectoireCard() {
-  // Aucun moteur de projection FHS n'existe aujourd'hui : la
-  // projection à 3 ans demanderait au minimum un modèle d'évolution
-  // par axe (discipline / résilience / trajectoire / etc.) calibré
-  // produit. Tant que ce moteur n'est pas validé, on n'invente PAS
-  // de score futur. Empty state premium.
+function TrajectoireCard({
+  cashflowMonthly,
+  currentSavings,
+  profile,
+}: {
+  cashflowMonthly: number;
+  currentSavings: number;
+  profile: Parameters<typeof formatUserCurrency>[1];
+}) {
+  // Sprint Audit Final — projection trajectoire linéaire honnête :
+  // épargne future = épargne actuelle + cashflow × N mois. Aucune
+  // hypothèse de rendement, aucun coup de pouce inventé. Si pas de
+  // donnée fiable (cashflow nul), empty state premium au lieu de
+  // tracer une ligne plate trompeuse.
+  const hasSignal = cashflowMonthly !== 0 || currentSavings > 0;
+  if (!hasSignal) {
+    return (
+      <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
+        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Trajectoire financière
+        </p>
+        <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+          Votre évolution projetée
+        </p>
+        <div
+          style={{
+            marginTop: 10,
+            flex: 1,
+            minHeight: 110,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 8px",
+            textAlign: "center",
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            <polyline points="17 6 23 6 23 12" />
+          </svg>
+          <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+            Projection en construction
+          </p>
+          <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
+            Ajoute tes revenus et tes dépenses pour voir ta trajectoire d&apos;épargne sur 12 mois.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 13 points : aujourd'hui + 12 prochains mois.
+  const points = Array.from({ length: 13 }, (_, i) =>
+    currentSavings + cashflowMonthly * i,
+  );
+  const minV = Math.min(...points);
+  const maxV = Math.max(...points);
+  const range = Math.max(maxV - minV, 1);
+  const W = 240;
+  const HH = 90;
+  const PAD = { top: 12, right: 12, bottom: 18, left: 12 };
+  const innerW = W - PAD.left - PAD.right;
+  const innerH = HH - PAD.top - PAD.bottom;
+  const scaled = points.map((v, i) => ({
+    x: PAD.left + (i / (points.length - 1)) * innerW,
+    y: PAD.top + innerH - ((v - minV) / range) * innerH,
+    v,
+  }));
+  const pathD = scaled
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+    .join(" ");
+  const last = scaled[scaled.length - 1];
+  const last3m = points[3];
+  const last6m = points[6];
+  const last12m = points[12];
+  const isPositive = cashflowMonthly >= 0;
+  const lineColor = isPositive ? C.success : C.coral;
+
   return (
     <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
       <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
         Trajectoire financière
       </p>
       <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Votre évolution projetée
+        Épargne projetée à 12 mois
       </p>
-      <div
+      <div style={{ marginTop: 8 }}>
+        <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height={HH} preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
+          <defs>
+            <linearGradient id="traj-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={lineColor} stopOpacity="0.2" />
+              <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path
+            d={`${pathD} L ${last.x.toFixed(2)} ${(PAD.top + innerH).toFixed(2)} L ${scaled[0].x.toFixed(2)} ${(PAD.top + innerH).toFixed(2)} Z`}
+            fill="url(#traj-grad)"
+          />
+          <path d={pathD} stroke={lineColor} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          <circle cx={last.x} cy={last.y} r={3} fill="white" stroke={lineColor} strokeWidth={2} />
+        </svg>
+      </div>
+      <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+        <TrajCol label="+3 mois" value={formatUserCurrency(last3m, profile)} />
+        <TrajCol label="+6 mois" value={formatUserCurrency(last6m, profile)} />
+        <TrajCol label="+12 mois" value={formatUserCurrency(last12m, profile)} highlight />
+      </div>
+      <p style={{ margin: "8px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.4 }}>
+        Extrapolation linéaire de ton cashflow actuel ({formatUserCurrency(cashflowMonthly, profile)}/mois). Sans hypothèse de rendement.
+      </p>
+    </div>
+  );
+}
+
+function TrajCol({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        padding: "5px 7px",
+        backgroundColor: highlight ? C.primaryBg : C.pageBg,
+        borderRadius: 7,
+        textAlign: "center",
+      }}
+    >
+      <p style={{ margin: 0, fontSize: 8.5, color: C.textMuted, letterSpacing: "0.04em", fontWeight: 600 }}>
+        {label}
+      </p>
+      <p
         style={{
-          marginTop: 10,
-          flex: 1,
-          minHeight: 110,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 8px",
-          textAlign: "center",
+          margin: "1px 0 0 0",
+          fontSize: 10.5,
+          fontWeight: 700,
+          color: highlight ? C.primary : C.textDark,
+          fontFamily: "Outfit, Inter, system-ui",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.textLight} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-        <p style={{ margin: "8px 0 0 0", fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Projection en construction
-        </p>
-        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 240 }}>
-          Ta trajectoire à 1, 3 et 5 ans s&apos;affinera au fil de tes snapshots hebdomadaires.
-        </p>
-      </div>
+        {value}
+      </p>
     </div>
   );
 }

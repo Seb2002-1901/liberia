@@ -69,6 +69,11 @@ export default async function AdminPage() {
         color: C.textDark,
       }}
     >
+      <style>{`
+        @media (max-width: 640px) {
+          [data-admin-grid] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+      `}</style>
       <div
         style={{
           maxWidth: 980,
@@ -325,6 +330,7 @@ function Section({
         {title}
       </h2>
       <div
+        data-admin-grid
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, minmax(0, 1fr))",

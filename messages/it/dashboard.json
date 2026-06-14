@@ -76,7 +76,9 @@
     },
     "steps": {
       "no_goal": {
-        "today": { "subtitle": "Poni basi solide" },
+        "today": {
+          "subtitle": "Poni basi solide"
+        },
         "fourMonths": {
           "title": "Primo obiettivo fissato",
           "subtitle": "Sai dove stai andando"
@@ -87,7 +89,9 @@
         }
       },
       "low_resilience": {
-        "today": { "subtitle": "Poni basi solide" },
+        "today": {
+          "subtitle": "Poni basi solide"
+        },
         "fourMonths": {
           "title": "Fondo di emergenza completo",
           "subtitle": "3 mesi di spese coperti"
@@ -98,7 +102,9 @@
         }
       },
       "incomplete_expenses": {
-        "today": { "subtitle": "Poni basi solide" },
+        "today": {
+          "subtitle": "Poni basi solide"
+        },
         "fourMonths": {
           "title": "Profilo completo",
           "subtitle": "La tua situazione è chiara e affidabile"
@@ -109,7 +115,9 @@
         }
       },
       "fhs_recommendation": {
-        "today": { "subtitle": "Poni basi solide" },
+        "today": {
+          "subtitle": "Poni basi solide"
+        },
         "fourMonths": {
           "title": "Azione avviata",
           "subtitle": "Il tuo punto debole è in lavorazione"
@@ -120,7 +128,9 @@
         }
       },
       "none": {
-        "today": { "subtitle": "Le tue basi sono pronte" },
+        "today": {
+          "subtitle": "Le tue basi sono pronte"
+        },
         "fourMonths": {
           "title": "Ottimizzazione continua",
           "subtitle": "Affini con calma"
@@ -998,5 +1008,8 @@
       "rental": "Reddito da affitti",
       "other": "Altro"
     }
+  },
+  "topbar": {
+    "subtitle": "Ecco la tua situazione, aggiornata oggi."
   }
 }

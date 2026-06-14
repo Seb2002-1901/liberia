@@ -332,6 +332,7 @@ export default async function DesignMatchDashboardV3() {
   // à components/dashboard/roadmap-timeline.tsx qui fait `t(milestone.eyebrowKey)`.
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const locale = await getLocale();
+  const tTopbar = await getTranslations("dashboard.topbar");
   const tRoadmap = (await getTranslations("dashboard.roadmap")) as (
     key: string,
     values?: Record<string, string | number>,
@@ -439,7 +440,7 @@ export default async function DesignMatchDashboardV3() {
           flexDirection: "column",
         }}
       >
-        <Topbar firstName={firstName} fullName={data.profile.full_name ?? null} />
+        <Topbar firstName={firstName} fullName={data.profile.full_name ?? null} subtitle={tTopbar("subtitle")} />
         <main data-dash-main style={{ flex: 1, padding: "0 42px 16px 42px" }}>
           <div style={{ maxWidth: 1176, margin: "0 auto" }}>
             <Hero
@@ -688,9 +689,11 @@ function NavItem({
 function Topbar({
   firstName,
   fullName,
+  subtitle,
 }: {
   firstName: string | null;
   fullName: string | null;
+  subtitle: string;
 }) {
   const displayName = firstName ?? "";
   return (
@@ -710,7 +713,7 @@ function Topbar({
           Bonjour {displayName} <span style={{ fontWeight: 400 }}>👋</span>
         </h1>
         <p style={{ marginTop: 4, fontSize: 13, color: C.textMuted, margin: "4px 0 0 0" }}>
-          Voici votre situation mise à jour aujourd&apos;hui.
+          {subtitle}
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
