@@ -1633,61 +1633,35 @@ function ActionsSemaineCard({ wired }: { wired: PlanWiredProps }) {
           </Link>
         </>
       ) : (
-        <div
-          style={{
-            marginTop: 10,
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
-            padding: "10px 6px",
-            backgroundColor: C.pageBg,
-            borderRadius: 12,
-          }}
-        >
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              backgroundColor: C.primaryBg,
-              marginBottom: 6,
-            }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 11 12 14 22 4" />
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-            </svg>
-          </span>
-          <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-            Aucune action planifiée
-          </p>
-          <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-            Générez un plan personnalisé pour voir vos prochaines actions.
-          </p>
-          <Link
+        // Sprint S1 — état "aucune action planifiée" enrichi : on sert
+        // la priorité du moment (issue de buildFirstMission, même moteur
+        // que le dashboard) comme étape #1 actionnable et on cite 2
+        // actions canoniques de démarrage. Plus de "Aucune action" sec.
+        <div style={{ marginTop: 10, flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+          <PlannerSeedAction
+            rank={1}
+            tone="primary"
+            title={wired.priorityTitle ?? "Identifier ta priorité du moment"}
+            detail="Démarre par cette priorité — ton coach peut détailler les sous-étapes."
             href="/coach"
-            style={{
-              marginTop: 8,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: C.primary,
-              textDecoration: "none",
-            }}
-          >
-            En parler au coach
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </Link>
+            cta="Détailler avec le coach"
+          />
+          <PlannerSeedAction
+            rank={2}
+            tone="neutral"
+            title="Consolider un fonds d'urgence de 3 mois"
+            detail="C'est l'action #1 de toute trajectoire financière saine."
+            href="/design-match/epargne-v3"
+            cta="Voir mon épargne"
+          />
+          <PlannerSeedAction
+            rank={3}
+            tone="neutral"
+            title="Définir un objectif chiffré sur 90 jours"
+            detail="Un objectif clair vaut dix bonnes intentions."
+            href="/design-match/objectifs-v3"
+            cta="Mes objectifs"
+          />
         </div>
       )}
     </div>
@@ -1913,7 +1887,7 @@ function ProgressionGlobaleCard({ wired }: { wired: PlanWiredProps }) {
   const stateLabel = wired.hasActivePlan ? "Plan en cours" : "Aucun plan actif";
   const subLabel = wired.hasActivePlan
     ? `${wired.completedSteps} étape${wired.completedSteps > 1 ? "s" : ""} sur ${wired.totalSteps} complétée${wired.completedSteps > 1 ? "s" : ""}`
-    : "Générez un plan personnalisé pour suivre votre progression.";
+    : "3 actions de démarrage proposées. Génère ton plan personnalisé avec le coach.";
   return (
     <div
       style={{
@@ -2236,6 +2210,85 @@ function ActionsRapidesRailCard() {
             </svg>
           </Link>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════ S1-04 — Seed actions when no plan ═══════════════ */
+
+function PlannerSeedAction({
+  rank,
+  tone,
+  title,
+  detail,
+  href,
+  cta,
+}: {
+  rank: number;
+  tone: "primary" | "neutral";
+  title: string;
+  detail: string;
+  href: string;
+  cta: string;
+}) {
+  const accentBg = tone === "primary" ? C.primary : C.borderGhost;
+  const accentColor = tone === "primary" ? "white" : C.textDark;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10,
+        padding: "8px 10px",
+        borderRadius: 10,
+        backgroundColor: C.pageBg,
+      }}
+    >
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 22,
+          height: 22,
+          borderRadius: 999,
+          backgroundColor: accentBg,
+          color: accentColor,
+          fontSize: 11,
+          fontWeight: 700,
+          fontFamily: "Outfit, Inter, system-ui",
+          flexShrink: 0,
+          marginTop: 2,
+        }}
+      >
+        {rank}
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
+          {title}
+        </p>
+        <p style={{ margin: "3px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4 }}>
+          {detail}
+        </p>
+        <Link
+          href={href}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            marginTop: 6,
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: C.primary,
+            textDecoration: "none",
+          }}
+        >
+          {cta}
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </Link>
       </div>
     </div>
   );

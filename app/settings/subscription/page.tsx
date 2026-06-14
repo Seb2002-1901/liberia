@@ -34,8 +34,6 @@ import {
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CheckoutFeedback } from "@/components/billing/checkout-feedback";
 import { PortalButton } from "@/components/billing/portal-button";
 import { PricingPlans } from "@/components/billing/pricing-plans";
@@ -153,176 +151,124 @@ export default async function SubscriptionPage() {
                 description={t("header.description")}
               />
 
-              {/* Billing state banner */}
+              {/* Billing state banner — Sprint S1 refonte V3 navy */}
               {billing.kind === "trial" && (
-                <Card>
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 py-5">
-                    <div className="flex items-start gap-3">
-                      <Clock className="mt-0.5 h-5 w-5 text-[hsl(var(--gold))]" />
-                      <div>
-                        <p className="font-medium">
-                          {billing.daysLeft === null
-                            ? t("banners.trialTitle")
-                            : t("banners.trialTitleWithDays", { days: billing.daysLeft })}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {billing.trialEndsAt
-                            ? t("banners.trialBillingFrom", { date: formatDate(billing.trialEndsAt) })
-                            : t("banners.trialBillingSoon")}
-                          {billing.cancelAtPeriodEnd
-                            ? t("banners.trialCancelled")
-                            : t("banners.trialCanCancel")}
-                        </p>
-                      </div>
-                    </div>
-                    {sub.has_customer && <PortalButton />}
-                  </CardContent>
-                </Card>
+                <V3Banner
+                  tone="primary"
+                  icon={<Clock width={20} height={20} />}
+                  title={
+                    billing.daysLeft === null
+                      ? t("banners.trialTitle")
+                      : t("banners.trialTitleWithDays", { days: billing.daysLeft })
+                  }
+                  body={`${
+                    billing.trialEndsAt
+                      ? t("banners.trialBillingFrom", { date: formatDate(billing.trialEndsAt) })
+                      : t("banners.trialBillingSoon")
+                  }${
+                    billing.cancelAtPeriodEnd
+                      ? t("banners.trialCancelled")
+                      : t("banners.trialCanCancel")
+                  }`}
+                  action={sub.has_customer ? <PortalButton /> : null}
+                />
               )}
 
               {billing.kind === "active" && (
-                <Card>
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 py-5">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 text-[hsl(var(--success))]" />
-                      <div>
-                        <p className="font-medium">
-                          {billing.cancelAtPeriodEnd
-                            ? t("banners.activeTitleCancelling")
-                            : t("banners.activeTitle")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {billing.cancelAtPeriodEnd
-                            ? billing.currentPeriodEnd
-                              ? t("banners.activeKeptUntil", { date: formatDate(billing.currentPeriodEnd) })
-                              : t("banners.activeKeptUntilFallback")
-                            : billing.currentPeriodEnd
-                              ? t("banners.activeRenews", { date: formatDate(billing.currentPeriodEnd) })
-                              : t("banners.activeManaged")}
-                        </p>
-                      </div>
-                    </div>
-                    {sub.has_customer && <PortalButton />}
-                  </CardContent>
-                </Card>
+                <V3Banner
+                  tone="success"
+                  icon={<CheckCircle2 width={20} height={20} />}
+                  title={
+                    billing.cancelAtPeriodEnd
+                      ? t("banners.activeTitleCancelling")
+                      : t("banners.activeTitle")
+                  }
+                  body={
+                    billing.cancelAtPeriodEnd
+                      ? billing.currentPeriodEnd
+                        ? t("banners.activeKeptUntil", { date: formatDate(billing.currentPeriodEnd) })
+                        : t("banners.activeKeptUntilFallback")
+                      : billing.currentPeriodEnd
+                        ? t("banners.activeRenews", { date: formatDate(billing.currentPeriodEnd) })
+                        : t("banners.activeManaged")
+                  }
+                  action={sub.has_customer ? <PortalButton /> : null}
+                />
               )}
 
               {billing.kind === "past_due" && (
-                <Card className="border-[hsl(var(--warning)/0.4)] bg-[hsl(var(--warning)/0.05)]">
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 py-5">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="mt-0.5 h-5 w-5 text-[hsl(var(--warning))]" />
-                      <div>
-                        <p className="font-medium text-[hsl(var(--warning))]">
-                          {t("banners.pastDueTitle")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{t("banners.pastDueBody")}</p>
-                      </div>
-                    </div>
-                    {sub.has_customer && <PortalButton />}
-                  </CardContent>
-                </Card>
+                <V3Banner
+                  tone="warning"
+                  icon={<AlertTriangle width={20} height={20} />}
+                  title={t("banners.pastDueTitle")}
+                  body={t("banners.pastDueBody")}
+                  action={sub.has_customer ? <PortalButton /> : null}
+                />
               )}
 
               {billing.kind === "lapsed" && (
-                <Card>
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 py-5">
-                    <div className="flex items-start gap-3">
-                      <Sparkles className="mt-0.5 h-5 w-5 text-[hsl(var(--gold))]" />
-                      <div>
-                        <p className="font-medium">
-                          {sub.trial_used
-                            ? t("banners.lapsedPausedTitle")
-                            : t("banners.lapsedNewTitle")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {sub.trial_used
-                            ? t("banners.lapsedPausedBody")
-                            : t("banners.lapsedNewBody", { days: TRIAL_DAYS })}
-                        </p>
-                      </div>
-                    </div>
-                    {sub.has_customer && <PortalButton />}
-                  </CardContent>
-                </Card>
+                <V3Banner
+                  tone="primary"
+                  icon={<Sparkles width={20} height={20} />}
+                  title={
+                    sub.trial_used
+                      ? t("banners.lapsedPausedTitle")
+                      : t("banners.lapsedNewTitle")
+                  }
+                  body={
+                    sub.trial_used
+                      ? t("banners.lapsedPausedBody")
+                      : t("banners.lapsedNewBody", { days: TRIAL_DAYS })
+                  }
+                  action={sub.has_customer ? <PortalButton /> : null}
+                />
               )}
 
-              {/* Status chip */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("status.label")}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-wrap items-center gap-3">
-                  <Badge
-                    variant={
-                      sub.status === "trialing"
-                        ? "gold"
-                        : sub.status === "active"
-                          ? "success"
-                          : sub.status === "past_due" || sub.status === "unpaid"
-                            ? "warning"
-                            : "secondary"
-                    }
-                  >
-                    {sub.status === "trialing"
-                      ? t("status.trialing")
-                      : sub.status === "active"
-                        ? t("status.active")
-                        : sub.status === "past_due" || sub.status === "unpaid"
-                          ? t("status.pastDue")
-                          : sub.status === "paused"
-                            ? t("status.paused")
-                            : sub.status === "canceled"
-                              ? t("status.canceled")
-                              : sub.status === "incomplete" ||
-                                  sub.status === "incomplete_expired"
-                                ? t("status.incomplete")
-                                : t("status.none")}
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">
-                    {sub.trial_used && billing.kind === "lapsed"
-                      ? t("status.trialUsedNote")
-                      : !sub.status
-                        ? t("status.freshNote", { days: TRIAL_DAYS })
-                        : t("status.manageNote")}
-                  </p>
-                </CardContent>
-              </Card>
+              {/* Pourquoi Premium — section conversion S1-06 */}
+              <PremiumValueSection />
+
+              {/* Status chip V3 */}
+              <V3StatusCard
+                statusLabel={
+                  sub.status === "trialing"
+                    ? t("status.trialing")
+                    : sub.status === "active"
+                      ? t("status.active")
+                      : sub.status === "past_due" || sub.status === "unpaid"
+                        ? t("status.pastDue")
+                        : sub.status === "paused"
+                          ? t("status.paused")
+                          : sub.status === "canceled"
+                            ? t("status.canceled")
+                            : sub.status === "incomplete" ||
+                                sub.status === "incomplete_expired"
+                              ? t("status.incomplete")
+                              : t("status.none")
+                }
+                statusKind={
+                  sub.status === "trialing"
+                    ? "trial"
+                    : sub.status === "active"
+                      ? "active"
+                      : sub.status === "past_due" || sub.status === "unpaid"
+                        ? "warning"
+                        : "neutral"
+                }
+                title={t("status.label")}
+                note={
+                  sub.trial_used && billing.kind === "lapsed"
+                    ? t("status.trialUsedNote")
+                    : !sub.status
+                      ? t("status.freshNote", { days: TRIAL_DAYS })
+                      : t("status.manageNote")
+                }
+              />
 
               {timeline.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <CalendarClock className="h-4 w-4 text-[hsl(var(--gold))]" />
-                      {t("timeline.title")}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2.5">
-                      {timeline.map((event, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/40 p-3"
-                        >
-                          <span
-                            aria-hidden
-                            className="mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--gold))]"
-                          />
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium leading-snug">
-                              {event.label}
-                            </p>
-                            {event.detail && (
-                              <p className="mt-0.5 text-xs text-muted-foreground">
-                                {event.detail}
-                              </p>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+                <V3TimelineCard
+                  title={t("timeline.title")}
+                  events={timeline}
+                />
               )}
 
               <PricingPlans
@@ -611,5 +557,340 @@ function Topbar({
         <V3TopbarMenu fullName={fullName} />
       </div>
     </header>
+  );
+}
+
+/* ═══════════════ S1 — V3 inline subscription atoms ═══════════════ */
+
+function V3Banner({
+  tone,
+  icon,
+  title,
+  body,
+  action,
+}: {
+  tone: "primary" | "success" | "warning";
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  action: React.ReactNode | null;
+}) {
+  const tones = {
+    primary: { bg: "#EDF2FD", border: "rgba(37, 99, 235, 0.18)", iconColor: "#2563EB" },
+    success: { bg: "#ECFDF5", border: "rgba(16, 163, 127, 0.22)", iconColor: "#10A37F" },
+    warning: { bg: "#FEF3C7", border: "rgba(245, 158, 11, 0.28)", iconColor: "#F59E0B" },
+  } as const;
+  const tk = tones[tone];
+  return (
+    <section
+      style={{
+        padding: "18px 20px",
+        backgroundColor: tk.bg,
+        border: `1px solid ${tk.border}`,
+        borderRadius: 14,
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 14,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, flex: 1, minWidth: 240 }}>
+        <span style={{ color: tk.iconColor, flexShrink: 0, marginTop: 2 }}>{icon}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0F172A", lineHeight: 1.4 }}>
+            {title}
+          </p>
+          <p style={{ margin: "5px 0 0 0", fontSize: 13, color: "#64748B", lineHeight: 1.55 }}>
+            {body}
+          </p>
+        </div>
+      </div>
+      {action}
+    </section>
+  );
+}
+
+function V3StatusCard({
+  title,
+  statusLabel,
+  statusKind,
+  note,
+}: {
+  title: string;
+  statusLabel: string;
+  statusKind: "trial" | "active" | "warning" | "neutral";
+  note: string;
+}) {
+  const tones = {
+    trial: { bg: "#EDF2FD", color: "#2563EB" },
+    active: { bg: "#10A37F", color: "white" },
+    warning: { bg: "#FEF3C7", color: "#B45309" },
+    neutral: { bg: "#F1F5F9", color: "#64748B" },
+  } as const;
+  const tk = tones[statusKind];
+  return (
+    <section
+      style={{
+        padding: "18px 20px",
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #E5E9F0",
+        borderRadius: 14,
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#64748B",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+        }}
+      >
+        {title}
+      </h3>
+      <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "5px 12px",
+            borderRadius: 999,
+            backgroundColor: tk.bg,
+            color: tk.color,
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: "0.04em",
+          }}
+        >
+          {statusLabel}
+        </span>
+        <p style={{ margin: 0, fontSize: 13, color: "#64748B", lineHeight: 1.5 }}>{note}</p>
+      </div>
+    </section>
+  );
+}
+
+function V3TimelineCard({
+  title,
+  events,
+}: {
+  title: string;
+  events: Array<{ label: string; detail?: string | null }>;
+}) {
+  return (
+    <section
+      style={{
+        padding: "20px 22px",
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #E5E9F0",
+        borderRadius: 14,
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          fontSize: 14,
+          fontWeight: 700,
+          color: "#0F172A",
+          fontFamily: "Outfit, Inter, system-ui",
+        }}
+      >
+        <CalendarClock width={15} height={15} style={{ color: "#2563EB" }} />
+        {title}
+      </h3>
+      <ul style={{ marginTop: 14, listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+        {events.map((event, i) => (
+          <li
+            key={i}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 12,
+              padding: "12px 14px",
+              backgroundColor: "#F9FAFD",
+              borderRadius: 10,
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                marginTop: 6,
+                width: 6,
+                height: 6,
+                borderRadius: 999,
+                backgroundColor: "#2563EB",
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: "#0F172A", lineHeight: 1.4 }}>
+                {event.label}
+              </p>
+              {event.detail && (
+                <p style={{ margin: "3px 0 0 0", fontSize: 11.5, color: "#64748B", lineHeight: 1.5 }}>
+                  {event.detail}
+                </p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ═══════════════ S1-06 — Pourquoi LIBERIA Premium ═══════════════ */
+
+function PremiumValueSection() {
+  const items = [
+    {
+      icon: "🧭",
+      title: "Coach IA illimité",
+      free: "5 conversations / mois",
+      premium: "Conversations illimitées + mémoire enrichie",
+    },
+    {
+      icon: "📊",
+      title: "Analyse FHS détaillée",
+      free: "Score global + tendance hebdomadaire",
+      premium: "6 axes détaillés + historique 12 mois + recommandations conditionnelles",
+    },
+    {
+      icon: "🎯",
+      title: "Plan d'action personnalisé",
+      free: "3 étapes de démarrage",
+      premium: "Plan complet généré par l'IA + suivi des étapes + impact estimé",
+    },
+    {
+      icon: "💡",
+      title: "Opportunités d'optimisation",
+      free: "1 opportunité visible",
+      premium: "Toutes les opportunités du moteur + projection annuelle",
+    },
+    {
+      icon: "🔐",
+      title: "Mémoire IA personnelle",
+      free: "Activable, lecture seule",
+      premium: "Ajout / édition / archivage des entrées clés",
+    },
+  ];
+  return (
+    <section
+      style={{
+        padding: "26px 24px",
+        backgroundColor: "#011E5F",
+        backgroundImage:
+          "radial-gradient(circle at 20% 0%, rgba(37, 99, 235, 0.35) 0%, transparent 55%), radial-gradient(circle at 80% 100%, rgba(2, 31, 96, 0.6) 0%, transparent 50%)",
+        color: "white",
+        borderRadius: 18,
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11,
+          fontWeight: 700,
+          color: "#FBBF24",
+          letterSpacing: "0.22em",
+          textTransform: "uppercase",
+        }}
+      >
+        Pourquoi LIBERIA Premium
+      </p>
+      <h2
+        style={{
+          margin: "12px 0 6px 0",
+          fontFamily: "Outfit, Inter, system-ui",
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.2,
+        }}
+      >
+        Ce que tu débloques en passant Premium
+      </h2>
+      <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.78)", lineHeight: 1.55, maxWidth: 560 }}>
+        Le coach IA, l'analyse, les opportunités et la mémoire personnelle deviennent illimités et personnalisés en
+        continu. Annulable à tout moment.
+      </p>
+      <ul
+        style={{
+          marginTop: 18,
+          listStyle: "none",
+          padding: 0,
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: 10,
+        }}
+      >
+        {items.map((it) => (
+          <li
+            key={it.title}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 14,
+              padding: "14px 16px",
+              backgroundColor: "rgba(255, 255, 255, 0.06)",
+              borderRadius: 12,
+            }}
+          >
+            <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }} aria-hidden>
+              {it.icon}
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: "white", lineHeight: 1.3 }}>
+                {it.title}
+              </p>
+              <div
+                style={{
+                  marginTop: 6,
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 10,
+                  fontSize: 11.5,
+                }}
+              >
+                <div>
+                  <span
+                    style={{
+                      display: "block",
+                      color: "rgba(255,255,255,0.55)",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      fontSize: 9.5,
+                    }}
+                  >
+                    Gratuit
+                  </span>
+                  <span style={{ color: "rgba(255,255,255,0.82)" }}>{it.free}</span>
+                </div>
+                <div>
+                  <span
+                    style={{
+                      display: "block",
+                      color: "#FBBF24",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      fontSize: 9.5,
+                    }}
+                  >
+                    Premium
+                  </span>
+                  <span style={{ color: "white", fontWeight: 500 }}>{it.premium}</span>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

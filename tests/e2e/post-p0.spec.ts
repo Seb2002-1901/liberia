@@ -130,35 +130,20 @@ test.describe("P0-A4 — Coach IA landing sans chat simulé", () => {
   });
 });
 
-test.describe("P0-A5 — Investissements page honnête", () => {
-  test("rend une seule hero card premium, pas 8 cards vides", async ({
+test.describe("P0-A5 + S1-05 — Investissements masqué (redirect épargne)", () => {
+  test("/investments redirige vers /design-match/epargne-v3 (module masqué)", async ({
     page,
   }) => {
     await page.goto("/investments", { waitUntil: "domcontentloaded" });
-    expect(page.url()).toContain("/design-match/investissements-v3");
-
-    const body = page.locator("body");
-    await expect(body).toContainText(
-      "Une vue dédiée à ton patrimoine, en préparation.",
-    );
-
-    const html = await page.content();
-    // Plus aucune trace des wordings "à venir / Module Investissements à venir"
-    expect(html).not.toContain("Module Investissements à venir");
-    expect(html).not.toContain("Recommandations à venir");
-    // Plus de "Performance globale", "Allocation", "Opportunités",
-    // "Performance chart", "Projection", "Conseil IA" (titres des 8 cards
-    // supprimées) — on s'assure qu'aucune card répétée n'a survécu.
-    expect(html).not.toContain("Performance globale");
+    expect(page.url()).toContain("/design-match/epargne-v3");
   });
 
-  test("CTAs réels : En parler à mon coach + Voir mon épargne + objectifs", async ({
+  test("/design-match/investissements-v3 redirige aussi vers épargne", async ({
     page,
   }) => {
-    await page.goto("/investments", { waitUntil: "domcontentloaded" });
-    const body = page.locator("body");
-    await expect(body).toContainText("En parler à mon coach");
-    await expect(body).toContainText("Voir mon épargne");
-    await expect(body).toContainText("Voir mes objectifs");
+    await page.goto("/design-match/investissements-v3", {
+      waitUntil: "domcontentloaded",
+    });
+    expect(page.url()).toContain("/design-match/epargne-v3");
   });
 });
