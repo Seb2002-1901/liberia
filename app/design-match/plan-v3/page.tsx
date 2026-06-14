@@ -596,7 +596,6 @@ function Topbar({
   fullName: string | null;
 }) {
   const displayName = firstName ?? "";
-  const pillName = fullName ?? "Mon profil";
   return (
     <header
       data-plan-topbar

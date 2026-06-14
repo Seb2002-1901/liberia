@@ -9,6 +9,11 @@ interface PageHeaderProps {
   className?: string;
 }
 
+/**
+ * PageHeader V3 — typo Outfit + couleur navy primary cohérente
+ * avec le cockpit V3. Plus de font-display shadcn (qui dépendait
+ * d'une variable CSS pré-V3).
+ */
 export function PageHeader({
   title,
   description,
@@ -25,15 +30,31 @@ export function PageHeader({
     >
       <div className="space-y-1.5">
         {eyebrow && (
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <p
+            className="text-xs font-bold uppercase"
+            style={{
+              letterSpacing: "0.22em",
+              color: "#2563EB",
+            }}
+          >
             {eyebrow}
           </p>
         )}
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+        <h1
+          className="text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+          style={{
+            fontFamily: "Outfit, Inter, system-ui",
+            letterSpacing: "-0.02em",
+            color: "#0F172A",
+          }}
+        >
           {title}
         </h1>
         {description && (
-          <p className="max-w-2xl text-sm text-muted-foreground">
+          <p
+            className="max-w-2xl text-sm"
+            style={{ color: "#64748B", lineHeight: 1.55 }}
+          >
             {description}
           </p>
         )}

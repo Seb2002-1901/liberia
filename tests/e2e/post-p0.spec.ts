@@ -34,10 +34,10 @@ test.describe("P0-A1 — Profil V3 édition", () => {
     await expect(editSection).toBeVisible();
     await expect(editSection).toContainText("Pays, devise et langue");
 
-    // LocaleForm rend 3 <Select> shadcn (Pays / Devise / Langue), chacun
-    // exposé en SelectTrigger (role="combobox"). On vérifie qu'on en
-    // trouve au moins 3 dans la section.
-    const triggers = editSection.locator('[role="combobox"]');
+    // LocaleForm rend 3 V3Select (Pays / Devise / Langue), chacun
+    // exposé en bouton avec aria-haspopup="listbox" (Phase Hardening :
+    // remplace l'ancien shadcn Select role="combobox").
+    const triggers = editSection.locator('button[aria-haspopup="listbox"]');
     await expect(triggers).toHaveCount(3);
 
     // Bouton "Enregistrer" (clé i18n auth.profile.locale.save)
