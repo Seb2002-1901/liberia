@@ -25,6 +25,7 @@ import { getTranslations } from "next-intl/server";
 import { getFinanceData } from "@/lib/services/finance";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getMyUserMemory } from "@/lib/services/memory";
+import { LocaleForm } from "@/components/profile/locale-form";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
@@ -361,6 +362,11 @@ export default async function DesignMatchProfilV3() {
               <SecuriteCard />
               <ActiviteRecenteCard />
             </div>
+            <EditPreferencesCard
+              country={profile.country}
+              currency={profile.currency}
+              locale={profile.locale}
+            />
             <MissionFooter pct={completionPct} />
           </main>
         </div>
@@ -865,8 +871,8 @@ function InfosPersoCard({
           </div>
         ))}
       </div>
-      <Link
-        href="/settings/memory"
+      <a
+        href="#edit-region"
         style={{
           marginTop: 6,
           padding: "6px 12px",
@@ -882,12 +888,12 @@ function InfosPersoCard({
           textDecoration: "none",
         }}
       >
-        Compléter mes informations
+        Modifier mes préférences
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 20h9" />
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" />
         </svg>
-      </Link>
+      </a>
     </div>
   );
 }
@@ -1255,6 +1261,53 @@ function ActiviteRecenteCard() {
         </p>
       </div>
     </div>
+  );
+}
+
+/* ═══════════════ EDIT — Préférences régionales ═══════════════
+ *
+ * Card pleine largeur hébergeant <LocaleForm> (client component
+ * shadcn). Permet à l'utilisateur de changer son pays, sa devise et
+ * sa langue depuis l'UI V3. La server action `updateProfileLocale`
+ * (déjà câblée) valide + persiste + sync NEXT_LOCALE cookie pour que
+ * la nouvelle langue prenne immédiatement.
+ *
+ * Anchor #edit-region : ciblé par le CTA "Modifier mes préférences"
+ * dans InfosPersoCard. Le navigateur scroll l'utilisateur jusqu'ici.
+ */
+
+function EditPreferencesCard({
+  country,
+  currency,
+  locale,
+}: {
+  country: string | null;
+  currency: string | null;
+  locale: string | null;
+}) {
+  return (
+    <section
+      id="edit-region"
+      style={{
+        padding: "20px 22px",
+        backgroundColor: C.cardBg,
+        borderRadius: 14,
+        boxShadow: SHADOW.card,
+        scrollMarginTop: 80,
+      }}
+    >
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Préférences régionales
+      </p>
+      <p style={{ margin: "2px 0 14px 0", fontSize: 14, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Pays, devise et langue
+      </p>
+      <LocaleForm
+        initialCountry={country ?? "CH"}
+        initialCurrency={currency ?? "CHF"}
+        initialLocale={locale ?? "fr-CH"}
+      />
+    </section>
   );
 }
 
