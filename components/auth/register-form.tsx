@@ -5,18 +5,38 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { TRIAL_DAYS } from "@/lib/stripe/config";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { TRIAL_DAYS } from "@/lib/stripe/config";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
+import { V3Field, V3Input, V3PrimaryButton } from "./login-form";
+
+/**
+ * Refonte V3 — Phase Auth-V3.
+ *
+ * Logique Supabase signUp + emailRedirectTo /auth/callback?next=/onboarding,
+ * react-hook-form, Zod registerSchema avec acceptTerms refine, Controller
+ * pattern, TRIAL_DAYS (constante pure, pas d'appel Stripe), branches
+ * "Confirm email" ON/OFF → push /login ou /onboarding : INCHANGÉS.
+ *
+ * JSX visuel : charte navy V3 inline (tokens C, Inter, Outfit).
+ */
+
+const C = {
+  navy: "#011E5F",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  textLight: "#94A3B8",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+  danger: "#DC2626",
+};
+
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
 
 export function RegisterForm() {
   const tForm = useTranslations("auth.register");
@@ -84,64 +104,99 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <header style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: FONT_DISPLAY,
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: C.textDark,
+            lineHeight: 1.15,
+          }}
+        >
           {tForm("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">{tForm("subtitle")}</p>
-        <div className="rounded-xl border border-[hsl(var(--gold)/0.25)] bg-[hsl(var(--gold)/0.06)] px-3 py-2.5 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: C.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          {tForm("subtitle")}
+        </p>
+        <div
+          style={{
+            marginTop: 4,
+            padding: "10px 14px",
+            borderRadius: 10,
+            backgroundColor: C.primaryBg,
+            fontSize: 12,
+            color: C.textDark,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong style={{ fontWeight: 600, color: C.navy }}>
             {tForm("trialBadgeStrong", { days: TRIAL_DAYS })}
-          </span>
-          {tForm("trialBadgeRest")}
+          </strong>{" "}
+          <span style={{ color: C.textMuted }}>{tForm("trialBadgeRest")}</span>
         </div>
-      </div>
+      </header>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <Field
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        style={{ display: "flex", flexDirection: "column", gap: 14 }}
+      >
+        <V3Field
           label={tForm("labels.name")}
           htmlFor="name"
           error={errors.name?.message ? tErr(errors.name.message) : undefined}
         >
-          <Input
+          <V3Input
             id="name"
             type="text"
             autoComplete="name"
             placeholder={tForm("placeholders.name")}
             {...register("name")}
           />
-        </Field>
+        </V3Field>
 
-        <Field
+        <V3Field
           label={tForm("labels.email")}
           htmlFor="email"
           error={errors.email?.message ? tErr(errors.email.message) : undefined}
         >
-          <Input
+          <V3Input
             id="email"
             type="email"
             autoComplete="email"
             placeholder={tForm("placeholders.email")}
             {...register("email")}
           />
-        </Field>
+        </V3Field>
 
-        <Field
+        <V3Field
           label={tForm("labels.password")}
           htmlFor="password"
-          error={errors.password?.message ? tErr(errors.password.message) : undefined}
+          error={
+            errors.password?.message ? tErr(errors.password.message) : undefined
+          }
         >
-          <Input
+          <V3Input
             id="password"
             type="password"
             autoComplete="new-password"
             placeholder={tForm("placeholders.password")}
             {...register("password")}
           />
-        </Field>
+        </V3Field>
 
-        <Field
+        <V3Field
           label={tForm("labels.confirmPassword")}
           htmlFor="confirmPassword"
           error={
@@ -150,14 +205,14 @@ export function RegisterForm() {
               : undefined
           }
         >
-          <Input
+          <V3Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             placeholder={tForm("placeholders.confirmPassword")}
             {...register("confirmPassword")}
           />
-        </Field>
+        </V3Field>
 
         <Controller
           control={control}
@@ -166,50 +221,77 @@ export function RegisterForm() {
             const checked = field.value === true;
             const hasError = Boolean(errors.acceptTerms);
             return (
-              <div>
-                <Label
+              <div style={{ marginTop: 4 }}>
+                <label
                   htmlFor="acceptTerms"
-                  className={cn(
-                    "flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm font-normal transition-colors",
-                    checked
-                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
-                      : hasError
-                        ? "border-[hsl(var(--destructive)/0.5)] bg-[hsl(var(--destructive)/0.04)]"
-                        : "border-border/60 bg-card/40 hover:border-border",
-                  )}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 11,
+                    padding: "12px 14px",
+                    borderRadius: 10,
+                    border: `1px solid ${
+                      checked
+                        ? C.primary
+                        : hasError
+                          ? C.danger
+                          : C.borderGhost
+                    }`,
+                    backgroundColor: checked ? C.primaryBg : C.cardBg,
+                    cursor: "pointer",
+                    transition: "border-color 0.15s ease, background-color 0.15s ease",
+                  }}
                 >
-                  <Checkbox
+                  <V3Checkbox
                     id="acceptTerms"
                     checked={checked}
-                    onCheckedChange={(v) => field.onChange(v === true)}
-                    className={cn(
-                      "mt-0.5 h-5 w-5 transition-colors",
-                      checked &&
-                        "border-[hsl(var(--gold))] bg-[hsl(var(--gold))] text-background",
-                    )}
+                    onChange={(v) => field.onChange(v)}
                   />
-                  <span className="text-xs leading-relaxed text-muted-foreground">
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: C.textMuted,
+                      lineHeight: 1.5,
+                    }}
+                  >
                     {tForm("acceptBefore")}{" "}
                     <Link
                       href={ROUTES.terms}
-                      className="font-medium text-foreground underline-offset-2 hover:underline"
                       onClick={(e) => e.stopPropagation()}
+                      style={{
+                        color: C.textDark,
+                        fontWeight: 600,
+                        textDecoration: "underline",
+                        textUnderlineOffset: 2,
+                      }}
                     >
                       {tForm("termsLink")}
                     </Link>{" "}
                     {tForm("and")}{" "}
                     <Link
                       href={ROUTES.privacy}
-                      className="font-medium text-foreground underline-offset-2 hover:underline"
                       onClick={(e) => e.stopPropagation()}
+                      style={{
+                        color: C.textDark,
+                        fontWeight: 600,
+                        textDecoration: "underline",
+                        textUnderlineOffset: 2,
+                      }}
                     >
                       {tForm("privacyLink")}
                     </Link>
                     .
                   </span>
-                </Label>
+                </label>
                 {hasError && errors.acceptTerms?.message && (
-                  <p className="mt-1.5 text-xs text-[hsl(var(--destructive))]">
+                  <p
+                    style={{
+                      margin: "6px 2px 0 2px",
+                      fontSize: 11.5,
+                      color: C.danger,
+                      fontWeight: 500,
+                    }}
+                  >
                     {tErr(errors.acceptTerms.message)}
                   </p>
                 )}
@@ -218,15 +300,28 @@ export function RegisterForm() {
           }}
         />
 
-        <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+        <V3PrimaryButton type="submit" disabled={submitting} loading={submitting}>
           {tForm("submit")}
-        </Button>
+        </V3PrimaryButton>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: 13,
+          color: C.textMuted,
+          margin: 0,
+        }}
+      >
         {tForm("alreadyRegistered")}{" "}
-        <Link href={ROUTES.login} className="font-medium text-foreground hover:underline">
+        <Link
+          href={ROUTES.login}
+          style={{
+            color: C.textDark,
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
           {tForm("loginLink")}
         </Link>
       </p>
@@ -234,22 +329,73 @@ export function RegisterForm() {
   );
 }
 
-function Field({
-  label,
-  htmlFor,
-  error,
-  children,
+function V3Checkbox({
+  id,
+  checked,
+  onChange,
 }: {
-  label: string;
-  htmlFor: string;
-  error?: string;
-  children: React.ReactNode;
+  id: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label htmlFor={htmlFor}>{label}</Label>
-      {children}
-      {error && <p className="text-xs text-[hsl(var(--destructive))]">{error}</p>}
-    </div>
+    <span
+      role="checkbox"
+      aria-checked={checked}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          onChange(!checked);
+        }
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onChange(!checked);
+      }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 20,
+        height: 20,
+        borderRadius: 6,
+        border: `1.5px solid ${checked ? C.navy : C.textLight}`,
+        backgroundColor: checked ? C.navy : C.cardBg,
+        flexShrink: 0,
+        cursor: "pointer",
+        transition: "border-color 0.15s ease, background-color 0.15s ease",
+        marginTop: 1,
+      }}
+    >
+      {checked && (
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      )}
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{
+          position: "absolute",
+          opacity: 0,
+          pointerEvents: "none",
+          width: 1,
+          height: 1,
+        }}
+      />
+    </span>
   );
 }
