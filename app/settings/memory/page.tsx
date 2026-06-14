@@ -1,14 +1,6 @@
 /**
  * /settings/memory — gestion mémoire IA (MemoryEntriesPanel).
- *
- * Migrée hors de (app)/ pour bypasser l'ancien AppShell et utiliser
- * le shell V3 inline (V3Shell). "Paramètres" est marqué actif dans
- * la sidebar. Toute la logique métier (listMyMemoryEntries,
- * getCoachMemoryEnabled, MemoryEntriesPanel) est strictement
- * préservée.
- *
- * L'auth + redirect onboarding (faits autrefois par (app)/layout.tsx)
- * sont reproduits ici.
+ * Refonte V3 Phase Hardening : zéro shadcn dans le header/info card.
  */
 
 import type { Metadata } from "next";
@@ -16,15 +8,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, BrainCircuit } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/ui/page-header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { MemoryEntriesPanel } from "@/components/settings/memory-entries-panel";
 import {
   getCoachMemoryEnabled,
@@ -41,11 +24,25 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("metaTitle") };
 }
 
+const C = {
+  navy: "#011E5F",
+  pageBg: "#F9FAFD",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  textLight: "#94A3B8",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+};
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
+const SHADOW_CARD =
+  "0 1px 2px rgb(15 23 42 / 0.03), 0 12px 32px -10px rgb(15 23 42 / 0.06)";
+
 export default async function MemorySettingsPage() {
   const t = await getTranslations("app.settings.memoryPage");
   const data = await getFinanceData();
 
-  // Reproduit la garde de (app)/layout.tsx.
   if (!data.isDemo && !data.profile.onboarding_completed) {
     redirect(ROUTES.onboarding);
   }
@@ -66,38 +63,152 @@ export default async function MemorySettingsPage() {
       activeHref="/design-match/parametres-v3"
       topbarSubtitle="Pilotez la mémoire de votre conseiller IA."
     >
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="-ml-2">
-            <Link href={ROUTES.settings}>
-              <ArrowLeft className="h-4 w-4" /> {t("backToSettings")}
-            </Link>
-          </Button>
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <Link
+          href={ROUTES.settings}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12.5,
+            color: C.textMuted,
+            textDecoration: "none",
+            fontWeight: 500,
+            alignSelf: "flex-start",
+          }}
+        >
+          <ArrowLeft width={14} height={14} />
+          {t("backToSettings")}
+        </Link>
 
-        <PageHeader
-          eyebrow={t("eyebrow")}
-          title={t("title")}
-          description={t("description")}
-        />
+        <header style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11,
+              fontWeight: 700,
+              color: C.primary,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+            }}
+          >
+            {t("eyebrow")}
+          </p>
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: FONT_DISPLAY,
+              fontSize: 26,
+              fontWeight: 700,
+              color: C.textDark,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.2,
+            }}
+          >
+            {t("title")}
+          </h1>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 13.5,
+              color: C.textMuted,
+              lineHeight: 1.55,
+              maxWidth: 640,
+            }}
+          >
+            {t("description")}
+          </p>
+        </header>
 
-        <Card className="border-[hsl(var(--gold)/0.25)] bg-gradient-to-br from-[hsl(var(--gold)/0.04)] via-card/40 to-card/40">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BrainCircuit className="h-4 w-4 text-[hsl(var(--gold))]" />
+        <section
+          style={{
+            padding: "20px 22px",
+            backgroundColor: C.cardBg,
+            borderRadius: 14,
+            boxShadow: SHADOW_CARD,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              aria-hidden
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                backgroundColor: C.primaryBg,
+                color: C.primary,
+              }}
+            >
+              <BrainCircuit width={15} height={15} />
+            </span>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 14,
+                fontWeight: 700,
+                color: C.textDark,
+                fontFamily: FONT_DISPLAY,
+              }}
+            >
               {t("howItWorksTitle")}
-            </CardTitle>
-            <CardDescription>{t("howItWorksBody")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-1.5 text-sm text-muted-foreground">
-              <li>· {t("howItWorksGoal")}</li>
-              <li>· {t("howItWorksPreference")}</li>
-              <li>· {t("howItWorksEvent")}</li>
-              <li>· {t("howItWorksBlocker")}</li>
-            </ul>
-          </CardContent>
-        </Card>
+            </h2>
+          </div>
+          <p
+            style={{
+              margin: "10px 0 14px 0",
+              fontSize: 12.5,
+              color: C.textMuted,
+              lineHeight: 1.55,
+            }}
+          >
+            {t("howItWorksBody")}
+          </p>
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 0,
+              listStyle: "none",
+              display: "flex",
+              flexDirection: "column",
+              gap: 7,
+            }}
+          >
+            {[
+              t("howItWorksGoal"),
+              t("howItWorksPreference"),
+              t("howItWorksEvent"),
+              t("howItWorksBlocker"),
+            ].map((item) => (
+              <li
+                key={item}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 8,
+                  fontSize: 12.5,
+                  color: C.textMuted,
+                  lineHeight: 1.5,
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    marginTop: 6,
+                    width: 5,
+                    height: 5,
+                    borderRadius: 999,
+                    backgroundColor: C.primary,
+                    flexShrink: 0,
+                  }}
+                />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <MemoryEntriesPanel entries={entries} enabled={enabled} />
       </div>
