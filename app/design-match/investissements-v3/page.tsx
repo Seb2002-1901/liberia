@@ -126,21 +126,8 @@ export default async function DesignMatchInvestissementsV3() {
               gap: 6,
             }}
           >
-            <div data-inv-row style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 8 }}>
-              <HeroPortefeuille />
-              <PerformanceGlobaleCard />
-            </div>
-            <div data-inv-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
-              <AllocationCard />
-              <OpportunitesCard />
-              <ObjectifsFinancesCard />
-            </div>
-            <div data-inv-row style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 8 }}>
-              <PerformanceChartCard />
-              <ProjectionCard />
-              <ConseilIACard />
-            </div>
-            <MissionFooter />
+            <InvestissementsHero />
+            <FoundationFooter />
           </main>
         </div>
       </div>
@@ -395,484 +382,173 @@ function Topbar({
     </header>
   );
 }
-/* ═══════════════ ROW 1 ═══════════════ */
 
-function HeroPortefeuille() {
+/* ═══════════════ HERO — module en préparation ═══════════════
+ *
+ * Module Investissements PAS encore implémenté :
+ *  - pas de table portfolios / holdings / transactions
+ *  - pas de feed market data ni de rendements indexés
+ *  - pas de catalogue d'instruments (ETF, actions, obligations)
+ *  - pas de moteur d'allocation, de projection, de performance
+ *
+ * Plutôt que d'afficher 8 cards toutes en empty state (effet "produit
+ * non fini"), on rend UNE SEULE card centrale, honnête et premium,
+ * qui explique pourquoi la section est en préparation et redirige
+ * vers le coach pour discuter de ses investissements actuels.
+ */
+
+function InvestissementsHero() {
   return (
-    <div
+    <section
       style={{
         position: "relative",
-        padding: "14px 20px",
-        backgroundColor: C.navy,
-        borderRadius: 14,
-        boxShadow: SHADOW.navy,
+        padding: "32px 32px 28px 32px",
+        backgroundColor: C.cardBg,
+        borderRadius: 18,
+        boxShadow: SHADOW.card,
         overflow: "hidden",
-        minHeight: 112,
       }}
     >
       <div
         aria-hidden
         style={{
           position: "absolute",
-          right: -40,
-          top: -40,
-          width: 180,
-          height: 180,
+          inset: 0,
           background:
-            "radial-gradient(circle, rgba(96, 165, 250, 0.20) 0%, rgba(96, 165, 250, 0) 65%)",
+            "radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 55%), radial-gradient(circle at 100% 100%, rgba(2, 31, 96, 0.05) 0%, transparent 50%)",
           pointerEvents: "none",
         }}
       />
-      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.78)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
-            Portefeuille
-          </p>
+      <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 56,
+            height: 56,
+            borderRadius: 16,
+            backgroundColor: C.primaryBg,
+            flexShrink: 0,
+          }}
+          aria-hidden
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 18 7 13 12 9 9 2 16" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+        </span>
+        <div style={{ flex: 1, minWidth: 260 }}>
           <p
+            style={{
+              margin: 0,
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: C.textMuted,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
+          >
+            Module Investissements
+          </p>
+          <h2
             style={{
               margin: "4px 0 0 0",
               fontSize: 22,
               fontWeight: 700,
-              color: "white",
-              lineHeight: 1.1,
+              color: C.textDark,
               fontFamily: "Outfit, Inter, system-ui",
               letterSpacing: "-0.02em",
+              lineHeight: 1.2,
             }}
           >
-            Aucun portefeuille suivi
-          </p>
-          <p style={{ margin: "6px 0 0 0", fontSize: 11, color: "rgba(255,255,255,0.78)", lineHeight: 1.4, maxWidth: 420 }}>
-            Vos investissements ne sont pas encore connectés à LIBERIA. Le module sera disponible une fois les intégrations bancaires en place.
-          </p>
-          <Link
-            href="/coach"
+            Une vue dédiée à ton patrimoine, en préparation.
+          </h2>
+          <p
             style={{
-              marginTop: 8,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "5px 11px",
-              backgroundColor: "rgba(255,255,255,0.16)",
-              color: "white",
-              fontSize: 11,
-              fontWeight: 600,
-              borderRadius: 999,
-              textDecoration: "none",
+              margin: "10px 0 0 0",
+              fontSize: 13.5,
+              color: C.textMuted,
+              lineHeight: 1.55,
+              maxWidth: 560,
             }}
           >
-            En parler au coach
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </Link>
-        </div>
-        <div
-          style={{
-            width: 60,
-            height: 60,
-            borderRadius: 999,
-            backgroundColor: "white",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            boxShadow: "0 6px 18px -6px rgba(0, 0, 0, 0.30)",
-          }}
-        >
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-            <polyline points="16 7 22 7 22 13" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PerformanceGlobaleCard() {
-  // Empty state honnête : aucun rendement, aucune performance, aucune
-  // volatilité, aucun "Score IA" investissements n'est calculable sans
-  // portefeuille tracké.
-  const labels = ["Rendement", "Performance", "Volatilité", "Score IA"];
-  return (
-    <div
-      style={{
-        padding: "12px 14px",
-        backgroundColor: C.cardBg,
-        borderRadius: 14,
-        boxShadow: SHADOW.card,
-        display: "flex",
-        flexDirection: "column",
-        minHeight: 112,
-      }}
-    >
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Performance globale
-      </p>
-      <div style={{ marginTop: 6, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, flex: 1 }}>
-        {labels.map((label) => (
-          <div key={label} style={{ padding: "5px 8px", backgroundColor: C.pageBg, borderRadius: 7 }}>
-            <p style={{ margin: 0, fontSize: 9, color: C.textMuted }}>{label}</p>
-            <p
+            LIBERIA ne suggère aucun produit financier nommé et n&apos;invente
+            aucune projection. Tant que la connexion avec un agrégateur
+            patrimonial fiable n&apos;est pas en place, nous préférons un
+            espace honnête plutôt qu&apos;un cockpit vide.
+          </p>
+          <p
+            style={{
+              margin: "10px 0 0 0",
+              fontSize: 13,
+              color: C.textMuted,
+              lineHeight: 1.55,
+              maxWidth: 560,
+            }}
+          >
+            En attendant, ton coach peut t&apos;orienter sur les principes
+            (épargne longue, fonds d&apos;urgence, hiérarchie des priorités)
+            selon ta situation.
+          </p>
+          <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+            <Link
+              href="/coach"
               style={{
-                margin: "1px 0 0 0",
-                fontSize: 12,
-                fontWeight: 700,
-                color: C.textLight,
-                fontFamily: "Outfit, Inter, system-ui",
-                fontVariantNumeric: "tabular-nums",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                padding: "10px 18px",
+                backgroundColor: C.navy,
+                color: "white",
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 10,
+                textDecoration: "none",
               }}
             >
-              —
-            </p>
-          </div>
-        ))}
-      </div>
-      <p style={{ margin: "6px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35 }}>
-        Aucune performance calculable sans portefeuille suivi.
-      </p>
-    </div>
-  );
-}
-
-/* ═══════════════ ROW 2 ═══════════════ */
-
-function AllocationCard() {
-  // Empty state honnête : aucune classe d'actifs (ETF, actions,
-  // immobilier, cash, crypto) n'est trackée. Ne pas afficher les
-  // 35/30/20/10/5 mockés serait inventer une répartition.
-  return (
-    <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Allocation
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Répartition de votre portefeuille
-      </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flex: 1 }}>
-        <div style={{ position: "relative", flexShrink: 0, width: 104, height: 104 }}>
-          <svg viewBox="0 0 100 100" width={104} height={104}>
-            <circle cx={50} cy={50} r={42} fill={C.pageBg} />
-            <circle cx={50} cy={50} r={28} fill={C.cardBg} />
-          </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ margin: 0, fontSize: 9, color: C.textMuted, textAlign: "center", letterSpacing: "0.14em", textTransform: "uppercase" }}>
-              Non<br />disponible
-            </p>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              En parler à mon coach
+            </Link>
+            <Link
+              href="/design-match/epargne-v3"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                padding: "10px 18px",
+                backgroundColor: C.cardBg,
+                color: C.textDark,
+                fontSize: 13,
+                fontWeight: 500,
+                borderRadius: 10,
+                border: `1px solid ${C.borderGhost}`,
+                textDecoration: "none",
+              }}
+            >
+              Voir mon épargne
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-            Allocation non disponible
-          </p>
-          <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.4 }}>
-            Aucune classe d&apos;actifs (ETF, actions, immobilier, cash) n&apos;est trackée. La répartition s&apos;affichera dès l&apos;intégration des comptes-titres.
-          </p>
-        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-function OpportunitesCard() {
-  // Empty state honnête : aucune logique de recommandation
-  // d'investissement n'est implémentée (pas de profil de risque, pas
-  // de catalogue, pas de moteur de scoring). Annoncer +8% ETF Monde
-  // serait inventer un rendement et conseiller un produit.
-  return (
-    <div style={{ padding: "17px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Opportunités
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Aucune opportunité ciblée
-      </p>
-      <div
-        style={{
-          marginTop: 8,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "12px 8px",
-          backgroundColor: C.pageBg,
-          borderRadius: 8,
-        }}
-      >
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            borderRadius: 999,
-            backgroundColor: C.primaryBg,
-            marginBottom: 6,
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Pas de recommandations
-        </p>
-        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-          LIBERIA ne suggère aucun produit financier nommé. Ton coach peut t&apos;orienter sur les principes selon ta situation.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ObjectifsFinancesCard() {
-  // Empty state honnête : le lien "portefeuille → financement
-  // d'objectifs" n'existe pas. Même si des goals sont définis côté
-  // Objectifs, on ne peut pas afficher "votre portefeuille finance
-  // X" tant qu'aucun portefeuille n'est tracké.
-  return (
-    <div style={{ padding: "18px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Objectifs financés
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Lien portefeuille ↔ objectifs
-      </p>
-      <div
-        style={{
-          marginTop: 8,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "12px 8px",
-          backgroundColor: C.pageBg,
-          borderRadius: 8,
-        }}
-      >
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            borderRadius: 999,
-            backgroundColor: C.primaryBg,
-            marginBottom: 6,
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-            <path d="M4 22V15" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Lien non disponible
-        </p>
-        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-          Aucun portefeuille n&apos;est tracké pour le moment. Vos objectifs restent gérés depuis la page Objectifs.
-        </p>
-        <Link
-          href="/goals"
-          style={{
-            marginTop: 8,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            fontSize: 11,
-            fontWeight: 600,
-            color: C.primary,
-            textDecoration: "none",
-          }}
-        >
-          Voir mes objectifs
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════ ROW 3 ═══════════════ */
-
-function PerformanceChartCard() {
-  // Empty state honnête : pas de série temporelle de valeur de
-  // portefeuille (pas de marquage mensuel, pas de flux historique).
-  return (
-    <div style={{ padding: "12px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-        <div>
-          <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-            Performance
-          </p>
-          <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-            Historique 12 mois
-          </p>
-        </div>
-      </div>
-      <div
-        style={{
-          marginTop: 8,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "12px 8px",
-          backgroundColor: C.pageBg,
-          borderRadius: 8,
-        }}
-      >
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            borderRadius: 999,
-            backgroundColor: C.primaryBg,
-            marginBottom: 6,
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Historique non disponible
-        </p>
-        <p style={{ margin: "4px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.35, maxWidth: 280 }}>
-          Aucune valeur historique de portefeuille n&apos;est archivée. La courbe sera tracée dès l&apos;intégration des comptes-titres.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ProjectionCard() {
-  // Empty state honnête : projection patrimoine 5/10 ans = invention
-  // pure (pas de rendement attendu, pas de scénario économique, pas
-  // de moteur de simulation Monte Carlo calibré).
-  return (
-    <div style={{ padding: "15px 14px", backgroundColor: C.cardBg, borderRadius: 14, boxShadow: SHADOW.card, display: "flex", flexDirection: "column" }}>
-      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-        Projection
-      </p>
-      <p style={{ margin: "2px 0 0 0", fontSize: 13, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
-        Patrimoine projeté
-      </p>
-      <div
-        style={{
-          marginTop: 8,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "12px 8px",
-          backgroundColor: C.pageBg,
-          borderRadius: 8,
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.textDark, lineHeight: 1.3 }}>
-          Aucune projection fiable
-        </p>
-        <p style={{ margin: "4px 0 0 0", fontSize: 10, color: C.textMuted, lineHeight: 1.35, maxWidth: 220 }}>
-          LIBERIA n&apos;extrapole pas de projection patrimoniale tant qu&apos;aucune donnée fiable n&apos;est disponible.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ConseilIACard() {
+function FoundationFooter() {
+  // Bandeau bas — rappel du parcours produit : avant les
+  // investissements, on consolide les bases (fonds d'urgence,
+  // objectifs concrets). Aligné sur la doctrine LIBERIA.
   return (
     <div
       style={{
-        padding: "15px 14px",
-        backgroundColor: C.primaryBg,
-        borderRadius: 14,
-        boxShadow: SHADOW.card,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 22,
-            height: 22,
-            borderRadius: 6,
-            backgroundColor: C.primary,
-            flexShrink: 0,
-          }}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
-            <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
-          </svg>
-        </span>
-        <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.primary, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Conseil IA
-        </p>
-      </div>
-      <p style={{ margin: "8px 0 0 0", fontSize: 12, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.3 }}>
-        Pas encore de portefeuille suivi.
-      </p>
-      <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, flex: 1 }}>
-        LIBERIA n&apos;émet aucune recommandation d&apos;investissement aujourd&apos;hui. La priorité reste votre fonds d&apos;urgence et vos objectifs concrets — votre coach peut vous y accompagner.
-      </p>
-      <Link
-        href="/coach"
-        style={{
-          marginTop: 8,
-          padding: "7px 12px",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 5,
-          backgroundColor: C.primary,
-          color: "white",
-          fontSize: 11.5,
-          fontWeight: 600,
-          borderRadius: 8,
-          textDecoration: "none",
-        }}
-      >
-        Parler à mon conseiller
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </Link>
-    </div>
-  );
-}
-
-/* ═══════════════ ROW 4 — MISSION FOOTER ═══════════════ */
-
-function MissionFooter() {
-  return (
-    <div
-      style={{
-        padding: "13px 16px",
+        padding: "14px 18px",
         backgroundColor: C.navy,
         borderRadius: 12,
         boxShadow: SHADOW.flat,
@@ -880,6 +556,7 @@ function MissionFooter() {
         alignItems: "center",
         justifyContent: "space-between",
         gap: 16,
+        flexWrap: "wrap",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0, flex: 1 }}>
@@ -893,38 +570,39 @@ function MissionFooter() {
             borderRadius: 999,
             backgroundColor: "rgba(255,255,255,0.14)",
             flexShrink: 0,
-            fontSize: 16,
           }}
           aria-hidden
         >
-          🚀
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-            Renforce d&apos;abord les bases
+          <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "white", fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
+            Pas encore d&apos;investissements ? C&apos;est très bien.
           </p>
-          <p style={{ margin: "6px 0 0 0", fontSize: 10.5, color: "rgba(255,255,255,0.78)", lineHeight: 1.35 }}>
-            Aucun portefeuille suivi aujourd&apos;hui. Consolide ton fonds d&apos;urgence et tes objectifs — ton coach peut t&apos;orienter.
+          <p style={{ margin: "5px 0 0 0", fontSize: 11, color: "rgba(255,255,255,0.78)", lineHeight: 1.4 }}>
+            Consolide d&apos;abord un fonds d&apos;urgence de 3 mois et des
+            objectifs concrets. Le bon moment pour investir vient ensuite.
           </p>
         </div>
       </div>
       <Link
-        href="/coach"
+        href="/design-match/objectifs-v3"
         style={{
-          padding: "9px 14px",
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          backgroundColor: "white",
-          color: C.navy,
-          fontSize: 11.5,
+          padding: "8px 14px",
+          backgroundColor: "rgba(255,255,255,0.12)",
+          color: "white",
+          fontSize: 12,
           fontWeight: 600,
           borderRadius: 8,
-          flexShrink: 0,
           textDecoration: "none",
         }}
       >
-        En parler au coach
+        Voir mes objectifs
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
@@ -933,4 +611,3 @@ function MissionFooter() {
     </div>
   );
 }
-
