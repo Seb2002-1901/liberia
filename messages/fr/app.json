@@ -1056,6 +1056,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Réactive ton abonnement pour retrouver {feature}",
+      "lapsedBody": "Ton accès Premium est expiré. Réactive ton plan pour reprendre exactement où tu t'étais arrêté — toutes tes données sont préservées.",
+      "noneHeadline": "{feature} est une fonctionnalité Premium",
+      "noneBody": "Démarre ton essai gratuit de 14 jours. Aucun prélèvement maintenant. Annule à tout moment.",
+      "cta": "Voir mon abonnement"
+    },
     "currentBadge": "Ton plan actuel",
     "activeButton": "Plan actif",
     "perYear": "an",

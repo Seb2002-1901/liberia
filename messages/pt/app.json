@@ -15,7 +15,9 @@
     "profil": "Perfil"
   },
   "savings": {
-    "metadata": { "title": "Poupança" },
+    "metadata": {
+      "title": "Poupança"
+    },
     "eyebrow": "Crescimento",
     "title": "A tua vista de poupança chega em breve",
     "description": "Um espaço dedicado para visualizar, projetar e planear a tua poupança — sem recomendação de produto.",
@@ -23,7 +25,9 @@
     "coachCta": "Falar com o meu conselheiro"
   },
   "investments": {
-    "metadata": { "title": "Investimentos" },
+    "metadata": {
+      "title": "Investimentos"
+    },
     "eyebrow": "Crescimento",
     "title": "A tua vista de investimentos chega em breve",
     "description": "Um espaço educativo para compreender, comparar e simular — sem nomes de produto nem recomendações de compra.",
@@ -31,7 +35,9 @@
     "coachCta": "Falar com o meu conselheiro"
   },
   "opportunities": {
-    "metadata": { "title": "Oportunidades" },
+    "metadata": {
+      "title": "Oportunidades"
+    },
     "eyebrow": "Crescimento",
     "title": "O teu catálogo de oportunidades chega em breve",
     "description": "Oportunidades classificadas por esforço, risco e prazo para aumentar os teus rendimentos e atingir os teus objetivos mais depressa.",
@@ -1056,6 +1062,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Reativa a tua subscrição para recuperares {feature}",
+      "lapsedBody": "O teu acesso Premium expirou. Reativa para retomares exatamente onde paraste — todos os teus dados estão preservados.",
+      "noneHeadline": "{feature} é uma funcionalidade Premium",
+      "noneBody": "Começa o teu teste gratuito de 14 dias. Sem cobrança hoje. Cancela quando quiseres.",
+      "cta": "Ver a minha subscrição"
+    },
     "currentBadge": "O teu plano atual",
     "activeButton": "Plano ativo",
     "perYear": "ano",

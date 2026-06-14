@@ -15,7 +15,9 @@
     "profil": "Profil"
   },
   "savings": {
-    "metadata": { "title": "Sparen" },
+    "metadata": {
+      "title": "Sparen"
+    },
     "eyebrow": "Wachstum",
     "title": "Deine Sparübersicht kommt bald",
     "description": "Ein eigener Bereich, um dein Sparen zu visualisieren, zu projizieren und zu planen — ohne Produktempfehlungen.",
@@ -23,7 +25,9 @@
     "coachCta": "Mit meinem Berater sprechen"
   },
   "investments": {
-    "metadata": { "title": "Investitionen" },
+    "metadata": {
+      "title": "Investitionen"
+    },
     "eyebrow": "Wachstum",
     "title": "Dein Investitionsbereich kommt bald",
     "description": "Ein lehrreicher Bereich, um zu verstehen, zu vergleichen und zu simulieren — ohne Produktnamen und Kaufempfehlungen.",
@@ -31,7 +35,9 @@
     "coachCta": "Mit meinem Berater sprechen"
   },
   "opportunities": {
-    "metadata": { "title": "Chancen" },
+    "metadata": {
+      "title": "Chancen"
+    },
     "eyebrow": "Wachstum",
     "title": "Dein Chancen-Katalog kommt bald",
     "description": "Chancen sortiert nach Aufwand, Risiko und Zeitrahmen, um dein Einkommen zu steigern und deine Ziele schneller zu erreichen.",
@@ -1056,6 +1062,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Reaktiviere dein Abo, um {feature} wiederzuerlangen",
+      "lapsedBody": "Dein Premium-Zugang ist abgelaufen. Reaktiviere ihn, um genau dort weiterzumachen, wo du aufgehört hast — alle deine Daten bleiben erhalten.",
+      "noneHeadline": "{feature} ist eine Premium-Funktion",
+      "noneBody": "Starte deine 14-tägige kostenlose Testphase. Heute keine Belastung. Jederzeit kündbar.",
+      "cta": "Mein Abo anzeigen"
+    },
     "currentBadge": "Dein aktueller Plan",
     "activeButton": "Aktiver Plan",
     "perYear": "Jahr",

@@ -15,7 +15,9 @@
     "profil": "Perfil"
   },
   "savings": {
-    "metadata": { "title": "Ahorro" },
+    "metadata": {
+      "title": "Ahorro"
+    },
     "eyebrow": "Crecimiento",
     "title": "Tu vista de ahorro llega pronto",
     "description": "Un espacio dedicado para visualizar, proyectar y planificar tu ahorro — sin recomendación de producto.",
@@ -23,7 +25,9 @@
     "coachCta": "Hablar con mi asesor"
   },
   "investments": {
-    "metadata": { "title": "Inversiones" },
+    "metadata": {
+      "title": "Inversiones"
+    },
     "eyebrow": "Crecimiento",
     "title": "Tu vista de inversiones llega pronto",
     "description": "Un espacio educativo para entender, comparar y simular — sin nombres de productos ni recomendaciones de compra.",
@@ -31,7 +35,9 @@
     "coachCta": "Hablar con mi asesor"
   },
   "opportunities": {
-    "metadata": { "title": "Oportunidades" },
+    "metadata": {
+      "title": "Oportunidades"
+    },
     "eyebrow": "Crecimiento",
     "title": "Tu catálogo de oportunidades llega pronto",
     "description": "Oportunidades clasificadas por esfuerzo, riesgo y plazo para aumentar tus ingresos y alcanzar tus metas más rápido.",
@@ -1056,6 +1062,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Reactiva tu suscripción para recuperar {feature}",
+      "lapsedBody": "Tu acceso Premium ha expirado. Reactívalo para retomar exactamente donde lo dejaste — todos tus datos están preservados.",
+      "noneHeadline": "{feature} es una función Premium",
+      "noneBody": "Inicia tu prueba gratuita de 14 días. Sin cargo hoy. Cancela cuando quieras.",
+      "cta": "Ver mi suscripción"
+    },
     "currentBadge": "Tu plan actual",
     "activeButton": "Plan activo",
     "perYear": "año",

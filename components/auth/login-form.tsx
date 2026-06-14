@@ -12,6 +12,12 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
 import { safeRedirectPath } from "@/lib/utils/redirect";
 import { localizeAuthError } from "@/lib/auth/error-messages";
+import { SocialLoginButtons } from "@/components/auth/social-login";
+import {
+  checkAuthThrottle,
+  bumpAuthThrottle,
+  clearAuthThrottle,
+} from "@/lib/auth/client-throttle";
 
 /**
  * Refonte V3 — Phase Auth-V3.
@@ -70,16 +76,31 @@ export function LoginForm() {
       });
       return;
     }
+    // Throttle UI : protège contre le double-clic + le spam de
+    // tentatives après mauvais mot de passe. Le vrai anti-bruteforce
+    // reste côté Supabase + Upstash (lib/rate-limit.ts).
+    const throttleKey = `login:${values.email.trim().toLowerCase()}`;
+    const check = checkAuthThrottle(throttleKey);
+    if (!check.allowed) {
+      toast.error(tErr("auth.errors.rateLimitExceeded"), {
+        description: tErr("auth.errors.retryInSeconds", {
+          seconds: check.retryInSeconds,
+        }),
+      });
+      return;
+    }
     setSubmitting(true);
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword(values);
       if (error) {
+        bumpAuthThrottle(throttleKey);
         toast.error(tForm("failedTitle"), {
           description: localizeAuthError(error.message, tErr),
         });
         return;
       }
+      clearAuthThrottle(throttleKey);
       toast.success(tForm("successWelcome"));
       router.push(next);
       router.refresh();
@@ -168,6 +189,8 @@ export function LoginForm() {
           {tForm("submit")}
         </V3PrimaryButton>
       </form>
+
+      <SocialLoginButtons mode="login" />
 
       <p
         style={{

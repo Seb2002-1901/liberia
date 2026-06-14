@@ -44,6 +44,8 @@ import { formatUserCurrency } from "@/lib/utils";
 import { EXPENSE_CATEGORIES } from "@/lib/constants";
 import type { DrawerData } from "@/lib/calculations/health/types";
 import { V3TopbarMenu } from "@/components/layout/v3-topbar-menu";
+import { getAccessState } from "@/lib/services/access-server";
+import { SoftPaywall } from "@/components/billing/soft-paywall";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
@@ -190,6 +192,71 @@ export default async function DesignMatchOpportunitesV3() {
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  // Sprint S2-BIS — paywall réel. Opportunités est un pilier Premium :
+  // détection ciblée + projection gains annuels = la valeur monétisable
+  // qui justifie l'abonnement. Lecture publique aux comptes en démo
+  // (data.isDemo) ; comptes lapsed/none = soft paywall + sidebar
+  // restent intacts pour ne pas piéger l'utilisateur.
+  let accessState: Awaited<ReturnType<typeof getAccessState>> = "premium";
+  if (!data.isDemo && authedUser?.id) {
+    try {
+      const supabase = await createClient();
+      accessState = await getAccessState(supabase, authedUser.id);
+    } catch {
+      accessState = "premium";
+    }
+  }
+
+  if (accessState !== "premium") {
+    return (
+      <>
+        <MobileNav />
+        <div
+          style={{
+            display: "flex",
+            minHeight: "100vh",
+            backgroundColor: C.pageBg,
+            fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+          }}
+        >
+          <div data-opp-sidebar>
+            <Sidebar />
+          </div>
+          <div
+            data-opp-content
+            style={{
+              marginLeft: 280,
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minWidth: 0,
+            }}
+          >
+            <Topbar firstName={firstName} fullName={fullName} />
+            <main
+              data-opp-main
+              style={{
+                padding: "32px 24px",
+                maxWidth: 1440,
+                margin: "0 auto",
+                width: "100%",
+              }}
+            >
+              <SoftPaywall state={accessState} feature="Opportunités IA" />
+            </main>
+          </div>
+        </div>
+        <style>{`
+          @media (max-width: 999px) {
+            [data-opp-sidebar] { display: none !important; }
+            [data-opp-content] { margin-left: 0 !important; }
+            [data-opp-main] { padding: 24px 16px !important; }
+          }
+        `}</style>
+      </>
+    );
+  }
 
   /* ------------------------------------------------------------------ */
   /*  Agrégats finance (alignés dashboard-v3 / plan-v3)                  */

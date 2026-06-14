@@ -23,6 +23,9 @@ import { getFinanceData, totalMonthly } from "@/lib/services/finance";
 import { calculateRunway } from "@/lib/calculations/finance";
 import { ROUTES } from "@/lib/constants";
 import { V3Shell } from "@/components/layout/v3-shell";
+import { createClient } from "@/lib/supabase/server";
+import { getAccessState } from "@/lib/services/access-server";
+import { SoftPaywall } from "@/components/billing/soft-paywall";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +46,24 @@ export default async function ExpensesAnalyticsPage() {
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+
+  // Sprint S2-BIS — paywall réel. Analytics détaillé (categorical
+  // breakdown + projection runway + budgets cross-category) reste
+  // ouvert en démo (data.isDemo) pour montrer la valeur. Les comptes
+  // authentifiés non-premium voient le soft paywall à la place du
+  // module analytique.
+  let accessState: Awaited<ReturnType<typeof getAccessState>> = "premium";
+  if (!data.isDemo) {
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) accessState = await getAccessState(supabase, user.id);
+    } catch {
+      accessState = "premium";
+    }
+  }
 
   return (
     <V3Shell
@@ -66,7 +87,9 @@ export default async function ExpensesAnalyticsPage() {
           description={t("description")}
         />
 
-        {data.isDemo ? (
+        {accessState !== "premium" ? (
+          <SoftPaywall state={accessState} feature="Analytics détaillé" />
+        ) : data.isDemo ? (
           <Card>
             <CardHeader>
               <CardTitle>{t("demoTitle")}</CardTitle>

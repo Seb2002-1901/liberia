@@ -13,6 +13,12 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
 import { V3Field, V3Input, V3PrimaryButton } from "./login-form";
 import { localizeAuthError } from "@/lib/auth/error-messages";
+import { SocialLoginButtons } from "@/components/auth/social-login";
+import {
+  checkAuthThrottle,
+  bumpAuthThrottle,
+  clearAuthThrottle,
+} from "@/lib/auth/client-throttle";
 
 /**
  * Refonte V3 — Phase Auth-V3.
@@ -68,6 +74,16 @@ export function RegisterForm() {
       });
       return;
     }
+    const throttleKey = `register:${values.email.trim().toLowerCase()}`;
+    const check = checkAuthThrottle(throttleKey);
+    if (!check.allowed) {
+      toast.error(tErr("auth.errors.rateLimitExceeded"), {
+        description: tErr("auth.errors.retryInSeconds", {
+          seconds: check.retryInSeconds,
+        }),
+      });
+      return;
+    }
     setSubmitting(true);
     try {
       const supabase = createClient();
@@ -82,11 +98,13 @@ export function RegisterForm() {
         },
       });
       if (error) {
+        bumpAuthThrottle(throttleKey);
         toast.error(tForm("failedTitle"), {
           description: localizeAuthError(error.message, tErr),
         });
         return;
       }
+      clearAuthThrottle(throttleKey);
 
       // Two possible Supabase configs:
       //  - "Confirm email" ON: signUp returns user but no session.
@@ -307,6 +325,8 @@ export function RegisterForm() {
           {tForm("submit")}
         </V3PrimaryButton>
       </form>
+
+      <SocialLoginButtons mode="register" />
 
       <p
         style={{

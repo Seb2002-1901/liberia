@@ -15,7 +15,9 @@
     "profil": "Profilo"
   },
   "savings": {
-    "metadata": { "title": "Risparmio" },
+    "metadata": {
+      "title": "Risparmio"
+    },
     "eyebrow": "Crescita",
     "title": "La tua vista risparmio arriva presto",
     "description": "Uno spazio dedicato per visualizzare, proiettare e pianificare il tuo risparmio — senza alcuna raccomandazione di prodotto.",
@@ -23,7 +25,9 @@
     "coachCta": "Parlare con il mio consulente"
   },
   "investments": {
-    "metadata": { "title": "Investimenti" },
+    "metadata": {
+      "title": "Investimenti"
+    },
     "eyebrow": "Crescita",
     "title": "La tua vista investimenti arriva presto",
     "description": "Uno spazio educativo per capire, confrontare e simulare — senza nomi di prodotto né raccomandazioni d'acquisto.",
@@ -31,7 +35,9 @@
     "coachCta": "Parlare con il mio consulente"
   },
   "opportunities": {
-    "metadata": { "title": "Opportunità" },
+    "metadata": {
+      "title": "Opportunità"
+    },
     "eyebrow": "Crescita",
     "title": "Il tuo catalogo di opportunità arriva presto",
     "description": "Opportunità classificate per impegno, rischio e tempistica per aumentare le tue entrate e raggiungere prima i tuoi obiettivi.",
@@ -1056,6 +1062,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Riattiva il tuo abbonamento per ritrovare {feature}",
+      "lapsedBody": "Il tuo accesso Premium è scaduto. Riattivalo per riprendere esattamente da dove hai lasciato — tutti i tuoi dati sono preservati.",
+      "noneHeadline": "{feature} è una funzionalità Premium",
+      "noneBody": "Inizia la tua prova gratuita di 14 giorni. Nessun addebito oggi. Annulla in qualsiasi momento.",
+      "cta": "Vedi il mio abbonamento"
+    },
     "currentBadge": "Il tuo piano attuale",
     "activeButton": "Piano attivo",
     "perYear": "anno",
