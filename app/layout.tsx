@@ -44,22 +44,32 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: APP_NAME,
       type: "website",
       locale: openGraphLocale,
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: `${APP_NAME} — ${tagline}`,
-        },
-      ],
+      // Image OG résolue dynamiquement par app/opengraph-image.tsx
+      // (Next 15 — ImageResponse). Pas besoin de référencer /og-image.png
+      // statique : un asset 404 ferait planter les previews LinkedIn /
+      // Twitter / iMessage.
     },
     twitter: {
       card: "summary_large_image",
       title: `${APP_NAME} — ${tagline}`,
       description,
-      images: ["/og-image.png"],
     },
     category: "finance",
+    // Sprint S2 — manifest + Apple webapp meta pour iOS "Add to Home
+    // Screen" + Android PWA install. Sans `appleWebApp`, iOS dégrade
+    // l'install en raccourci Safari basique sans splash ni icône
+    // standalone.
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title: APP_NAME,
+      statusBarStyle: "default",
+    },
+    formatDetection: {
+      telephone: false,
+      email: false,
+      address: false,
+    },
     // Sensible default for marketing pages. /admin and /dashboard set
     // their own robots:{ index: false } overrides via per-route metadata.
     robots: { index: true, follow: true },
