@@ -772,8 +772,8 @@ function ChatThread({ wired }: { wired: CoachWired }) {
   const greeting = wired.firstName ? `Salut ${wired.firstName}` : "Bonjour";
   const scoreFragment =
     wired.scoreDisplay !== null
-      ? `votre score est de ${wired.scoreDisplay}/100`
-      : "votre score est en cours de construction";
+      ? `ton score est de ${wired.scoreDisplay}/100`
+      : "ton score est en cours de construction";
   const cashflowFragment = (() => {
     if (!wired.hasIncome || !wired.hasExpenses) return null;
     if (wired.cashflow >= 0) {
@@ -782,19 +782,10 @@ function ChatThread({ wired }: { wired: CoachWired }) {
     return `cashflow négatif de ${formatMoney(Math.abs(wired.cashflow), profile)}/mois`;
   })();
 
-  // Le LeverRow #3 (réduire dépenses fixes 10 %) ne s'affiche que si on
-  // a un volume de dépenses réel à afficher. Calcul honnête : 10 % de
-  // monthlyExpenses, formaté en devise utilisateur.
-  const expenseReduction = wired.hasExpenses
-    ? wired.monthlyExpenses * 0.1
-    : 0;
-  const showLever3 = expenseReduction > 0;
-
-  // Les "impacts en points" mockés (+12 pts / +8 pts) ne sont pas
-  // calculables fidèlement sans le moteur d'impact FHS dédié. On bascule
-  // donc les labels d'impact sur des descriptions qualitatives + le
-  // montant réel pour le lever #3.
-
+  // Pas de chat simulé : pas de bulle user inventée, pas de réponse IA
+  // hardcodée, pas de TypingIndicator perpétuel. Un seul message
+  // d'introduction adossé aux DONNÉES réelles de l'utilisateur (score,
+  // cashflow, priorité), puis on rend la main au composer + suggestions.
   return (
     <div
       style={{
@@ -807,17 +798,16 @@ function ChatThread({ wired }: { wired: CoachWired }) {
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
-        gap: 20,
+        gap: 18,
       }}
     >
-      <PreviewBanner />
       <DateSeparator label="Aujourd'hui" />
-      <AssistantMessage time="10:30">
+      <AssistantMessage>
         <p style={{ margin: 0, fontSize: 13.5, color: C.textDark, lineHeight: 1.55 }}>
           {greeting}&nbsp;<span aria-hidden>👋</span>
         </p>
         <p style={{ margin: "8px 0 0 0", fontSize: 13.5, color: C.textDark, lineHeight: 1.55 }}>
-          J&apos;ai analysé votre situation :{" "}
+          J&apos;ai jeté un œil à ta situation :{" "}
           <strong style={{ color: C.navy, fontWeight: 700 }}>{scoreFragment}</strong>
           {cashflowFragment && (
             <>
@@ -828,152 +818,14 @@ function ChatThread({ wired }: { wired: CoachWired }) {
           .
         </p>
         <p style={{ margin: "8px 0 0 0", fontSize: 13.5, color: C.textDark, lineHeight: 1.55 }}>
-          Votre priorité actuelle&nbsp;:{" "}
-          <strong style={{ color: C.navy, fontWeight: 700 }}>{wired.priorityTitle.toLowerCase()}</strong>. Par quoi voulez-vous commencer ?
+          Ta priorité du moment&nbsp;:{" "}
+          <strong style={{ color: C.navy, fontWeight: 700 }}>{wired.priorityTitle.toLowerCase()}</strong>.
+        </p>
+        <p style={{ margin: "10px 0 0 0", fontSize: 13, color: C.textMuted, lineHeight: 1.5 }}>
+          Démarre une conversation pour explorer ensemble. Choisis une suggestion ci-dessous ou écris directement dans le composer.
         </p>
       </AssistantMessage>
-      <UserMessage time="10:31" status="read">
-        Comment augmenter mon épargne plus rapidement&nbsp;?
-      </UserMessage>
-      <AssistantMessage time="10:31">
-        <p style={{ margin: 0, fontSize: 13.5, color: C.textDark, lineHeight: 1.55 }}>
-          Excellente question. Voici quelques leviers concrets adaptés à votre situation :
-        </p>
-        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-          <LeverRow
-            rank={1}
-            color={C.success}
-            colorBg={C.successBg}
-            title="Augmenter vos revenus mensuels"
-            impact="Fort impact"
-            detail="C'est le levier le plus puissant sur votre score (32 % du calcul)."
-            isPrimary
-          />
-          <LeverRow
-            rank={2}
-            color={C.primary}
-            colorBg={C.primaryBg}
-            title="Automatiser un virement vers votre épargne"
-            impact="Habitude"
-            detail="Versement le 25 du mois, juste après votre salaire."
-          />
-          {showLever3 && (
-            <LeverRow
-              rank={3}
-              color={C.violet}
-              colorBg={C.violetBg}
-              title="Réduire vos dépenses fixes de 10 %"
-              impact={`≈ ${formatMoney(expenseReduction, profile)}/mois`}
-              detail="Renégociation assurances, abonnements, énergie."
-            />
-          )}
-        </div>
-        <p style={{ margin: "12px 0 0 0", fontSize: 13, color: C.textMuted, lineHeight: 1.5 }}>
-          Lequel souhaitez-vous approfondir&nbsp;?
-        </p>
-      </AssistantMessage>
-      <UserMessage time="10:32" status="read">
-        Montre-moi comment réduire mes dépenses fixes.
-      </UserMessage>
-      <TypingIndicator />
     </div>
-  );
-}
-
-function PreviewBanner() {
-  // Badge discret indiquant que le thread visible est un APERÇU
-  // personnalisé (chiffres réels intégrés dans des bulles
-  // d'illustration). La vraie conversation se passe dans /coach/[id]
-  // déclenché par "Nouvelle conversation".
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignSelf: "flex-start",
-        alignItems: "center",
-        gap: 6,
-        padding: "4px 10px",
-        borderRadius: 999,
-        backgroundColor: C.primaryBg,
-        color: C.primary,
-        fontSize: 10.5,
-        fontWeight: 700,
-        letterSpacing: "0.08em",
-        textTransform: "uppercase",
-      }}
-    >
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      Aperçu personnalisé
-    </div>
-  );
-}
-
-function TypingIndicator() {
-  return (
-    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-      <span
-        aria-hidden
-        style={{
-          flexShrink: 0,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 30,
-          height: 30,
-          borderRadius: 999,
-          backgroundColor: C.navy,
-          marginTop: 2,
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-          <path d="M13 2L4.09 12.97 12 14l-1 8 8.91-10.97L13 12l1-10z" />
-        </svg>
-      </span>
-      <div>
-        <div
-          aria-label="Coach IA est en train d'écrire"
-          style={{
-            padding: "12px 16px",
-            backgroundColor: C.assistantBubble,
-            borderRadius: "4px 14px 14px 14px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-          }}
-        >
-          <TypingDot delay="0s" />
-          <TypingDot delay="0.16s" />
-          <TypingDot delay="0.32s" />
-        </div>
-        <p style={{ marginTop: 4, fontSize: 10.5, color: C.textLight, margin: "4px 0 0 4px" }}>
-          Coach IA écrit…
-        </p>
-      </div>
-      {/* Keyframes inlined via <style> pour rester autonome (pas
-          d'imports Tailwind ni de classes globales). */}
-      <style>{`@keyframes coach-typing { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }`}</style>
-    </div>
-  );
-}
-
-function TypingDot({ delay }: { delay: string }) {
-  return (
-    <span
-      aria-hidden
-      style={{
-        display: "inline-block",
-        width: 6,
-        height: 6,
-        borderRadius: 999,
-        backgroundColor: C.textMuted,
-        animation: "coach-typing 1.2s ease-in-out infinite",
-        animationDelay: delay,
-      }}
-    />
   );
 }
 
@@ -994,7 +846,7 @@ function AssistantMessage({
   time,
 }: {
   children: React.ReactNode;
-  time: string;
+  time?: string;
 }) {
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -1025,145 +877,12 @@ function AssistantMessage({
         >
           {children}
         </div>
-        <p style={{ marginTop: 4, fontSize: 10.5, color: C.textLight, marginLeft: 4, margin: "4px 0 0 4px" }}>
-          Coach IA · {time}
-        </p>
+        {time && (
+          <p style={{ marginTop: 4, fontSize: 10.5, color: C.textLight, marginLeft: 4, margin: "4px 0 0 4px" }}>
+            Coach IA · {time}
+          </p>
+        )}
       </div>
-    </div>
-  );
-}
-
-function UserMessage({
-  children,
-  time,
-  status,
-}: {
-  children: React.ReactNode;
-  time: string;
-  status: "sent" | "read";
-}) {
-  return (
-    <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <div style={{ maxWidth: 480 }}>
-        <div
-          style={{
-            padding: "11px 16px",
-            backgroundColor: C.navy,
-            color: "white",
-            borderRadius: "14px 4px 14px 14px",
-            fontSize: 13.5,
-            lineHeight: 1.55,
-          }}
-        >
-          {children}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4, marginTop: 4 }}>
-          <span style={{ fontSize: 10.5, color: C.textLight }}>{time}</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={status === "read" ? C.primary : C.textLight} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-            <polyline points="22 12 14 20 13 19" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LeverRow({
-  rank,
-  color,
-  colorBg,
-  title,
-  impact,
-  detail,
-  isPrimary = false,
-}: {
-  rank: number;
-  color: string;
-  colorBg: string;
-  title: string;
-  impact: string;
-  detail: string;
-  isPrimary?: boolean;
-}) {
-  return (
-    <div
-      style={{
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        // Sur le #1 : padding-left renforcé pour héberger l'accent
-        // vertical 3 px (success), bg très légèrement tinté
-        // (#F4FBF8 ≈ successBg dilué). Aucun effet flashy, juste un
-        // shift de lecture côté best lever.
-        padding: isPrimary ? "11px 12px 11px 15px" : "10px 12px",
-        backgroundColor: isPrimary ? "#F4FBF8" : C.cardBg,
-        borderRadius: 10,
-        boxShadow: SHADOW.flat,
-        overflow: "hidden",
-      }}
-    >
-      {isPrimary && (
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 8,
-            bottom: 8,
-            width: 3,
-            borderRadius: "0 3px 3px 0",
-            backgroundColor: C.success,
-          }}
-        />
-      )}
-      <span
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 24,
-          height: 24,
-          borderRadius: 999,
-          backgroundColor: isPrimary ? color : colorBg,
-          color: isPrimary ? "white" : color,
-          fontSize: 11.5,
-          fontWeight: 700,
-          fontFamily: "Outfit, Inter, system-ui",
-          flexShrink: 0,
-          boxShadow: isPrimary ? `0 0 0 3px rgba(16, 163, 127, 0.14)` : "none",
-        }}
-      >
-        {rank}
-      </span>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 12.5,
-            fontWeight: isPrimary ? 700 : 600,
-            color: C.textDark,
-            lineHeight: 1.3,
-          }}
-        >
-          {title}
-        </p>
-        <p style={{ margin: "2px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.4 }}>
-          {detail}
-        </p>
-      </div>
-      <span
-        style={{
-          fontSize: isPrimary ? 12.5 : 11.5,
-          fontWeight: 700,
-          color: color,
-          fontVariantNumeric: "tabular-nums",
-          flexShrink: 0,
-        }}
-      >
-        {impact}
-      </span>
     </div>
   );
 }
