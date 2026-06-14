@@ -135,6 +135,99 @@ export function CoachConversationV3Client({
     scrollToBottom(false);
   }, [messages, streamedText, scrollToBottom]);
 
+  // Sprint S1 — Auto-réponse au seed de la landing.
+  // Si la conversation arrive avec un message USER en dernier (cas où
+  // la landing /coach a inséré un seed via startNewConversationAction),
+  // on déclenche automatiquement /api/ai/chat avec ce contenu. Le user
+  // voit son message + la réponse coach se streamer, sans avoir à
+  // recliquer "Envoyer". Pattern ChatGPT.
+  const autoSeedTriggered = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (autoSeedTriggered.current === conversationId) return;
+    if (streaming || isDemo) return;
+    const last = initialMessages[initialMessages.length - 1];
+    if (!last || last.role !== "user") return;
+    autoSeedTriggered.current = conversationId;
+    // Le sendMessage rajouterait un message user en double ; on
+    // bypasse l'optimistic-user et on streame directement.
+    const trigger = async () => {
+      setStreamedText("");
+      setStreaming(true);
+      const ac = new AbortController();
+      abortRef.current = ac;
+      try {
+        const res = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversationId, content: last.content }),
+          signal: ac.signal,
+        });
+        if (!res.ok || !res.body) {
+          throw new Error(t("fallbackError"));
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantContent = "";
+        let assistantMessageId: string | null = null;
+        const sseBuf = { current: "" };
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          sseBuf.current += chunk;
+          const events = sseBuf.current.split("\n\n");
+          sseBuf.current = events.pop() ?? "";
+          for (const ev of events) {
+            const line = ev.trim();
+            if (!line.startsWith("data:")) continue;
+            const json = line.slice(5).trim();
+            try {
+              const parsed = JSON.parse(json) as
+                | { type: "delta"; content: string }
+                | { type: "done"; message_id?: string; content?: string }
+                | { type: "error"; message?: string };
+              if (parsed.type === "delta") {
+                assistantContent += parsed.content;
+                setStreamedText(assistantContent);
+              } else if (parsed.type === "done") {
+                assistantMessageId =
+                  parsed.message_id ?? `local-${Date.now()}`;
+                if (typeof parsed.content === "string") {
+                  assistantContent = parsed.content;
+                }
+              } else if (parsed.type === "error") {
+                throw new Error(parsed.message ?? t("fallbackError"));
+              }
+            } catch {
+              /* ignore parse error */
+            }
+          }
+        }
+        if (assistantMessageId) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: assistantMessageId!,
+              role: "assistant",
+              content: assistantContent,
+              created_at: new Date().toISOString(),
+            },
+          ]);
+        }
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        toast.error(t("fallbackError"));
+      } finally {
+        setStreaming(false);
+        setStreamedText("");
+        abortRef.current = null;
+      }
+    };
+    void trigger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, initialMessages]);
+
   // Abort in-flight stream on unmount / conversation switch.
   React.useEffect(() => {
     return () => {

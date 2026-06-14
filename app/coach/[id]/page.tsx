@@ -772,11 +772,6 @@ function Sidebar() {
             iconPath="M21 11h-1a4 4 0 0 0-4-4h-4a8 8 0 0 0-8 8 6 6 0 0 0 6 6h2v-3h4v3h2a6 6 0 0 0 4-2v-2h2v-6z"
           />
           <NavItem
-            label="Investissements"
-            href="/design-match/investissements-v3"
-            iconPath="M22 12L18 7l-5 5-4-3-7 7|M22 7V12 17H22Z"
-          />
-          <NavItem
             label="Opportunités"
             href="/design-match/opportunites-v3"
             iconPath="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z"

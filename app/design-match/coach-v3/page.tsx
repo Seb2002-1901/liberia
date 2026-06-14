@@ -875,9 +875,14 @@ function SuggestionChips({ wired }: { wired: CoachWired }) {
       </span>
       {suggestions.map((s) => (
         <form key={s} action={startNewConversationAction}>
+          {/* Le texte de la suggestion est envoyé comme premier message
+              utilisateur via le champ seed (cf. startNewConversationAction).
+              Pattern ChatGPT : le user clique, son message s'affiche déjà
+              côté thread quand il atterrit sur /coach/{id}. */}
+          <input type="hidden" name="seed" value={s} />
           <button
             type="submit"
-            title="Démarre une nouvelle conversation"
+            title={s}
             style={{
               padding: "7px 12px",
               borderRadius: 999,
@@ -891,12 +896,14 @@ function SuggestionChips({ wired }: { wired: CoachWired }) {
               alignItems: "center",
               gap: 5,
               boxShadow: SHADOW.flat,
+              maxWidth: 320,
+              textAlign: "left",
             }}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-            {s}
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s}</span>
           </button>
         </form>
       ))}
@@ -907,12 +914,11 @@ function SuggestionChips({ wired }: { wired: CoachWired }) {
 /* ═══════════════ COMPOSER ═══════════════ */
 
 function Composer() {
-  // Le composer de la LANDING n'envoie pas de message — c'est /coach/
-  // [id] qui héberge le vrai input. On le transforme en CTA explicite
-  // "Démarrer une conversation" : le clic sur Envoyer crée une
-  // conversation et redirige vers /coach/{id}. Les 3 actions
-  // secondaires (joindre fichier / analyser données / dicter) ne sont
-  // pas câblées côté backend — on les neutralise en disabled honnête.
+  // Composer réel : textarea HTML + bouton submit. Le FormData est
+  // reçu par startNewConversationAction qui (1) crée la conversation
+  // (2) insère le texte saisi comme premier message utilisateur (3)
+  // redirige vers /coach/{id}. Le user atterrit avec son message déjà
+  // envoyé, le coach répond immédiatement (pattern ChatGPT).
   return (
     <form
       action={startNewConversationAction}
@@ -926,23 +932,29 @@ function Composer() {
         gap: 8,
       }}
     >
-      <div
+      <textarea
+        name="seed"
+        rows={2}
+        placeholder="Pose ta question à ton coach financier…"
+        aria-label="Message à votre conseiller IA"
         style={{
-          fontSize: 13.5,
-          color: C.textLight,
-          lineHeight: 1.5,
+          width: "100%",
+          resize: "none",
+          border: "none",
+          outline: "none",
+          fontSize: 16, // iOS Safari : no zoom on focus
+          color: C.textDark,
+          fontFamily: "inherit",
+          backgroundColor: "transparent",
           padding: "6px 4px",
-          minHeight: 24,
+          lineHeight: 1.5,
+          minHeight: 48,
         }}
-        aria-label="Démarrer une conversation"
-      >
-        Démarrez une conversation avec votre conseiller IA…
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
-        {/* Boutons composer (fichier / analyse / dicter) retirés : non
-            câblés côté backend, garder des contrôles désactivés crée
-            une dette UX premium. À réintroduire avec leurs fonctionnalités
-            réelles. */}
+      />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <span style={{ fontSize: 10.5, color: C.textLight, letterSpacing: "0.04em" }}>
+          Entrée pour envoyer · Maj+Entrée pour aller à la ligne
+        </span>
         <button
           type="submit"
           aria-label="Envoyer"
@@ -961,7 +973,7 @@ function Composer() {
             cursor: "pointer",
           }}
         >
-          Démarrer
+          Envoyer
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />

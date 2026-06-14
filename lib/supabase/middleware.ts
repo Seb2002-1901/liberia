@@ -49,7 +49,8 @@ const PROD_TO_V3_REDIRECTS: Record<string, string> = {
   "/budget": "/design-match/budget-v3",
   "/goals": "/design-match/objectifs-v3",
   "/savings": "/design-match/epargne-v3",
-  "/investments": "/design-match/investissements-v3",
+  // Sprint S1 — module Investissements masqué (page redirect → /epargne).
+  "/investments": "/design-match/epargne-v3",
   "/opportunities": "/design-match/opportunites-v3",
   "/profile": "/design-match/profil-v3",
   "/settings": "/design-match/parametres-v3",
