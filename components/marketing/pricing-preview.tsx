@@ -1,33 +1,87 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
 import { PricingPlans } from "@/components/billing/pricing-plans";
 import { ROUTES } from "@/lib/constants";
 import { TRIAL_DAYS } from "@/lib/stripe/config";
 
+const C = {
+  primary: "#2563EB",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  borderGhost: "#E5E9F0",
+};
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
+
 export async function PricingPreview() {
   const t = await getTranslations("marketing.pricingPreview");
   return (
-    <section id="pricing" className="border-t border-border/60">
-      <div className="container py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
+    <section id="pricing" style={{ borderTop: `1px solid ${C.borderGhost}` }}>
+      <div className="container" style={{ padding: "72px 24px" }}>
+        <div
+          style={{
+            maxWidth: 640,
+            margin: "0 auto",
+            textAlign: "center",
+            fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11,
+              fontWeight: 700,
+              color: C.primary,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+            }}
+          >
             {t("eyebrow")}
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          <h2
+            style={{
+              margin: "14px 0 0 0",
+              fontFamily: FONT_DISPLAY,
+              fontSize: 32,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: C.textDark,
+              lineHeight: 1.15,
+            }}
+          >
             {t("title", { days: TRIAL_DAYS })}
           </h2>
-          <p className="mt-3 text-muted-foreground">{t("subtitle")}</p>
+          <p
+            style={{
+              margin: "10px 0 0 0",
+              fontSize: 14.5,
+              color: C.textMuted,
+              lineHeight: 1.55,
+            }}
+          >
+            {t("subtitle")}
+          </p>
         </div>
 
-        <div className="mt-12">
+        <div style={{ marginTop: 40 }}>
           <PricingPlans variant="marketing" />
         </div>
 
-        <div className="mt-6 text-center">
-          <Button asChild variant="ghost" size="sm">
-            <Link href={ROUTES.pricing}>{t("seeAll")}</Link>
-          </Button>
+        <div style={{ marginTop: 24, textAlign: "center" }}>
+          <Link
+            href={ROUTES.pricing}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "8px 14px",
+              fontSize: 13,
+              fontWeight: 500,
+              color: C.textMuted,
+              textDecoration: "none",
+              borderRadius: 8,
+            }}
+          >
+            {t("seeAll")}
+          </Link>
         </div>
       </div>
     </section>
