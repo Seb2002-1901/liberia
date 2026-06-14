@@ -1,13 +1,11 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft,
-  ArrowRight,
   Banknote,
-  Loader2,
   MoreHorizontal,
   PiggyBank,
   Plane,
@@ -19,13 +17,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { BrandMark } from "@/components/layout/brand-mark";
 import {
   FINANCIAL_SITUATIONS,
   GOAL_TYPES,
@@ -34,21 +25,24 @@ import {
 } from "@/lib/constants";
 import { onboardingSchema } from "@/lib/validations/finance";
 import { completeOnboarding, skipOnboarding } from "@/app/actions/onboarding";
-import { cn } from "@/lib/utils";
 
 /**
- * Phase 4.0 — Onboarding réduit de 8 étapes à 3.
+ * Refonte V3 — Phase Auth-V3 / Onboarding.
  *
- * Étape 1 — "Toi" : situation + revenu mensuel.
- * Étape 2 — "Tes 4 charges principales" : logement / assurances /
- *           alimentation / transport, chaque catégorie pouvant être
- *           marquée "je ne sais pas" (= null, honnête, le coach
- *           demandera plus tard).
- * Étape 3 — "Ton objectif principal" : 7 cards visuelles, skippable.
+ * Logique CRITIQUE inchangée :
+ *  - StepKey state machine 3 étapes (you, fixed_costs, main_goal)
+ *  - FormState : situation, monthlyIncome, expenseBreakdown, mainGoal
+ *  - ExpenseBreakdown : null = "Je ne sais pas" ≠ 0 = "Je n'en ai pas"
+ *  - mainGoal nullable (skip explicite)
+ *  - canContinue() gating boutons par step
+ *  - submit() avec onboardingSchema.safeParse + completeOnboarding
+ *  - skipOnboarding form action préservé
+ *  - framer-motion AnimatePresence transitions opacity/y
+ *  - router.push(ROUTES.dashboard) après succès (= V3 dashboard direct)
  *
- * Les anciens champs (savings, debt, behavior, stress, insight) ne
- * sont plus demandés à l'onboarding. Defaults au submit, le coach
- * récupère les informations manquantes au fil des conversations.
+ * JSX visuel : charte navy V3 inline (tokens C, Outfit, Inter, ombres).
+ * Plus de dépendance shadcn (Button, Input, Label, Progress, Checkbox,
+ * RadioGroup).
  */
 
 type StepKey = "you" | "fixed_costs" | "main_goal";
@@ -66,13 +60,6 @@ const GOAL_ICONS: Record<string, LucideIcon> = {
   MoreHorizontal,
 };
 
-/**
- * Phase 4.0 — 4 catégories majeures saisies à l'onboarding. Chaque
- * champ accepte un nombre OU null ("je ne sais pas").
- * null → pas d'expense entry créée → FHS Couverture honnête (le
- * coach demandera). 0 et null sont distincts : 0 = "je n'en ai pas"
- * (entry créée à 0), null = "je ne sais pas" (pas d'entry).
- */
 type ExpenseBreakdown = {
   housing: number | null;
   insurance: number | null;
@@ -84,9 +71,29 @@ type FormState = {
   situation: "struggling" | "tight" | "stable" | "comfortable";
   monthlyIncome: number | "";
   expenseBreakdown: ExpenseBreakdown;
-  /** null = user a choisi "Passer cette étape" — le coach proposera J3. */
   mainGoal: GoalTypeId | null;
 };
+
+const C = {
+  navy: "#011E5F",
+  pageBg: "#F9FAFD",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  textLight: "#94A3B8",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+  success: "#10A37F",
+  danger: "#DC2626",
+};
+
+const SHADOW = {
+  card: "0 1px 2px rgb(15 23 42 / 0.03), 0 12px 32px -10px rgb(15 23 42 / 0.06)",
+};
+
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
+const FONT_STACK = "Inter, system-ui, -apple-system, sans-serif";
 
 export function OnboardingFlow() {
   const t = useTranslations("onboarding");
@@ -132,13 +139,11 @@ export function OnboardingFlow() {
           Number(form.monthlyIncome) >= 0
         );
       case "fixed_costs": {
-        // Au moins UNE catégorie renseignée avec un montant ≥ 0
-        // (un montant = 0 est valide, "je ne sais pas" = null ne l'est pas).
         const vals = Object.values(form.expenseBreakdown);
         return vals.some((v) => v !== null && v >= 0);
       }
       case "main_goal":
-        return true; // skippable
+        return true;
     }
   };
 
@@ -153,16 +158,12 @@ export function OnboardingFlow() {
       situation: form.situation,
       monthlyIncome: Number(form.monthlyIncome) || 0,
       monthlyExpenses,
-      // Defaults pour les champs différés (coach demandera J3-J7).
       currentSavings: 0,
       monthlyDebt: 0,
       hasEmergencyFund: false,
       mainGoal: form.mainGoal ?? "emergency_fund",
       perceivedStress: 3,
       behaviorTraits: [],
-      // Phase 4.0 — breakdown détaillé : la server action crée 4
-      // expense entries dans la table `expenses` (1 par catégorie
-      // non-null), ce qui peuple immédiatement la Couverture FHS.
       expenseBreakdown: {
         housing,
         insurance,
@@ -193,105 +194,370 @@ export function OnboardingFlow() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-10">
-      <div className="flex items-center justify-between">
-        <BrandMark />
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: C.pageBg,
+        fontFamily: FONT_STACK,
+        color: C.textDark,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <header
+        style={{
+          padding: "24px 32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Link
+          href="/"
+          aria-label="LIBERIA"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+            textDecoration: "none",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 30,
+              height: 30,
+              backgroundColor: C.navy,
+              borderRadius: 8,
+            }}
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 20V6" />
+              <path d="M4 20h14" />
+              <path d="M8 14l4-4 3 3 5-6" />
+            </svg>
+          </span>
+          <span
+            style={{
+              color: C.navy,
+              letterSpacing: "0.16em",
+              fontSize: 15,
+              fontWeight: 700,
+            }}
+          >
+            LIBERIA
+          </span>
+        </Link>
         <form action={skipOnboarding}>
           <button
             type="submit"
-            className="text-xs text-muted-foreground hover:text-foreground"
+            style={{
+              fontSize: 12.5,
+              color: C.textMuted,
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              padding: 4,
+            }}
           >
             {t("skip")}
           </button>
         </form>
-      </div>
+      </header>
 
-      <div className="mt-8 space-y-2">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            {t("stepCounter", { current: step + 1, total: STEP_KEYS.length })}
-          </span>
-          <span>{Math.round(progress)} %</span>
-        </div>
-        <Progress
-          value={progress}
-          indicatorClassName="bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--gold-muted))]"
-        />
-      </div>
-
-      <div className="my-auto py-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentKey}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-6"
+      <main
+        style={{
+          flex: 1,
+          maxWidth: 640,
+          width: "100%",
+          margin: "0 auto",
+          padding: "16px 24px 40px 24px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: 11.5,
+              color: C.textMuted,
+              fontWeight: 500,
+              letterSpacing: "0.04em",
+            }}
           >
-            <div className="space-y-2">
-              <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
-                {t(`steps.${currentKey}.eyebrow`)}
-              </p>
-              <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                {t(`steps.${currentKey}.title`)}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {t(`steps.${currentKey}.subtitle`)}
-              </p>
-            </div>
-            <StepContent
-              step={currentKey}
-              form={form}
-              update={update}
-              updateExpense={updateExpense}
+            <span>
+              {t("stepCounter", { current: step + 1, total: STEP_KEYS.length })}
+            </span>
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>
+              {Math.round(progress)} %
+            </span>
+          </div>
+          <div
+            style={{
+              height: 4,
+              borderRadius: 999,
+              backgroundColor: C.borderGhost,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${progress}%`,
+                height: "100%",
+                background: `linear-gradient(90deg, ${C.primary}, ${C.navy})`,
+                borderRadius: 999,
+                transition: "width 0.3s ease",
+              }}
             />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          </div>
+        </div>
 
-      <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-6">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={back}
-          disabled={step === 0 || submitting}
+        <div
+          style={{
+            margin: "auto 0",
+            padding: "40px 0",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
-          <ArrowLeft className="h-4 w-4" /> {t("actions.back")}
-        </Button>
-        {step < STEP_KEYS.length - 1 ? (
-          <Button
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentKey}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 24,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.primary,
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {t(`steps.${currentKey}.eyebrow`)}
+                </p>
+                <h1
+                  style={{
+                    margin: 0,
+                    fontFamily: FONT_DISPLAY,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: C.textDark,
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {t(`steps.${currentKey}.title`)}
+                </h1>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 14,
+                    color: C.textMuted,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {t(`steps.${currentKey}.subtitle`)}
+                </p>
+              </div>
+              <StepContent
+                step={currentKey}
+                form={form}
+                update={update}
+                updateExpense={updateExpense}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <footer
+          style={{
+            paddingTop: 24,
+            borderTop: `1px solid ${C.borderGhost}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+          }}
+        >
+          <button
             type="button"
-            variant="gold"
-            disabled={!canContinue() || submitting}
-            onClick={next}
+            onClick={back}
+            disabled={step === 0 || submitting}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 14px",
+              backgroundColor: "transparent",
+              border: "none",
+              fontSize: 13,
+              fontWeight: 500,
+              color: step === 0 || submitting ? C.textLight : C.textDark,
+              cursor: step === 0 || submitting ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              borderRadius: 8,
+            }}
           >
-            {t("actions.continue")} <ArrowRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant="gold"
-            disabled={submitting}
-            onClick={submit}
-          >
-            {submitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                {t("actions.finish")} <ArrowRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            {t("actions.back")}
+          </button>
+
+          {step < STEP_KEYS.length - 1 ? (
+            <NavyCta
+              disabled={!canContinue() || submitting}
+              onClick={next}
+            >
+              {t("actions.continue")}
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </NavyCta>
+          ) : (
+            <NavyCta
+              disabled={submitting}
+              loading={submitting}
+              onClick={submit}
+            >
+              {!submitting && (
+                <>
+                  {t("actions.finish")}
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </>
+              )}
+            </NavyCta>
+          )}
+        </footer>
+      </main>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Steps                                                                      */
-/* -------------------------------------------------------------------------- */
+
+function NavyCta({
+  children,
+  disabled,
+  loading = false,
+  onClick,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  loading?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "12px 22px",
+        backgroundColor: C.navy,
+        color: "white",
+        border: "none",
+        fontSize: 14,
+        fontWeight: 600,
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.55 : 1,
+        borderRadius: 11,
+        fontFamily: "inherit",
+        transition: "opacity 0.15s ease",
+      }}
+    >
+      {loading && (
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          aria-hidden
+          style={{ animation: "v3-spin 0.7s linear infinite" }}
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            fill="none"
+            stroke="white"
+            strokeOpacity="0.3"
+            strokeWidth="2.5"
+          />
+          <path
+            d="M12 3a9 9 0 0 1 9 9"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+      {children}
+      <style>{`@keyframes v3-spin { to { transform: rotate(360deg); } }`}</style>
+    </button>
+  );
+}
 
 function StepContent({
   step,
@@ -305,60 +571,107 @@ function StepContent({
   updateExpense: (cat: keyof ExpenseBreakdown, value: number | null) => void;
 }) {
   const t = useTranslations("onboarding");
+
   switch (step) {
     case "you":
       return (
-        <div className="space-y-6">
-          <RadioGroup
-            value={form.situation}
-            onValueChange={(v) => update("situation", v as FormState["situation"])}
-            className="space-y-2"
+        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+          <div
+            role="radiogroup"
+            style={{ display: "flex", flexDirection: "column", gap: 10 }}
           >
-            {FINANCIAL_SITUATIONS.map((opt) => (
-              <label
-                key={opt.id}
-                htmlFor={opt.id}
-                className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors",
-                  form.situation === opt.id
-                    ? "border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.04)]"
-                    : "border-border/60 hover:bg-card/60",
-                )}
-              >
-                <RadioGroupItem value={opt.id} id={opt.id} className="mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium">
-                    {t(`situations.${opt.id}.label`)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t(`situations.${opt.id}.description`)}
-                  </p>
-                </div>
-              </label>
-            ))}
-          </RadioGroup>
-
-          <div className="space-y-2">
-            <Label htmlFor="income">{t("steps.you.incomeLabel")}</Label>
-            <Input
-              id="income"
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              placeholder={t("steps.you.incomePlaceholder")}
-              value={form.monthlyIncome}
-              onChange={(e) =>
-                update(
-                  "monthlyIncome",
-                  e.target.value === "" ? "" : Number(e.target.value),
-                )
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              {t("steps.you.incomeHelper")}
-            </p>
+            {FINANCIAL_SITUATIONS.map((opt) => {
+              const active = form.situation === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => update("situation", opt.id)}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    padding: "16px 18px",
+                    borderRadius: 12,
+                    border: `1px solid ${active ? C.primary : C.borderGhost}`,
+                    backgroundColor: active ? C.primaryBg : C.cardBg,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    textAlign: "left",
+                    transition:
+                      "border-color 0.15s ease, background-color 0.15s ease",
+                    boxShadow: SHADOW.card,
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    style={{
+                      flexShrink: 0,
+                      width: 20,
+                      height: 20,
+                      borderRadius: 999,
+                      border: `2px solid ${active ? C.navy : C.textLight}`,
+                      backgroundColor: C.cardBg,
+                      marginTop: 2,
+                      position: "relative",
+                    }}
+                  >
+                    {active && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          inset: 3,
+                          borderRadius: 999,
+                          backgroundColor: C.navy,
+                        }}
+                      />
+                    )}
+                  </span>
+                  <span style={{ flex: 1 }}>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: C.textDark,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {t(`situations.${opt.id}.label`)}
+                    </span>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 12.5,
+                        color: C.textMuted,
+                        marginTop: 4,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {t(`situations.${opt.id}.description`)}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
+
+          <V3InputField
+            id="income"
+            label={t("steps.you.incomeLabel")}
+            placeholder={t("steps.you.incomePlaceholder")}
+            helper={t("steps.you.incomeHelper")}
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step="0.01"
+            value={form.monthlyIncome}
+            onChange={(v) =>
+              update("monthlyIncome", v === "" ? "" : Number(v))
+            }
+          />
         </div>
       );
 
@@ -373,27 +686,42 @@ function StepContent({
         { id: "transport", placeholderKey: "transportPlaceholder" },
       ];
       return (
-        <div className="space-y-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           {categories.map((cat) => {
             const value = form.expenseBreakdown[cat.id];
             const unknown = value === null;
             return (
-              <div key={cat.id} className="space-y-2">
-                <div className="flex items-baseline justify-between gap-3">
-                  <Label htmlFor={`exp-${cat.id}`}>
+              <div
+                key={cat.id}
+                style={{ display: "flex", flexDirection: "column", gap: 8 }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                    gap: 12,
+                  }}
+                >
+                  <label
+                    htmlFor={`exp-${cat.id}`}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: C.textDark,
+                    }}
+                  >
                     {t(`steps.fixed_costs.${cat.id}Label`)}
-                  </Label>
-                  <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
-                    <Checkbox
-                      checked={unknown}
-                      onCheckedChange={(v) =>
-                        updateExpense(cat.id, v === true ? null : 0)
-                      }
-                    />
-                    {t("steps.fixed_costs.unknown")}
                   </label>
+                  <UnknownToggle
+                    checked={unknown}
+                    onChange={(v) =>
+                      updateExpense(cat.id, v ? null : 0)
+                    }
+                    label={t("steps.fixed_costs.unknown")}
+                  />
                 </div>
-                <Input
+                <input
                   id={`exp-${cat.id}`}
                   type="number"
                   inputMode="decimal"
@@ -408,11 +736,28 @@ function StepContent({
                       e.target.value === "" ? null : Number(e.target.value),
                     )
                   }
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: 10,
+                    border: `1px solid ${C.borderGhost}`,
+                    backgroundColor: unknown ? C.pageBg : C.cardBg,
+                    fontSize: 16,
+                    color: unknown ? C.textLight : C.textDark,
+                    fontFamily: "inherit",
+                    outline: "none",
+                  }}
                 />
               </div>
             );
           })}
-          <p className="text-xs text-muted-foreground">
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              color: C.textMuted,
+              lineHeight: 1.5,
+            }}
+          >
             {t("steps.fixed_costs.helper")}
           </p>
         </div>
@@ -421,8 +766,14 @@ function StepContent({
 
     case "main_goal":
       return (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 10,
+            }}
+          >
             {GOAL_TYPES.map((g) => {
               const Icon = GOAL_ICONS[g.icon] ?? Target;
               const active = form.mainGoal === g.id;
@@ -431,24 +782,45 @@ function StepContent({
                   key={g.id}
                   type="button"
                   onClick={() => update("mainGoal", g.id)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
-                    active
-                      ? "border-[hsl(var(--gold)/0.5)] bg-[hsl(var(--gold)/0.06)]"
-                      : "border-border/60 hover:border-border hover:bg-card/60",
-                  )}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "13px 14px",
+                    borderRadius: 12,
+                    border: `1px solid ${active ? C.primary : C.borderGhost}`,
+                    backgroundColor: active ? C.primaryBg : C.cardBg,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    fontFamily: "inherit",
+                    transition:
+                      "border-color 0.15s ease, background-color 0.15s ease",
+                    boxShadow: SHADOW.card,
+                  }}
                 >
                   <span
-                    className={cn(
-                      "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-                      active
-                        ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
-                        : "bg-secondary text-foreground",
-                    )}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 34,
+                      height: 34,
+                      borderRadius: 10,
+                      backgroundColor: active ? C.navy : C.pageBg,
+                      color: active ? "white" : C.textDark,
+                      flexShrink: 0,
+                    }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon style={{ width: 16, height: 16 }} />
                   </span>
-                  <span className="text-sm font-medium">
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: 500,
+                      color: C.textDark,
+                      lineHeight: 1.35,
+                    }}
+                  >
                     {t(`goals.${g.id}`)}
                   </span>
                 </button>
@@ -458,16 +830,159 @@ function StepContent({
           <button
             type="button"
             onClick={() => update("mainGoal", null)}
-            className={cn(
-              "w-full rounded-2xl border border-dashed p-3 text-xs transition-colors",
-              form.mainGoal === null
-                ? "border-[hsl(var(--gold)/0.4)] text-foreground"
-                : "border-border/60 text-muted-foreground hover:bg-card/40",
-            )}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              borderRadius: 11,
+              border: `1px dashed ${
+                form.mainGoal === null ? C.primary : C.borderGhost
+              }`,
+              backgroundColor: "transparent",
+              fontSize: 12.5,
+              color: form.mainGoal === null ? C.textDark : C.textMuted,
+              fontWeight: form.mainGoal === null ? 600 : 500,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "border-color 0.15s ease, color 0.15s ease",
+            }}
           >
             {t("steps.main_goal.skip")}
           </button>
         </div>
       );
   }
+}
+
+function V3InputField({
+  id,
+  label,
+  placeholder,
+  helper,
+  type,
+  inputMode,
+  min,
+  step,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  placeholder?: string;
+  helper?: string;
+  type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  min?: number;
+  step?: string | number;
+  value: number | "";
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <label
+        htmlFor={id}
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: C.textDark,
+        }}
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        inputMode={inputMode}
+        min={min}
+        step={step}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          padding: "13px 14px",
+          borderRadius: 10,
+          border: `1px solid ${C.borderGhost}`,
+          backgroundColor: C.cardBg,
+          fontSize: 16,
+          color: C.textDark,
+          fontFamily: "inherit",
+          outline: "none",
+        }}
+      />
+      {helper && (
+        <p
+          style={{
+            margin: 0,
+            fontSize: 11.5,
+            color: C.textMuted,
+            lineHeight: 1.4,
+          }}
+        >
+          {helper}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function UnknownToggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      aria-pressed={checked}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "5px 9px",
+        borderRadius: 999,
+        backgroundColor: checked ? C.primaryBg : "transparent",
+        border: `1px solid ${checked ? C.primary : C.borderGhost}`,
+        fontSize: 11,
+        fontWeight: 500,
+        color: checked ? C.primary : C.textMuted,
+        cursor: "pointer",
+        fontFamily: "inherit",
+        transition: "background-color 0.15s ease, color 0.15s ease",
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 13,
+          height: 13,
+          borderRadius: 4,
+          border: `1.5px solid ${checked ? C.primary : C.textLight}`,
+          backgroundColor: checked ? C.primary : "transparent",
+        }}
+      >
+        {checked && (
+          <svg
+            width="9"
+            height="9"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+      </span>
+      {label}
+    </button>
+  );
 }
