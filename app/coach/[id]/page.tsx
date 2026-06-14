@@ -1069,7 +1069,7 @@ function SituationCard({ wired }: { wired: CoachWired }) {
   const scoreLabel =
     wired.scoreDisplay !== null
       ? `${wired.scoreDisplay} / 100`
-      : "Score à venir";
+      : "Score en construction";
   const delta = wired.scoreDelta;
   return (
     <div

@@ -18,7 +18,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { Goal } from "@/types/database";
 import { getFinanceData } from "@/lib/services/finance";
 import { GOAL_TYPES } from "@/lib/constants";
@@ -101,31 +101,24 @@ function getGoalTypeLabel(id: string): string {
   return GOAL_TYPES.find((t) => t.id === id)?.label ?? "Autre";
 }
 
-const MONTH_LABELS_FR = [
-  "JANV.",
-  "FÉVR.",
-  "MARS",
-  "AVR.",
-  "MAI",
-  "JUIN",
-  "JUIL.",
-  "AOÛT",
-  "SEPT.",
-  "OCT.",
-  "NOV.",
-  "DÉC.",
-];
-
 function buildMilestoneView(
   goal: Goal,
   index: number,
   now: Date,
+  locale: string,
 ): MilestoneView | null {
   if (!goal.deadline) return null;
   const deadline = new Date(goal.deadline);
   if (Number.isNaN(deadline.getTime())) return null;
   const day = String(deadline.getUTCDate()).padStart(2, "0");
-  const month = MONTH_LABELS_FR[deadline.getUTCMonth()] ?? "";
+  // Mois court localisé (Intl) puis en upper-case pour le visuel
+  // pré-existant du jalon. EN/DE/IT/etc. respectés.
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    timeZone: "UTC",
+  })
+    .format(deadline)
+    .toUpperCase();
   const msPerDay = 1000 * 60 * 60 * 24;
   const diffDays = Math.round(
     (deadline.getTime() - now.getTime()) / msPerDay,
@@ -221,8 +214,9 @@ export default async function DesignMatchObjectifsV3() {
 
   // Jalons à venir — goals avec deadline, triés par deadline asc, top 3
   const now = new Date();
+  const locale = await getLocale();
   const milestoneViews: MilestoneView[] = activeGoals
-    .map((g, idx) => buildMilestoneView(g, idx, now))
+    .map((g, idx) => buildMilestoneView(g, idx, now, locale))
     .filter((m): m is MilestoneView => m !== null)
     .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
     .slice(0, 3);

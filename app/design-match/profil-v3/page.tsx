@@ -21,7 +21,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getFinanceData } from "@/lib/services/finance";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getMyUserMemory } from "@/lib/services/memory";
@@ -172,34 +172,28 @@ function formatCountry(country: string | null): string {
   return map[country] ?? country;
 }
 
-const MONTH_LABELS_FR = [
-  "janvier",
-  "février",
-  "mars",
-  "avril",
-  "mai",
-  "juin",
-  "juillet",
-  "août",
-  "septembre",
-  "octobre",
-  "novembre",
-  "décembre",
-];
-
-function formatMemberSince(iso: string | null): string | null {
+// Pas de hardcode FR : on utilise Intl.DateTimeFormat qui respecte
+// le locale courant (passé en argument). Un user EN voit "April",
+// un user DE voit "April", un user IT voit "aprile", etc.
+function formatMemberSince(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  const month = MONTH_LABELS_FR[d.getUTCMonth()];
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    timeZone: "UTC",
+  }).format(d);
   return `Membre depuis ${month} ${d.getUTCFullYear()}`;
 }
 
-function formatMonthYear(iso: string | null): string | null {
+function formatMonthYear(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  const month = MONTH_LABELS_FR[d.getUTCMonth()];
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    timeZone: "UTC",
+  }).format(d);
   return `${month.charAt(0).toUpperCase() + month.slice(1)} ${d.getUTCFullYear()}`;
 }
 
@@ -233,6 +227,7 @@ export default async function DesignMatchProfilV3() {
   const firstName =
     data.profile.full_name?.split(" ")[0]?.trim() || null;
   const fullName = data.profile.full_name ?? null;
+  const locale = await getLocale();
 
   /* ------------------------------------------------------------------ */
   /*  Agrégats profil                                                    */
@@ -241,8 +236,8 @@ export default async function DesignMatchProfilV3() {
   const profile: FinanceProfile = data.profile;
   const subscription: Subscription = data.subscription;
   const initials = initialsFrom(fullName);
-  const memberSince = formatMemberSince(account.accountCreatedAt);
-  const memberSinceShort = formatMonthYear(account.accountCreatedAt);
+  const memberSince = formatMemberSince(account.accountCreatedAt, locale);
+  const memberSinceShort = formatMonthYear(account.accountCreatedAt, locale);
 
   // Calcul de complétude — basé uniquement sur les vrais champs
   // existants côté base. 8 critères × 100 / 8.
@@ -355,6 +350,7 @@ export default async function DesignMatchProfilV3() {
               <AbonnementCard
                 subscription={subscription}
                 memberSinceShort={memberSinceShort}
+                locale={locale}
               />
             </div>
             <div data-prof-row style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
@@ -972,11 +968,13 @@ function PreferencesCard({
 function AbonnementCard({
   subscription,
   memberSinceShort,
+  locale,
 }: {
   subscription: Subscription;
   memberSinceShort: string | null;
+  locale: string;
 }) {
-  const trialEnds = formatMonthYear(subscription.trial_ends_at);
+  const trialEnds = formatMonthYear(subscription.trial_ends_at, locale);
   const items = [
     { label: "Plan actuel", value: planLabel(subscription), iconPath: "M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" },
     {
@@ -1129,7 +1127,7 @@ function DocumentsCard() {
           Aucun document
         </p>
         <p style={{ margin: 0, fontSize: 10.5, color: C.textMuted, lineHeight: 1.4, maxWidth: 220 }}>
-          Le stockage de documents (pièce d&apos;identité, rapports patrimoine, etc.) arrivera dans une prochaine phase.
+          Le stockage de documents (pièce d&apos;identité, rapports patrimoine, etc.) n&apos;est pas encore proposé sur LIBERIA.
         </p>
       </div>
       <Link

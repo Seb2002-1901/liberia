@@ -222,7 +222,11 @@ export default async function DesignMatchRevenusV3() {
             <div data-rev-row style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gap: 8 }}>
               <CategoryTableCard rows={categoryRows} profile={data.profile} />
               <OpportunitesCard />
-              <ConseilCard />
+              <ConseilCard
+                hasIncomes={hasIncomes}
+                sourcesCount={categoryRows.length}
+                monthlyTotal={monthlyTotal}
+              />
             </div>
             <MissionFooter hasIncomes={hasIncomes} />
           </main>
@@ -939,7 +943,41 @@ function OpportunitesCard() {
   );
 }
 
-function ConseilCard() {
+function ConseilCard({
+  hasIncomes,
+  sourcesCount,
+  monthlyTotal,
+}: {
+  hasIncomes: boolean;
+  sourcesCount: number;
+  monthlyTotal: number;
+}) {
+  // Conseil contextuel adossé à l'état RÉEL du profil revenus de
+  // l'utilisateur — pas de platitudes génériques. Trois cas :
+  //   1. Aucun revenu enregistré      → encourager à démarrer
+  //   2. Une seule source de revenus  → encourager la diversification
+  //   3. Plusieurs sources            → message neutre + CTA coach
+  const { lead, support } = (() => {
+    if (!hasIncomes || monthlyTotal <= 0) {
+      return {
+        lead: "Commence par enregistrer ta principale source de revenus.",
+        support:
+          "Avec un total mensuel, ton coach pourra identifier des leviers concrets.",
+      };
+    }
+    if (sourcesCount <= 1) {
+      return {
+        lead: "Tu n'as qu'une source de revenus identifiée.",
+        support:
+          "Diversifier (complément, freelance, dividendes) renforce ta résilience financière.",
+      };
+    }
+    return {
+      lead: `${sourcesCount} sources de revenus identifiées.`,
+      support:
+        "Ton coach peut t'aider à choisir laquelle prioriser pour augmenter ta marge mensuelle.",
+    };
+  })();
   return (
     <div
       style={{
@@ -973,10 +1011,10 @@ function ConseilCard() {
         </p>
       </div>
       <p style={{ margin: "8px 0 0 0", fontSize: 11.5, color: C.textDark, lineHeight: 1.45 }}>
-        L&apos;augmentation de revenus offre un potentiel supérieur à la réduction des dépenses.
+        {lead}
       </p>
       <p style={{ margin: "6px 0 0 0", fontSize: 11.5, color: C.textDark, lineHeight: 1.45 }}>
-        Concentrez-vous sur les opportunités à impact rapide et moyen terme.
+        {support}
       </p>
       <Link
         href="/coach"

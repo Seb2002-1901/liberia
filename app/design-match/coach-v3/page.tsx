@@ -966,21 +966,11 @@ function Composer() {
       >
         Démarrez une conversation avec votre conseiller IA…
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <ComposerAction
-            iconPath="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
-            label="Joindre un fichier"
-          />
-          <ComposerAction
-            iconPath="M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3"
-            label="Analyser mes données"
-          />
-          <ComposerAction
-            iconPath="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z|M19 10v2a7 7 0 0 1-14 0v-2|M12 19v4|M8 23h8"
-            label="Dicter un message"
-          />
-        </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
+        {/* Boutons composer (fichier / analyse / dicter) retirés : non
+            câblés côté backend, garder des contrôles désactivés crée
+            une dette UX premium. À réintroduire avec leurs fonctionnalités
+            réelles. */}
         <button
           type="submit"
           aria-label="Envoyer"
@@ -1007,37 +997,6 @@ function Composer() {
         </button>
       </div>
     </form>
-  );
-}
-
-function ComposerAction({ iconPath, label }: { iconPath: string; label: string }) {
-  const paths = iconPath.split("|");
-  // disabled honnête : non câblé côté backend. Conserve le visuel
-  // (même icône, même taille) mais retire l'illusion de clic actif.
-  return (
-    <button
-      type="button"
-      disabled
-      aria-label={label}
-      title={label}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        border: "none",
-        backgroundColor: "transparent",
-        color: C.textLight,
-        cursor: "not-allowed",
-        opacity: 0.6,
-      }}
-    >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {paths.map((d, i) => <path key={i} d={d} />)}
-      </svg>
-    </button>
   );
 }
 

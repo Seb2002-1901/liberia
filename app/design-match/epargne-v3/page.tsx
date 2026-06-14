@@ -35,7 +35,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app.pageTitles");
   return {
     title: `${t("epargne")} — LIBERIA`,
-    robots: { index: false, follow: false },
   };
 }
 
