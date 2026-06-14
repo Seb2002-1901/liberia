@@ -99,9 +99,11 @@ export function V3Shell({
   mainPadding = "0 24px 24px 24px",
   children,
 }: V3ShellProps) {
-  const displayName = firstName ?? "explorer";
+  const displayName = firstName ?? "";
   const pillName = fullName ?? "Mon profil";
-  const title = topbarTitle ?? `Bonjour ${displayName}`;
+  const title =
+    topbarTitle ??
+    (displayName ? `Bonjour ${displayName}` : "Bonjour");
   return (
     <>
       <style>{`
