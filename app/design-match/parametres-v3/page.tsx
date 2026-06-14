@@ -26,6 +26,7 @@ import { getFinanceData } from "@/lib/services/finance";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getMyUserMemory } from "@/lib/services/memory";
 import { COACHING_TONES } from "@/lib/constants";
+import { SettingsPreferences } from "@/components/settings/settings-preferences";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
@@ -389,6 +390,7 @@ export default async function DesignMatchParametresV3() {
               />
               <ConseilIACard title={conseilState.title} body={conseilState.body} />
             </div>
+            <EditPreferencesCard settings={settings} />
             <MissionFooter configPct={configPct} />
           </main>
         </div>
@@ -1124,6 +1126,48 @@ function ConseilIACard({ title, body }: { title: string; body: string }) {
         </svg>
       </Link>
     </div>
+  );
+}
+
+/* ═══════════════ EDIT — Toggles notifications / emails ═══════════════
+ *
+ * Card pleine largeur hébergeant <SettingsPreferences> (client
+ * component shadcn). Permet à l'utilisateur d'activer/désactiver les
+ * 7 préférences en temps réel — chaque switch persiste via les server
+ * actions setEmailWeeklySummary / setNotificationAlerts /
+ * setEmailPreference / setAnalyticsOptOut.
+ */
+
+function EditPreferencesCard({
+  settings,
+}: {
+  settings: SettingsRow | null;
+}) {
+  return (
+    <section
+      style={{
+        padding: "20px 22px",
+        backgroundColor: C.cardBg,
+        borderRadius: 14,
+        boxShadow: SHADOW.card,
+      }}
+    >
+      <p style={{ margin: 0, fontSize: 9.5, fontWeight: 700, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        Mes préférences
+      </p>
+      <p style={{ margin: "2px 0 14px 0", fontSize: 14, fontWeight: 700, color: C.textDark, fontFamily: "Outfit, Inter, system-ui", letterSpacing: "-0.01em" }}>
+        Notifications & emails
+      </p>
+      <SettingsPreferences
+        weeklyEnabled={settings?.email_weekly_summary === true}
+        alertsEnabled={settings?.notification_alerts === true}
+        encouragementEnabled={settings?.email_encouragement === true}
+        trialRemindersEnabled={settings?.email_trial_reminders !== false}
+        goalMilestonesEnabled={settings?.email_goal_milestones === true}
+        inactivityFollowupEnabled={settings?.email_inactivity_followup === true}
+        analyticsEnabled={settings?.analytics_opt_out !== true}
+      />
+    </section>
   );
 }
 
