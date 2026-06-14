@@ -2206,14 +2206,106 @@ function EvolutionCard({
   locale: string;
 }) {
   // snapshots arrivent triés DESC par week (le plus récent en 0). On
-  // les remet en ordre chronologique pour le tracé. Si moins de 2
-  // points : fallback courbe mockée pour préserver le visuel de la
-  // maquette (mais on le marque dans le rapport).
+  // les remet en ordre chronologique pour le tracé. Tant qu'on n'a pas
+  // au moins 2 points sealés, on n'invente PAS de courbe : empty state
+  // honnête. Premium = on n'affiche jamais une trajectoire fictive.
   const sortedChrono = [...snapshots].reverse();
   const hasRealSeries = sortedChrono.length >= 2;
-  const points = hasRealSeries
-    ? sortedChrono.map((s) => s.result.display)
-    : [22, 30, 38, 32, 42, 50, 54, 46];
+
+  if (!hasRealSeries) {
+    return (
+      <div
+        style={{
+          height: H.bottomRow,
+          padding: 20,
+          backgroundColor: C.cardBg,
+          borderRadius: 18,
+          boxShadow: SHADOW.card,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
+            Évolution du score
+          </p>
+        </div>
+        <div
+          style={{
+            marginTop: 12,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "0 12px",
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              backgroundColor: C.primaryBg,
+              marginBottom: 8,
+            }}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </span>
+          {currentScore !== null ? (
+            <>
+              <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, color: C.textDark, lineHeight: 1.35, fontFamily: "Outfit, Inter, system-ui" }}>
+                Premier point enregistré : {currentScore}/100
+              </p>
+              <p style={{ margin: "4px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.45, maxWidth: 240 }}>
+                Ta courbe d&apos;évolution se construit semaine après semaine. Un snapshot scellé chaque dimanche.
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, color: C.textDark, lineHeight: 1.35, fontFamily: "Outfit, Inter, system-ui" }}>
+                Courbe en construction
+              </p>
+              <p style={{ margin: "4px 0 0 0", fontSize: 11, color: C.textMuted, lineHeight: 1.45, maxWidth: 240 }}>
+                Les premiers points de ton évolution apparaîtront ici dès le 2e snapshot hebdomadaire scellé.
+              </p>
+            </>
+          )}
+        </div>
+        <Link
+          href={ROUTES_V3.monAnalyse}
+          style={{
+            marginTop: 6,
+            alignSelf: "flex-start",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            fontSize: 12.5,
+            fontWeight: 500,
+            color: C.primary,
+            textDecoration: "none",
+          }}
+        >
+          Voir mon analyse
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </Link>
+      </div>
+    );
+  }
+
+  const points = sortedChrono.map((s) => s.result.display);
 
   const W = 320;
   const HH = 110;
@@ -2234,31 +2326,15 @@ function EvolutionCard({
   const areaD = `${pathD} L ${scaled[scaled.length - 1].x.toFixed(2)} ${baselineY.toFixed(2)} L ${scaled[0].x.toFixed(2)} ${baselineY.toFixed(2)} Z`;
   const last = scaled[scaled.length - 1];
 
-  // 5 labels X évenly-spaced à partir des dates de snapshots quand
-  // possible. Sinon, labels mockés de la maquette.
-  const xLabels = hasRealSeries
-    ? [0, 1, 2, 3, 4].map((slot) => {
-        const idx = Math.round(
-          (slot * (sortedChrono.length - 1)) / 4,
-        );
-        const snap = sortedChrono[Math.min(idx, sortedChrono.length - 1)];
-        return formatWeekLabel(snap.week, locale);
-      })
-    : // Pas encore d'historique : 5 jalons sur les 8 dernières semaines,
-      // formatés selon la langue de l'utilisateur. Évite d'afficher des
-      // dates inventées en français à un user non francophone.
-      [0, 1, 2, 3, 4].map((slot) => {
-        const d = new Date();
-        d.setUTCDate(d.getUTCDate() - (4 - slot) * 14);
-        return formatWeekLabel(d.toISOString(), locale);
-      });
+  // 5 labels X évenly-spaced à partir des dates de snapshots réels.
+  const xLabels = [0, 1, 2, 3, 4].map((slot) => {
+    const idx = Math.round((slot * (sortedChrono.length - 1)) / 4);
+    const snap = sortedChrono[Math.min(idx, sortedChrono.length - 1)];
+    return formatWeekLabel(snap.week, locale);
+  });
 
-  // Badge "+N pts (60j)" — delta entre 1er et dernier point réel.
-  // Fenêtre 60j ≈ 8-9 snapshots hebdo, mais on utilise toute la
-  // série dispo pour rester lisible. Caché si pas de série réelle.
-  const evoDelta = hasRealSeries
-    ? points[points.length - 1] - points[0]
-    : null;
+  // Delta entre 1er et dernier point réel.
+  const evoDelta = points[points.length - 1] - points[0];
   const badgeScore = currentScore ?? points[points.length - 1];
 
   return (
@@ -2278,27 +2354,25 @@ function EvolutionCard({
         <p style={{ fontSize: 10, fontWeight: 600, color: C.textMuted, letterSpacing: "0.18em", textTransform: "uppercase", margin: 0 }}>
           Évolution du score
         </p>
-        {evoDelta !== null && (
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 3,
-              padding: "2px 7px",
-              borderRadius: 999,
-              backgroundColor: evoDelta >= 0 ? C.successBg : "#FEE2E2",
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: evoDelta >= 0 ? C.success : "#DC2626",
-            }}
-          >
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="7 17 17 7" />
-              <polyline points="7 7 17 7 17 17" />
-            </svg>
-            {evoDelta >= 0 ? "+" : ""}{Math.round(evoDelta)} pts ({sortedChrono.length} sem.)
-          </span>
-        )}
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 3,
+            padding: "2px 7px",
+            borderRadius: 999,
+            backgroundColor: evoDelta >= 0 ? C.successBg : "#FEE2E2",
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: evoDelta >= 0 ? C.success : "#DC2626",
+          }}
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="7 17 17 7" />
+            <polyline points="7 7 17 7 17 17" />
+          </svg>
+          {evoDelta >= 0 ? "+" : ""}{Math.round(evoDelta)} pts ({sortedChrono.length} sem.)
+        </span>
       </div>
       <div style={{ marginTop: 10, flex: 1, minHeight: 0 }}>
         <svg viewBox={`0 0 ${W} ${HH}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ display: "block" }}>
