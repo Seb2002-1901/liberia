@@ -123,11 +123,6 @@ const NAV_SECTIONS: NavSectionConfig[] = [
           "M21 11h-1a4 4 0 0 0-4-4h-4a8 8 0 0 0-8 8 6 6 0 0 0 6 6h2v-3h4v3h2a6 6 0 0 0 4-2v-2h2v-6z",
       },
       {
-        label: "Investissements",
-        href: "/design-match/investissements-v3",
-        iconPath: "M22 12L18 7l-5 5-4-3-7 7|M22 7V12 17H22Z",
-      },
-      {
         label: "Opportunités",
         href: "/design-match/opportunites-v3",
         iconPath:

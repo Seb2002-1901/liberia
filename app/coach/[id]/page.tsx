@@ -30,7 +30,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getConversation, listConversations } from "@/lib/services/coach";
 import { getFinanceData, totalMonthly } from "@/lib/services/finance";
@@ -56,6 +56,7 @@ import { startNewConversationAction } from "@/app/actions/coach-landing";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { CoachConversationV3Client } from "@/components/coach/v3-conversation-client";
 import type { DrawerData } from "@/lib/calculations/health/types";
+import { V3TopbarMenu } from "@/components/layout/v3-topbar-menu";
 
 export const dynamic = "force-dynamic";
 
@@ -184,7 +185,11 @@ export default async function CoachConversationPage({ params }: PageProps) {
   }
 
   const conversation = await getConversation(id);
-  if (!conversation) notFound();
+  // Conversation inexistante (lien périmé, autre user, supprimée) :
+  // au lieu d'une 404 brute, on renvoie poliment vers le landing
+  // Coach IA. Si une conv récente existe, l'auto-redirect interne
+  // amènera l'utilisateur dessus immédiatement.
+  if (!conversation) redirect("/design-match/coach-v3");
 
   const tSuggestions = await getTranslations("app.coach.chat.suggestions");
 
@@ -991,44 +996,7 @@ function Topbar({
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Link
-          href="/profile"
-          aria-label="Mon profil"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "4px 12px 4px 4px",
-            borderRadius: 999,
-            backgroundColor: C.cardBg,
-            boxShadow: SHADOW.kpi,
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
-            }}
-          />
-          <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
-            {pillName}
-          </span>
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={C.textMuted}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </Link>
+        <V3TopbarMenu fullName={fullName} />
       </div>
     </header>
   );

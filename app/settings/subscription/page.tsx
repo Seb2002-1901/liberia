@@ -44,6 +44,7 @@ import { formatDate } from "@/lib/utils";
 import { getFinanceData } from "@/lib/services/finance";
 import { inferBillingState } from "@/lib/billing/state";
 import { ROUTES } from "@/lib/constants";
+import { V3TopbarMenu } from "@/components/layout/v3-topbar-menu";
 
 // Auth via cookies Supabase — pas de prerender possible. Cohérent
 // avec les autres pages V3 et l'ex-(app)/layout.tsx parent.
@@ -609,35 +610,7 @@ function Topbar({
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Link
-          href="/profile"
-          aria-label="Mon profil"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "4px 12px 4px 4px",
-            borderRadius: 999,
-            backgroundColor: C.cardBg,
-            boxShadow: SHADOW.kpi,
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
-            }}
-          />
-          <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
-            {pillName}
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </Link>
+        <V3TopbarMenu fullName={fullName} />
       </div>
     </header>
   );

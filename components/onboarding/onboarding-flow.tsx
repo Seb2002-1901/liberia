@@ -67,8 +67,12 @@ type ExpenseBreakdown = {
   transport: number | null;
 };
 
+type Situation = "struggling" | "tight" | "stable" | "comfortable";
+
 type FormState = {
-  situation: "struggling" | "tight" | "stable" | "comfortable";
+  /** null = choix non encore actif (évite pré-cocher une situation
+   *  qui biaiserait la lecture FHS dès J0). */
+  situation: Situation | null;
   monthlyIncome: number | "";
   expenseBreakdown: ExpenseBreakdown;
   mainGoal: GoalTypeId | null;
@@ -101,7 +105,7 @@ export function OnboardingFlow() {
   const [step, setStep] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
   const [form, setForm] = React.useState<FormState>({
-    situation: "tight",
+    situation: null,
     monthlyIncome: "",
     expenseBreakdown: {
       housing: null,
@@ -134,7 +138,7 @@ export function OnboardingFlow() {
     switch (currentKey) {
       case "you":
         return (
-          Boolean(form.situation) &&
+          form.situation !== null &&
           form.monthlyIncome !== "" &&
           Number(form.monthlyIncome) >= 0
         );
@@ -155,7 +159,10 @@ export function OnboardingFlow() {
     const monthlyExpenses = knownExpenses.reduce((sum, v) => sum + v, 0);
 
     const payload = {
-      situation: form.situation,
+      // Si l'utilisateur a sauté la question situation (théoriquement
+      // bloqué par canContinue, mais ceinture+bretelles), on assume
+      // "tight" comme défaut pédagogique côté serveur.
+      situation: form.situation ?? "tight",
       monthlyIncome: Number(form.monthlyIncome) || 0,
       monthlyExpenses,
       currentSavings: 0,
@@ -439,6 +446,23 @@ export function OnboardingFlow() {
             </svg>
             {t("actions.back")}
           </button>
+
+          {!canContinue() && step < STEP_KEYS.length - 1 && (
+            <span
+              style={{
+                fontSize: 11.5,
+                color: C.textMuted,
+                fontStyle: "italic",
+                maxWidth: 200,
+                textAlign: "right",
+                lineHeight: 1.4,
+              }}
+            >
+              {currentKey === "you"
+                ? "Choisis ta situation et renseigne ton revenu pour continuer."
+                : "Renseigne au moins une catégorie."}
+            </span>
+          )}
 
           {step < STEP_KEYS.length - 1 ? (
             <NavyCta
@@ -767,7 +791,16 @@ function StepContent({
     case "main_goal":
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Media query inline : à partir de 480 px on bascule à 2
+              colonnes ; en-dessous, on stack en 1 colonne pour éviter
+              tout overflow des labels longs sur iPhone SE. */}
+          <style>{`
+            @media (max-width: 479px) {
+              [data-onb-goal-grid] { grid-template-columns: 1fr !important; }
+            }
+          `}</style>
           <div
+            data-onb-goal-grid
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",

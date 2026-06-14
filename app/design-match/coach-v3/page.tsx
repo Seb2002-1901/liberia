@@ -45,6 +45,7 @@ import {
 import { formatUserCurrency } from "@/lib/utils";
 import { startNewConversationAction } from "@/app/actions/coach-landing";
 import type { DrawerData } from "@/lib/calculations/health/types";
+import { V3TopbarMenu } from "@/components/layout/v3-topbar-menu";
 
 // Auth via cookies Supabase — pas de prerender possible.
 export const dynamic = "force-dynamic";
@@ -421,7 +422,6 @@ function Sidebar() {
         </NavSection>
         <NavSection title="CROISSANCE">
           <NavItem label="Épargne" href="/design-match/epargne-v3" iconPath="M21 11h-1a4 4 0 0 0-4-4h-4a8 8 0 0 0-8 8 6 6 0 0 0 6 6h2v-3h4v3h2a6 6 0 0 0 4-2v-2h2v-6z" />
-          <NavItem label="Investissements" href="/design-match/investissements-v3" iconPath="M22 12L18 7l-5 5-4-3-7 7|M22 7V12 17H22Z" />
           <NavItem label="Opportunités" href="/design-match/opportunites-v3" iconPath="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z|M16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88z" />
         </NavSection>
         <NavSection title="PLUS">
@@ -582,35 +582,7 @@ function Topbar({
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Link
-          href="/profile"
-          aria-label="Mon profil"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "4px 12px 4px 4px",
-            borderRadius: 999,
-            backgroundColor: C.cardBg,
-            boxShadow: SHADOW.kpi,
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #FCD34D, #F59E0B)",
-            }}
-          />
-          <span style={{ fontSize: 13, fontWeight: 500, color: C.textDark }}>
-            {fullName ?? "Mon profil"}
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </Link>
+        <V3TopbarMenu fullName={fullName} />
       </div>
     </header>
   );
