@@ -25,18 +25,33 @@
     "submit": "Enviar"
   },
   "shell": {
+    "sectionPrincipal": "Principal",
+    "sectionFinances": "Finanzas",
+    "sectionCroissance": "Crecimiento",
+    "sectionPlus": "Más",
     "sectionPilotage": "Pilotaje",
     "sectionAccount": "Cuenta",
     "demoBadge": "Modo demo",
     "demoBottomNote": "Modo demo · solo lectura",
+    "greeting": {
+      "hello": "Hola {firstName}",
+      "subline": "Aquí está tu situación actualizada hoy.",
+      "fallbackName": "tú"
+    },
+    "notifications": {
+      "ariaLabel": "Notificaciones (próximamente)"
+    },
     "nav": {
       "dashboard": "Panel",
       "coach": "Coach IA",
-      "plan": "Plan",
+      "plan": "Plan de acción",
       "budget": "Presupuesto",
       "incomes": "Ingresos",
       "expenses": "Gastos",
       "goals": "Metas",
+      "savings": "Ahorro",
+      "investments": "Inversiones",
+      "opportunities": "Oportunidades",
       "profile": "Perfil",
       "settings": "Ajustes",
       "subscription": "Suscripción"
@@ -62,13 +77,13 @@
       "eyebrowDemo": "Demo",
       "demoBody": "Crea tu cuenta para pilotar tus datos reales.",
       "demoCta": "Crear mi cuenta",
-      "eyebrowPremium": "Premium",
-      "premiumActive": "Plan Premium activo",
+      "eyebrowPremium": "Suscripción",
+      "premiumActive": "Suscripción activa",
       "premiumThanks": "Gracias por tu apoyo.",
       "trialCta": "Iniciar mi prueba de 14 días",
-      "trialBody": "14 días gratis, luego 14.99 CHF/mes o 119.99 CHF/año. Cancela cuando quieras.",
+      "trialBody": "14 días gratis, tarjeta requerida. Standard 14.95/mes (149/año). Premium 19.95/mes (199/año). Cancela antes de la facturación.",
       "resumeCta": "Reanudar mi suscripción",
-      "resumeBody": "Tu acceso está en pausa. Reanuda tu suscripción por 14.99 CHF/mes o 119.99 CHF/año. Cancela cuando quieras."
+      "resumeBody": "Tu acceso está en pausa. Reanuda Standard (14.95 CHF/mes) o Premium (19.95 CHF/mes). Cancela cuando quieras."
     }
   },
   "errorPages": {

@@ -2,6 +2,241 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "scoreCard": {
+    "eyebrow": "Finanz-Gesundheits-Score",
+    "outOf": "/100",
+    "ariaOpen": "Score {score} von 100. Klicken für Details.",
+    "deltaUp": "+{points} Pkt seit letzter Woche",
+    "deltaDown": "-{points} Pkt seit letzter Woche",
+    "deltaStable": "Score stabil diese Woche",
+    "deltaUnavailable": "Erste Messung — Sonntag wiederkommen für dein Delta",
+    "emptyTitle": "Score wird aufgebaut",
+    "emptyBody": "Vervollständige dein Profil, um deinen Score freizuschalten.",
+    "delta": {
+      "up": "Verbessert sich",
+      "down": "Genau beobachten",
+      "stable": "Stabil"
+    }
+  },
+  "priorityCard": {
+    "eyebrow": "Deine aktuelle Priorität",
+    "whyLink": "Warum",
+    "title": {
+      "no_goal": "Erstes konkretes Ziel setzen",
+      "low_resilience": "Notgroschen aufbauen",
+      "incomplete_expenses": "Hauptausgaben vervollständigen",
+      "fhs_recommendation": "Beste Spur verfolgen",
+      "none": "So weitermachen wie bisher"
+    },
+    "subline": {
+      "no_goal": "Ohne klares Ziel hat dein Sparen keine Richtung.",
+      "low_resilience": "{months} Monate Sicherheit verfügbar. Mindestziel: 1 Monat.",
+      "incomplete_expenses": "Dein Profil ist unvollständig. Füge deine Hauptausgaben hinzu für eine zuverlässige Analyse.",
+      "fhs_recommendation": "Dein Berater hat eine wirkungsvolle Aktion erkannt.",
+      "none": "Deine Grundlagen sind solide. Verfeinere für die nächste Stufe."
+    }
+  },
+  "missionCard": {
+    "eyebrow": "Aktuelle Mission",
+    "cta": "Jetzt handeln",
+    "no_goal": {
+      "title": "Setze ein erstes konkretes Ziel",
+      "subline": "Ein Ziel gibt jedem zurückgelegten CHF Sinn."
+    },
+    "low_resilience": {
+      "title": "Baue deinen ersten Notgroschen auf",
+      "subline": "Beginne mit {suggestedAmount} CHF diesen Monat."
+    },
+    "incomplete_expenses": {
+      "title": "Vervollständige deine Hauptausgaben",
+      "subline": "Füge {missingArea} hinzu, um deinen Score verlässlich zu machen."
+    },
+    "fhs_recommendation": {
+      "title": "Folge der Empfehlung des Beraters",
+      "subline": "Eine konkrete Aktion für diese Woche."
+    },
+    "none": {
+      "title": "Verfeinere für die nächste Stufe",
+      "subline": "Deine Grundlagen sind solide. Zeit zu optimieren."
+    }
+  },
+  "roadmap": {
+    "title": "Deine Zukunft, unser Fahrplan",
+    "seeAllLink": "Alle Projektionen ansehen",
+    "eyebrow": {
+      "today": "Heute",
+      "fourMonths": "In 4 Monaten",
+      "twelveMonths": "In 12 Monaten",
+      "threeYears": "In 3 Jahren"
+    },
+    "today": {
+      "scoreLabel": "Score {score}",
+      "gettingStartedTitle": "Grundlagen schaffen",
+      "gettingStartedSubtitle": "Vervollständige dein Profil, um deinen Score freizuschalten."
+    },
+    "steps": {
+      "no_goal": {
+        "today": {
+          "subtitle": "Solide Grundlagen schaffen"
+        },
+        "fourMonths": {
+          "title": "Erstes Ziel gesetzt",
+          "subtitle": "Du weisst, wohin du willst"
+        },
+        "twelveMonths": {
+          "title": "Sparen in Bewegung",
+          "subtitle": "Dein Ziel nimmt Form an"
+        }
+      },
+      "low_resilience": {
+        "today": {
+          "subtitle": "Solide Grundlagen schaffen"
+        },
+        "fourMonths": {
+          "title": "Notgroschen vollständig",
+          "subtitle": "3 Monate Ausgaben gedeckt"
+        },
+        "twelveMonths": {
+          "title": "Sparen beschleunigt",
+          "subtitle": "Dein Sparen gewinnt Schwung"
+        }
+      },
+      "incomplete_expenses": {
+        "today": {
+          "subtitle": "Solide Grundlagen schaffen"
+        },
+        "fourMonths": {
+          "title": "Profil vollständig",
+          "subtitle": "Deine Situation ist klar und verlässlich"
+        },
+        "twelveMonths": {
+          "title": "Ausgaben optimiert",
+          "subtitle": "Deine Kosten sind unter Kontrolle"
+        }
+      },
+      "fhs_recommendation": {
+        "today": {
+          "subtitle": "Solide Grundlagen schaffen"
+        },
+        "fourMonths": {
+          "title": "Aktion gestartet",
+          "subtitle": "Dein Schwachpunkt wird angegangen"
+        },
+        "twelveMonths": {
+          "title": "Score gestärkt",
+          "subtitle": "Deine Achsen sind im Gleichgewicht"
+        }
+      },
+      "none": {
+        "today": {
+          "subtitle": "Deine Grundlagen sind vorhanden"
+        },
+        "fourMonths": {
+          "title": "Kontinuierliche Optimierung",
+          "subtitle": "Du verfeinerst ruhig"
+        },
+        "twelveMonths": {
+          "title": "Komfortable Marge",
+          "subtitle": "Deine Situation ist solide"
+        }
+      }
+    },
+    "threeYears": {
+      "emergency_fund": {
+        "title": "Verstärkte Absicherung",
+        "subtitle": "12 Monate Sicherheit erreicht"
+      },
+      "debt_payoff": {
+        "title": "Schulden zurückgezahlt",
+        "subtitle": "Deine monatliche Marge ist frei"
+      },
+      "savings": {
+        "title": "Konsolidiertes Sparen",
+        "subtitle": "Dein Vermögen nimmt Form an"
+      },
+      "purchase": {
+        "title": "Eigenkapital bereit",
+        "subtitle": "Dein Kaufprojekt ist finanzierbar"
+      },
+      "travel": {
+        "title": "Reise finanziert",
+        "subtitle": "Dein Projekt ist in Reichweite"
+      },
+      "increase_income": {
+        "title": "Diversifizierte Einkommen",
+        "subtitle": "Deine Einkommensquellen sind gewachsen"
+      },
+      "other": {
+        "title": "Ziel erreicht",
+        "subtitle": "Dein persönliches Projekt ist umgesetzt"
+      },
+      "fallback": {
+        "title": "Langfristiger Horizont",
+        "subtitle": "Definiere dein 3-Jahres-Projekt"
+      }
+    }
+  },
+  "kpi": {
+    "income": {
+      "label": "Monatliches Einkommen",
+      "hint": "Nach Steuern",
+      "emptyHint": "Noch kein Einkommen erfasst"
+    },
+    "expenses": {
+      "label": "Monatliche Ausgaben",
+      "hintShare": "{share}% deines Einkommens",
+      "emptyHint": "Noch keine Ausgabe erfasst"
+    },
+    "remainder": {
+      "label": "Verfügbares Einkommen",
+      "hintShare": "{share}% deines Einkommens",
+      "emptyHint": "Noch nicht vergleichbar"
+    },
+    "emergency": {
+      "label": "Notgroschen",
+      "monthsValue": "{months} Monate",
+      "hintSavings": "{amount} verfügbar",
+      "emptyHint": "Baue dein erstes Polster auf"
+    }
+  },
+  "opportunityHighlight": {
+    "eyebrow": "Chance des Moments",
+    "badgeImpact": "Grösste Wirkung für dich",
+    "impactLabel": "Mögliche Wirkung:",
+    "impactLevel": {
+      "high": "hoch",
+      "medium": "mittel",
+      "low": "gering"
+    },
+    "pointsLabel": "+{points} Punkte auf deinen Score",
+    "cta": "Erkunden wie",
+    "emptyTitle": "Deine Grundlagen sind vorhanden",
+    "emptyBody": "Keine dringende Chance erkannt. Mach so weiter.",
+    "emptyCta": "Meinen Plan ansehen"
+  },
+  "repartition": {
+    "eyebrow": "Ausgabenverteilung",
+    "period": "Diesen Monat",
+    "centerLabel": "dieser Monat",
+    "detailLink": "Details ansehen",
+    "emptyTitle": "Keine Ausgabe diesen Monat",
+    "emptyBody": "Füge deine Ausgaben hinzu, um ihre Verteilung zu sehen.",
+    "emptyCta": "Ausgabe hinzufügen"
+  },
+  "scoreEvolution": {
+    "eyebrow": "Score-Verlauf",
+    "progression": "Dein Fortschritt",
+    "historyLink": "Verlauf ansehen",
+    "ariaChart": "Score-Verlauf, aktueller Wert {score} von 100",
+    "calloutLabel": "Aktueller Score",
+    "emptyTitle": "Noch keine Kurve",
+    "emptyBody": "Komm nächste Woche wieder, um deinen ersten Fortschritt zu sehen."
+  },
+  "talkToAdvisor": {
+    "title": "Mit meinem Berater sprechen",
+    "body": "Stelle eine Frage, erhalte personalisierte Tipps.",
+    "cta": "Konversation starten"
+  },
   "firstMission": {
     "label": "Mission des Moments",
     "whyLabel": "Warum:",
@@ -773,5 +1008,8 @@
       "rental": "Mieteinnahmen",
       "other": "Andere"
     }
+  },
+  "topbar": {
+    "subtitle": "Hier ist deine Situation, heute aktualisiert."
   }
 }

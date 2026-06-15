@@ -35,7 +35,10 @@
     "coachStreamError": "Ein vorübergehender Fehler ist aufgetreten. Versuche es gleich erneut.",
     "premiumRequired": "Diese Funktion ist für Premium-Konten. Starte deine 14-tägige Testphase, um sie zu aktivieren.",
     "premiumLapsed": "Dein Abo ist nicht mehr aktiv. Setze dein Abo fort, um diese Funktion zu nutzen — deine Daten bleiben zugänglich.",
-    "newConversationDefaultTitle": "Neue Konversation"
+    "newConversationDefaultTitle": "Neue Konversation",
+    "transcriptionUnavailable": "Audio-Transkription ist nicht konfiguriert.",
+    "transcribeFailed": "Transkription fehlgeschlagen. Bitte erneut versuchen.",
+    "audioTooLarge": "Audio zu groß (max. 25 MB)."
   },
   "validation": {
     "emailRequired": "E-Mail erforderlich",

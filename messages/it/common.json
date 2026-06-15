@@ -25,18 +25,33 @@
     "submit": "Invia"
   },
   "shell": {
+    "sectionPrincipal": "Principale",
+    "sectionFinances": "Finanze",
+    "sectionCroissance": "Crescita",
+    "sectionPlus": "Altro",
     "sectionPilotage": "Pilotaggio",
     "sectionAccount": "Account",
     "demoBadge": "Modalità demo",
     "demoBottomNote": "Modalità demo · sola lettura",
+    "greeting": {
+      "hello": "Ciao {firstName}",
+      "subline": "Ecco la tua situazione aggiornata oggi.",
+      "fallbackName": "a te"
+    },
+    "notifications": {
+      "ariaLabel": "Notifiche (presto disponibili)"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "coach": "Coach IA",
-      "plan": "Piano",
+      "plan": "Piano d'azione",
       "budget": "Budget",
       "incomes": "Entrate",
       "expenses": "Spese",
       "goals": "Obiettivi",
+      "savings": "Risparmio",
+      "investments": "Investimenti",
+      "opportunities": "Opportunità",
       "profile": "Profilo",
       "settings": "Impostazioni",
       "subscription": "Abbonamento"
@@ -62,13 +77,13 @@
       "eyebrowDemo": "Demo",
       "demoBody": "Crea il tuo account per pilotare i tuoi dati reali.",
       "demoCta": "Crea il mio account",
-      "eyebrowPremium": "Premium",
-      "premiumActive": "Piano Premium attivo",
+      "eyebrowPremium": "Abbonamento",
+      "premiumActive": "Abbonamento attivo",
       "premiumThanks": "Grazie per il tuo supporto.",
       "trialCta": "Iniziare la mia prova di 14 giorni",
-      "trialBody": "14 giorni gratuiti, poi 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento.",
+      "trialBody": "14 giorni gratuiti, carta richiesta. Standard 14.95/mese (149/anno). Premium 19.95/mese (199/anno). Disdici prima dell'addebito.",
       "resumeCta": "Riprendere il mio abbonamento",
-      "resumeBody": "Il tuo accesso è in pausa. Riprendi il tuo abbonamento a 14.99 CHF/mese o 119.99 CHF/anno. Disdicibile in qualsiasi momento."
+      "resumeBody": "Il tuo accesso è in pausa. Riprendi Standard (14.95 CHF/mese) o Premium (19.95 CHF/mese). Disdicibile in qualsiasi momento."
     }
   },
   "errorPages": {

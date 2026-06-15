@@ -44,22 +44,32 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: APP_NAME,
       type: "website",
       locale: openGraphLocale,
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: `${APP_NAME} — ${tagline}`,
-        },
-      ],
+      // Image OG résolue dynamiquement par app/opengraph-image.tsx
+      // (Next 15 — ImageResponse). Pas besoin de référencer /og-image.png
+      // statique : un asset 404 ferait planter les previews LinkedIn /
+      // Twitter / iMessage.
     },
     twitter: {
       card: "summary_large_image",
       title: `${APP_NAME} — ${tagline}`,
       description,
-      images: ["/og-image.png"],
     },
     category: "finance",
+    // Sprint S2 — manifest + Apple webapp meta pour iOS "Add to Home
+    // Screen" + Android PWA install. Sans `appleWebApp`, iOS dégrade
+    // l'install en raccourci Safari basique sans splash ni icône
+    // standalone.
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title: APP_NAME,
+      statusBarStyle: "default",
+    },
+    formatDetection: {
+      telephone: false,
+      email: false,
+      address: false,
+    },
     // Sensible default for marketing pages. /admin and /dashboard set
     // their own robots:{ index: false } overrides via per-route metadata.
     robots: { index: true, follow: true },
@@ -67,8 +77,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0c",
-  colorScheme: "dark",
+  // Phase 5.0 — passage en light premium. themeColor = couleur du fond
+  // app (#F6F8FC) pour que la barre d'adresse mobile l'adopte.
+  themeColor: "#F6F8FC",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   // Enables env(safe-area-inset-*) on iOS so the bottom nav clears the
@@ -86,7 +98,10 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${outfit.variable} dark`}
+      // Phase 5.0 — light-first. La classe `dark` est retirée ; le
+      // darkMode Tailwind a aussi été désactivé (tailwind.config.ts)
+      // pour interdire la réactivation accidentelle d'un thème sombre.
+      className={`${inter.variable} ${outfit.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans antialiased">
@@ -94,13 +109,13 @@ export default async function RootLayout({
           {children}
           <Toaster
             position="top-right"
-            theme="dark"
+            theme="light"
             richColors
             closeButton
             toastOptions={{
               classNames: {
                 toast:
-                  "rounded-xl border border-border/60 bg-card/95 backdrop-blur-md",
+                  "rounded-xl border border-border bg-card shadow-[0_4px_16px_-4px_hsl(222_47%_11%/0.08)]",
               },
             }}
           />

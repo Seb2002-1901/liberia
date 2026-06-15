@@ -22,8 +22,12 @@ const analyticsSource = readFileSync(
   "utf8",
 );
 
+// Phase Stabilisation : la page a été migrée hors de (app)/ pour
+// utiliser le shell V3 inline (cf. components/layout/v3-shell.tsx)
+// et harmoniser la sidebar avec "Mon analyse" visible. La logique
+// (rendu d'ExpenseAnalyticsClient) est strictement préservée.
 const analyticsPageSource = readFileSync(
-  resolve(process.cwd(), "app/(app)/expenses/analytics/page.tsx"),
+  resolve(process.cwd(), "app/expenses/analytics/page.tsx"),
   "utf8",
 );
 

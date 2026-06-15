@@ -35,7 +35,10 @@
     "coachStreamError": "Ocorreu um erro temporário. Tenta daqui a um momento.",
     "premiumRequired": "Esta funcionalidade é para contas Premium. Inicia a tua experiência de 14 dias para a ativar.",
     "premiumLapsed": "A tua subscrição já não está ativa. Retoma a tua subscrição para usar esta funcionalidade — os teus dados permanecem acessíveis.",
-    "newConversationDefaultTitle": "Nova conversa"
+    "newConversationDefaultTitle": "Nova conversa",
+    "transcriptionUnavailable": "Transcrição de áudio não configurada.",
+    "transcribeFailed": "Transcrição falhou. Tenta novamente.",
+    "audioTooLarge": "Áudio demasiado grande (máx. 25 MB)."
   },
   "validation": {
     "emailRequired": "Email obrigatório",

@@ -25,18 +25,33 @@
     "submit": "Senden"
   },
   "shell": {
+    "sectionPrincipal": "Hauptmenü",
+    "sectionFinances": "Finanzen",
+    "sectionCroissance": "Wachstum",
+    "sectionPlus": "Mehr",
     "sectionPilotage": "Steuerung",
     "sectionAccount": "Konto",
     "demoBadge": "Demo-Modus",
     "demoBottomNote": "Demo-Modus · nur Ansicht",
+    "greeting": {
+      "hello": "Hallo {firstName}",
+      "subline": "Hier ist deine heute aktualisierte Situation.",
+      "fallbackName": "du"
+    },
+    "notifications": {
+      "ariaLabel": "Benachrichtigungen (bald verfügbar)"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "coach": "KI-Coach",
-      "plan": "Plan",
+      "plan": "Aktionsplan",
       "budget": "Budget",
       "incomes": "Einkommen",
       "expenses": "Ausgaben",
       "goals": "Ziele",
+      "savings": "Sparen",
+      "investments": "Investitionen",
+      "opportunities": "Chancen",
       "profile": "Profil",
       "settings": "Einstellungen",
       "subscription": "Abo"
@@ -62,13 +77,13 @@
       "eyebrowDemo": "Demo",
       "demoBody": "Erstelle dein Konto, um deine echten Daten zu steuern.",
       "demoCta": "Konto erstellen",
-      "eyebrowPremium": "Premium",
-      "premiumActive": "Premium-Abo aktiv",
+      "eyebrowPremium": "Abo",
+      "premiumActive": "Abo aktiv",
       "premiumThanks": "Danke für deine Unterstützung.",
       "trialCta": "Meine 14-tägige Testphase starten",
-      "trialBody": "14 Tage kostenlos, danach 14.99 CHF/Monat oder 119.99 CHF/Jahr. Jederzeit kündbar.",
+      "trialBody": "14 Tage gratis, Karte erforderlich. Standard 14.95/Monat (149/Jahr). Premium 19.95/Monat (199/Jahr). Vor Abrechnung kündbar.",
       "resumeCta": "Mein Abo fortsetzen",
-      "resumeBody": "Dein Zugang ist pausiert. Setze dein Abo für 14.99 CHF/Monat oder 119.99 CHF/Jahr fort. Jederzeit kündbar."
+      "resumeBody": "Dein Zugang ist pausiert. Setze Standard (14.95 CHF/Monat) oder Premium (19.95 CHF/Monat) fort. Jederzeit kündbar."
     }
   },
   "errorPages": {

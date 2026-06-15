@@ -1,4 +1,49 @@
 {
+  "pageTitles": {
+    "dashboard": "Dashboard",
+    "coach": "AI coach",
+    "monAnalyse": "My analysis",
+    "plan": "Action plan",
+    "revenus": "Income",
+    "depenses": "Expenses",
+    "budget": "Budget",
+    "objectifs": "Goals",
+    "epargne": "Savings",
+    "investissements": "Investments",
+    "opportunites": "Opportunities",
+    "parametres": "Settings",
+    "profil": "Profile"
+  },
+  "savings": {
+    "metadata": {
+      "title": "Savings"
+    },
+    "eyebrow": "Growth",
+    "title": "Your savings view is coming soon",
+    "description": "A dedicated space to visualize, project and plan your savings — without any product recommendation.",
+    "teaser": "You'll find your saving rate, emergency fund, personal goals and a clear simulator showing the impact of every CHF set aside.",
+    "coachCta": "Talk to my advisor"
+  },
+  "investments": {
+    "metadata": {
+      "title": "Investments"
+    },
+    "eyebrow": "Growth",
+    "title": "Your investments view is coming soon",
+    "description": "An educational space to understand, compare and simulate — without product names or buy recommendations.",
+    "teaser": "You'll find resources to understand ETFs, compare investment scenarios and simulate the growth of a given amount over 5, 10 or 20 years. LIBERIA informs and simulates, never recommends a specific product.",
+    "coachCta": "Talk to my advisor"
+  },
+  "opportunities": {
+    "metadata": {
+      "title": "Opportunities"
+    },
+    "eyebrow": "Growth",
+    "title": "Your opportunities catalog is coming soon",
+    "description": "Opportunities ranked by effort, risk and timeline to grow your income and reach your goals faster.",
+    "teaser": "You'll find concrete opportunities: quick income, secondary income and long-term income. Each opportunity shows its effort, time, estimated impact and potential gain — no unrealistic promises.",
+    "coachCta": "Talk to my advisor"
+  },
   "profile": {
     "metadata": {
       "title": "Profile"
@@ -10,7 +55,7 @@
     },
     "fallbackName": "Member",
     "infoCard": "Information",
-    "planActive": "Premium plan",
+    "planActive": "Active subscription",
     "planInactive": "No active subscription",
     "fields": {
       "fullName": "Full name",
@@ -186,7 +231,7 @@
     "status": {
       "label": "Current plan",
       "trialing": "Trial",
-      "active": "Premium",
+      "active": "Active",
       "pastDue": "Payment pending",
       "paused": "Trial paused",
       "canceled": "Cancelled",
@@ -284,6 +329,15 @@
           "How do I put my savings to work?",
           "How do I optimise my insurance and contracts?"
         ]
+      },
+      "audio": {
+        "micLabel": "Dictate a message",
+        "stopLabel": "Stop recording",
+        "permissionDenied": "Microphone blocked. Enable it in browser settings.",
+        "unavailable": "Voice dictation unavailable — transcription is not configured.",
+        "recording": "Recording…",
+        "transcribing": "Transcribing…",
+        "transcribeFailed": "Transcription failed. Try again."
       }
     },
     "proposeExpense": {
@@ -404,6 +458,39 @@
         "fundNoteMissing": " and you don't have an emergency fund yet",
         "options": "- Want to **cut an expense**? Say \"which expense to watch this week\".\n- Want to **start saving**? Say \"how to build an emergency fund\".\n- Want to **manage debt**? Say \"what to pay off first\".\n- Want **a general check-in**? Say \"give me a quick recap\"."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Expense detected",
+        "income": "Income detected",
+        "goal": "Goal detected",
+        "budget": "Budget detected"
+      },
+      "frequency": {
+        "one_time": "One-time",
+        "monthly": "Monthly",
+        "weekly": "Weekly",
+        "yearly": "Yearly"
+      },
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "savedToast": {
+        "expense": "Expense saved.",
+        "income": "Income saved.",
+        "goal": "Goal created.",
+        "budget": "Budget updated."
+      },
+      "savedInline": {
+        "expense": "Expense saved.",
+        "income": "Income saved.",
+        "goal": "Goal created.",
+        "budget": "Budget updated."
+      },
+      "cancelledInline": "Proposal cancelled.",
+      "goalDeadline": "Due {date}",
+      "goalProgress": "Already {current}",
+      "budgetSubline": "Monthly cap to respect",
+      "genericError": "Something went wrong. Try again."
     }
   },
   "plan": {
@@ -1017,6 +1104,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Reactivate your subscription to restore {feature}",
+      "lapsedBody": "Your Premium access has lapsed. Reactivate to pick up exactly where you left off — all your data is preserved.",
+      "noneHeadline": "{feature} is a Premium feature",
+      "noneBody": "Start your free 14-day trial. No charge today. Cancel anytime.",
+      "cta": "See my subscription"
+    },
     "currentBadge": "Your current plan",
     "activeButton": "Active plan",
     "perYear": "year",
@@ -1027,7 +1121,9 @@
     "ctaCheckoutYearly": "Start yearly trial",
     "ctaCheckoutMonthly": "Start monthly trial",
     "ctaStartTrial": "Start {days} free days",
-    "fineprint": "Card required to start. Automatic billing at the end of the {days} days. Cancel any time.",
+    "fineprint": "A card is required to start the trial. No charge during {days} days. Cancel before the trial ends to pay nothing.",
+    "intervalMonthly": "Monthly",
+    "intervalYearly": "Yearly",
     "portal": "Manage my subscription",
     "errors": {
       "checkoutFallback": "Couldn't start the payment.",
@@ -1035,34 +1131,43 @@
       "generic": "Something went wrong."
     },
     "feedback": {
-      "successTitle": "Payment received. Welcome to Premium.",
+      "successTitle": "Payment received. Welcome to LIBERIA.",
       "successBody": "Your access is being activated, this can take a few seconds.",
       "cancelled": "Payment cancelled. You can retry any time."
     },
     "plans": {
-      "monthly": {
-        "name": "Monthly",
-        "description": "Full LIBERIA access. Cancel any time from your account.",
+      "recommendedBadge": "Recommended",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 days free, no commitment",
-          "Conversational AI coach",
-          "Personalised 30 / 60 / 90-day AI financial plan",
-          "Full budget tracking (income, expenses, goals)",
-          "Weekly recap by email",
-          "Cancel any time"
-        ]
+          "Financial score and full analysis",
+          "Income, expense, budget tracking",
+          "Weekly AI coach",
+          "Personalised action plan",
+          "Mobile + desktop app"
+        ],
+        "monthly": {
+          "description": "The essential financial cockpit. Cancel before the trial ends."
+        },
+        "yearly": {
+          "description": "Standard, billed yearly. About 30 CHF saved vs monthly."
+        }
       },
-      "yearly": {
-        "name": "Yearly",
-        "description": "That's ~9.99 CHF/month — about 60 CHF saved per year.",
-        "badge": "Recommended",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 days free, no commitment",
-          "Everything in Monthly",
-          "Save around 60 CHF per year",
-          "One charge per year",
-          "Cancel any time"
-        ]
+          "Everything in Standard",
+          "Advanced opportunity detection",
+          "3-year wealth trajectory",
+          "Personalised weekly AI recap",
+          "Priority support"
+        ],
+        "monthly": {
+          "description": "The full AI copilot. Cancel before the trial ends."
+        },
+        "yearly": {
+          "description": "Premium, billed yearly. About 40 CHF saved vs monthly."
+        }
       }
     }
   },

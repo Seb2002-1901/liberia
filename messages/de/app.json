@@ -1,4 +1,49 @@
 {
+  "pageTitles": {
+    "dashboard": "Übersicht",
+    "coach": "KI-Coach",
+    "monAnalyse": "Meine Analyse",
+    "plan": "Aktionsplan",
+    "revenus": "Einkünfte",
+    "depenses": "Ausgaben",
+    "budget": "Budget",
+    "objectifs": "Ziele",
+    "epargne": "Sparen",
+    "investissements": "Investitionen",
+    "opportunites": "Chancen",
+    "parametres": "Einstellungen",
+    "profil": "Profil"
+  },
+  "savings": {
+    "metadata": {
+      "title": "Sparen"
+    },
+    "eyebrow": "Wachstum",
+    "title": "Deine Sparübersicht kommt bald",
+    "description": "Ein eigener Bereich, um dein Sparen zu visualisieren, zu projizieren und zu planen — ohne Produktempfehlungen.",
+    "teaser": "Du findest deine Sparquote, deinen Notgroschen, deine persönlichen Ziele und einen klaren Simulator, der dir den Effekt jedes beiseite gelegten CHF zeigt.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
+  "investments": {
+    "metadata": {
+      "title": "Investitionen"
+    },
+    "eyebrow": "Wachstum",
+    "title": "Dein Investitionsbereich kommt bald",
+    "description": "Ein lehrreicher Bereich, um zu verstehen, zu vergleichen und zu simulieren — ohne Produktnamen und Kaufempfehlungen.",
+    "teaser": "Du findest Hilfen, um ETFs zu verstehen, Szenarien zu vergleichen und das Wachstum eines Betrags über 5, 10 oder 20 Jahre zu simulieren. LIBERIA informiert und simuliert, empfiehlt aber kein konkretes Produkt.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
+  "opportunities": {
+    "metadata": {
+      "title": "Chancen"
+    },
+    "eyebrow": "Wachstum",
+    "title": "Dein Chancen-Katalog kommt bald",
+    "description": "Chancen sortiert nach Aufwand, Risiko und Zeitrahmen, um dein Einkommen zu steigern und deine Ziele schneller zu erreichen.",
+    "teaser": "Du findest konkrete Chancen: schnelle Einkommen, Zusatzeinkommen und langfristige Einkommen. Jede Chance zeigt Aufwand, Zeit, geschätzten Effekt und potenziellen Gewinn — ohne unrealistische Versprechen.",
+    "coachCta": "Mit meinem Berater sprechen"
+  },
   "profile": {
     "metadata": {
       "title": "Profil"
@@ -10,7 +55,7 @@
     },
     "fallbackName": "Mitglied",
     "infoCard": "Informationen",
-    "planActive": "Premium-Plan",
+    "planActive": "Aktives Abo",
     "planInactive": "Kein aktives Abo",
     "fields": {
       "fullName": "Vollständiger Name",
@@ -186,7 +231,7 @@
     "status": {
       "label": "Aktueller Plan",
       "trialing": "Testphase",
-      "active": "Premium",
+      "active": "Aktiv",
       "pastDue": "Zahlung ausstehend",
       "paused": "Testphase pausiert",
       "canceled": "Gekündigt",
@@ -284,6 +329,15 @@
           "Wie bringe ich meine Ersparnisse zum Arbeiten?",
           "Wie optimiere ich meine Versicherungen und Verträge?"
         ]
+      },
+      "audio": {
+        "micLabel": "Eine Nachricht diktieren",
+        "stopLabel": "Aufnahme stoppen",
+        "permissionDenied": "Mikrofon blockiert. Aktiviere es in den Browser-Einstellungen.",
+        "unavailable": "Sprachdiktat nicht verfügbar — Transkription ist nicht konfiguriert.",
+        "recording": "Aufnahme…",
+        "transcribing": "Transkribiere…",
+        "transcribeFailed": "Transkription fehlgeschlagen. Bitte erneut versuchen."
       }
     },
     "proposeExpense": {
@@ -404,6 +458,39 @@
         "fundNoteMissing": " und du hast noch keinen Notgroschen",
         "options": "- Willst du **eine Ausgabe kürzen**? Sag „welche Ausgabe diese Woche beobachten\".\n- Willst du **mit dem Sparen anfangen**? Sag „wie einen Notgroschen aufbauen\".\n- Willst du **Schulden verwalten**? Sag „was zuerst zurückzahlen\".\n- Willst du **eine allgemeine Übersicht**? Sag „gib mir eine schnelle Übersicht\"."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Ausgabe erkannt",
+        "income": "Einnahme erkannt",
+        "goal": "Ziel erkannt",
+        "budget": "Budget erkannt"
+      },
+      "frequency": {
+        "one_time": "Einmalig",
+        "monthly": "Monatlich",
+        "weekly": "Wöchentlich",
+        "yearly": "Jährlich"
+      },
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen",
+      "savedToast": {
+        "expense": "Ausgabe gespeichert.",
+        "income": "Einnahme gespeichert.",
+        "goal": "Ziel erstellt.",
+        "budget": "Budget aktualisiert."
+      },
+      "savedInline": {
+        "expense": "Ausgabe gespeichert.",
+        "income": "Einnahme gespeichert.",
+        "goal": "Ziel erstellt.",
+        "budget": "Budget aktualisiert."
+      },
+      "cancelledInline": "Vorschlag abgebrochen.",
+      "goalDeadline": "Frist {date}",
+      "goalProgress": "Bereits {current}",
+      "budgetSubline": "Monatslimit einhalten",
+      "genericError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     }
   },
   "plan": {
@@ -1017,6 +1104,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Reaktiviere dein Abo, um {feature} wiederzuerlangen",
+      "lapsedBody": "Dein Premium-Zugang ist abgelaufen. Reaktiviere ihn, um genau dort weiterzumachen, wo du aufgehört hast — alle deine Daten bleiben erhalten.",
+      "noneHeadline": "{feature} ist eine Premium-Funktion",
+      "noneBody": "Starte deine 14-tägige kostenlose Testphase. Heute keine Belastung. Jederzeit kündbar.",
+      "cta": "Mein Abo anzeigen"
+    },
     "currentBadge": "Dein aktueller Plan",
     "activeButton": "Aktiver Plan",
     "perYear": "Jahr",
@@ -1027,7 +1121,9 @@
     "ctaCheckoutYearly": "Jahres-Testphase starten",
     "ctaCheckoutMonthly": "Monats-Testphase starten",
     "ctaStartTrial": "{days} kostenlose Tage starten",
-    "fineprint": "Karte zum Start erforderlich. Automatische Abrechnung am Ende der {days} Tage. Jederzeit kündbar.",
+    "fineprint": "Karte zum Start der Testphase erforderlich. Keine Abbuchung während {days} Tagen. Vor Testende kündbar, um nichts zu zahlen.",
+    "intervalMonthly": "Monatlich",
+    "intervalYearly": "Jährlich",
     "portal": "Mein Abo verwalten",
     "errors": {
       "checkoutFallback": "Die Zahlung konnte nicht gestartet werden.",
@@ -1035,34 +1131,43 @@
       "generic": "Etwas ist schiefgegangen."
     },
     "feedback": {
-      "successTitle": "Zahlung empfangen. Willkommen bei Premium.",
+      "successTitle": "Zahlung empfangen. Willkommen bei LIBERIA.",
       "successBody": "Dein Zugang wird aktiviert, das kann ein paar Sekunden dauern.",
       "cancelled": "Zahlung abgebrochen. Du kannst jederzeit erneut versuchen."
     },
     "plans": {
-      "monthly": {
-        "name": "Monatlich",
-        "description": "Vollständiger LIBERIA-Zugang. Jederzeit über dein Konto kündbar.",
+      "recommendedBadge": "Empfohlen",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 Tage gratis, ohne Bindung",
-          "Konversations-KI-Coach",
-          "Personalisierter 30 / 60 / 90-Tage-KI-Finanzplan",
-          "Vollständiges Budget-Tracking (Einkommen, Ausgaben, Ziele)",
-          "Wöchentlicher Rückblick per E-Mail",
-          "Jederzeit kündbar"
-        ]
+          "Finanz-Score und vollständige Analyse",
+          "Einnahmen-, Ausgaben-, Budget-Tracking",
+          "Wöchentlicher KI-Coach",
+          "Personalisierter Aktionsplan",
+          "Mobile + Desktop-App"
+        ],
+        "monthly": {
+          "description": "Das essenzielle Finanz-Cockpit. Vor Testende kündbar."
+        },
+        "yearly": {
+          "description": "Standard jährlich abgerechnet. Etwa 30 CHF Ersparnis gegenüber monatlich."
+        }
       },
-      "yearly": {
-        "name": "Jährlich",
-        "description": "Das sind ~9.99 CHF/Monat — etwa 60 CHF Ersparnis pro Jahr.",
-        "badge": "Empfohlen",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 Tage gratis, ohne Bindung",
-          "Alles aus Monatlich",
-          "Spare rund 60 CHF pro Jahr",
-          "Eine Abbuchung pro Jahr",
-          "Jederzeit kündbar"
-        ]
+          "Alles aus Standard",
+          "Erweiterte Chancenerkennung",
+          "3-Jahres-Vermögenstrajektorie",
+          "Personalisierter wöchentlicher KI-Rückblick",
+          "Prioritäts-Support"
+        ],
+        "monthly": {
+          "description": "Der vollständige KI-Copilot. Vor Testende kündbar."
+        },
+        "yearly": {
+          "description": "Premium jährlich abgerechnet. Etwa 40 CHF Ersparnis gegenüber monatlich."
+        }
       }
     }
   },

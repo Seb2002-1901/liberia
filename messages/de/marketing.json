@@ -166,7 +166,7 @@
     "items": {
       "free": {
         "q": "Ist es wirklich gratis?",
-        "a": "Du beginnst mit einer 14-tägigen Testphase (Karte zur Aktivierung erforderlich). Nach der Testphase startet dein gewähltes Abo automatisch: 14.99 CHF/Monat oder 119.99 CHF/Jahr. Du kannst jederzeit aus deinem Konto kündigen, ohne Fragen."
+        "a": "Es gibt keinen dauerhaft kostenlosen Plan. Du kannst die Demo ohne Konto ausprobieren (Daten der Demo werden nicht gespeichert). Um LIBERIA wirklich zu nutzen, beginnst du mit einer 14-tägigen Testphase. Eine Karte ist zur Aktivierung erforderlich — keine Abbuchung während dieser 14 Tage. Am Ende der Testphase startet das gewählte Abo automatisch (Standard 14.95 CHF/Monat oder 149 CHF/Jahr, oder Premium 19.95 CHF/Monat oder 199 CHF/Jahr). Vor Testende kündbar, um nichts zu zahlen."
       },
       "cancelTrial": {
         "q": "Was passiert, wenn ich während der Testphase kündige?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Preise",
-        "html": "<ul><li>Monatsabo: 14.99 CHF / Monat, jeden Monat nach der 14-tägigen Testphase abgebucht.</li><li>Jahresabo: 119.99 CHF / Jahr (ungefähr 9.99 CHF / Monat, ≈ 60 CHF Ersparnis pro Jahr), einmal im Jahr abgebucht.</li></ul><p>Preise sind in Schweizer Franken (CHF) angegeben, inklusive aller Steuern. Keine versteckten Kosten.</p>"
+        "html": "<p>Zwei Pläne, jeweils monatlich oder jährlich verfügbar. Die 14-tägige Testphase ist in allen Fällen enthalten (Karte zur Aktivierung erforderlich, keine Abbuchung während der Testphase).</p><ul><li><strong>Standard monatlich</strong>: 14.95 CHF / Monat, monatlich nach der 14-tägigen Testphase abgebucht.</li><li><strong>Standard jährlich</strong>: 149 CHF / Jahr (etwa 12.42 CHF / Monat, ≈ 30 CHF Ersparnis gegenüber monatlich), einmal im Jahr abgebucht.</li><li><strong>Premium monatlich</strong>: 19.95 CHF / Monat, monatlich nach der 14-tägigen Testphase abgebucht.</li><li><strong>Premium jährlich</strong>: 199 CHF / Jahr (etwa 16.58 CHF / Monat, ≈ 40 CHF Ersparnis gegenüber monatlich), einmal im Jahr abgebucht.</li></ul><p>Preise in Schweizer Franken (CHF), inklusive aller Steuern. Keine versteckten Kosten. Es gibt KEINEN dauerhaft kostenlosen Plan.</p>"
       },
       {
         "heading": "6. Kündigung und Widerruf",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Preise",
-      "description": "LIBERIA — {days} Tage gratis, danach 14.99 CHF/Monat oder 119.99 CHF/Jahr. Jederzeit kündbar."
+      "description": "LIBERIA — {days} Tage gratis (Karte erforderlich), danach Standard 14.95 CHF/Monat (149 CHF/Jahr) oder Premium 19.95 CHF/Monat (199 CHF/Jahr). Vor Testende kündbar."
     },
     "eyebrow": "Preise",
     "title": "Ein klarer Preis. Ohne Fallen.",

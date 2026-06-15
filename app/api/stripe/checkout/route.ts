@@ -13,7 +13,12 @@ import { getAppBaseUrl } from "@/lib/url";
 import { getActionErrors } from "@/lib/i18n/action-errors";
 
 const bodySchema = z.object({
-  planId: z.enum(["premium_monthly", "premium_yearly"]),
+  planId: z.enum([
+    "standard_monthly",
+    "standard_yearly",
+    "premium_monthly",
+    "premium_yearly",
+  ]),
 });
 
 export async function POST(request: Request) {

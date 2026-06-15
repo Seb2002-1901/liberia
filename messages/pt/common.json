@@ -25,18 +25,33 @@
     "submit": "Enviar"
   },
   "shell": {
+    "sectionPrincipal": "Principal",
+    "sectionFinances": "Finanças",
+    "sectionCroissance": "Crescimento",
+    "sectionPlus": "Mais",
     "sectionPilotage": "Pilotagem",
     "sectionAccount": "Conta",
     "demoBadge": "Modo demo",
     "demoBottomNote": "Modo demo · só leitura",
+    "greeting": {
+      "hello": "Olá {firstName}",
+      "subline": "Aqui está a tua situação atualizada hoje.",
+      "fallbackName": "a ti"
+    },
+    "notifications": {
+      "ariaLabel": "Notificações (em breve)"
+    },
     "nav": {
       "dashboard": "Painel",
       "coach": "Coach IA",
-      "plan": "Plano",
+      "plan": "Plano de ação",
       "budget": "Orçamento",
       "incomes": "Receitas",
       "expenses": "Despesas",
       "goals": "Objetivos",
+      "savings": "Poupança",
+      "investments": "Investimentos",
+      "opportunities": "Oportunidades",
       "profile": "Perfil",
       "settings": "Definições",
       "subscription": "Subscrição"
@@ -62,13 +77,13 @@
       "eyebrowDemo": "Demo",
       "demoBody": "Cria a tua conta para pilotar os teus dados reais.",
       "demoCta": "Criar a minha conta",
-      "eyebrowPremium": "Premium",
-      "premiumActive": "Plano Premium ativo",
+      "eyebrowPremium": "Subscrição",
+      "premiumActive": "Subscrição ativa",
       "premiumThanks": "Obrigado pelo teu apoio.",
       "trialCta": "Iniciar a minha experiência de 14 dias",
-      "trialBody": "14 dias gratuitos, depois 14.99 CHF/mês ou 119.99 CHF/ano. Cancela quando quiseres.",
+      "trialBody": "14 dias gratuitos, cartão exigido. Standard 14.95/mês (149/ano). Premium 19.95/mês (199/ano). Cancela antes da cobrança.",
       "resumeCta": "Retomar a minha subscrição",
-      "resumeBody": "O teu acesso está em pausa. Retoma a tua subscrição por 14.99 CHF/mês ou 119.99 CHF/ano. Cancela quando quiseres."
+      "resumeBody": "O teu acesso está em pausa. Retoma Standard (14.95 CHF/mês) ou Premium (19.95 CHF/mês). Cancela quando quiseres."
     }
   },
   "errorPages": {

@@ -166,7 +166,7 @@
     "items": {
       "free": {
         "q": "¿Es realmente gratis?",
-        "a": "Empiezas con una prueba gratuita de 14 días (se requiere tarjeta para activar). Tras la prueba, tu suscripción elegida arranca automáticamente: 14.99 CHF/mes o 119.99 CHF/año. Puedes cancelar cuando quieras desde tu cuenta, sin preguntas."
+        "a": "No hay plan gratuito permanente. Puedes probar la demo sin cuenta (los datos introducidos en la demo no se guardan). Para usar LIBERIA de verdad, empiezas con una prueba gratuita de 14 días. Se requiere una tarjeta al registrarte para activar la prueba — sin cargo durante esos 14 días. Al final de la prueba, el plan elegido arranca automáticamente (Standard 14.95 CHF/mes o 149 CHF/año, o Premium 19.95 CHF/mes o 199 CHF/año). Cancela antes del fin de la prueba para no pagar nada."
       },
       "cancelTrial": {
         "q": "¿Qué pasa si cancelo durante la prueba?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Precios",
-        "html": "<ul><li>Suscripción mensual: 14.99 CHF / mes, cargada cada mes tras la prueba de 14 días.</li><li>Suscripción anual: 119.99 CHF / año (alrededor de 9.99 CHF / mes, ≈ 60 CHF ahorrados al año), cargada una vez al año.</li></ul><p>Los precios se indican en francos suizos (CHF), impuestos incluidos. Sin gastos ocultos.</p>"
+        "html": "<p>Dos planes, cada uno disponible mensual o anual. La prueba de 14 días está incluida en todos los casos (tarjeta requerida al registrarse, sin cargo durante la prueba).</p><ul><li><strong>Standard mensual</strong>: 14.95 CHF / mes, cargado cada mes tras la prueba de 14 días.</li><li><strong>Standard anual</strong>: 149 CHF / año (alrededor de 12.42 CHF / mes, ≈ 30 CHF ahorrados frente al mensual), cargado una vez al año.</li><li><strong>Premium mensual</strong>: 19.95 CHF / mes, cargado cada mes tras la prueba de 14 días.</li><li><strong>Premium anual</strong>: 199 CHF / año (alrededor de 16.58 CHF / mes, ≈ 40 CHF ahorrados frente al mensual), cargado una vez al año.</li></ul><p>Los precios se indican en francos suizos (CHF), impuestos incluidos. Sin gastos ocultos. NO hay plan gratuito permanente.</p>"
       },
       {
         "heading": "6. Cancelación y desistimiento",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Precios",
-      "description": "LIBERIA — {days} días gratis luego 14.99 CHF/mes o 119.99 CHF/año. Cancela cuando quieras."
+      "description": "LIBERIA — {days} días gratis (tarjeta requerida) luego Standard 14.95 CHF/mes (149 CHF/año) o Premium 19.95 CHF/mes (199 CHF/año). Cancelable antes del fin de la prueba."
     },
     "eyebrow": "Precios",
     "title": "Un precio claro. Sin trampas.",

@@ -165,8 +165,8 @@
     "title": "Questions fréquentes.",
     "items": {
       "free": {
-        "q": "C'est vraiment gratuit ?",
-        "a": "Tu démarres avec 14 jours d'essai gratuit (carte requise pour activer). Après l'essai, ton abonnement choisi se déclenche automatiquement : 14.99 CHF/mois ou 119.99 CHF/an. Tu peux annuler à tout moment depuis ton espace, sans question."
+        "q": "Il n'y a pas de version gratuite à vie ?",
+        "a": "Non. LIBERIA n'a pas de plan gratuit permanent. Tu peux essayer la démo sans créer de compte (les données saisies en démo ne sont pas sauvegardées). Pour utiliser LIBERIA pour de vrai, tu démarres par 14 jours d'essai gratuit. Une carte bancaire est requise à l'inscription pour activer l'essai — aucun prélèvement pendant ces 14 jours. À la fin de l'essai, le plan choisi (Standard 14.95 CHF/mois ou 149 CHF/an, ou Premium 19.95 CHF/mois ou 199 CHF/an) se déclenche automatiquement. Tu peux annuler avant la fin de l'essai pour ne rien payer."
       },
       "cancelTrial": {
         "q": "Que se passe-t-il si j'annule pendant l'essai ?",
@@ -272,7 +272,7 @@
       },
       {
         "heading": "5. Tarifs",
-        "html": "<ul><li>Abonnement mensuel : 14.99 CHF / mois, prélevé chaque mois après les 14 jours d'essai.</li><li>Abonnement annuel : 119.99 CHF / an (soit environ 9.99 CHF / mois, ≈ 60 CHF d'économie sur l'année), prélevé chaque année.</li></ul><p>Les prix sont indiqués en francs suisses (CHF), toutes taxes comprises. Aucun frais caché.</p>"
+        "html": "<p>Deux formules, chacune disponible en mensuel ou annuel. L'essai de 14 jours est inclus dans tous les cas (carte bancaire requise à l'inscription, aucun prélèvement pendant l'essai).</p><ul><li><strong>Standard mensuel</strong> : 14.95 CHF / mois, prélevé chaque mois après les 14 jours d'essai.</li><li><strong>Standard annuel</strong> : 149 CHF / an (soit environ 12.42 CHF / mois, ≈ 30 CHF d'économie par rapport au mensuel), prélevé une fois par an.</li><li><strong>Premium mensuel</strong> : 19.95 CHF / mois, prélevé chaque mois après les 14 jours d'essai.</li><li><strong>Premium annuel</strong> : 199 CHF / an (soit environ 16.58 CHF / mois, ≈ 40 CHF d'économie par rapport au mensuel), prélevé une fois par an.</li></ul><p>Les prix sont indiqués en francs suisses (CHF), toutes taxes comprises. Aucun frais caché. Il n'y a PAS de plan gratuit permanent.</p>"
       },
       {
         "heading": "6. Annulation et droit de rétractation",
@@ -357,7 +357,7 @@
   "pricingPage": {
     "metadata": {
       "title": "Tarifs",
-      "description": "LIBERIA — {days} jours gratuits puis 14.99 CHF/mois ou 119.99 CHF/an. Annulable à tout moment."
+      "description": "LIBERIA — {days} jours gratuits (carte requise) puis Standard 14.95 CHF/mois (149 CHF/an) ou Premium 19.95 CHF/mois (199 CHF/an). Annulable avant la fin de l'essai."
     },
     "eyebrow": "Tarification",
     "title": "Un prix clair. Sans pièges.",

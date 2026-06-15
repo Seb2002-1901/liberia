@@ -1,4 +1,49 @@
 {
+  "pageTitles": {
+    "dashboard": "Pannello",
+    "coach": "Coach IA",
+    "monAnalyse": "La mia analisi",
+    "plan": "Piano d'azione",
+    "revenus": "Entrate",
+    "depenses": "Spese",
+    "budget": "Bilancio",
+    "objectifs": "Obiettivi",
+    "epargne": "Risparmio",
+    "investissements": "Investimenti",
+    "opportunites": "Opportunità",
+    "parametres": "Impostazioni",
+    "profil": "Profilo"
+  },
+  "savings": {
+    "metadata": {
+      "title": "Risparmio"
+    },
+    "eyebrow": "Crescita",
+    "title": "La tua vista risparmio arriva presto",
+    "description": "Uno spazio dedicato per visualizzare, proiettare e pianificare il tuo risparmio — senza alcuna raccomandazione di prodotto.",
+    "teaser": "Troverai il tuo tasso di risparmio, il tuo fondo di emergenza, i tuoi obiettivi personali e un simulatore chiaro che mostra l'impatto di ogni CHF messo da parte.",
+    "coachCta": "Parlare con il mio consulente"
+  },
+  "investments": {
+    "metadata": {
+      "title": "Investimenti"
+    },
+    "eyebrow": "Crescita",
+    "title": "La tua vista investimenti arriva presto",
+    "description": "Uno spazio educativo per capire, confrontare e simulare — senza nomi di prodotto né raccomandazioni d'acquisto.",
+    "teaser": "Troverai risorse per capire gli ETF, confrontare scenari di investimento e simulare la crescita di un importo investito su 5, 10 o 20 anni. LIBERIA informa e simula, non raccomanda mai un prodotto specifico.",
+    "coachCta": "Parlare con il mio consulente"
+  },
+  "opportunities": {
+    "metadata": {
+      "title": "Opportunità"
+    },
+    "eyebrow": "Crescita",
+    "title": "Il tuo catalogo di opportunità arriva presto",
+    "description": "Opportunità classificate per impegno, rischio e tempistica per aumentare le tue entrate e raggiungere prima i tuoi obiettivi.",
+    "teaser": "Troverai opportunità concrete: entrate rapide, entrate complementari ed entrate a lungo termine. Ogni opportunità mostra impegno, tempo, impatto stimato e guadagno potenziale — senza promesse irrealistiche.",
+    "coachCta": "Parlare con il mio consulente"
+  },
   "profile": {
     "metadata": {
       "title": "Profilo"
@@ -10,7 +55,7 @@
     },
     "fallbackName": "Membro",
     "infoCard": "Informazioni",
-    "planActive": "Piano Premium",
+    "planActive": "Abbonamento attivo",
     "planInactive": "Nessun abbonamento attivo",
     "fields": {
       "fullName": "Nome completo",
@@ -186,7 +231,7 @@
     "status": {
       "label": "Piano attuale",
       "trialing": "Prova",
-      "active": "Premium",
+      "active": "Attivo",
       "pastDue": "Pagamento in sospeso",
       "paused": "Prova in pausa",
       "canceled": "Disdetto",
@@ -284,6 +329,15 @@
           "Come faccio lavorare il mio risparmio?",
           "Come ottimizzo le mie assicurazioni e contratti?"
         ]
+      },
+      "audio": {
+        "micLabel": "Detta un messaggio",
+        "stopLabel": "Ferma registrazione",
+        "permissionDenied": "Microfono bloccato. Attivalo nelle impostazioni del browser.",
+        "unavailable": "Dettatura vocale non disponibile — la trascrizione non è configurata.",
+        "recording": "Registrazione…",
+        "transcribing": "Trascrizione…",
+        "transcribeFailed": "Trascrizione fallita. Riprova."
       }
     },
     "proposeExpense": {
@@ -404,6 +458,39 @@
         "fundNoteMissing": " e non hai ancora un fondo di emergenza",
         "options": "- Vuoi **tagliare una spesa**? Dì «quale spesa sorvegliare questa settimana».\n- Vuoi **iniziare a risparmiare**? Dì «come costruire un fondo di emergenza».\n- Vuoi **gestire il debito**? Dì «cosa pagare per primo».\n- Vuoi **un check-in generale**? Dì «dammi un riepilogo veloce»."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Spesa rilevata",
+        "income": "Entrata rilevata",
+        "goal": "Obiettivo rilevato",
+        "budget": "Budget rilevato"
+      },
+      "frequency": {
+        "one_time": "Una tantum",
+        "monthly": "Mensile",
+        "weekly": "Settimanale",
+        "yearly": "Annuale"
+      },
+      "confirm": "Conferma",
+      "cancel": "Annulla",
+      "savedToast": {
+        "expense": "Spesa salvata.",
+        "income": "Entrata salvata.",
+        "goal": "Obiettivo creato.",
+        "budget": "Budget aggiornato."
+      },
+      "savedInline": {
+        "expense": "Spesa salvata.",
+        "income": "Entrata salvata.",
+        "goal": "Obiettivo creato.",
+        "budget": "Budget aggiornato."
+      },
+      "cancelledInline": "Proposta annullata.",
+      "goalDeadline": "Scadenza {date}",
+      "goalProgress": "Già {current}",
+      "budgetSubline": "Limite mensile da rispettare",
+      "genericError": "Qualcosa è andato storto. Riprova."
     }
   },
   "plan": {
@@ -1017,6 +1104,13 @@
     }
   },
   "billing": {
+    "paywall": {
+      "lapsedHeadline": "Riattiva il tuo abbonamento per ritrovare {feature}",
+      "lapsedBody": "Il tuo accesso Premium è scaduto. Riattivalo per riprendere esattamente da dove hai lasciato — tutti i tuoi dati sono preservati.",
+      "noneHeadline": "{feature} è una funzionalità Premium",
+      "noneBody": "Inizia la tua prova gratuita di 14 giorni. Nessun addebito oggi. Annulla in qualsiasi momento.",
+      "cta": "Vedi il mio abbonamento"
+    },
     "currentBadge": "Il tuo piano attuale",
     "activeButton": "Piano attivo",
     "perYear": "anno",
@@ -1027,7 +1121,9 @@
     "ctaCheckoutYearly": "Iniziare prova annuale",
     "ctaCheckoutMonthly": "Iniziare prova mensile",
     "ctaStartTrial": "Iniziare {days} giorni gratuiti",
-    "fineprint": "Carta richiesta per iniziare. Addebito automatico alla fine dei {days} giorni. Disdicibile in qualsiasi momento.",
+    "fineprint": "Carta richiesta per iniziare la prova. Nessun addebito durante {days} giorni. Disdici prima della fine della prova per non pagare nulla.",
+    "intervalMonthly": "Mensile",
+    "intervalYearly": "Annuale",
     "portal": "Gestire il mio abbonamento",
     "errors": {
       "checkoutFallback": "Impossibile avviare il pagamento.",
@@ -1035,34 +1131,43 @@
       "generic": "Qualcosa è andato storto."
     },
     "feedback": {
-      "successTitle": "Pagamento ricevuto. Benvenuto in Premium.",
+      "successTitle": "Pagamento ricevuto. Benvenuto in LIBERIA.",
       "successBody": "Il tuo accesso si sta attivando, può richiedere qualche secondo.",
       "cancelled": "Pagamento annullato. Puoi riprovare in qualsiasi momento."
     },
     "plans": {
-      "monthly": {
-        "name": "Mensile",
-        "description": "Accesso completo a LIBERIA. Disdicibile in qualsiasi momento dal tuo account.",
+      "recommendedBadge": "Consigliato",
+      "standard": {
+        "name": "Standard",
         "features": [
-          "14 giorni gratuiti, senza vincoli",
-          "Coach IA conversazionale",
-          "Piano finanziario IA personalizzato 30 / 60 / 90 giorni",
-          "Tracciamento completo del budget (entrate, spese, obiettivi)",
-          "Riepilogo settimanale via email",
-          "Disdicibile in qualsiasi momento"
-        ]
+          "Punteggio finanziario e analisi completa",
+          "Tracciamento entrate, spese, budget",
+          "Coach IA settimanale",
+          "Piano d'azione personalizzato",
+          "App mobile + desktop"
+        ],
+        "monthly": {
+          "description": "Il cockpit finanziario essenziale. Disdicibile prima della fine della prova."
+        },
+        "yearly": {
+          "description": "Standard fatturato annualmente. Circa 30 CHF risparmiati rispetto al mensile."
+        }
       },
-      "yearly": {
-        "name": "Annuale",
-        "description": "Sono ~9.99 CHF/mese — circa 60 CHF risparmiati all'anno.",
-        "badge": "Consigliato",
+      "premium": {
+        "name": "Premium",
         "features": [
-          "14 giorni gratuiti, senza vincoli",
-          "Tutto del Mensile",
-          "Risparmia circa 60 CHF all'anno",
-          "Un addebito all'anno",
-          "Disdicibile in qualsiasi momento"
-        ]
+          "Tutto di Standard",
+          "Rilevamento avanzato di opportunità",
+          "Traiettoria patrimoniale a 3 anni",
+          "Riepilogo settimanale IA personalizzato",
+          "Supporto prioritario"
+        ],
+        "monthly": {
+          "description": "Il copilota IA completo. Disdicibile prima della fine della prova."
+        },
+        "yearly": {
+          "description": "Premium fatturato annualmente. Circa 40 CHF risparmiati rispetto al mensile."
+        }
       }
     }
   },

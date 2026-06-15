@@ -25,18 +25,33 @@
     "submit": "Submit"
   },
   "shell": {
+    "sectionPrincipal": "Main",
+    "sectionFinances": "Finances",
+    "sectionCroissance": "Growth",
+    "sectionPlus": "More",
     "sectionPilotage": "Piloting",
     "sectionAccount": "Account",
     "demoBadge": "Demo mode",
     "demoBottomNote": "Demo mode · read-only",
+    "greeting": {
+      "hello": "Hi {firstName}",
+      "subline": "Here's your situation, updated today.",
+      "fallbackName": "there"
+    },
+    "notifications": {
+      "ariaLabel": "Notifications (coming soon)"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "coach": "AI coach",
-      "plan": "Plan",
+      "plan": "Action plan",
       "budget": "Budget",
       "incomes": "Income",
       "expenses": "Expenses",
       "goals": "Goals",
+      "savings": "Savings",
+      "investments": "Investments",
+      "opportunities": "Opportunities",
       "profile": "Profile",
       "settings": "Settings",
       "subscription": "Subscription"
@@ -62,13 +77,13 @@
       "eyebrowDemo": "Demo",
       "demoBody": "Create your account to pilot your real data.",
       "demoCta": "Create my account",
-      "eyebrowPremium": "Premium",
-      "premiumActive": "Premium plan active",
+      "eyebrowPremium": "Subscription",
+      "premiumActive": "Subscription active",
       "premiumThanks": "Thanks for the support.",
       "trialCta": "Start my 14-day trial",
-      "trialBody": "14 days free, then 14.99 CHF/month or 119.99 CHF/year. Cancel any time.",
+      "trialBody": "14 days free, card required. Standard 14.95/month (149/year). Premium 19.95/month (199/year). Cancel before billing.",
       "resumeCta": "Resume my subscription",
-      "resumeBody": "Your access is paused. Resume your subscription at 14.99 CHF/month or 119.99 CHF/year. Cancel any time."
+      "resumeBody": "Your access is paused. Resume Standard (14.95 CHF/month) or Premium (19.95 CHF/month). Cancel any time."
     }
   },
   "errorPages": {

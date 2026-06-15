@@ -5,9 +5,10 @@ import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import type { PlanId } from "@/lib/constants";
 
 interface CheckoutButtonProps {
-  planId: "premium_monthly" | "premium_yearly";
+  planId: PlanId;
   label?: string;
   variant?: ButtonProps["variant"];
   className?: string;
@@ -43,10 +44,10 @@ export function CheckoutButton({
     }
   };
 
-  const defaultLabel =
-    planId === "premium_yearly"
-      ? t("ctaCheckoutYearly")
-      : t("ctaCheckoutMonthly");
+  const isYearly = planId.endsWith("_yearly");
+  const defaultLabel = isYearly
+    ? t("ctaCheckoutYearly")
+    : t("ctaCheckoutMonthly");
 
   return (
     <Button

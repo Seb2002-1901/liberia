@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
+import { Greeting } from "@/components/layout/greeting";
 import { getFinanceData } from "@/lib/services/finance";
 import { signOutAction } from "@/app/actions/auth";
 import { ROUTES } from "@/lib/constants";
@@ -20,6 +21,14 @@ export default async function AppLayout({
     redirect(ROUTES.onboarding);
   }
 
+  // Phase 5.0 S2 — la salutation "Bonjour {prénom} 👋" est injectée
+  // dans la topbar globale. Le composant est async (next-intl
+  // server) ; on l'instancie ici (Server Component) et on le passe
+  // à `<AppShell>` (Client Component) en tant que ReactNode prop.
+  // Le fallback "fallbackName" couvre le démo et les profils sans nom.
+  const firstName =
+    data.profile.full_name?.split(" ")[0]?.trim() || null;
+
   return (
     <AppShell
       user={{
@@ -30,6 +39,7 @@ export default async function AppLayout({
       trialUsed={data.subscription.trial_used}
       isDemo={data.isDemo}
       onSignOut={signOutAction}
+      greeting={<Greeting firstName={firstName} />}
     >
       {children}
     </AppShell>
