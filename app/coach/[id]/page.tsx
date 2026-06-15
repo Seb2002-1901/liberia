@@ -412,6 +412,11 @@ function ChatColumn({
   recentConversationsCount: number;
   conversationTitle: string;
 }) {
+  // Sprint Coach IA — sticky composer fix.
+  // ChatColumn doit remplir la grid cell (height 100% + minHeight 0)
+  // ET être un flex container où SEUL CoachConversationV3Client
+  // grandit (flex: 1). Sans ça, la conversation pousse le composer
+  // hors écran après 20+ messages (bug P0-5).
   return (
     <div
       style={{
@@ -419,6 +424,7 @@ function ChatColumn({
         flexDirection: "column",
         minWidth: 0,
         minHeight: 0,
+        height: "100%",
         gap: 12,
       }}
     >
@@ -427,12 +433,14 @@ function ChatColumn({
         recentOtherConversationId={recentOtherConversationId}
         recentConversationsCount={recentConversationsCount}
       />
-      <CoachConversationV3Client
-        conversationId={conversationId}
-        initialMessages={initialMessages}
-        isDemo={isDemo}
-        suggestions={suggestions}
-      />
+      <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
+        <CoachConversationV3Client
+          conversationId={conversationId}
+          initialMessages={initialMessages}
+          isDemo={isDemo}
+          suggestions={suggestions}
+        />
+      </div>
       <PrivacyFooter />
     </div>
   );
