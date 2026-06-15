@@ -16,6 +16,13 @@ import {
   confirmProposedBudgetAction,
   confirmProposedUpdateGoalAction,
   confirmProposedDeleteGoalAction,
+  confirmProposedUpdateExpenseAction,
+  confirmProposedDeleteExpenseAction,
+  confirmProposedUpdateIncomeAction,
+  confirmProposedDeleteIncomeAction,
+  confirmProposedDeleteBudgetAction,
+  confirmProposedAddMemoryAction,
+  confirmProposedTogglePlanStepAction,
 } from "@/app/actions/coach-actions";
 import type { PendingAction } from "./proposed-action-types";
 
@@ -44,6 +51,13 @@ const COLORS = {
   budget: { accent: "#011E5F", bg: "#E0E7FF", text: "#011E5F" },
   update_goal: { accent: "#7C3AED", bg: "#F3E8FF", text: "#5B21B6" },
   delete_goal: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
+  update_expense: { accent: "#7C3AED", bg: "#F3E8FF", text: "#5B21B6" },
+  delete_expense: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
+  update_income: { accent: "#7C3AED", bg: "#F3E8FF", text: "#5B21B6" },
+  delete_income: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
+  delete_budget: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
+  add_memory: { accent: "#0EA5E9", bg: "#E0F2FE", text: "#075985" },
+  toggle_plan_step: { accent: "#16A34A", bg: "#DCFCE7", text: "#15803D" },
 } as const;
 
 export function ProposedActionCard({ action, onResolved }: Props) {
@@ -113,6 +127,56 @@ export function ProposedActionCard({ action, onResolved }: Props) {
         case "delete_goal":
           res = await confirmProposedDeleteGoalAction({
             match_title: action.match_title,
+          });
+          break;
+        case "update_expense":
+          res = await confirmProposedUpdateExpenseAction({
+            match_label: action.match_label,
+            match_category: action.match_category ?? undefined,
+            newAmount: action.newAmount ?? undefined,
+            newFrequency: action.newFrequency ?? undefined,
+            newCategory: action.newCategory ?? undefined,
+            newLabel: action.newLabel ?? undefined,
+            currency: action.currency,
+          });
+          break;
+        case "delete_expense":
+          res = await confirmProposedDeleteExpenseAction({
+            match_label: action.match_label,
+            match_category: action.match_category ?? undefined,
+          });
+          break;
+        case "update_income":
+          res = await confirmProposedUpdateIncomeAction({
+            match_label: action.match_label,
+            match_category: action.match_category ?? undefined,
+            newAmount: action.newAmount ?? undefined,
+            newFrequency: action.newFrequency ?? undefined,
+            newLabel: action.newLabel ?? undefined,
+            currency: action.currency,
+          });
+          break;
+        case "delete_income":
+          res = await confirmProposedDeleteIncomeAction({
+            match_label: action.match_label,
+            match_category: action.match_category ?? undefined,
+          });
+          break;
+        case "delete_budget":
+          res = await confirmProposedDeleteBudgetAction({
+            category: action.category,
+          });
+          break;
+        case "add_memory":
+          res = await confirmProposedAddMemoryAction({
+            kind: action.memoryKind,
+            summary: action.summary,
+          });
+          break;
+        case "toggle_plan_step":
+          res = await confirmProposedTogglePlanStepAction({
+            match_query: action.match_query,
+            completed: action.completed,
           });
           break;
       }
@@ -314,6 +378,22 @@ function renderHeadline(
       return a.newTitle ?? a.match_title;
     case "delete_goal":
       return a.match_title;
+    case "update_expense":
+      return a.newLabel ?? a.match_label;
+    case "delete_expense":
+      return a.match_label;
+    case "update_income":
+      return a.newLabel ?? a.match_label;
+    case "delete_income":
+      return a.match_label;
+    case "delete_budget": {
+      const cat = EXPENSE_CATEGORIES.find((c) => c.id === a.category);
+      return cat?.label ?? a.category;
+    }
+    case "add_memory":
+      return a.summary;
+    case "toggle_plan_step":
+      return a.match_query;
   }
 }
 
@@ -360,5 +440,27 @@ function renderSubline(
     }
     case "delete_goal":
       return t("deleteGoalSubline");
+    case "update_expense":
+    case "update_income": {
+      const parts: string[] = [];
+      if (a.newAmount !== null) parts.push(t("newAmount", { amount: a.newAmount }));
+      if (a.newFrequency !== null) parts.push(t(`frequency.${a.newFrequency}`));
+      if ("newCategory" in a && a.newCategory !== null) {
+        const cat = EXPENSE_CATEGORIES.find((c) => c.id === a.newCategory);
+        parts.push(cat?.label ?? a.newCategory);
+      }
+      if (a.newLabel !== null && a.newLabel !== a.match_label) {
+        parts.push(t("renameTo", { name: a.newLabel }));
+      }
+      return parts.length > 0 ? parts.join(" · ") : t("updateGoalNoChange");
+    }
+    case "delete_expense":
+    case "delete_income":
+    case "delete_budget":
+      return t("deleteSubline");
+    case "add_memory":
+      return t(`memoryKind.${a.memoryKind}`);
+    case "toggle_plan_step":
+      return a.completed ? t("toggleCompleted") : t("toggleUncompleted");
   }
 }

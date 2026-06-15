@@ -81,13 +81,79 @@ export interface PendingDeleteGoalAction {
   match_title: string;
 }
 
+export interface PendingUpdateExpenseAction {
+  kind: "update_expense";
+  toolUseId: string;
+  match_label: string;
+  match_category: ExpenseCategoryId | null;
+  newAmount: number | null;
+  newFrequency: ExpenseFrequency | null;
+  newCategory: ExpenseCategoryId | null;
+  newLabel: string | null;
+  currency: string;
+}
+
+export interface PendingDeleteExpenseAction {
+  kind: "delete_expense";
+  toolUseId: string;
+  match_label: string;
+  match_category: ExpenseCategoryId | null;
+}
+
+export interface PendingUpdateIncomeAction {
+  kind: "update_income";
+  toolUseId: string;
+  match_label: string;
+  match_category: IncomeCategoryId | null;
+  newAmount: number | null;
+  newFrequency: ExpenseFrequency | null;
+  newLabel: string | null;
+  currency: string;
+}
+
+export interface PendingDeleteIncomeAction {
+  kind: "delete_income";
+  toolUseId: string;
+  match_label: string;
+  match_category: IncomeCategoryId | null;
+}
+
+export interface PendingDeleteBudgetAction {
+  kind: "delete_budget";
+  toolUseId: string;
+  category: ExpenseCategoryId;
+}
+
+export type MemoryKind = "goal" | "constraint" | "preference" | "context" | "event";
+
+export interface PendingAddMemoryAction {
+  kind: "add_memory";
+  toolUseId: string;
+  memoryKind: MemoryKind;
+  summary: string;
+}
+
+export interface PendingTogglePlanStepAction {
+  kind: "toggle_plan_step";
+  toolUseId: string;
+  match_query: string;
+  completed: boolean;
+}
+
 export type PendingAction =
   | PendingExpenseAction
   | PendingIncomeAction
   | PendingGoalAction
   | PendingBudgetAction
   | PendingUpdateGoalAction
-  | PendingDeleteGoalAction;
+  | PendingDeleteGoalAction
+  | PendingUpdateExpenseAction
+  | PendingDeleteExpenseAction
+  | PendingUpdateIncomeAction
+  | PendingDeleteIncomeAction
+  | PendingDeleteBudgetAction
+  | PendingAddMemoryAction
+  | PendingTogglePlanStepAction;
 
 /**
  * Parse un payload SSE inconnu en PendingAction typée. Retourne
@@ -243,6 +309,144 @@ export function parseSseProposedAction(
       kind: "delete_goal",
       toolUseId,
       match_title: payload.match_title,
+    };
+  }
+
+  if (event === "propose_update_expense") {
+    if (typeof payload.match_label !== "string" || payload.match_label.length === 0)
+      return null;
+    if (typeof payload.currency !== "string") return null;
+    const newAmount =
+      typeof payload.newAmount === "number" && payload.newAmount > 0
+        ? payload.newAmount
+        : null;
+    const newFrequency = isFrequency(payload.newFrequency)
+      ? payload.newFrequency
+      : null;
+    const newCategory =
+      typeof payload.newCategory === "string" ? (payload.newCategory as ExpenseCategoryId) : null;
+    const newLabel =
+      typeof payload.newLabel === "string" && payload.newLabel.length > 0
+        ? payload.newLabel
+        : null;
+    if (newAmount === null && newFrequency === null && newCategory === null && newLabel === null)
+      return null;
+    return {
+      kind: "update_expense",
+      toolUseId,
+      match_label: payload.match_label,
+      match_category:
+        typeof payload.match_category === "string"
+          ? (payload.match_category as ExpenseCategoryId)
+          : null,
+      newAmount,
+      newFrequency,
+      newCategory,
+      newLabel,
+      currency: payload.currency,
+    };
+  }
+
+  if (event === "propose_delete_expense") {
+    if (typeof payload.match_label !== "string" || payload.match_label.length === 0)
+      return null;
+    return {
+      kind: "delete_expense",
+      toolUseId,
+      match_label: payload.match_label,
+      match_category:
+        typeof payload.match_category === "string"
+          ? (payload.match_category as ExpenseCategoryId)
+          : null,
+    };
+  }
+
+  if (event === "propose_update_income") {
+    if (typeof payload.match_label !== "string" || payload.match_label.length === 0)
+      return null;
+    if (typeof payload.currency !== "string") return null;
+    const newAmount =
+      typeof payload.newAmount === "number" && payload.newAmount > 0
+        ? payload.newAmount
+        : null;
+    const newFrequency = isFrequency(payload.newFrequency)
+      ? payload.newFrequency
+      : null;
+    const newLabel =
+      typeof payload.newLabel === "string" && payload.newLabel.length > 0
+        ? payload.newLabel
+        : null;
+    if (newAmount === null && newFrequency === null && newLabel === null) return null;
+    return {
+      kind: "update_income",
+      toolUseId,
+      match_label: payload.match_label,
+      match_category:
+        typeof payload.match_category === "string"
+          ? (payload.match_category as IncomeCategoryId)
+          : null,
+      newAmount,
+      newFrequency,
+      newLabel,
+      currency: payload.currency,
+    };
+  }
+
+  if (event === "propose_delete_income") {
+    if (typeof payload.match_label !== "string" || payload.match_label.length === 0)
+      return null;
+    return {
+      kind: "delete_income",
+      toolUseId,
+      match_label: payload.match_label,
+      match_category:
+        typeof payload.match_category === "string"
+          ? (payload.match_category as IncomeCategoryId)
+          : null,
+    };
+  }
+
+  if (event === "propose_delete_budget") {
+    if (typeof payload.category !== "string") return null;
+    return {
+      kind: "delete_budget",
+      toolUseId,
+      category: payload.category as ExpenseCategoryId,
+    };
+  }
+
+  if (event === "propose_add_memory") {
+    if (
+      typeof payload.summary !== "string" ||
+      payload.summary.length < 3
+    )
+      return null;
+    const kind = payload.kind;
+    if (
+      kind !== "goal" &&
+      kind !== "constraint" &&
+      kind !== "preference" &&
+      kind !== "context" &&
+      kind !== "event"
+    )
+      return null;
+    return {
+      kind: "add_memory",
+      toolUseId,
+      memoryKind: kind,
+      summary: payload.summary,
+    };
+  }
+
+  if (event === "propose_toggle_plan_step") {
+    if (typeof payload.match_query !== "string" || payload.match_query.length === 0)
+      return null;
+    if (typeof payload.completed !== "boolean") return null;
+    return {
+      kind: "toggle_plan_step",
+      toolUseId,
+      match_query: payload.match_query,
+      completed: payload.completed,
     };
   }
 

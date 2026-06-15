@@ -271,6 +271,122 @@ describe("parseSseProposedAction", () => {
     });
   });
 
+  describe("propose_update_expense", () => {
+    it("parses with newAmount + match_label", () => {
+      const r = parseSseProposedAction("propose_update_expense", {
+        toolUseId: "tu_ue1",
+        match_label: "Coop",
+        newAmount: 45,
+        currency: "CHF",
+      });
+      expect(r?.kind).toBe("update_expense");
+      if (r?.kind === "update_expense") {
+        expect(r.newAmount).toBe(45);
+        expect(r.newCategory).toBeNull();
+      }
+    });
+
+    it("rejects no-op", () => {
+      expect(
+        parseSseProposedAction("propose_update_expense", {
+          toolUseId: "tu_ue2",
+          match_label: "X",
+          currency: "CHF",
+        }),
+      ).toBeNull();
+    });
+  });
+
+  describe("propose_delete_expense", () => {
+    it("parses with match_label only", () => {
+      const r = parseSseProposedAction("propose_delete_expense", {
+        toolUseId: "tu_de1",
+        match_label: "Netflix",
+      });
+      expect(r?.kind).toBe("delete_expense");
+    });
+  });
+
+  describe("propose_update_income", () => {
+    it("parses with newAmount", () => {
+      const r = parseSseProposedAction("propose_update_income", {
+        toolUseId: "tu_ui1",
+        match_label: "Salaire",
+        newAmount: 5200,
+        currency: "CHF",
+      });
+      expect(r?.kind).toBe("update_income");
+    });
+  });
+
+  describe("propose_delete_income", () => {
+    it("parses", () => {
+      const r = parseSseProposedAction("propose_delete_income", {
+        toolUseId: "tu_di1",
+        match_label: "Freelance Acme",
+      });
+      expect(r?.kind).toBe("delete_income");
+    });
+  });
+
+  describe("propose_delete_budget", () => {
+    it("parses", () => {
+      const r = parseSseProposedAction("propose_delete_budget", {
+        toolUseId: "tu_db1",
+        category: "leisure",
+      });
+      expect(r?.kind).toBe("delete_budget");
+    });
+  });
+
+  describe("propose_add_memory", () => {
+    it("parses with goal kind", () => {
+      const r = parseSseProposedAction("propose_add_memory", {
+        toolUseId: "tu_m1",
+        kind: "goal",
+        summary: "User wants to buy a motorcycle in 2027",
+      });
+      expect(r?.kind).toBe("add_memory");
+      if (r?.kind === "add_memory") {
+        expect(r.memoryKind).toBe("goal");
+      }
+    });
+
+    it("rejects unknown kind", () => {
+      expect(
+        parseSseProposedAction("propose_add_memory", {
+          toolUseId: "tu_m2",
+          kind: "unicorn",
+          summary: "x",
+        }),
+      ).toBeNull();
+    });
+
+    it("rejects summary too short", () => {
+      expect(
+        parseSseProposedAction("propose_add_memory", {
+          toolUseId: "tu_m3",
+          kind: "goal",
+          summary: "x",
+        }),
+      ).toBeNull();
+    });
+  });
+
+  describe("propose_toggle_plan_step", () => {
+    it("parses completed=true", () => {
+      const r = parseSseProposedAction("propose_toggle_plan_step", {
+        toolUseId: "tu_t1",
+        match_query: "fonds urgence",
+        completed: true,
+      });
+      expect(r?.kind).toBe("toggle_plan_step");
+      if (r?.kind === "toggle_plan_step") {
+        expect(r.completed).toBe(true);
+      }
+    });
+  });
+
   describe("propose_delete_goal", () => {
     it("parses with match_title", () => {
       const result = parseSseProposedAction("propose_delete_goal", {

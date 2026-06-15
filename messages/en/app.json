@@ -466,7 +466,14 @@
         "goal": "Goal detected",
         "budget": "Budget detected",
         "update_goal": "Update a goal",
-        "delete_goal": "Delete a goal"
+        "delete_goal": "Delete a goal",
+        "update_expense": "Update an expense",
+        "delete_expense": "Delete an expense",
+        "update_income": "Update an income",
+        "delete_income": "Delete an income",
+        "delete_budget": "Remove budget",
+        "add_memory": "Save to memory",
+        "toggle_plan_step": "Plan step"
       },
       "frequency": {
         "one_time": "One-time",
@@ -482,7 +489,14 @@
         "goal": "Goal created.",
         "budget": "Budget updated.",
         "update_goal": "Goal updated.",
-        "delete_goal": "Goal deleted."
+        "delete_goal": "Goal deleted.",
+        "update_expense": "Expense updated.",
+        "delete_expense": "Expense deleted.",
+        "update_income": "Income updated.",
+        "delete_income": "Income deleted.",
+        "delete_budget": "Budget removed.",
+        "add_memory": "Note added to memory.",
+        "toggle_plan_step": "Step updated."
       },
       "savedInline": {
         "expense": "Expense saved.",
@@ -490,7 +504,14 @@
         "goal": "Goal created.",
         "budget": "Budget updated.",
         "update_goal": "Goal updated.",
-        "delete_goal": "Goal deleted."
+        "delete_goal": "Goal deleted.",
+        "update_expense": "Expense updated.",
+        "delete_expense": "Expense deleted.",
+        "update_income": "Income updated.",
+        "delete_income": "Income deleted.",
+        "delete_budget": "Budget removed.",
+        "add_memory": "Note saved.",
+        "toggle_plan_step": "Step updated."
       },
       "cancelledInline": "Proposal cancelled.",
       "goalDeadline": "Due {date}",
@@ -502,7 +523,19 @@
       "updateGoalNewDeadline": "New deadline {date}",
       "updateGoalRename": "Rename to \"{title}\"",
       "updateGoalNoChange": "No change detected",
-      "deleteGoalSubline": "Permanent deletion — confirm to remove"
+      "deleteGoalSubline": "Permanent deletion — confirm to remove",
+      "newAmount": "New amount {amount}",
+      "renameTo": "Rename to \"{name}\"",
+      "deleteSubline": "Permanent deletion — confirm to remove",
+      "toggleCompleted": "Mark as completed",
+      "toggleUncompleted": "Mark as not completed",
+      "memoryKind": {
+        "goal": "Personal goal",
+        "constraint": "Constraint",
+        "preference": "Preference",
+        "context": "Context",
+        "event": "Event"
+      }
     }
   },
   "plan": {

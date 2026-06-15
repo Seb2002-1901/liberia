@@ -40,7 +40,13 @@
     "transcribeFailed": "Transcription failed. Try again.",
     "audioTooLarge": "Audio too large (max 25 MB).",
     "goalNotFound": "No matching goal found. Be more specific.",
-    "goalAmbiguous": "Several goals match. Specify the exact title."
+    "goalAmbiguous": "Several goals match. Specify the exact title.",
+    "expenseNotFound": "No matching expense. Be more specific.",
+    "expenseAmbiguous": "Several expenses match. Specify label or category.",
+    "incomeNotFound": "No matching income. Be more specific.",
+    "incomeAmbiguous": "Several incomes match. Specify the exact label.",
+    "planStepNotFound": "No matching plan step.",
+    "planStepAmbiguous": "Several steps match. Specify the number or exact title."
   },
   "validation": {
     "emailRequired": "Email required",

@@ -365,7 +365,14 @@
         "goal": "Objectif détecté",
         "budget": "Budget détecté",
         "update_goal": "Modifier un objectif",
-        "delete_goal": "Supprimer un objectif"
+        "delete_goal": "Supprimer un objectif",
+        "update_expense": "Modifier une dépense",
+        "delete_expense": "Supprimer une dépense",
+        "update_income": "Modifier un revenu",
+        "delete_income": "Supprimer un revenu",
+        "delete_budget": "Supprimer un budget",
+        "add_memory": "Mémoriser",
+        "toggle_plan_step": "Étape du plan"
       },
       "frequency": {
         "one_time": "Ponctuel",
@@ -381,7 +388,14 @@
         "goal": "Objectif créé.",
         "budget": "Budget mis à jour.",
         "update_goal": "Objectif modifié.",
-        "delete_goal": "Objectif supprimé."
+        "delete_goal": "Objectif supprimé.",
+        "update_expense": "Dépense modifiée.",
+        "delete_expense": "Dépense supprimée.",
+        "update_income": "Revenu modifié.",
+        "delete_income": "Revenu supprimé.",
+        "delete_budget": "Budget supprimé.",
+        "add_memory": "Note ajoutée à ta mémoire IA.",
+        "toggle_plan_step": "Étape mise à jour."
       },
       "savedInline": {
         "expense": "Dépense enregistrée.",
@@ -389,7 +403,14 @@
         "goal": "Objectif créé.",
         "budget": "Budget mis à jour.",
         "update_goal": "Objectif modifié.",
-        "delete_goal": "Objectif supprimé."
+        "delete_goal": "Objectif supprimé.",
+        "update_expense": "Dépense modifiée.",
+        "delete_expense": "Dépense supprimée.",
+        "update_income": "Revenu modifié.",
+        "delete_income": "Revenu supprimé.",
+        "delete_budget": "Budget supprimé.",
+        "add_memory": "Note ajoutée.",
+        "toggle_plan_step": "Étape mise à jour."
       },
       "cancelledInline": "Proposition annulée.",
       "goalDeadline": "Échéance {date}",
@@ -401,7 +422,19 @@
       "updateGoalNewDeadline": "Nouvelle échéance {date}",
       "updateGoalRename": "Renommer en « {title} »",
       "updateGoalNoChange": "Aucune modification détectée",
-      "deleteGoalSubline": "Suppression définitive — confirme pour effacer"
+      "deleteGoalSubline": "Suppression définitive — confirme pour effacer",
+      "newAmount": "Nouveau montant {amount}",
+      "renameTo": "Renommer en « {name} »",
+      "deleteSubline": "Suppression définitive — confirme pour effacer",
+      "toggleCompleted": "Marquer comme terminée",
+      "toggleUncompleted": "Repasser en non-terminée",
+      "memoryKind": {
+        "goal": "Objectif personnel",
+        "constraint": "Contrainte",
+        "preference": "Préférence",
+        "context": "Contexte",
+        "event": "Événement"
+      }
     },
     "sidebar": {
       "newConversation": "Nouvelle conversation",

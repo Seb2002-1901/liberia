@@ -40,7 +40,13 @@
     "transcribeFailed": "Transcription impossible. Réessaie.",
     "audioTooLarge": "Audio trop volumineux (max 25 Mo).",
     "goalNotFound": "Aucun objectif ne correspond à ce nom. Sois plus précis.",
-    "goalAmbiguous": "Plusieurs objectifs correspondent. Précise le titre exact."
+    "goalAmbiguous": "Plusieurs objectifs correspondent. Précise le titre exact.",
+    "expenseNotFound": "Aucune dépense ne correspond. Précise le label.",
+    "expenseAmbiguous": "Plusieurs dépenses correspondent. Précise le label exact ou la catégorie.",
+    "incomeNotFound": "Aucun revenu ne correspond. Précise le label.",
+    "incomeAmbiguous": "Plusieurs revenus correspondent. Précise le label exact.",
+    "planStepNotFound": "Aucune étape de plan ne correspond.",
+    "planStepAmbiguous": "Plusieurs étapes correspondent. Précise le numéro ou le titre exact."
   },
   "validation": {
     "emailRequired": "Email requis",

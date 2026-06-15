@@ -466,7 +466,14 @@
         "goal": "Objetivo detectado",
         "budget": "Orçamento detectado",
         "update_goal": "Modificar um objetivo",
-        "delete_goal": "Apagar um objetivo"
+        "delete_goal": "Apagar um objetivo",
+        "update_expense": "Modificar uma despesa",
+        "delete_expense": "Apagar uma despesa",
+        "update_income": "Modificar uma receita",
+        "delete_income": "Apagar uma receita",
+        "delete_budget": "Remover orçamento",
+        "add_memory": "Guardar na memória",
+        "toggle_plan_step": "Etapa do plano"
       },
       "frequency": {
         "one_time": "Pontual",
@@ -482,7 +489,14 @@
         "goal": "Objetivo criado.",
         "budget": "Orçamento atualizado.",
         "update_goal": "Objetivo modificado.",
-        "delete_goal": "Objetivo apagado."
+        "delete_goal": "Objetivo apagado.",
+        "update_expense": "Despesa modificada.",
+        "delete_expense": "Despesa apagada.",
+        "update_income": "Receita modificada.",
+        "delete_income": "Receita apagada.",
+        "delete_budget": "Orçamento removido.",
+        "add_memory": "Nota adicionada à memória.",
+        "toggle_plan_step": "Etapa atualizada."
       },
       "savedInline": {
         "expense": "Despesa guardada.",
@@ -490,7 +504,14 @@
         "goal": "Objetivo criado.",
         "budget": "Orçamento atualizado.",
         "update_goal": "Objetivo modificado.",
-        "delete_goal": "Objetivo apagado."
+        "delete_goal": "Objetivo apagado.",
+        "update_expense": "Despesa modificada.",
+        "delete_expense": "Despesa apagada.",
+        "update_income": "Receita modificada.",
+        "delete_income": "Receita apagada.",
+        "delete_budget": "Orçamento removido.",
+        "add_memory": "Nota guardada.",
+        "toggle_plan_step": "Etapa atualizada."
       },
       "cancelledInline": "Proposta cancelada.",
       "goalDeadline": "Prazo {date}",
@@ -502,7 +523,19 @@
       "updateGoalNewDeadline": "Novo prazo {date}",
       "updateGoalRename": "Renomear para «{title}»",
       "updateGoalNoChange": "Nenhuma alteração detetada",
-      "deleteGoalSubline": "Exclusão definitiva — confirma para remover"
+      "deleteGoalSubline": "Exclusão definitiva — confirma para remover",
+      "newAmount": "Novo valor {amount}",
+      "renameTo": "Renomear para «{name}»",
+      "deleteSubline": "Exclusão definitiva — confirma para remover",
+      "toggleCompleted": "Marcar como concluída",
+      "toggleUncompleted": "Marcar como não concluída",
+      "memoryKind": {
+        "goal": "Objetivo pessoal",
+        "constraint": "Restrição",
+        "preference": "Preferência",
+        "context": "Contexto",
+        "event": "Evento"
+      }
     }
   },
   "plan": {

@@ -51,7 +51,13 @@ export type ActionErrorKey =
   | "transcribeFailed"
   | "audioTooLarge"
   | "goalNotFound"
-  | "goalAmbiguous";
+  | "goalAmbiguous"
+  | "expenseNotFound"
+  | "expenseAmbiguous"
+  | "incomeNotFound"
+  | "incomeAmbiguous"
+  | "planStepNotFound"
+  | "planStepAmbiguous";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string

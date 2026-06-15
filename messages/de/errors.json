@@ -40,7 +40,13 @@
     "transcribeFailed": "Transkription fehlgeschlagen. Bitte erneut versuchen.",
     "audioTooLarge": "Audio zu groß (max. 25 MB).",
     "goalNotFound": "Kein passendes Ziel gefunden. Bitte präzisiere.",
-    "goalAmbiguous": "Mehrere Ziele passen. Bitte gib den genauen Titel an."
+    "goalAmbiguous": "Mehrere Ziele passen. Bitte gib den genauen Titel an.",
+    "expenseNotFound": "Keine passende Ausgabe gefunden. Bitte präzisiere.",
+    "expenseAmbiguous": "Mehrere Ausgaben passen. Bitte präzisiere Bezeichnung oder Kategorie.",
+    "incomeNotFound": "Keine passende Einnahme gefunden. Bitte präzisiere.",
+    "incomeAmbiguous": "Mehrere Einnahmen passen. Bitte präzisiere die Bezeichnung.",
+    "planStepNotFound": "Kein passender Planschritt gefunden.",
+    "planStepAmbiguous": "Mehrere Schritte passen. Bitte präzisiere Nummer oder Titel."
   },
   "validation": {
     "emailRequired": "E-Mail erforderlich",

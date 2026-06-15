@@ -378,6 +378,248 @@ export interface ProposeDeleteGoalInput {
   match_title: string;
 }
 
+/* ════════════════════════════════════════════════════════════
+ * Sprint Iris V4 — update/delete pour expenses, incomes, budget
+ * + memory write + plan step toggle.
+ *
+ * Stratégie de désambiguïsation pour expenses/incomes :
+ *  - Le coach passe match_label (ILIKE substring sur label)
+ *  - Optionnel : match_amount (exact match dans une tolérance ±2%)
+ *  - Optionnel : match_category (filtre supplémentaire)
+ *  - 0 result → notFound, 1 → execute, >1 → ambiguous (server
+ *    retourne les candidats au coach pour qu'il pose une question)
+ *
+ * Pour budget : 1 row par (user, category) — pas d'ambiguïté
+ * possible. Le coach passe la catégorie directement.
+ * ════════════════════════════════════════════════════════════ */
+
+export const PROPOSE_UPDATE_EXPENSE_TOOL_NAME = "propose_update_expense" as const;
+
+export const PROPOSE_UPDATE_EXPENSE_TOOL: Tool = {
+  name: PROPOSE_UPDATE_EXPENSE_TOOL_NAME,
+  description:
+    "Call this tool to UPDATE an existing expense (correct an amount, change a frequency, fix the category). The user must reference WHICH expense — by label, amount, or category. Examples: 'change mon loyer à 1600', 'corrige la dépense Coop, c'était 45 pas 5', 'l'assurance maladie c'est 280 pas 250'. If user is vague ('change ma dépense') and you can't tell which one from the context — ask first before calling the tool. The UI shows a confirmation card.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_label: {
+        type: "string",
+        description:
+          "Label substring of the existing expense to update (ILIKE lookup). REQUIRED.",
+      },
+      match_category: {
+        type: "string",
+        enum: EXPENSE_CATEGORIES.map((c) => c.id),
+        description:
+          "Optional category filter for disambiguation when multiple labels match.",
+      },
+      newAmount: {
+        type: "number",
+        description: "New amount in user currency. Omit if not changing.",
+      },
+      newFrequency: {
+        type: "string",
+        enum: ["one_time", "monthly", "weekly", "yearly"],
+        description: "New frequency. Omit if not changing.",
+      },
+      newCategory: {
+        type: "string",
+        enum: EXPENSE_CATEGORIES.map((c) => c.id),
+        description: "New category. Omit if not changing.",
+      },
+      newLabel: {
+        type: "string",
+        description: "Rename the expense. Omit if not renaming.",
+      },
+      currency: {
+        type: "string",
+        description: "ISO currency code.",
+      },
+    },
+    required: ["match_label", "currency"],
+  },
+};
+
+export interface ProposeUpdateExpenseInput {
+  match_label: string;
+  match_category?: ExpenseCategoryId;
+  newAmount?: number;
+  newFrequency?: "one_time" | "monthly" | "weekly" | "yearly";
+  newCategory?: ExpenseCategoryId;
+  newLabel?: string;
+  currency: string;
+}
+
+export const PROPOSE_DELETE_EXPENSE_TOOL_NAME = "propose_delete_expense" as const;
+
+export const PROPOSE_DELETE_EXPENSE_TOOL: Tool = {
+  name: PROPOSE_DELETE_EXPENSE_TOOL_NAME,
+  description:
+    "Call this tool to DELETE an existing expense. User must clearly reference WHICH one. Example: 'supprime la dépense Netflix', 'efface l'assurance auto, je n'ai plus la voiture'. ALWAYS ask the user to confirm in your text reply before calling — deletion is permanent.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_label: { type: "string", description: "Label substring." },
+      match_category: {
+        type: "string",
+        enum: EXPENSE_CATEGORIES.map((c) => c.id),
+        description: "Optional category filter.",
+      },
+    },
+    required: ["match_label"],
+  },
+};
+
+export interface ProposeDeleteExpenseInput {
+  match_label: string;
+  match_category?: ExpenseCategoryId;
+}
+
+export const PROPOSE_UPDATE_INCOME_TOOL_NAME = "propose_update_income" as const;
+
+export const PROPOSE_UPDATE_INCOME_TOOL: Tool = {
+  name: PROPOSE_UPDATE_INCOME_TOOL_NAME,
+  description:
+    "Call this tool to UPDATE an existing income (salary raise, change of freelance retainer, correction). Examples: 'mon salaire passe à 5200', 'corrige le freelance à 1800', 'augmentation, je suis à 5500 maintenant'. User must reference which income by label.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_label: {
+        type: "string",
+        description: "Label substring of existing income. REQUIRED.",
+      },
+      match_category: {
+        type: "string",
+        enum: INCOME_CATEGORIES.map((c) => c.id),
+        description: "Optional category filter.",
+      },
+      newAmount: { type: "number", description: "New amount. Omit if not changing." },
+      newFrequency: {
+        type: "string",
+        enum: ["one_time", "monthly", "weekly", "yearly"],
+        description: "New frequency. Omit if not changing.",
+      },
+      newLabel: { type: "string", description: "Rename. Omit if not renaming." },
+      currency: { type: "string", description: "ISO currency." },
+    },
+    required: ["match_label", "currency"],
+  },
+};
+
+export interface ProposeUpdateIncomeInput {
+  match_label: string;
+  match_category?: IncomeCategoryId;
+  newAmount?: number;
+  newFrequency?: "one_time" | "monthly" | "weekly" | "yearly";
+  newLabel?: string;
+  currency: string;
+}
+
+export const PROPOSE_DELETE_INCOME_TOOL_NAME = "propose_delete_income" as const;
+
+export const PROPOSE_DELETE_INCOME_TOOL: Tool = {
+  name: PROPOSE_DELETE_INCOME_TOOL_NAME,
+  description:
+    "Call this tool to DELETE an existing income. Example: 'supprime le revenu freelance Acme, j'ai arrêté ce client'. Confirm in your text reply.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_label: { type: "string", description: "Label substring." },
+      match_category: {
+        type: "string",
+        enum: INCOME_CATEGORIES.map((c) => c.id),
+        description: "Optional category filter.",
+      },
+    },
+    required: ["match_label"],
+  },
+};
+
+export interface ProposeDeleteIncomeInput {
+  match_label: string;
+  match_category?: IncomeCategoryId;
+}
+
+export const PROPOSE_DELETE_BUDGET_TOOL_NAME = "propose_delete_budget" as const;
+
+export const PROPOSE_DELETE_BUDGET_TOOL: Tool = {
+  name: PROPOSE_DELETE_BUDGET_TOOL_NAME,
+  description:
+    "Call this tool to REMOVE a monthly budget cap on a category. Example: 'supprime mon budget loisirs, je ne veux plus de plafond là-dessus'. The UI shows a confirmation card.",
+  input_schema: {
+    type: "object",
+    properties: {
+      category: {
+        type: "string",
+        enum: EXPENSE_CATEGORIES.map((c) => c.id),
+        description: "Category whose budget cap to remove.",
+      },
+    },
+    required: ["category"],
+  },
+};
+
+export interface ProposeDeleteBudgetInput {
+  category: ExpenseCategoryId;
+}
+
+export const PROPOSE_ADD_MEMORY_TOOL_NAME = "propose_add_memory" as const;
+
+export const PROPOSE_ADD_MEMORY_TOOL: Tool = {
+  name: PROPOSE_ADD_MEMORY_TOOL_NAME,
+  description:
+    "Call this tool to SAVE a personal note about the user that should persist across conversations. Use sparingly: only for stable personal context that will matter in future sessions. Examples: 'note que je veux acheter une moto vers 2027', 'rappelle-toi que je suis stressé par les factures', 'mémorise que je préfère l'épargne 3a au compte-titres'. Don't use for one-off facts that are already in the finance context (current balance, current goals — those refresh automatically).",
+  input_schema: {
+    type: "object",
+    properties: {
+      kind: {
+        type: "string",
+        enum: ["goal", "constraint", "preference", "context", "event"],
+        description:
+          "Category of memory: 'goal' (long-term aspiration not yet a formal goal), 'constraint' (lifestyle limit, dependents, contract), 'preference' (risk tolerance, investment style), 'context' (job, family, location), 'event' (recent life change, decision pending).",
+      },
+      summary: {
+        type: "string",
+        description: "1-2 line summary of the note. Will be shown in the user's memory dashboard.",
+      },
+    },
+    required: ["kind", "summary"],
+  },
+};
+
+export interface ProposeAddMemoryInput {
+  kind: "goal" | "constraint" | "preference" | "context" | "event";
+  summary: string;
+}
+
+export const PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME = "propose_toggle_plan_step" as const;
+
+export const PROPOSE_TOGGLE_PLAN_STEP_TOOL: Tool = {
+  name: PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME,
+  description:
+    "Call this tool to MARK a plan step as completed (or uncompleted). The user must reference WHICH step — usually by its number, title, or focus area. Example: 'marque la première étape comme terminée', 'j'ai fini l'étape budget', 'reprends l'étape 3, je dois la refaire'. If multiple matches, ask for precision before calling.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_query: {
+        type: "string",
+        description:
+          "Title or focus substring of the plan step. Server ILIKE lookup against plan_steps.title OR plan_steps.focus.",
+      },
+      completed: {
+        type: "boolean",
+        description: "True to mark completed, false to mark uncompleted.",
+      },
+    },
+    required: ["match_query", "completed"],
+  },
+};
+
+export interface ProposeTogglePlanStepInput {
+  match_query: string;
+  completed: boolean;
+}
+
 /** Toutes les tools exposées au modèle en un tableau prêt-à-passer. */
 export const COACH_TOOLS: Tool[] = [
   PROPOSE_EXPENSE_TOOL,
@@ -386,6 +628,13 @@ export const COACH_TOOLS: Tool[] = [
   PROPOSE_BUDGET_TOOL,
   PROPOSE_UPDATE_GOAL_TOOL,
   PROPOSE_DELETE_GOAL_TOOL,
+  PROPOSE_UPDATE_EXPENSE_TOOL,
+  PROPOSE_DELETE_EXPENSE_TOOL,
+  PROPOSE_UPDATE_INCOME_TOOL,
+  PROPOSE_DELETE_INCOME_TOOL,
+  PROPOSE_DELETE_BUDGET_TOOL,
+  PROPOSE_ADD_MEMORY_TOOL,
+  PROPOSE_TOGGLE_PLAN_STEP_TOOL,
 ];
 
 export const COACH_TOOL_NAMES = [
@@ -395,6 +644,13 @@ export const COACH_TOOL_NAMES = [
   PROPOSE_BUDGET_TOOL_NAME,
   PROPOSE_UPDATE_GOAL_TOOL_NAME,
   PROPOSE_DELETE_GOAL_TOOL_NAME,
+  PROPOSE_UPDATE_EXPENSE_TOOL_NAME,
+  PROPOSE_DELETE_EXPENSE_TOOL_NAME,
+  PROPOSE_UPDATE_INCOME_TOOL_NAME,
+  PROPOSE_DELETE_INCOME_TOOL_NAME,
+  PROPOSE_DELETE_BUDGET_TOOL_NAME,
+  PROPOSE_ADD_MEMORY_TOOL_NAME,
+  PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME,
 ] as const;
 
 export type CoachToolName = typeof COACH_TOOL_NAMES[number];

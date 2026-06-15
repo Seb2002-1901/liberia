@@ -37,12 +37,26 @@ import {
   PROPOSE_BUDGET_TOOL_NAME,
   PROPOSE_UPDATE_GOAL_TOOL_NAME,
   PROPOSE_DELETE_GOAL_TOOL_NAME,
+  PROPOSE_UPDATE_EXPENSE_TOOL_NAME,
+  PROPOSE_DELETE_EXPENSE_TOOL_NAME,
+  PROPOSE_UPDATE_INCOME_TOOL_NAME,
+  PROPOSE_DELETE_INCOME_TOOL_NAME,
+  PROPOSE_DELETE_BUDGET_TOOL_NAME,
+  PROPOSE_ADD_MEMORY_TOOL_NAME,
+  PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME,
   type ProposeExpenseInput,
   type ProposeIncomeInput,
   type ProposeGoalInput,
   type ProposeBudgetInput,
   type ProposeUpdateGoalInput,
   type ProposeDeleteGoalInput,
+  type ProposeUpdateExpenseInput,
+  type ProposeDeleteExpenseInput,
+  type ProposeUpdateIncomeInput,
+  type ProposeDeleteIncomeInput,
+  type ProposeDeleteBudgetInput,
+  type ProposeAddMemoryInput,
+  type ProposeTogglePlanStepInput,
 } from "@/lib/coach/tools";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -537,6 +551,98 @@ export async function POST(request: Request) {
                   send("propose_delete_goal", {
                     toolUseId: block.id,
                     match_title: input.match_title,
+                  });
+                  break;
+                }
+                case PROPOSE_UPDATE_EXPENSE_TOOL_NAME: {
+                  const input = block.input as ProposeUpdateExpenseInput;
+                  console.log(
+                    `[coach/propose_update_expense] match="${input.match_label}" newAmount=${input.newAmount ?? "-"}`,
+                  );
+                  send("propose_update_expense", {
+                    toolUseId: block.id,
+                    match_label: input.match_label,
+                    match_category: input.match_category ?? null,
+                    newAmount: input.newAmount ?? null,
+                    newFrequency: input.newFrequency ?? null,
+                    newCategory: input.newCategory ?? null,
+                    newLabel: input.newLabel ?? null,
+                    currency: input.currency,
+                  });
+                  break;
+                }
+                case PROPOSE_DELETE_EXPENSE_TOOL_NAME: {
+                  const input = block.input as ProposeDeleteExpenseInput;
+                  console.log(
+                    `[coach/propose_delete_expense] match="${input.match_label}"`,
+                  );
+                  send("propose_delete_expense", {
+                    toolUseId: block.id,
+                    match_label: input.match_label,
+                    match_category: input.match_category ?? null,
+                  });
+                  break;
+                }
+                case PROPOSE_UPDATE_INCOME_TOOL_NAME: {
+                  const input = block.input as ProposeUpdateIncomeInput;
+                  console.log(
+                    `[coach/propose_update_income] match="${input.match_label}" newAmount=${input.newAmount ?? "-"}`,
+                  );
+                  send("propose_update_income", {
+                    toolUseId: block.id,
+                    match_label: input.match_label,
+                    match_category: input.match_category ?? null,
+                    newAmount: input.newAmount ?? null,
+                    newFrequency: input.newFrequency ?? null,
+                    newLabel: input.newLabel ?? null,
+                    currency: input.currency,
+                  });
+                  break;
+                }
+                case PROPOSE_DELETE_INCOME_TOOL_NAME: {
+                  const input = block.input as ProposeDeleteIncomeInput;
+                  console.log(
+                    `[coach/propose_delete_income] match="${input.match_label}"`,
+                  );
+                  send("propose_delete_income", {
+                    toolUseId: block.id,
+                    match_label: input.match_label,
+                    match_category: input.match_category ?? null,
+                  });
+                  break;
+                }
+                case PROPOSE_DELETE_BUDGET_TOOL_NAME: {
+                  const input = block.input as ProposeDeleteBudgetInput;
+                  console.log(
+                    `[coach/propose_delete_budget] category=${input.category}`,
+                  );
+                  send("propose_delete_budget", {
+                    toolUseId: block.id,
+                    category: input.category,
+                  });
+                  break;
+                }
+                case PROPOSE_ADD_MEMORY_TOOL_NAME: {
+                  const input = block.input as ProposeAddMemoryInput;
+                  console.log(
+                    `[coach/propose_add_memory] kind=${input.kind} "${input.summary.slice(0, 50)}"`,
+                  );
+                  send("propose_add_memory", {
+                    toolUseId: block.id,
+                    kind: input.kind,
+                    summary: input.summary,
+                  });
+                  break;
+                }
+                case PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME: {
+                  const input = block.input as ProposeTogglePlanStepInput;
+                  console.log(
+                    `[coach/propose_toggle_plan_step] match="${input.match_query}" completed=${input.completed}`,
+                  );
+                  send("propose_toggle_plan_step", {
+                    toolUseId: block.id,
+                    match_query: input.match_query,
+                    completed: input.completed,
                   });
                   break;
                 }

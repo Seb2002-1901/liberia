@@ -466,7 +466,14 @@
         "goal": "Ziel erkannt",
         "budget": "Budget erkannt",
         "update_goal": "Ziel ändern",
-        "delete_goal": "Ziel löschen"
+        "delete_goal": "Ziel löschen",
+        "update_expense": "Ausgabe ändern",
+        "delete_expense": "Ausgabe löschen",
+        "update_income": "Einnahme ändern",
+        "delete_income": "Einnahme löschen",
+        "delete_budget": "Budget entfernen",
+        "add_memory": "Im Gedächtnis speichern",
+        "toggle_plan_step": "Planschritt"
       },
       "frequency": {
         "one_time": "Einmalig",
@@ -482,7 +489,14 @@
         "goal": "Ziel erstellt.",
         "budget": "Budget aktualisiert.",
         "update_goal": "Ziel aktualisiert.",
-        "delete_goal": "Ziel gelöscht."
+        "delete_goal": "Ziel gelöscht.",
+        "update_expense": "Ausgabe aktualisiert.",
+        "delete_expense": "Ausgabe gelöscht.",
+        "update_income": "Einnahme aktualisiert.",
+        "delete_income": "Einnahme gelöscht.",
+        "delete_budget": "Budget entfernt.",
+        "add_memory": "Notiz im Gedächtnis gespeichert.",
+        "toggle_plan_step": "Schritt aktualisiert."
       },
       "savedInline": {
         "expense": "Ausgabe gespeichert.",
@@ -490,7 +504,14 @@
         "goal": "Ziel erstellt.",
         "budget": "Budget aktualisiert.",
         "update_goal": "Ziel aktualisiert.",
-        "delete_goal": "Ziel gelöscht."
+        "delete_goal": "Ziel gelöscht.",
+        "update_expense": "Ausgabe aktualisiert.",
+        "delete_expense": "Ausgabe gelöscht.",
+        "update_income": "Einnahme aktualisiert.",
+        "delete_income": "Einnahme gelöscht.",
+        "delete_budget": "Budget entfernt.",
+        "add_memory": "Notiz gespeichert.",
+        "toggle_plan_step": "Schritt aktualisiert."
       },
       "cancelledInline": "Vorschlag abgebrochen.",
       "goalDeadline": "Frist {date}",
@@ -502,7 +523,19 @@
       "updateGoalNewDeadline": "Neue Frist {date}",
       "updateGoalRename": "Umbenennen in «{title}»",
       "updateGoalNoChange": "Keine Änderung erkannt",
-      "deleteGoalSubline": "Endgültige Löschung — bestätige zum Entfernen"
+      "deleteGoalSubline": "Endgültige Löschung — bestätige zum Entfernen",
+      "newAmount": "Neuer Betrag {amount}",
+      "renameTo": "Umbenennen in «{name}»",
+      "deleteSubline": "Endgültige Löschung — bestätige zum Entfernen",
+      "toggleCompleted": "Als erledigt markieren",
+      "toggleUncompleted": "Als nicht erledigt markieren",
+      "memoryKind": {
+        "goal": "Persönliches Ziel",
+        "constraint": "Einschränkung",
+        "preference": "Präferenz",
+        "context": "Kontext",
+        "event": "Ereignis"
+      }
     }
   },
   "plan": {

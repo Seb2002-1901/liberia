@@ -466,7 +466,14 @@
         "goal": "Objetivo detectado",
         "budget": "Presupuesto detectado",
         "update_goal": "Modificar un objetivo",
-        "delete_goal": "Eliminar un objetivo"
+        "delete_goal": "Eliminar un objetivo",
+        "update_expense": "Modificar un gasto",
+        "delete_expense": "Eliminar un gasto",
+        "update_income": "Modificar un ingreso",
+        "delete_income": "Eliminar un ingreso",
+        "delete_budget": "Eliminar presupuesto",
+        "add_memory": "Guardar en memoria",
+        "toggle_plan_step": "Etapa del plan"
       },
       "frequency": {
         "one_time": "Puntual",
@@ -482,7 +489,14 @@
         "goal": "Objetivo creado.",
         "budget": "Presupuesto actualizado.",
         "update_goal": "Objetivo modificado.",
-        "delete_goal": "Objetivo eliminado."
+        "delete_goal": "Objetivo eliminado.",
+        "update_expense": "Gasto modificado.",
+        "delete_expense": "Gasto eliminado.",
+        "update_income": "Ingreso modificado.",
+        "delete_income": "Ingreso eliminado.",
+        "delete_budget": "Presupuesto eliminado.",
+        "add_memory": "Nota añadida a memoria.",
+        "toggle_plan_step": "Etapa actualizada."
       },
       "savedInline": {
         "expense": "Gasto guardado.",
@@ -490,7 +504,14 @@
         "goal": "Objetivo creado.",
         "budget": "Presupuesto actualizado.",
         "update_goal": "Objetivo modificado.",
-        "delete_goal": "Objetivo eliminado."
+        "delete_goal": "Objetivo eliminado.",
+        "update_expense": "Gasto modificado.",
+        "delete_expense": "Gasto eliminado.",
+        "update_income": "Ingreso modificado.",
+        "delete_income": "Ingreso eliminado.",
+        "delete_budget": "Presupuesto eliminado.",
+        "add_memory": "Nota guardada.",
+        "toggle_plan_step": "Etapa actualizada."
       },
       "cancelledInline": "Propuesta cancelada.",
       "goalDeadline": "Fecha {date}",
@@ -502,7 +523,19 @@
       "updateGoalNewDeadline": "Nueva fecha {date}",
       "updateGoalRename": "Renombrar a «{title}»",
       "updateGoalNoChange": "Sin cambios detectados",
-      "deleteGoalSubline": "Eliminación definitiva — confirma para borrar"
+      "deleteGoalSubline": "Eliminación definitiva — confirma para borrar",
+      "newAmount": "Nuevo importe {amount}",
+      "renameTo": "Renombrar a «{name}»",
+      "deleteSubline": "Eliminación definitiva — confirma para borrar",
+      "toggleCompleted": "Marcar como completada",
+      "toggleUncompleted": "Marcar como no completada",
+      "memoryKind": {
+        "goal": "Objetivo personal",
+        "constraint": "Restricción",
+        "preference": "Preferencia",
+        "context": "Contexto",
+        "event": "Evento"
+      }
     }
   },
   "plan": {
