@@ -329,6 +329,15 @@
           "¿Cómo pongo a trabajar mi ahorro?",
           "¿Cómo optimizo mis seguros y contratos?"
         ]
+      },
+      "audio": {
+        "micLabel": "Dictar un mensaje",
+        "stopLabel": "Detener grabación",
+        "permissionDenied": "Micrófono bloqueado. Actívalo en los ajustes del navegador.",
+        "unavailable": "Dictado por voz no disponible — la transcripción no está configurada.",
+        "recording": "Grabando…",
+        "transcribing": "Transcribiendo…",
+        "transcribeFailed": "Transcripción fallida. Inténtalo de nuevo."
       }
     },
     "proposeExpense": {
@@ -449,6 +458,39 @@
         "fundNoteMissing": " y aún no tienes fondo de emergencia",
         "options": "- ¿Quieres **recortar un gasto**? Di «qué gasto vigilar esta semana».\n- ¿Quieres **empezar a ahorrar**? Di «cómo construir un fondo de emergencia».\n- ¿Quieres **gestionar deuda**? Di «qué pagar primero».\n- ¿Quieres **un repaso general**? Di «dame un resumen rápido»."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Gasto detectado",
+        "income": "Ingreso detectado",
+        "goal": "Objetivo detectado",
+        "budget": "Presupuesto detectado"
+      },
+      "frequency": {
+        "one_time": "Puntual",
+        "monthly": "Mensual",
+        "weekly": "Semanal",
+        "yearly": "Anual"
+      },
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "savedToast": {
+        "expense": "Gasto guardado.",
+        "income": "Ingreso guardado.",
+        "goal": "Objetivo creado.",
+        "budget": "Presupuesto actualizado."
+      },
+      "savedInline": {
+        "expense": "Gasto guardado.",
+        "income": "Ingreso guardado.",
+        "goal": "Objetivo creado.",
+        "budget": "Presupuesto actualizado."
+      },
+      "cancelledInline": "Propuesta cancelada.",
+      "goalDeadline": "Fecha {date}",
+      "goalProgress": "Ya {current}",
+      "budgetSubline": "Límite mensual a respetar",
+      "genericError": "Algo salió mal. Inténtalo de nuevo."
     }
   },
   "plan": {

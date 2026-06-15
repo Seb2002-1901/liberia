@@ -15,7 +15,9 @@
     "profil": "Profil"
   },
   "savings": {
-    "metadata": { "title": "Épargne" },
+    "metadata": {
+      "title": "Épargne"
+    },
     "eyebrow": "Croissance",
     "title": "Votre épargne arrive bientôt",
     "description": "Une vue dédiée pour visualiser, projeter et planifier votre épargne — sans recommandation de produit financier.",
@@ -23,7 +25,9 @@
     "coachCta": "En parler à mon conseiller"
   },
   "investments": {
-    "metadata": { "title": "Investissements" },
+    "metadata": {
+      "title": "Investissements"
+    },
     "eyebrow": "Croissance",
     "title": "Vos investissements arrivent bientôt",
     "description": "Une vue éducative pour comprendre, comparer et simuler — sans recommandation d'achat ni produit nommé.",
@@ -31,7 +35,9 @@
     "coachCta": "En parler à mon conseiller"
   },
   "opportunities": {
-    "metadata": { "title": "Opportunités" },
+    "metadata": {
+      "title": "Opportunités"
+    },
     "eyebrow": "Croissance",
     "title": "Vos opportunités arrivent bientôt",
     "description": "Un catalogue d'opportunités classées par effort, risque et délai pour augmenter vos revenus et accélérer vos objectifs.",
@@ -323,6 +329,15 @@
           "Comment faire travailler mon épargne ?",
           "Comment optimiser mes assurances et contrats ?"
         ]
+      },
+      "audio": {
+        "micLabel": "Dicter un message",
+        "stopLabel": "Arrêter l'enregistrement",
+        "permissionDenied": "Le micro est bloqué. Active-le dans les réglages du navigateur.",
+        "unavailable": "Dictée vocale indisponible — la transcription n'est pas configurée.",
+        "recording": "Enregistrement…",
+        "transcribing": "Transcription en cours…",
+        "transcribeFailed": "Transcription impossible. Réessaie."
       }
     },
     "proposeExpense": {
@@ -342,6 +357,39 @@
       "savedToast": "Dépense enregistrée.",
       "savedInline": "{amount} chez {label} enregistré dans tes dépenses.",
       "cancelledInline": "Proposition ignorée."
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Dépense détectée",
+        "income": "Revenu détecté",
+        "goal": "Objectif détecté",
+        "budget": "Budget détecté"
+      },
+      "frequency": {
+        "one_time": "Ponctuel",
+        "monthly": "Mensuel",
+        "weekly": "Hebdomadaire",
+        "yearly": "Annuel"
+      },
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "savedToast": {
+        "expense": "Dépense enregistrée.",
+        "income": "Revenu enregistré.",
+        "goal": "Objectif créé.",
+        "budget": "Budget mis à jour."
+      },
+      "savedInline": {
+        "expense": "Dépense enregistrée.",
+        "income": "Revenu enregistré.",
+        "goal": "Objectif créé.",
+        "budget": "Budget mis à jour."
+      },
+      "cancelledInline": "Proposition annulée.",
+      "goalDeadline": "Échéance {date}",
+      "goalProgress": "Déjà {current}",
+      "budgetSubline": "Plafond mensuel à respecter",
+      "genericError": "Une erreur est survenue. Réessaie."
     },
     "sidebar": {
       "newConversation": "Nouvelle conversation",

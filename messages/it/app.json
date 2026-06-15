@@ -329,6 +329,15 @@
           "Come faccio lavorare il mio risparmio?",
           "Come ottimizzo le mie assicurazioni e contratti?"
         ]
+      },
+      "audio": {
+        "micLabel": "Detta un messaggio",
+        "stopLabel": "Ferma registrazione",
+        "permissionDenied": "Microfono bloccato. Attivalo nelle impostazioni del browser.",
+        "unavailable": "Dettatura vocale non disponibile — la trascrizione non è configurata.",
+        "recording": "Registrazione…",
+        "transcribing": "Trascrizione…",
+        "transcribeFailed": "Trascrizione fallita. Riprova."
       }
     },
     "proposeExpense": {
@@ -449,6 +458,39 @@
         "fundNoteMissing": " e non hai ancora un fondo di emergenza",
         "options": "- Vuoi **tagliare una spesa**? Dì «quale spesa sorvegliare questa settimana».\n- Vuoi **iniziare a risparmiare**? Dì «come costruire un fondo di emergenza».\n- Vuoi **gestire il debito**? Dì «cosa pagare per primo».\n- Vuoi **un check-in generale**? Dì «dammi un riepilogo veloce»."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Spesa rilevata",
+        "income": "Entrata rilevata",
+        "goal": "Obiettivo rilevato",
+        "budget": "Budget rilevato"
+      },
+      "frequency": {
+        "one_time": "Una tantum",
+        "monthly": "Mensile",
+        "weekly": "Settimanale",
+        "yearly": "Annuale"
+      },
+      "confirm": "Conferma",
+      "cancel": "Annulla",
+      "savedToast": {
+        "expense": "Spesa salvata.",
+        "income": "Entrata salvata.",
+        "goal": "Obiettivo creato.",
+        "budget": "Budget aggiornato."
+      },
+      "savedInline": {
+        "expense": "Spesa salvata.",
+        "income": "Entrata salvata.",
+        "goal": "Obiettivo creato.",
+        "budget": "Budget aggiornato."
+      },
+      "cancelledInline": "Proposta annullata.",
+      "goalDeadline": "Scadenza {date}",
+      "goalProgress": "Già {current}",
+      "budgetSubline": "Limite mensile da rispettare",
+      "genericError": "Qualcosa è andato storto. Riprova."
     }
   },
   "plan": {

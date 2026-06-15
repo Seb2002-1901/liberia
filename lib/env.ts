@@ -47,3 +47,28 @@ export function isAppleAuthConfigured(): boolean {
 export function isAnySocialAuthConfigured(): boolean {
   return isGoogleAuthConfigured() || isAppleAuthConfigured();
 }
+
+/**
+ * Sprint Coach IA — détection clé de transcription audio.
+ *
+ * Pour activer la dictée vocale dans le composer coach, on a besoin
+ * d'un service de speech-to-text. Choix Whisper (OpenAI) car :
+ *  - HTTPS direct, format multipart standard
+ *  - 0.006 USD/minute (négligeable au volume LIBERIA)
+ *  - Robuste FR/EN/ES/IT/PT/DE (les 6 locales LIBERIA)
+ *
+ * Côté client : `NEXT_PUBLIC_TRANSCRIPTION_ENABLED=true` doit être
+ * activé pour afficher le bouton micro. Le bouton resterait visible
+ * sinon (UX dégradée → mort) → on préfère ne RIEN afficher si pas
+ * configuré (cf. instruction P0-5 "aucun bouton mort").
+ *
+ * Côté serveur : `OPENAI_API_KEY` est la vraie source de vérité —
+ * sans elle l'endpoint /api/ai/transcribe retourne 501.
+ */
+export function isTranscriptionUiEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_TRANSCRIPTION_ENABLED === "true";
+}
+
+export function isTranscriptionServerConfigured(): boolean {
+  return Boolean(process.env.OPENAI_API_KEY);
+}

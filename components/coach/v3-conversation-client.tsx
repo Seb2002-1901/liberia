@@ -29,10 +29,13 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Markdown } from "@/components/coach/markdown";
+import { ProposedActionCard } from "@/components/coach/proposed-action-card";
 import {
-  ExpenseConfirmCard,
-  type PendingExpense,
-} from "@/components/coach/expense-confirm-card";
+  parseSseProposedAction,
+  type PendingAction,
+} from "@/components/coach/proposed-action-types";
+import { AudioMicButton } from "@/components/coach/audio-mic-button";
+import { isTranscriptionUiEnabled } from "@/lib/env";
 import type { CoachMessage } from "@/lib/services/coach";
 
 const C = {
@@ -81,7 +84,7 @@ export function CoachConversationV3Client({
   const [streaming, setStreaming] = React.useState(false);
   const [streamedText, setStreamedText] = React.useState("");
   const [pendingByMessage, setPendingByMessage] = React.useState<
-    Record<string, PendingExpense[]>
+    Record<string, PendingAction[]>
   >({});
 
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
@@ -260,7 +263,7 @@ export function CoachConversationV3Client({
       const ac = new AbortController();
       abortRef.current = ac;
 
-      const pendingFromStream: PendingExpense[] = [];
+      const pendingFromStream: PendingAction[] = [];
 
       try {
         const res = await fetch("/api/ai/chat", {
@@ -306,31 +309,18 @@ export function CoachConversationV3Client({
               if (event === "delta" && typeof parsed.text === "string") {
                 assembled += parsed.text;
                 setStreamedText(assembled);
-              } else if (event === "propose_expense") {
-                if (
-                  typeof parsed.toolUseId === "string" &&
-                  typeof parsed.amount === "number" &&
-                  typeof parsed.currency === "string" &&
-                  typeof parsed.label === "string" &&
-                  typeof parsed.category === "string" &&
-                  (parsed.expense_type === "variable_one_time" ||
-                    parsed.expense_type === "fixed_recurring") &&
-                  ["one_time", "monthly", "weekly", "yearly"].includes(
-                    parsed.frequency,
-                  )
-                ) {
-                  pendingFromStream.push({
-                    toolUseId: parsed.toolUseId,
-                    expense_type: parsed.expense_type,
-                    frequency: parsed.frequency,
-                    amount: parsed.amount,
-                    currency: parsed.currency,
-                    label: parsed.label,
-                    category: parsed.category,
-                    notes:
-                      typeof parsed.notes === "string" ? parsed.notes : null,
-                  });
-                }
+              } else if (
+                event === "propose_expense" ||
+                event === "propose_income" ||
+                event === "propose_goal" ||
+                event === "propose_budget"
+              ) {
+                // Sprint Coach IA — parser unique pour les 4 events.
+                // Le route handler valide déjà via les input_schema
+                // Anthropic, mais on revalide ici (DOM tampering /
+                // SSE replay).
+                const action = parseSseProposedAction(event, parsed);
+                if (action) pendingFromStream.push(action);
               } else if (event === "error" && typeof parsed.message === "string") {
                 throw new Error(parsed.message);
               }
@@ -377,11 +367,11 @@ export function CoachConversationV3Client({
     [conversationId, disabled, router, t],
   );
 
-  const onExpenseResolved = React.useCallback(
-    (toolUseId: string, action: "confirmed" | "cancelled") => {
-      if (action === "confirmed") router.refresh();
+  const onActionResolved = React.useCallback(
+    (toolUseId: string, status: "confirmed" | "cancelled") => {
+      if (status === "confirmed") router.refresh();
       setPendingByMessage((prev) => {
-        const next: Record<string, PendingExpense[]> = {};
+        const next: Record<string, PendingAction[]> = {};
         for (const [msgId, list] of Object.entries(prev)) {
           const filtered = list.filter((p) => p.toolUseId !== toolUseId);
           if (filtered.length > 0) next[msgId] = filtered;
@@ -442,10 +432,10 @@ export function CoachConversationV3Client({
               key={m.id}
               role={m.role}
               content={m.content}
-              pendingExpenses={
+              pendingActions={
                 m.role === "assistant" ? pendingByMessage[m.id] ?? [] : []
               }
-              onExpenseResolved={onExpenseResolved}
+              onActionResolved={onActionResolved}
             />
           ))}
           {streamedText && (
@@ -504,6 +494,16 @@ export function CoachConversationV3Client({
             gap: 8,
           }}
         >
+          <AudioMicButton
+            enabled={isTranscriptionUiEnabled()}
+            disabled={disabled || streaming}
+            onTranscribed={(text) => {
+              setInput((current) =>
+                current.length > 0 ? `${current.trim()} ${text}` : text,
+              );
+              textareaRef.current?.focus();
+            }}
+          />
           <button
             type="submit"
             aria-label={t("sendAriaLabel")}
@@ -552,16 +552,16 @@ function MessageBubble({
   role,
   content,
   pending,
-  pendingExpenses,
-  onExpenseResolved,
+  pendingActions,
+  onActionResolved,
 }: {
   role: "user" | "assistant";
   content: string;
   pending?: boolean;
-  pendingExpenses?: PendingExpense[];
-  onExpenseResolved?: (
+  pendingActions?: PendingAction[];
+  onActionResolved?: (
     toolUseId: string,
-    action: "confirmed" | "cancelled",
+    status: "confirmed" | "cancelled",
   ) => void;
 }) {
   if (role === "user") {
@@ -634,13 +634,13 @@ function MessageBubble({
             />
           )}
         </div>
-        {pendingExpenses && pendingExpenses.length > 0 && onExpenseResolved && (
+        {pendingActions && pendingActions.length > 0 && onActionResolved && (
           <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
-            {pendingExpenses.map((p) => (
-              <ExpenseConfirmCard
+            {pendingActions.map((p) => (
+              <ProposedActionCard
                 key={p.toolUseId}
-                pending={p}
-                onResolved={onExpenseResolved}
+                action={p}
+                onResolved={onActionResolved}
               />
             ))}
           </div>

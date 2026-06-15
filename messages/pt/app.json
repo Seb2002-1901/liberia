@@ -329,6 +329,15 @@
           "Como ponho a minha poupança a trabalhar?",
           "Como otimizo os meus seguros e contratos?"
         ]
+      },
+      "audio": {
+        "micLabel": "Ditar uma mensagem",
+        "stopLabel": "Parar gravação",
+        "permissionDenied": "Microfone bloqueado. Ativa-o nas definições do navegador.",
+        "unavailable": "Ditado por voz indisponível — a transcrição não está configurada.",
+        "recording": "Gravação…",
+        "transcribing": "A transcrever…",
+        "transcribeFailed": "Transcrição falhou. Tenta novamente."
       }
     },
     "proposeExpense": {
@@ -449,6 +458,39 @@
         "fundNoteMissing": " e ainda não tens fundo de emergência",
         "options": "- Queres **cortar uma despesa**? Diz «que despesa vigiar esta semana».\n- Queres **começar a poupar**? Diz «como construir um fundo de emergência».\n- Queres **gerir dívida**? Diz «o que pagar primeiro».\n- Queres **um check-in geral**? Diz «dá-me um resumo rápido»."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Despesa detectada",
+        "income": "Receita detectada",
+        "goal": "Objetivo detectado",
+        "budget": "Orçamento detectado"
+      },
+      "frequency": {
+        "one_time": "Pontual",
+        "monthly": "Mensal",
+        "weekly": "Semanal",
+        "yearly": "Anual"
+      },
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "savedToast": {
+        "expense": "Despesa guardada.",
+        "income": "Receita guardada.",
+        "goal": "Objetivo criado.",
+        "budget": "Orçamento atualizado."
+      },
+      "savedInline": {
+        "expense": "Despesa guardada.",
+        "income": "Receita guardada.",
+        "goal": "Objetivo criado.",
+        "budget": "Orçamento atualizado."
+      },
+      "cancelledInline": "Proposta cancelada.",
+      "goalDeadline": "Prazo {date}",
+      "goalProgress": "Já {current}",
+      "budgetSubline": "Limite mensal a respeitar",
+      "genericError": "Algo correu mal. Tenta novamente."
     }
   },
   "plan": {

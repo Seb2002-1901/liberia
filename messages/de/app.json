@@ -329,6 +329,15 @@
           "Wie bringe ich meine Ersparnisse zum Arbeiten?",
           "Wie optimiere ich meine Versicherungen und Verträge?"
         ]
+      },
+      "audio": {
+        "micLabel": "Eine Nachricht diktieren",
+        "stopLabel": "Aufnahme stoppen",
+        "permissionDenied": "Mikrofon blockiert. Aktiviere es in den Browser-Einstellungen.",
+        "unavailable": "Sprachdiktat nicht verfügbar — Transkription ist nicht konfiguriert.",
+        "recording": "Aufnahme…",
+        "transcribing": "Transkribiere…",
+        "transcribeFailed": "Transkription fehlgeschlagen. Bitte erneut versuchen."
       }
     },
     "proposeExpense": {
@@ -449,6 +458,39 @@
         "fundNoteMissing": " und du hast noch keinen Notgroschen",
         "options": "- Willst du **eine Ausgabe kürzen**? Sag „welche Ausgabe diese Woche beobachten\".\n- Willst du **mit dem Sparen anfangen**? Sag „wie einen Notgroschen aufbauen\".\n- Willst du **Schulden verwalten**? Sag „was zuerst zurückzahlen\".\n- Willst du **eine allgemeine Übersicht**? Sag „gib mir eine schnelle Übersicht\"."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Ausgabe erkannt",
+        "income": "Einnahme erkannt",
+        "goal": "Ziel erkannt",
+        "budget": "Budget erkannt"
+      },
+      "frequency": {
+        "one_time": "Einmalig",
+        "monthly": "Monatlich",
+        "weekly": "Wöchentlich",
+        "yearly": "Jährlich"
+      },
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen",
+      "savedToast": {
+        "expense": "Ausgabe gespeichert.",
+        "income": "Einnahme gespeichert.",
+        "goal": "Ziel erstellt.",
+        "budget": "Budget aktualisiert."
+      },
+      "savedInline": {
+        "expense": "Ausgabe gespeichert.",
+        "income": "Einnahme gespeichert.",
+        "goal": "Ziel erstellt.",
+        "budget": "Budget aktualisiert."
+      },
+      "cancelledInline": "Vorschlag abgebrochen.",
+      "goalDeadline": "Frist {date}",
+      "goalProgress": "Bereits {current}",
+      "budgetSubline": "Monatslimit einhalten",
+      "genericError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     }
   },
   "plan": {

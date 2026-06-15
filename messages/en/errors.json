@@ -35,7 +35,10 @@
     "coachStreamError": "A temporary error occurred. Try again in a moment.",
     "premiumRequired": "This feature is for Premium accounts. Start your 14-day trial to activate it.",
     "premiumLapsed": "Your subscription is no longer active. Resume your subscription to use this feature — your data remains accessible.",
-    "newConversationDefaultTitle": "New conversation"
+    "newConversationDefaultTitle": "New conversation",
+    "transcriptionUnavailable": "Audio transcription is not configured.",
+    "transcribeFailed": "Transcription failed. Try again.",
+    "audioTooLarge": "Audio too large (max 25 MB)."
   },
   "validation": {
     "emailRequired": "Email required",

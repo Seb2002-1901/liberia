@@ -35,7 +35,10 @@
     "coachStreamError": "Si è verificato un errore temporaneo. Riprova tra un momento.",
     "premiumRequired": "Questa funzione è per account Premium. Inizia la prova di 14 giorni per attivarla.",
     "premiumLapsed": "Il tuo abbonamento non è più attivo. Riprendi il tuo abbonamento per usare questa funzione — i tuoi dati restano accessibili.",
-    "newConversationDefaultTitle": "Nuova conversazione"
+    "newConversationDefaultTitle": "Nuova conversazione",
+    "transcriptionUnavailable": "Trascrizione audio non configurata.",
+    "transcribeFailed": "Trascrizione fallita. Riprova.",
+    "audioTooLarge": "Audio troppo grande (max 25 MB)."
   },
   "validation": {
     "emailRequired": "Email richiesta",

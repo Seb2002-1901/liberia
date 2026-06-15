@@ -329,6 +329,15 @@
           "How do I put my savings to work?",
           "How do I optimise my insurance and contracts?"
         ]
+      },
+      "audio": {
+        "micLabel": "Dictate a message",
+        "stopLabel": "Stop recording",
+        "permissionDenied": "Microphone blocked. Enable it in browser settings.",
+        "unavailable": "Voice dictation unavailable — transcription is not configured.",
+        "recording": "Recording…",
+        "transcribing": "Transcribing…",
+        "transcribeFailed": "Transcription failed. Try again."
       }
     },
     "proposeExpense": {
@@ -449,6 +458,39 @@
         "fundNoteMissing": " and you don't have an emergency fund yet",
         "options": "- Want to **cut an expense**? Say \"which expense to watch this week\".\n- Want to **start saving**? Say \"how to build an emergency fund\".\n- Want to **manage debt**? Say \"what to pay off first\".\n- Want **a general check-in**? Say \"give me a quick recap\"."
       }
+    },
+    "proposedAction": {
+      "title": {
+        "expense": "Expense detected",
+        "income": "Income detected",
+        "goal": "Goal detected",
+        "budget": "Budget detected"
+      },
+      "frequency": {
+        "one_time": "One-time",
+        "monthly": "Monthly",
+        "weekly": "Weekly",
+        "yearly": "Yearly"
+      },
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "savedToast": {
+        "expense": "Expense saved.",
+        "income": "Income saved.",
+        "goal": "Goal created.",
+        "budget": "Budget updated."
+      },
+      "savedInline": {
+        "expense": "Expense saved.",
+        "income": "Income saved.",
+        "goal": "Goal created.",
+        "budget": "Budget updated."
+      },
+      "cancelledInline": "Proposal cancelled.",
+      "goalDeadline": "Due {date}",
+      "goalProgress": "Already {current}",
+      "budgetSubline": "Monthly cap to respect",
+      "genericError": "Something went wrong. Try again."
     }
   },
   "plan": {

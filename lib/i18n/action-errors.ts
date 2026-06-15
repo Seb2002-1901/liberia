@@ -46,7 +46,10 @@ export type ActionErrorKey =
   | "coachStreamError"
   | "premiumRequired"
   | "premiumLapsed"
-  | "newConversationDefaultTitle";
+  | "newConversationDefaultTitle"
+  | "transcriptionUnavailable"
+  | "transcribeFailed"
+  | "audioTooLarge";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string
