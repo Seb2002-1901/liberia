@@ -49,7 +49,9 @@ export type ActionErrorKey =
   | "newConversationDefaultTitle"
   | "transcriptionUnavailable"
   | "transcribeFailed"
-  | "audioTooLarge";
+  | "audioTooLarge"
+  | "goalNotFound"
+  | "goalAmbiguous";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string

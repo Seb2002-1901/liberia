@@ -19,6 +19,12 @@ const state = {
     row: Record<string, unknown>;
     conflict?: string;
   }>,
+  updates: [] as Array<{
+    table: string;
+    patch: Record<string, unknown>;
+  }>,
+  deletes: [] as Array<{ table: string; id: string }>,
+  goalsLookupResult: [] as Array<Record<string, unknown>>,
   revalidated: [] as string[],
   insertError: null as { code?: string; message: string } | null,
 };
@@ -31,21 +37,56 @@ vi.mock("@/lib/supabase/server", () => ({
         data: { user: state.userId ? { id: state.userId } : null },
       }),
     },
-    from: (table: string) => ({
-      insert: async (row: Record<string, unknown>) => {
-        if (state.insertError) return { error: state.insertError };
-        state.inserts.push({ table, row });
-        return { error: null };
-      },
-      upsert: async (
-        row: Record<string, unknown>,
-        opts?: { onConflict?: string },
-      ) => {
-        if (state.insertError) return { error: state.insertError };
-        state.upserts.push({ table, row, conflict: opts?.onConflict });
-        return { error: null };
-      },
-    }),
+    from: (table: string) => {
+      const builder = {
+        insert: async (row: Record<string, unknown>) => {
+          if (state.insertError) return { error: state.insertError };
+          state.inserts.push({ table, row });
+          return { error: null };
+        },
+        upsert: async (
+          row: Record<string, unknown>,
+          opts?: { onConflict?: string },
+        ) => {
+          if (state.insertError) return { error: state.insertError };
+          state.upserts.push({ table, row, conflict: opts?.onConflict });
+          return { error: null };
+        },
+        // select(...).eq(...).ilike(...).limit(...) chain for goal lookup
+        select: () => ({
+          eq: () => ({
+            ilike: () => ({
+              limit: async () => ({
+                data: state.goalsLookupResult,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+        // update(...).eq(...).eq(...) chain
+        update: (patch: Record<string, unknown>) => ({
+          eq: () => ({
+            eq: async () => {
+              state.updates.push({ table, patch });
+              return { error: null };
+            },
+          }),
+        }),
+        // delete().eq().eq() chain
+        delete: () => ({
+          eq: () => ({
+            eq: async () => {
+              state.deletes.push({
+                table,
+                id: state.goalsLookupResult[0]?.id as string,
+              });
+              return { error: null };
+            },
+          }),
+        }),
+      };
+      return builder;
+    },
   }),
 }));
 
@@ -64,6 +105,9 @@ beforeEach(() => {
   state.userId = "u-abc";
   state.inserts = [];
   state.upserts = [];
+  state.updates = [];
+  state.deletes = [];
+  state.goalsLookupResult = [];
   state.revalidated = [];
   state.insertError = null;
 });
@@ -206,6 +250,140 @@ describe("confirmProposedGoalAction", () => {
       notes: null,
     });
     expect(res.ok).toBe(false);
+  });
+});
+
+describe("confirmProposedUpdateGoalAction", () => {
+  it("updates target_amount on golden path", async () => {
+    state.goalsLookupResult = [
+      { id: "g1", title: "Apport maison", target_amount: 20000, current_amount: 3000 },
+    ];
+    const { confirmProposedUpdateGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedUpdateGoalAction({
+      match_title: "maison",
+      newTargetAmount: 30000,
+      currency: "CHF",
+    });
+    expect(res).toEqual({ ok: true });
+    expect(state.updates).toHaveLength(1);
+    expect(state.updates[0].patch).toEqual({ target_amount: 30000 });
+    expect(state.revalidated).toContain("/design-match/objectifs-v3");
+  });
+
+  it("returns goalNotFound when zero matches", async () => {
+    state.goalsLookupResult = [];
+    const { confirmProposedUpdateGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedUpdateGoalAction({
+      match_title: "inexistant",
+      newTargetAmount: 1000,
+      currency: "CHF",
+    });
+    expect(res).toEqual({ ok: false, error: "T(goalNotFound)" });
+    expect(state.updates).toHaveLength(0);
+  });
+
+  it("returns goalAmbiguous when several matches", async () => {
+    state.goalsLookupResult = [
+      { id: "g1", title: "Maison principale", target_amount: 20000, current_amount: 0 },
+      { id: "g2", title: "Maison vacances", target_amount: 50000, current_amount: 5000 },
+    ];
+    const { confirmProposedUpdateGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedUpdateGoalAction({
+      match_title: "maison",
+      newTargetAmount: 30000,
+      currency: "CHF",
+    });
+    expect(res).toEqual({ ok: false, error: "T(goalAmbiguous)" });
+    expect(state.updates).toHaveLength(0);
+  });
+
+  it("rejects no-op (no fields to update)", async () => {
+    state.goalsLookupResult = [
+      { id: "g1", title: "X", target_amount: 1000, current_amount: 0 },
+    ];
+    const { confirmProposedUpdateGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedUpdateGoalAction({
+      match_title: "X",
+      currency: "CHF",
+    });
+    expect(res.ok).toBe(false);
+    expect(state.updates).toHaveLength(0);
+  });
+
+  it("rejects update where newCurrent > newTarget", async () => {
+    state.goalsLookupResult = [
+      { id: "g1", title: "X", target_amount: 10000, current_amount: 0 },
+    ];
+    const { confirmProposedUpdateGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedUpdateGoalAction({
+      match_title: "X",
+      newTargetAmount: 5000,
+      newCurrentAmount: 8000,
+      currency: "CHF",
+    });
+    expect(res).toEqual({ ok: false, error: "T(invalidData)" });
+  });
+});
+
+describe("confirmProposedDeleteGoalAction", () => {
+  it("deletes on golden path", async () => {
+    state.goalsLookupResult = [{ id: "g1", title: "Voyage Japon" }];
+    const { confirmProposedDeleteGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedDeleteGoalAction({
+      match_title: "Japon",
+    });
+    expect(res).toEqual({ ok: true });
+    expect(state.deletes).toHaveLength(1);
+    expect(state.deletes[0].id).toBe("g1");
+    expect(state.revalidated).toContain("/design-match/objectifs-v3");
+  });
+
+  it("returns goalNotFound when zero matches", async () => {
+    state.goalsLookupResult = [];
+    const { confirmProposedDeleteGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedDeleteGoalAction({
+      match_title: "inexistant",
+    });
+    expect(res).toEqual({ ok: false, error: "T(goalNotFound)" });
+  });
+
+  it("returns goalAmbiguous when several matches", async () => {
+    state.goalsLookupResult = [
+      { id: "g1", title: "Voyage Japon" },
+      { id: "g2", title: "Voyage Canada" },
+    ];
+    const { confirmProposedDeleteGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedDeleteGoalAction({
+      match_title: "voyage",
+    });
+    expect(res).toEqual({ ok: false, error: "T(goalAmbiguous)" });
+  });
+
+  it("refuses if not authenticated", async () => {
+    state.userId = null;
+    const { confirmProposedDeleteGoalAction } = await import(
+      "@/app/actions/coach-actions"
+    );
+    const res = await confirmProposedDeleteGoalAction({
+      match_title: "X",
+    });
+    expect(res).toEqual({ ok: false, error: "T(authRequired)" });
   });
 });
 

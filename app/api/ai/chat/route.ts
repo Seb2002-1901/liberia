@@ -35,10 +35,14 @@ import {
   PROPOSE_INCOME_TOOL_NAME,
   PROPOSE_GOAL_TOOL_NAME,
   PROPOSE_BUDGET_TOOL_NAME,
+  PROPOSE_UPDATE_GOAL_TOOL_NAME,
+  PROPOSE_DELETE_GOAL_TOOL_NAME,
   type ProposeExpenseInput,
   type ProposeIncomeInput,
   type ProposeGoalInput,
   type ProposeBudgetInput,
+  type ProposeUpdateGoalInput,
+  type ProposeDeleteGoalInput,
 } from "@/lib/coach/tools";
 import { isAnthropicConfigured } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -506,6 +510,33 @@ export async function POST(request: Request) {
                     category: input.category,
                     monthlyLimit: input.monthlyLimit,
                     currency: input.currency,
+                  });
+                  break;
+                }
+                case PROPOSE_UPDATE_GOAL_TOOL_NAME: {
+                  const input = block.input as ProposeUpdateGoalInput;
+                  console.log(
+                    `[coach/propose_update_goal] match="${input.match_title}" newTarget=${input.newTargetAmount ?? "-"} newDeadline=${input.newDeadline ?? "-"}`,
+                  );
+                  send("propose_update_goal", {
+                    toolUseId: block.id,
+                    match_title: input.match_title,
+                    newTargetAmount: input.newTargetAmount ?? null,
+                    newCurrentAmount: input.newCurrentAmount ?? null,
+                    newDeadline: input.newDeadline ?? null,
+                    newTitle: input.newTitle ?? null,
+                    currency: input.currency,
+                  });
+                  break;
+                }
+                case PROPOSE_DELETE_GOAL_TOOL_NAME: {
+                  const input = block.input as ProposeDeleteGoalInput;
+                  console.log(
+                    `[coach/propose_delete_goal] match="${input.match_title}"`,
+                  );
+                  send("propose_delete_goal", {
+                    toolUseId: block.id,
+                    match_title: input.match_title,
                   });
                   break;
                 }

@@ -38,7 +38,9 @@
     "newConversationDefaultTitle": "Nueva conversación",
     "transcriptionUnavailable": "Transcripción de audio no configurada.",
     "transcribeFailed": "Transcripción fallida. Inténtalo de nuevo.",
-    "audioTooLarge": "Audio demasiado grande (máx. 25 MB)."
+    "audioTooLarge": "Audio demasiado grande (máx. 25 MB).",
+    "goalNotFound": "Ningún objetivo coincide con ese nombre. Sé más preciso.",
+    "goalAmbiguous": "Varios objetivos coinciden. Especifica el título exacto."
   },
   "validation": {
     "emailRequired": "Email requerido",

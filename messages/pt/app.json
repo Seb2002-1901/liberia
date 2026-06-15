@@ -464,7 +464,9 @@
         "expense": "Despesa detectada",
         "income": "Receita detectada",
         "goal": "Objetivo detectado",
-        "budget": "Orçamento detectado"
+        "budget": "Orçamento detectado",
+        "update_goal": "Modificar um objetivo",
+        "delete_goal": "Apagar um objetivo"
       },
       "frequency": {
         "one_time": "Pontual",
@@ -478,19 +480,29 @@
         "expense": "Despesa guardada.",
         "income": "Receita guardada.",
         "goal": "Objetivo criado.",
-        "budget": "Orçamento atualizado."
+        "budget": "Orçamento atualizado.",
+        "update_goal": "Objetivo modificado.",
+        "delete_goal": "Objetivo apagado."
       },
       "savedInline": {
         "expense": "Despesa guardada.",
         "income": "Receita guardada.",
         "goal": "Objetivo criado.",
-        "budget": "Orçamento atualizado."
+        "budget": "Orçamento atualizado.",
+        "update_goal": "Objetivo modificado.",
+        "delete_goal": "Objetivo apagado."
       },
       "cancelledInline": "Proposta cancelada.",
       "goalDeadline": "Prazo {date}",
       "goalProgress": "Já {current}",
       "budgetSubline": "Limite mensal a respeitar",
-      "genericError": "Algo correu mal. Tenta novamente."
+      "genericError": "Algo correu mal. Tenta novamente.",
+      "updateGoalNewTarget": "Novo alvo {amount}",
+      "updateGoalNewCurrent": "Já {amount}",
+      "updateGoalNewDeadline": "Novo prazo {date}",
+      "updateGoalRename": "Renomear para «{title}»",
+      "updateGoalNoChange": "Nenhuma alteração detetada",
+      "deleteGoalSubline": "Exclusão definitiva — confirma para remover"
     }
   },
   "plan": {

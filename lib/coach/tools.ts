@@ -285,12 +285,107 @@ export interface ProposeBudgetInput {
   currency: string;
 }
 
+/* ════════════════════════════════════════════════════════════
+ * Sprint Advisor V3 — outils de MISE À JOUR.
+ *
+ * propose_update_goal : changer target / deadline / currentAmount /
+ *   title / type d'un objectif existant identifié par son TITRE
+ *   (le coach lit la liste des objectifs dans le contexte financier,
+ *   identifie celui que l'utilisateur veut modifier par son titre).
+ *
+ * Le tool retourne dans son input le NOUVEAU `title` cible et les
+ * nouveaux champs ; la server action recherche un goal qui matche
+ * `match_title` (texte fourni séparément) ET appartient au user
+ * connecté. Si plusieurs matches : l'action retourne ambiguity et
+ * le coach pose une question au tour suivant.
+ *
+ * SCOPE LIMITÉ — sprint actuel : objectifs uniquement. Pas
+ * d'update/delete pour expenses/incomes/budgets (besoin d'une UX
+ * de désambiguïsation plus poussée — risque trop élevé d'écraser
+ * une donnée sans le vouloir).
+ * ════════════════════════════════════════════════════════════ */
+
+export const PROPOSE_UPDATE_GOAL_TOOL_NAME = "propose_update_goal" as const;
+
+export const PROPOSE_UPDATE_GOAL_TOOL: Tool = {
+  name: PROPOSE_UPDATE_GOAL_TOOL_NAME,
+  description:
+    "Call this tool when the user wants to UPDATE an existing financial goal (change target amount, deadline, progress, or rename it). The user must clearly reference WHICH goal — by title or topic. Example triggers: 'change mon objectif maison à 30000', 'déplace mon fonds d'urgence à décembre 2027', 'augmente mon objectif retraite à 500000', 'j'ai déjà 5000 sur l'objectif vacances'. DO NOT call for vague 'change my goal' — ask which one first. The UI shows a confirmation card before any DB write.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_title: {
+        type: "string",
+        description:
+          "Title (or partial title) of the existing goal to update. Used to look it up server-side. Must match what the user said and what's in the goals list of the finance context.",
+      },
+      newTargetAmount: {
+        type: "number",
+        description:
+          "New target amount in user's currency. Omit if not changing.",
+      },
+      newCurrentAmount: {
+        type: "number",
+        description: "New current saved amount. Omit if not changing.",
+      },
+      newDeadline: {
+        type: "string",
+        description:
+          "New ISO date (YYYY-MM-DD). Omit if not changing.",
+      },
+      newTitle: {
+        type: "string",
+        description: "Rename the goal. Omit if not renaming.",
+      },
+      currency: {
+        type: "string",
+        description: "ISO currency code.",
+      },
+    },
+    required: ["match_title", "currency"],
+  },
+};
+
+export interface ProposeUpdateGoalInput {
+  match_title: string;
+  newTargetAmount?: number;
+  newCurrentAmount?: number;
+  newDeadline?: string;
+  newTitle?: string;
+  currency: string;
+}
+
+export const PROPOSE_DELETE_GOAL_TOOL_NAME = "propose_delete_goal" as const;
+
+export const PROPOSE_DELETE_GOAL_TOOL: Tool = {
+  name: PROPOSE_DELETE_GOAL_TOOL_NAME,
+  description:
+    "Call this tool when the user wants to DELETE an existing goal. Reference the goal by title. Example: 'supprime mon objectif voyage Japon', 'efface l'objectif voiture, j'abandonne'. ALWAYS ask for confirmation in your text reply (the user might mean 'mark as completed' rather than delete). The UI also shows a confirmation card before any DB write.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_title: {
+        type: "string",
+        description:
+          "Title of the existing goal to delete. Server-side lookup.",
+      },
+    },
+    required: ["match_title"],
+  },
+};
+
+export interface ProposeDeleteGoalInput {
+  match_title: string;
+}
+
 /** Toutes les tools exposées au modèle en un tableau prêt-à-passer. */
 export const COACH_TOOLS: Tool[] = [
   PROPOSE_EXPENSE_TOOL,
   PROPOSE_INCOME_TOOL,
   PROPOSE_GOAL_TOOL,
   PROPOSE_BUDGET_TOOL,
+  PROPOSE_UPDATE_GOAL_TOOL,
+  PROPOSE_DELETE_GOAL_TOOL,
 ];
 
 export const COACH_TOOL_NAMES = [
@@ -298,6 +393,8 @@ export const COACH_TOOL_NAMES = [
   PROPOSE_INCOME_TOOL_NAME,
   PROPOSE_GOAL_TOOL_NAME,
   PROPOSE_BUDGET_TOOL_NAME,
+  PROPOSE_UPDATE_GOAL_TOOL_NAME,
+  PROPOSE_DELETE_GOAL_TOOL_NAME,
 ] as const;
 
 export type CoachToolName = typeof COACH_TOOL_NAMES[number];

@@ -215,6 +215,85 @@ describe("parseSseProposedAction", () => {
     ).toBeNull();
   });
 
+  describe("propose_update_goal", () => {
+    it("parses with newTargetAmount only", () => {
+      const result = parseSseProposedAction("propose_update_goal", {
+        toolUseId: "tu_u1",
+        match_title: "maison",
+        newTargetAmount: 30000,
+        currency: "CHF",
+      });
+      expect(result).toEqual({
+        kind: "update_goal",
+        toolUseId: "tu_u1",
+        match_title: "maison",
+        newTargetAmount: 30000,
+        newCurrentAmount: null,
+        newDeadline: null,
+        newTitle: null,
+        currency: "CHF",
+      });
+    });
+
+    it("parses with newDeadline only", () => {
+      const result = parseSseProposedAction("propose_update_goal", {
+        toolUseId: "tu_u2",
+        match_title: "vacances",
+        newDeadline: "2028-12-31",
+        currency: "CHF",
+      });
+      expect(result?.kind).toBe("update_goal");
+      if (result?.kind === "update_goal") {
+        expect(result.newDeadline).toBe("2028-12-31");
+        expect(result.newTargetAmount).toBeNull();
+      }
+    });
+
+    it("rejects no-op update (all fields empty)", () => {
+      expect(
+        parseSseProposedAction("propose_update_goal", {
+          toolUseId: "tu_u3",
+          match_title: "x",
+          currency: "CHF",
+        }),
+      ).toBeNull();
+    });
+
+    it("rejects empty match_title", () => {
+      expect(
+        parseSseProposedAction("propose_update_goal", {
+          toolUseId: "tu_u4",
+          match_title: "",
+          newTargetAmount: 1000,
+          currency: "CHF",
+        }),
+      ).toBeNull();
+    });
+  });
+
+  describe("propose_delete_goal", () => {
+    it("parses with match_title", () => {
+      const result = parseSseProposedAction("propose_delete_goal", {
+        toolUseId: "tu_d1",
+        match_title: "voyage Japon",
+      });
+      expect(result).toEqual({
+        kind: "delete_goal",
+        toolUseId: "tu_d1",
+        match_title: "voyage Japon",
+      });
+    });
+
+    it("rejects empty match_title", () => {
+      expect(
+        parseSseProposedAction("propose_delete_goal", {
+          toolUseId: "tu_d2",
+          match_title: "",
+        }),
+      ).toBeNull();
+    });
+  });
+
   it("rejects propose_budget with zero limit", () => {
     expect(
       parseSseProposedAction("propose_budget", {

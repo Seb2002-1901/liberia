@@ -14,6 +14,8 @@ import {
   confirmProposedIncomeAction,
   confirmProposedGoalAction,
   confirmProposedBudgetAction,
+  confirmProposedUpdateGoalAction,
+  confirmProposedDeleteGoalAction,
 } from "@/app/actions/coach-actions";
 import type { PendingAction } from "./proposed-action-types";
 
@@ -40,6 +42,8 @@ const COLORS = {
   income: { accent: "#10A37F", bg: "#ECFDF5", text: "#065F46" },
   goal: { accent: "#2563EB", bg: "#EDF2FD", text: "#1E40AF" },
   budget: { accent: "#011E5F", bg: "#E0E7FF", text: "#011E5F" },
+  update_goal: { accent: "#7C3AED", bg: "#F3E8FF", text: "#5B21B6" },
+  delete_goal: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
 } as const;
 
 export function ProposedActionCard({ action, onResolved }: Props) {
@@ -94,6 +98,21 @@ export function ProposedActionCard({ action, onResolved }: Props) {
             category: action.category,
             monthlyLimit: action.monthlyLimit,
             currency: action.currency,
+          });
+          break;
+        case "update_goal":
+          res = await confirmProposedUpdateGoalAction({
+            match_title: action.match_title,
+            newTargetAmount: action.newTargetAmount ?? undefined,
+            newCurrentAmount: action.newCurrentAmount ?? undefined,
+            newDeadline: action.newDeadline ?? undefined,
+            newTitle: action.newTitle ?? undefined,
+            currency: action.currency,
+          });
+          break;
+        case "delete_goal":
+          res = await confirmProposedDeleteGoalAction({
+            match_title: action.match_title,
           });
           break;
       }
@@ -291,6 +310,10 @@ function renderHeadline(
       const cat = EXPENSE_CATEGORIES.find((c) => c.id === a.category);
       return `${cat?.label ?? a.category} : ${limit} / mois`;
     }
+    case "update_goal":
+      return a.newTitle ?? a.match_title;
+    case "delete_goal":
+      return a.match_title;
   }
 }
 
@@ -319,5 +342,23 @@ function renderSubline(
     }
     case "budget":
       return t("budgetSubline");
+    case "update_goal": {
+      const parts: string[] = [];
+      if (a.newTargetAmount !== null)
+        parts.push(t("updateGoalNewTarget", { amount: a.newTargetAmount }));
+      if (a.newCurrentAmount !== null)
+        parts.push(
+          t("updateGoalNewCurrent", { amount: a.newCurrentAmount }),
+        );
+      if (a.newDeadline !== null)
+        parts.push(t("updateGoalNewDeadline", { date: a.newDeadline }));
+      if (a.newTitle !== null && a.newTitle !== a.match_title)
+        parts.push(t("updateGoalRename", { title: a.newTitle }));
+      return parts.length > 0
+        ? parts.join(" · ")
+        : t("updateGoalNoChange");
+    }
+    case "delete_goal":
+      return t("deleteGoalSubline");
   }
 }

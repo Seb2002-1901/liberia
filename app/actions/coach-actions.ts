@@ -344,3 +344,176 @@ export async function confirmProposedBudgetAction(
   );
   return { ok: true };
 }
+
+/* ════════════════════════════════════════════════════════════
+ * Sprint Advisor V3 — update / delete goal.
+ *
+ * Le coach passe le `match_title` (texte fourni par l'utilisateur),
+ * on cherche le goal du user qui matche. Si 0 match → notFound,
+ * si plusieurs → ambiguity (le coach demandera plus de précision
+ * au tour suivant), si 1 → update/delete.
+ * ════════════════════════════════════════════════════════════ */
+
+const updateGoalSchema = z.object({
+  match_title: z.string().min(1).max(120),
+  newTargetAmount: z
+    .number()
+    .positive("errors.validation.amountPositive")
+    .max(10_000_000)
+    .optional(),
+  newCurrentAmount: z.number().min(0).max(10_000_000).optional(),
+  newDeadline: z
+    .string()
+    .optional()
+    .refine(
+      (v) => !v || !Number.isNaN(new Date(v).getTime()),
+      "errors.validation.dateInvalid",
+    ),
+  newTitle: z.string().min(1).max(80).optional(),
+  currency: z.string().min(2).max(8),
+});
+
+export type CoachUpdateGoalPayload = z.infer<typeof updateGoalSchema>;
+
+export async function confirmProposedUpdateGoalAction(
+  input: CoachUpdateGoalPayload,
+): Promise<ActionResult> {
+  const tErr = await getActionErrors();
+  const parsed = updateGoalSchema.safeParse(input);
+  if (!parsed.success) {
+    console.error(
+      "[coach/propose_update_goal] validation failed:",
+      parsed.error.flatten(),
+    );
+    return { ok: false, error: tErr("invalidData") };
+  }
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: tErr("authRequired") };
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: tErr("authRequired") };
+
+  // Lookup ILIKE — case-insensitive substring match. Si plusieurs
+  // matches : on remonte ambiguity. Si zéro : notFound.
+  const { data: matches, error: lookupError } = await supabase
+    .from("goals")
+    .select("id, title, target_amount, current_amount")
+    .eq("user_id", user.id)
+    .ilike("title", `%${parsed.data.match_title}%`)
+    .limit(5);
+  if (lookupError) return { ok: false, error: lookupError.message };
+  if (!matches || matches.length === 0) {
+    return { ok: false, error: tErr("goalNotFound") };
+  }
+  if (matches.length > 1) {
+    return { ok: false, error: tErr("goalAmbiguous") };
+  }
+
+  const existing = matches[0] as {
+    id: string;
+    title: string;
+    target_amount: number;
+    current_amount: number;
+  };
+
+  // Construit le patch en respectant l'invariant currentAmount <= target.
+  const nextTarget =
+    parsed.data.newTargetAmount ?? existing.target_amount;
+  const nextCurrent =
+    parsed.data.newCurrentAmount ?? existing.current_amount;
+  if (nextCurrent > nextTarget) {
+    return { ok: false, error: tErr("invalidData") };
+  }
+
+  const patch: Record<string, unknown> = {};
+  if (parsed.data.newTargetAmount !== undefined)
+    patch.target_amount = parsed.data.newTargetAmount;
+  if (parsed.data.newCurrentAmount !== undefined)
+    patch.current_amount = parsed.data.newCurrentAmount;
+  if (parsed.data.newDeadline !== undefined)
+    patch.deadline = parsed.data.newDeadline || null;
+  if (parsed.data.newTitle !== undefined) patch.title = parsed.data.newTitle;
+
+  if (Object.keys(patch).length === 0) {
+    return { ok: false, error: tErr("invalidData") };
+  }
+
+  const { error: updateError } = await supabase
+    .from("goals")
+    .update(patch)
+    .eq("id", existing.id)
+    .eq("user_id", user.id);
+  if (updateError) return { ok: false, error: updateError.message };
+
+  revalidatePath("/goals");
+  revalidatePath("/design-match/objectifs-v3");
+  revalidatePath("/dashboard");
+  revalidatePath("/design-match/dashboard-v3");
+  revalidatePath("/coach");
+
+  console.log(
+    `[coach/propose_update_goal] updated: ${existing.title} patch=${JSON.stringify(patch)}`,
+  );
+  return { ok: true };
+}
+
+const deleteGoalSchema = z.object({
+  match_title: z.string().min(1).max(120),
+});
+
+export type CoachDeleteGoalPayload = z.infer<typeof deleteGoalSchema>;
+
+export async function confirmProposedDeleteGoalAction(
+  input: CoachDeleteGoalPayload,
+): Promise<ActionResult> {
+  const tErr = await getActionErrors();
+  const parsed = deleteGoalSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: tErr("invalidData") };
+  }
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: tErr("authRequired") };
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: tErr("authRequired") };
+
+  const { data: matches, error: lookupError } = await supabase
+    .from("goals")
+    .select("id, title")
+    .eq("user_id", user.id)
+    .ilike("title", `%${parsed.data.match_title}%`)
+    .limit(5);
+  if (lookupError) return { ok: false, error: lookupError.message };
+  if (!matches || matches.length === 0) {
+    return { ok: false, error: tErr("goalNotFound") };
+  }
+  if (matches.length > 1) {
+    return { ok: false, error: tErr("goalAmbiguous") };
+  }
+
+  const existing = matches[0] as { id: string; title: string };
+
+  const { error: deleteError } = await supabase
+    .from("goals")
+    .delete()
+    .eq("id", existing.id)
+    .eq("user_id", user.id);
+  if (deleteError) return { ok: false, error: deleteError.message };
+
+  revalidatePath("/goals");
+  revalidatePath("/design-match/objectifs-v3");
+  revalidatePath("/dashboard");
+  revalidatePath("/design-match/dashboard-v3");
+  revalidatePath("/coach");
+
+  console.log(
+    `[coach/propose_delete_goal] deleted: ${existing.title} (${existing.id})`,
+  );
+  return { ok: true };
+}

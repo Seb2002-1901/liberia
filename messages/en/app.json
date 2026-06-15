@@ -464,7 +464,9 @@
         "expense": "Expense detected",
         "income": "Income detected",
         "goal": "Goal detected",
-        "budget": "Budget detected"
+        "budget": "Budget detected",
+        "update_goal": "Update a goal",
+        "delete_goal": "Delete a goal"
       },
       "frequency": {
         "one_time": "One-time",
@@ -478,19 +480,29 @@
         "expense": "Expense saved.",
         "income": "Income saved.",
         "goal": "Goal created.",
-        "budget": "Budget updated."
+        "budget": "Budget updated.",
+        "update_goal": "Goal updated.",
+        "delete_goal": "Goal deleted."
       },
       "savedInline": {
         "expense": "Expense saved.",
         "income": "Income saved.",
         "goal": "Goal created.",
-        "budget": "Budget updated."
+        "budget": "Budget updated.",
+        "update_goal": "Goal updated.",
+        "delete_goal": "Goal deleted."
       },
       "cancelledInline": "Proposal cancelled.",
       "goalDeadline": "Due {date}",
       "goalProgress": "Already {current}",
       "budgetSubline": "Monthly cap to respect",
-      "genericError": "Something went wrong. Try again."
+      "genericError": "Something went wrong. Try again.",
+      "updateGoalNewTarget": "New target {amount}",
+      "updateGoalNewCurrent": "Already {amount}",
+      "updateGoalNewDeadline": "New deadline {date}",
+      "updateGoalRename": "Rename to \"{title}\"",
+      "updateGoalNoChange": "No change detected",
+      "deleteGoalSubline": "Permanent deletion — confirm to remove"
     }
   },
   "plan": {

@@ -64,11 +64,30 @@ export interface PendingBudgetAction {
   currency: string;
 }
 
+export interface PendingUpdateGoalAction {
+  kind: "update_goal";
+  toolUseId: string;
+  match_title: string;
+  newTargetAmount: number | null;
+  newCurrentAmount: number | null;
+  newDeadline: string | null;
+  newTitle: string | null;
+  currency: string;
+}
+
+export interface PendingDeleteGoalAction {
+  kind: "delete_goal";
+  toolUseId: string;
+  match_title: string;
+}
+
 export type PendingAction =
   | PendingExpenseAction
   | PendingIncomeAction
   | PendingGoalAction
-  | PendingBudgetAction;
+  | PendingBudgetAction
+  | PendingUpdateGoalAction
+  | PendingDeleteGoalAction;
 
 /**
  * Parse un payload SSE inconnu en PendingAction typée. Retourne
@@ -167,6 +186,63 @@ export function parseSseProposedAction(
       category: payload.category as ExpenseCategoryId,
       monthlyLimit: payload.monthlyLimit,
       currency: payload.currency,
+    };
+  }
+
+  if (event === "propose_update_goal") {
+    if (
+      typeof payload.match_title !== "string" ||
+      payload.match_title.length === 0
+    )
+      return null;
+    if (typeof payload.currency !== "string") return null;
+    const newTargetAmount =
+      typeof payload.newTargetAmount === "number" && payload.newTargetAmount > 0
+        ? payload.newTargetAmount
+        : null;
+    const newCurrentAmount =
+      typeof payload.newCurrentAmount === "number" &&
+      payload.newCurrentAmount >= 0
+        ? payload.newCurrentAmount
+        : null;
+    const newDeadline =
+      typeof payload.newDeadline === "string" && payload.newDeadline.length > 0
+        ? payload.newDeadline
+        : null;
+    const newTitle =
+      typeof payload.newTitle === "string" && payload.newTitle.length > 0
+        ? payload.newTitle
+        : null;
+    // Reject no-op (rien à changer)
+    if (
+      newTargetAmount === null &&
+      newCurrentAmount === null &&
+      newDeadline === null &&
+      newTitle === null
+    )
+      return null;
+    return {
+      kind: "update_goal",
+      toolUseId,
+      match_title: payload.match_title,
+      newTargetAmount,
+      newCurrentAmount,
+      newDeadline,
+      newTitle,
+      currency: payload.currency,
+    };
+  }
+
+  if (event === "propose_delete_goal") {
+    if (
+      typeof payload.match_title !== "string" ||
+      payload.match_title.length === 0
+    )
+      return null;
+    return {
+      kind: "delete_goal",
+      toolUseId,
+      match_title: payload.match_title,
     };
   }
 

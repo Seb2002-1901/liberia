@@ -464,7 +464,9 @@
         "expense": "Ausgabe erkannt",
         "income": "Einnahme erkannt",
         "goal": "Ziel erkannt",
-        "budget": "Budget erkannt"
+        "budget": "Budget erkannt",
+        "update_goal": "Ziel ändern",
+        "delete_goal": "Ziel löschen"
       },
       "frequency": {
         "one_time": "Einmalig",
@@ -478,19 +480,29 @@
         "expense": "Ausgabe gespeichert.",
         "income": "Einnahme gespeichert.",
         "goal": "Ziel erstellt.",
-        "budget": "Budget aktualisiert."
+        "budget": "Budget aktualisiert.",
+        "update_goal": "Ziel aktualisiert.",
+        "delete_goal": "Ziel gelöscht."
       },
       "savedInline": {
         "expense": "Ausgabe gespeichert.",
         "income": "Einnahme gespeichert.",
         "goal": "Ziel erstellt.",
-        "budget": "Budget aktualisiert."
+        "budget": "Budget aktualisiert.",
+        "update_goal": "Ziel aktualisiert.",
+        "delete_goal": "Ziel gelöscht."
       },
       "cancelledInline": "Vorschlag abgebrochen.",
       "goalDeadline": "Frist {date}",
       "goalProgress": "Bereits {current}",
       "budgetSubline": "Monatslimit einhalten",
-      "genericError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+      "genericError": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+      "updateGoalNewTarget": "Neues Ziel {amount}",
+      "updateGoalNewCurrent": "Bereits {amount}",
+      "updateGoalNewDeadline": "Neue Frist {date}",
+      "updateGoalRename": "Umbenennen in «{title}»",
+      "updateGoalNoChange": "Keine Änderung erkannt",
+      "deleteGoalSubline": "Endgültige Löschung — bestätige zum Entfernen"
     }
   },
   "plan": {

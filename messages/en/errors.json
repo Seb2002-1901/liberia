@@ -38,7 +38,9 @@
     "newConversationDefaultTitle": "New conversation",
     "transcriptionUnavailable": "Audio transcription is not configured.",
     "transcribeFailed": "Transcription failed. Try again.",
-    "audioTooLarge": "Audio too large (max 25 MB)."
+    "audioTooLarge": "Audio too large (max 25 MB).",
+    "goalNotFound": "No matching goal found. Be more specific.",
+    "goalAmbiguous": "Several goals match. Specify the exact title."
   },
   "validation": {
     "emailRequired": "Email required",

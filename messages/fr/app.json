@@ -363,7 +363,9 @@
         "expense": "Dépense détectée",
         "income": "Revenu détecté",
         "goal": "Objectif détecté",
-        "budget": "Budget détecté"
+        "budget": "Budget détecté",
+        "update_goal": "Modifier un objectif",
+        "delete_goal": "Supprimer un objectif"
       },
       "frequency": {
         "one_time": "Ponctuel",
@@ -377,19 +379,29 @@
         "expense": "Dépense enregistrée.",
         "income": "Revenu enregistré.",
         "goal": "Objectif créé.",
-        "budget": "Budget mis à jour."
+        "budget": "Budget mis à jour.",
+        "update_goal": "Objectif modifié.",
+        "delete_goal": "Objectif supprimé."
       },
       "savedInline": {
         "expense": "Dépense enregistrée.",
         "income": "Revenu enregistré.",
         "goal": "Objectif créé.",
-        "budget": "Budget mis à jour."
+        "budget": "Budget mis à jour.",
+        "update_goal": "Objectif modifié.",
+        "delete_goal": "Objectif supprimé."
       },
       "cancelledInline": "Proposition annulée.",
       "goalDeadline": "Échéance {date}",
       "goalProgress": "Déjà {current}",
       "budgetSubline": "Plafond mensuel à respecter",
-      "genericError": "Une erreur est survenue. Réessaie."
+      "genericError": "Une erreur est survenue. Réessaie.",
+      "updateGoalNewTarget": "Nouveau cible {amount}",
+      "updateGoalNewCurrent": "Déjà {amount}",
+      "updateGoalNewDeadline": "Nouvelle échéance {date}",
+      "updateGoalRename": "Renommer en « {title} »",
+      "updateGoalNoChange": "Aucune modification détectée",
+      "deleteGoalSubline": "Suppression définitive — confirme pour effacer"
     },
     "sidebar": {
       "newConversation": "Nouvelle conversation",
