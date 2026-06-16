@@ -39,6 +39,19 @@ export function ImportClient() {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const onUpload = async (file: File) => {
+    // Validation côté client AVANT envoi.
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      toast.error("Le fichier doit être un CSV (extension .csv).");
+      return;
+    }
+    if (file.size === 0) {
+      toast.error("Le fichier est vide.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Le fichier dépasse 2 MB. Découpe l'export en plusieurs fichiers.");
+      return;
+    }
     setUploading(true);
     setSummary(null);
     try {
@@ -50,9 +63,17 @@ export function ImportClient() {
         return;
       }
       setSummary(res.data);
-      toast.success(
-        `${res.data.importedCount} transaction${res.data.importedCount > 1 ? "s" : ""} importée${res.data.importedCount > 1 ? "s" : ""}.`,
-      );
+      const imported = res.data.importedCount;
+      const skipped = res.data.skippedDuplicateCount;
+      if (imported === 0 && skipped > 0) {
+        toast.info(
+          `${skipped} transaction${skipped > 1 ? "s" : ""} déjà présente${skipped > 1 ? "s" : ""}.`,
+        );
+      } else {
+        toast.success(
+          `${imported} transaction${imported > 1 ? "s" : ""} importée${imported > 1 ? "s" : ""}${skipped > 0 ? ` · ${skipped} doublon${skipped > 1 ? "s" : ""} ignoré${skipped > 1 ? "s" : ""}` : ""}.`,
+        );
+      }
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erreur lors de l'import",

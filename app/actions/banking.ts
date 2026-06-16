@@ -66,6 +66,22 @@ export async function importBankCsvAction(
     return { ok: false, error: tErr("invalidRequest") };
   }
 
+  // Optional : associer l'import à un compte bancaire spécifique.
+  // Le user peut envoyer bank_account_id comme champ du FormData.
+  const bankAccountIdRaw = formData.get("bank_account_id");
+  let bankAccountId: string | null = null;
+  if (typeof bankAccountIdRaw === "string" && bankAccountIdRaw.length > 0) {
+    // Validation : l'id doit appartenir au user (RLS le fera, mais on
+    // valide au passage pour échouer proprement).
+    const { data: acc } = await supabase
+      .from("bank_accounts")
+      .select("id")
+      .eq("id", bankAccountIdRaw)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (acc) bankAccountId = (acc as { id: string }).id;
+  }
+
   const content = await file.text();
   const parsed = parseBankCsv(content);
 
@@ -73,6 +89,7 @@ export async function importBankCsvAction(
     // Aucune transaction extraite : on log l'import en failed
     await supabase.from("bank_imports").insert({
       user_id: user.id,
+      bank_account_id: bankAccountId,
       bank_hint: parsed.bankHint,
       file_name: file.name,
       file_size_bytes: file.size,
@@ -90,6 +107,7 @@ export async function importBankCsvAction(
     .from("bank_imports")
     .insert({
       user_id: user.id,
+      bank_account_id: bankAccountId,
       bank_hint: parsed.bankHint,
       file_name: file.name,
       file_size_bytes: file.size,
@@ -133,6 +151,7 @@ export async function importBankCsvAction(
     rowsToInsert.push({
       user_id: user.id,
       import_id: importId,
+      bank_account_id: bankAccountId,
       dedup_hash: dedupHash,
       transaction_date: tx.date,
       amount: tx.amount,
@@ -331,4 +350,69 @@ export async function ignoreBankTransactionAction(
 
 function sha256(input: string): string {
   return createHash("sha256").update(input).digest("hex");
+}
+
+/* ════════════════════════════════════════════════════════════
+ * CRUD bank_accounts — l'utilisateur nomme ses comptes pour
+ * filtrer les imports et la liste des transactions.
+ * ════════════════════════════════════════════════════════════ */
+
+export type BankAccountInput = {
+  name: string;
+  bank_hint?: string | null;
+  currency?: string;
+  current_balance?: number | null;
+};
+
+export async function createBankAccountAction(
+  input: BankAccountInput,
+): Promise<ActionResult<{ id: string }>> {
+  const tErr = await getActionErrors();
+  if (!isSupabaseConfigured()) return { ok: false, error: tErr("authRequired") };
+  if (!input.name || input.name.trim().length === 0) {
+    return { ok: false, error: tErr("invalidData") };
+  }
+  if (input.name.length > 80) {
+    return { ok: false, error: tErr("invalidData") };
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: tErr("authRequired") };
+  const { data, error } = await supabase
+    .from("bank_accounts")
+    .insert({
+      user_id: user.id,
+      name: input.name.trim(),
+      bank_hint: input.bank_hint ?? null,
+      currency: input.currency ?? "CHF",
+      current_balance: input.current_balance ?? null,
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { ok: false, error: error?.message ?? "insert failed" };
+  revalidatePath("/banking");
+  revalidatePath("/banking/import");
+  return { ok: true, data: { id: (data as { id: string }).id } };
+}
+
+export async function archiveBankAccountAction(
+  id: string,
+): Promise<ActionResult> {
+  const tErr = await getActionErrors();
+  if (!isSupabaseConfigured()) return { ok: false, error: tErr("authRequired") };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: tErr("authRequired") };
+  const { error } = await supabase
+    .from("bank_accounts")
+    .update({ is_archived: true })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/banking");
+  return { ok: true };
 }
