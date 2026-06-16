@@ -416,6 +416,16 @@ export function CoachConversationV3Client({
           borderRadius: 18,
           boxShadow: SHADOW.card,
           overflowY: "auto",
+          // Sprint Iris — durcissement scroll mobile iOS Safari.
+          //  - overscrollBehavior: contain → quand on atteint le haut/bas
+          //    du thread, le scroll ne bouble PAS sur le parent (évite
+          //    que la page entière scroll quand le user pull-down sur le
+          //    thread, ce qui faisait disparaître le composer derrière
+          //    l'URL bar iOS).
+          //  - WebkitOverflowScrolling: touch → momentum scroll natif iOS,
+          //    pour un comportement attendu type ChatGPT/Claude.
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 760, margin: "0 auto" }}>

@@ -326,15 +326,26 @@ export default async function CoachConversationPage({ params }: PageProps) {
           [data-coachid-rail] { display: none !important; }
           [data-coachid-topbar] { padding: 0 16px !important; }
         }
+        /* Sprint Iris — durcissement scroll page entière mobile iOS.
+           - body overscroll-behavior: contain → bloque le rubber-band
+             qui ferait disparaître le composer derrière l'URL bar quand
+             l'utilisateur pull-down/pull-up sur le thread.
+           - html/body height clamped à 100dvh = source de vérité unique
+             du viewport visible. */
+        html, body { overscroll-behavior: contain; }
       `}</style>
       <MobileNav />
       <div
         style={{
           display: "flex",
-          // dvh : iOS Safari adapte à la hauteur réelle. Fallback
-          // 100vh pour browsers anciens (Safari < 15.4).
-          height: "100vh",
-          minHeight: "100dvh",
+          // Sprint Iris — 100dvh source unique. Le 100vh prior était
+          // l'ancienne approche fallback pour Safari < 15.4 (mars 2022).
+          // Tous les iPhones avec iOS supporté en 2026 ont dvh natif —
+          // garder 100vh comme height initial créait un overflow latent
+          // avant que maxHeight 100dvh ne clampe, ce qui pouvait
+          // momentanément pousser le composer hors viewport au changement
+          // d'URL bar.
+          height: "100dvh",
           maxHeight: "100dvh",
           overflow: "hidden",
           backgroundColor: C.pageBg,
@@ -412,11 +423,27 @@ function ChatColumn({
   recentConversationsCount: number;
   conversationTitle: string;
 }) {
-  // Sprint Coach IA — sticky composer fix.
-  // ChatColumn doit remplir la grid cell (height 100% + minHeight 0)
-  // ET être un flex container où SEUL CoachConversationV3Client
-  // grandit (flex: 1). Sans ça, la conversation pousse le composer
-  // hors écran après 20+ messages (bug P0-5).
+  // Sprint Coach IA — sticky composer fix (V2 — vraie correction).
+  //
+  // Root cause de la régression précédente : un wrapper flex ROW
+  // (display:flex sans flexDirection) entre ChatColumn et
+  // CoachConversationV3Client. Le `flex: 1` à la racine du client
+  // était interprété en croissance HORIZONTALE au lieu de verticale,
+  // donc sa hauteur retombait sur l'intrinsèque (contenu) → thread
+  // long faisait grandir la colonne au-delà de la grid cell, composer
+  // hors écran.
+  //
+  // Bonne structure :
+  //   ChatColumn (flex column, height 100% de la grid cell)
+  //   ├─ CoachHero (intrinsèque)
+  //   ├─ CoachConversationV3Client (flex:1 minHeight:0 → grandit
+  //   │  verticalement, son thread interne flex:1 + overflow:auto)
+  //   └─ PrivacyFooter (intrinsèque)
+  //
+  // CSS Grid : ChatColumn est dans une grid cell `gridTemplateRows: 1fr`,
+  // align-self:stretch par défaut. Le `height: 100%` garantit que les
+  // navigateurs où align-self stretch est mal résolu (vieux Safari iOS)
+  // ne basculent pas en height:auto.
   return (
     <div
       style={{
@@ -433,14 +460,12 @@ function ChatColumn({
         recentOtherConversationId={recentOtherConversationId}
         recentConversationsCount={recentConversationsCount}
       />
-      <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
-        <CoachConversationV3Client
-          conversationId={conversationId}
-          initialMessages={initialMessages}
-          isDemo={isDemo}
-          suggestions={suggestions}
-        />
-      </div>
+      <CoachConversationV3Client
+        conversationId={conversationId}
+        initialMessages={initialMessages}
+        isDemo={isDemo}
+        suggestions={suggestions}
+      />
       <PrivacyFooter />
     </div>
   );
