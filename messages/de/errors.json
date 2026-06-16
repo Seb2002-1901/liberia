@@ -48,7 +48,8 @@
     "planStepNotFound": "Kein passender Planschritt gefunden.",
     "planStepAmbiguous": "Mehrere Schritte passen. Bitte präzisiere Nummer oder Titel.",
     "memoryNotFound": "Keine passende Gedächtnisnotiz gefunden.",
-    "memoryAmbiguous": "Mehrere Notizen passen. Bitte präzisiere."
+    "memoryAmbiguous": "Mehrere Notizen passen. Bitte präzisiere.",
+    "csvParseFailed": "CSV nicht lesbar — bitte Format prüfen."
   },
   "validation": {
     "emailRequired": "E-Mail erforderlich",

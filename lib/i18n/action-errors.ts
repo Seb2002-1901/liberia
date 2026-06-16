@@ -59,7 +59,8 @@ export type ActionErrorKey =
   | "planStepNotFound"
   | "planStepAmbiguous"
   | "memoryNotFound"
-  | "memoryAmbiguous";
+  | "memoryAmbiguous"
+  | "csvParseFailed";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string

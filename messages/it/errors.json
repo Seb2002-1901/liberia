@@ -48,7 +48,8 @@
     "planStepNotFound": "Nessuna fase del piano corrisponde.",
     "planStepAmbiguous": "Più fasi corrispondono. Specifica il numero o il titolo esatto.",
     "memoryNotFound": "Nessuna nota di memoria corrisponde.",
-    "memoryAmbiguous": "Più note corrispondono. Sii più preciso."
+    "memoryAmbiguous": "Più note corrispondono. Sii più preciso.",
+    "csvParseFailed": "Impossibile leggere il CSV — verifica il formato."
   },
   "validation": {
     "emailRequired": "Email richiesta",

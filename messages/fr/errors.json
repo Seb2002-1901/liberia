@@ -48,7 +48,8 @@
     "planStepNotFound": "Aucune étape de plan ne correspond.",
     "planStepAmbiguous": "Plusieurs étapes correspondent. Précise le numéro ou le titre exact.",
     "memoryNotFound": "Aucune note de mémoire ne correspond.",
-    "memoryAmbiguous": "Plusieurs notes correspondent. Précise."
+    "memoryAmbiguous": "Plusieurs notes correspondent. Précise.",
+    "csvParseFailed": "Impossible de lire le fichier CSV — vérifie le format ou contacte ta banque pour exporter un fichier valide."
   },
   "validation": {
     "emailRequired": "Email requis",

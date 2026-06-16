@@ -48,7 +48,8 @@
     "planStepNotFound": "Ninguna etapa del plan coincide.",
     "planStepAmbiguous": "Varias etapas coinciden. Especifica el número o título exacto.",
     "memoryNotFound": "Ninguna nota de memoria coincide.",
-    "memoryAmbiguous": "Varias notas coinciden. Sé más preciso."
+    "memoryAmbiguous": "Varias notas coinciden. Sé más preciso.",
+    "csvParseFailed": "No se puede leer el CSV — verifica el formato."
   },
   "validation": {
     "emailRequired": "Email requerido",

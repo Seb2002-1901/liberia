@@ -48,7 +48,8 @@
     "planStepNotFound": "No matching plan step.",
     "planStepAmbiguous": "Several steps match. Specify the number or exact title.",
     "memoryNotFound": "No memory note matches.",
-    "memoryAmbiguous": "Several notes match. Be more specific."
+    "memoryAmbiguous": "Several notes match. Be more specific.",
+    "csvParseFailed": "Unable to read CSV — verify the format or export a fresh file from your bank."
   },
   "validation": {
     "emailRequired": "Email required",
