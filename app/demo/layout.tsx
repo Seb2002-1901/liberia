@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { AppShell } from "@/components/layout/app-shell";
+import { V3Shell } from "@/components/layout/v3-shell";
 import { getDemoProfile } from "@/lib/demo/data";
 
 export default async function DemoLayout({
@@ -9,13 +9,16 @@ export default async function DemoLayout({
 }) {
   const t = await getTranslations("app.demo.data");
   const demoProfile = getDemoProfile((key: string) => t(key));
+  const firstName =
+    demoProfile.full_name?.split(" ")[0]?.trim() || null;
   return (
-    <AppShell
-      user={{ fullName: demoProfile.full_name, email: demoProfile.email }}
-      plan="free"
-      isDemo
+    <V3Shell
+      firstName={firstName}
+      fullName={demoProfile.full_name ?? null}
+      activeHref="/design-match/dashboard-v3"
+      topbarSubtitle="Mode démo"
     >
       {children}
-    </AppShell>
+    </V3Shell>
   );
 }

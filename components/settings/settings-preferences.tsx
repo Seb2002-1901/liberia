@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import {
+  V3Switch,
+  V3InlineButton,
+  V3_TOKENS as C,
+} from "@/components/ui/v3-atoms";
 import {
   deleteAccount,
   exportUserData,
@@ -15,6 +17,12 @@ import {
   setNotificationAlerts,
   type EmailPreferenceKey,
 } from "@/app/actions/settings";
+
+/**
+ * Refonte V3 — Phase Hardening.
+ * Plus aucune dépendance shadcn. V3Switch + V3InlineButton.
+ * Logique server actions inchangée.
+ */
 
 interface SettingsPreferencesProps {
   weeklyEnabled: boolean;
@@ -45,148 +53,261 @@ export function SettingsPreferences({
   const [inactivity, setInactivity] = React.useState(inactivityFollowupEnabled);
   const [analytics, setAnalytics] = React.useState(analyticsEnabled);
   const [pending, startTransition] = React.useTransition();
+  const [lastSavedKey, setLastSavedKey] = React.useState<string | null>(null);
 
-  const onWeeklyChange = (v: boolean) => {
-    setWeekly(v);
+  const handleSave = (
+    key: string,
+    setter: React.Dispatch<React.SetStateAction<boolean>>,
+    prev: boolean,
+    next: boolean,
+    action: () => Promise<{ ok: true } | { ok: false; error: string }>,
+  ) => {
+    setter(next);
     startTransition(async () => {
-      const res = await setEmailWeeklySummary(v);
+      const res = await action();
       if (!res.ok) {
-        setWeekly(!v);
+        setter(prev);
         toast.error(res.error);
+        return;
       }
+      setLastSavedKey(key);
     });
   };
-
-  const onAlertsChange = (v: boolean) => {
-    setAlerts(v);
-    startTransition(async () => {
-      const res = await setNotificationAlerts(v);
-      if (!res.ok) {
-        setAlerts(!v);
-        toast.error(res.error);
-      }
-    });
-  };
-
-  const makePrefHandler =
-    (
-      key: EmailPreferenceKey,
-      setter: React.Dispatch<React.SetStateAction<boolean>>,
-    ) =>
-    (v: boolean) => {
-      setter(v);
-      startTransition(async () => {
-        const res = await setEmailPreference(key, v);
-        if (!res.ok) {
-          setter(!v);
-          toast.error(res.error);
-        }
-      });
-    };
 
   return (
-    <div className="space-y-5">
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <Row
         title={t("weekly.title")}
         description={t("weekly.description")}
-        control={
-          <Switch checked={weekly} onCheckedChange={onWeeklyChange} disabled={pending} />
+        checked={weekly}
+        onChange={(v) =>
+          handleSave(
+            "weekly",
+            setWeekly,
+            weekly,
+            v,
+            async () => await setEmailWeeklySummary(v),
+          )
         }
+        disabled={pending}
+        savedJustNow={lastSavedKey === "weekly"}
       />
       <Row
         title={t("alerts.title")}
         description={t("alerts.description")}
-        control={
-          <Switch checked={alerts} onCheckedChange={onAlertsChange} disabled={pending} />
+        checked={alerts}
+        onChange={(v) =>
+          handleSave(
+            "alerts",
+            setAlerts,
+            alerts,
+            v,
+            async () => await setNotificationAlerts(v),
+          )
         }
+        disabled={pending}
+        savedJustNow={lastSavedKey === "alerts"}
       />
-      <Row
+      <PrefRow
+        keyName="email_encouragement"
         title={t("encouragement.title")}
         description={t("encouragement.description")}
-        control={
-          <Switch
-            checked={encouragement}
-            onCheckedChange={makePrefHandler("email_encouragement", setEncouragement)}
-            disabled={pending}
-          />
-        }
+        checked={encouragement}
+        setChecked={setEncouragement}
+        handleSave={handleSave}
+        pending={pending}
+        savedJustNow={lastSavedKey === "email_encouragement"}
       />
-      <Row
+      <PrefRow
+        keyName="email_goal_milestones"
         title={t("milestones.title")}
         description={t("milestones.description")}
-        control={
-          <Switch
-            checked={milestones}
-            onCheckedChange={makePrefHandler("email_goal_milestones", setMilestones)}
-            disabled={pending}
-          />
-        }
+        checked={milestones}
+        setChecked={setMilestones}
+        handleSave={handleSave}
+        pending={pending}
+        savedJustNow={lastSavedKey === "email_goal_milestones"}
       />
-      <Row
+      <PrefRow
+        keyName="email_inactivity_followup"
         title={t("inactivity.title")}
         description={t("inactivity.description")}
-        control={
-          <Switch
-            checked={inactivity}
-            onCheckedChange={makePrefHandler("email_inactivity_followup", setInactivity)}
-            disabled={pending}
-          />
-        }
+        checked={inactivity}
+        setChecked={setInactivity}
+        handleSave={handleSave}
+        pending={pending}
+        savedJustNow={lastSavedKey === "email_inactivity_followup"}
       />
-      <Row
+      <PrefRow
+        keyName="email_trial_reminders"
         title={t("trial.title")}
         description={t("trial.description")}
-        control={
-          <Switch
-            checked={trial}
-            onCheckedChange={makePrefHandler("email_trial_reminders", setTrial)}
-            disabled={pending}
-          />
-        }
+        checked={trial}
+        setChecked={setTrial}
+        handleSave={handleSave}
+        pending={pending}
+        savedJustNow={lastSavedKey === "email_trial_reminders"}
       />
       <Row
         title={t("analytics.title")}
         description={t("analytics.description")}
-        control={
-          <Switch
-            checked={analytics}
-            onCheckedChange={(v) => {
-              setAnalytics(v);
-              startTransition(async () => {
-                const res = await setAnalyticsOptOut(!v);
-                if (!res.ok) {
-                  setAnalytics(!v);
-                  toast.error(res.error);
-                }
-              });
-            }}
-            disabled={pending}
-          />
-        }
+        checked={analytics}
+        onChange={(v) => {
+          handleSave(
+            "analytics",
+            setAnalytics,
+            analytics,
+            v,
+            async () => await setAnalyticsOptOut(!v),
+          );
+        }}
+        disabled={pending}
+        savedJustNow={lastSavedKey === "analytics"}
       />
     </div>
+  );
+}
+
+function PrefRow({
+  keyName,
+  title,
+  description,
+  checked,
+  setChecked,
+  handleSave,
+  pending,
+  savedJustNow,
+}: {
+  keyName: EmailPreferenceKey;
+  title: string;
+  description: string;
+  checked: boolean;
+  setChecked: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSave: (
+    key: string,
+    setter: React.Dispatch<React.SetStateAction<boolean>>,
+    prev: boolean,
+    next: boolean,
+    action: () => Promise<{ ok: true } | { ok: false; error: string }>,
+  ) => void;
+  pending: boolean;
+  savedJustNow: boolean;
+}) {
+  return (
+    <Row
+      title={title}
+      description={description}
+      checked={checked}
+      onChange={(v) =>
+        handleSave(
+          keyName,
+          setChecked,
+          checked,
+          v,
+          async () => await setEmailPreference(keyName, v),
+        )
+      }
+      disabled={pending}
+      savedJustNow={savedJustNow}
+    />
   );
 }
 
 function Row({
   title,
   description,
-  control,
+  checked,
+  onChange,
+  disabled,
+  savedJustNow,
 }: {
   title: string;
   description: string;
-  control: React.ReactNode;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+  savedJustNow?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 14,
+        padding: "14px 0",
+        borderBottom: `1px solid ${C.borderGhost}`,
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 13.5,
+              fontWeight: 600,
+              color: C.textDark,
+              lineHeight: 1.35,
+            }}
+          >
+            {title}
+          </p>
+          {savedJustNow && <SavedDot />}
+        </div>
+        <p
+          style={{
+            margin: "4px 0 0 0",
+            fontSize: 12,
+            color: C.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          {description}
+        </p>
       </div>
-      {control}
+      <V3Switch
+        checked={checked}
+        onCheckedChange={onChange}
+        disabled={disabled}
+        ariaLabel={title}
+      />
     </div>
   );
 }
+
+function SavedDot() {
+  return (
+    <span
+      aria-label="Sauvegardé"
+      title="Sauvegardé"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 14,
+        height: 14,
+        borderRadius: 999,
+        backgroundColor: C.success,
+        flexShrink: 0,
+      }}
+    >
+      <svg
+        width="8"
+        height="8"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </span>
+  );
+}
+
+/* ════════════ Export buttons (export + delete) ════════════ */
 
 export function DataExportButton() {
   const t = useTranslations("app.settings.data");
@@ -216,10 +337,9 @@ export function DataExportButton() {
   };
 
   return (
-    <Button variant="outline" onClick={onClick} disabled={pending}>
-      {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+    <V3InlineButton variant="ghost" onClick={onClick} loading={pending}>
       {t("exportCta")}
-    </Button>
+    </V3InlineButton>
   );
 }
 
@@ -242,26 +362,16 @@ export function DeleteAccountButton() {
       if (res && !res.ok) {
         toast.error(res.error);
       }
-      // On success, deleteAccount() redirects — we won't get here.
     } catch {
-      // redirect() throws — this is the success path. A real network
-      // failure also lands here; the finally below ensures the button
-      // unlocks so the user can retry instead of staring at a forever
-      // spinner.
+      // redirect() throws — success path
     } finally {
       setPending(false);
     }
   };
 
   return (
-    <Button
-      variant="outline"
-      onClick={onClick}
-      disabled={pending}
-      className="text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/0.08)]"
-    >
-      {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+    <V3InlineButton variant="danger" onClick={onClick} loading={pending}>
       {t("deleteCta")}
-    </Button>
+    </V3InlineButton>
   );
 }

@@ -46,7 +46,21 @@ export type ActionErrorKey =
   | "coachStreamError"
   | "premiumRequired"
   | "premiumLapsed"
-  | "newConversationDefaultTitle";
+  | "newConversationDefaultTitle"
+  | "transcriptionUnavailable"
+  | "transcribeFailed"
+  | "audioTooLarge"
+  | "goalNotFound"
+  | "goalAmbiguous"
+  | "expenseNotFound"
+  | "expenseAmbiguous"
+  | "incomeNotFound"
+  | "incomeAmbiguous"
+  | "planStepNotFound"
+  | "planStepAmbiguous"
+  | "memoryNotFound"
+  | "memoryAmbiguous"
+  | "csvParseFailed";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string

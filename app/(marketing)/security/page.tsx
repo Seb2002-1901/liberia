@@ -10,8 +10,18 @@ import {
   UserCheck,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
+
+const C = {
+  navy: "#011E5F",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+};
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.securityPage.metadata");
@@ -39,22 +49,66 @@ export default async function SecurityPage() {
   const sections = t.raw("sections") as Section[];
 
   return (
-    <article className="container max-w-3xl py-16">
-      <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--gold))]">
+    <article
+      className="container"
+      style={{
+        maxWidth: 880,
+        padding: "64px 24px",
+        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        color: C.textDark,
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11,
+          fontWeight: 700,
+          color: C.primary,
+          letterSpacing: "0.22em",
+          textTransform: "uppercase",
+        }}
+      >
         {t("eyebrow")}
       </p>
-      <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+      <h1
+        style={{
+          margin: "14px 0 0 0",
+          fontFamily: FONT_DISPLAY,
+          fontSize: 36,
+          fontWeight: 700,
+          letterSpacing: "-0.02em",
+          color: C.textDark,
+          lineHeight: 1.1,
+        }}
+      >
         {t("title")}
       </h1>
-      <p className="mt-4 max-w-2xl text-muted-foreground">{t("intro")}</p>
+      <p
+        style={{
+          margin: "14px 0 0 0",
+          fontSize: 15,
+          color: C.textMuted,
+          lineHeight: 1.6,
+          maxWidth: 640,
+        }}
+      >
+        {t("intro")}
+      </p>
 
-      <div className="mt-10 grid gap-3 sm:grid-cols-2">
+      <div
+        style={{
+          marginTop: 36,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+          gap: 12,
+        }}
+      >
         {pillars.map((p, i) => {
           const Icon = PILLAR_ICONS[i] ?? Lock;
           return (
             <PillarCard
               key={i}
-              icon={<Icon className="h-4 w-4" />}
+              icon={<Icon width={16} height={16} />}
               title={p.title}
               body={p.body}
             />
@@ -62,27 +116,69 @@ export default async function SecurityPage() {
         })}
       </div>
 
-      {sections.map((s, i) => (
-        <Fragment key={i}>
-          <section className="mt-12 space-y-3">
-            <h2 className="font-display text-2xl font-semibold tracking-tight">
-              {s.heading}
-            </h2>
-            <div
-              className="space-y-2 text-sm text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: s.html }}
-            />
-          </section>
-        </Fragment>
-      ))}
+      <div style={{ marginTop: 48, display: "flex", flexDirection: "column", gap: 26 }}>
+        {sections.map((s, i) => (
+          <Fragment key={i}>
+            <section style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: C.textDark,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {s.heading}
+              </h2>
+              <div
+                style={{
+                  fontSize: 14.5,
+                  color: C.textMuted,
+                  lineHeight: 1.65,
+                }}
+                dangerouslySetInnerHTML={{ __html: s.html }}
+              />
+            </section>
+          </Fragment>
+        ))}
+      </div>
 
-      <div className="mt-12 flex flex-wrap gap-3">
-        <Button asChild variant="gold">
-          <Link href={ROUTES.privacy}>{t("ctaPrivacy")}</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href={ROUTES.aiPolicy}>{t("ctaAiPolicy")}</Link>
-        </Button>
+      <div style={{ marginTop: 48, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Link
+          href={ROUTES.privacy}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "13px 22px",
+            backgroundColor: C.navy,
+            color: "white",
+            fontSize: 14,
+            fontWeight: 600,
+            borderRadius: 11,
+            textDecoration: "none",
+          }}
+        >
+          {t("ctaPrivacy")}
+        </Link>
+        <Link
+          href={ROUTES.aiPolicy}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "13px 22px",
+            backgroundColor: C.cardBg,
+            color: C.textDark,
+            fontSize: 14,
+            fontWeight: 500,
+            borderRadius: 11,
+            textDecoration: "none",
+            border: `1px solid ${C.borderGhost}`,
+          }}
+        >
+          {t("ctaAiPolicy")}
+        </Link>
       </div>
     </article>
   );
@@ -98,15 +194,50 @@ function PillarCard({
   body: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/40 p-5">
+    <div
+      style={{
+        padding: "20px 22px",
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.borderGhost}`,
+        borderRadius: 14,
+      }}
+    >
       <span
         aria-hidden
-        className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 32,
+          height: 32,
+          borderRadius: 10,
+          backgroundColor: C.primaryBg,
+          color: C.primary,
+        }}
       >
         {icon}
       </span>
-      <p className="mt-3 text-sm font-medium">{title}</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{body}</p>
+      <p
+        style={{
+          margin: "14px 0 0 0",
+          fontSize: 14,
+          fontWeight: 600,
+          color: C.textDark,
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {title}
+      </p>
+      <p
+        style={{
+          margin: "5px 0 0 0",
+          fontSize: 12.5,
+          color: C.textMuted,
+          lineHeight: 1.55,
+        }}
+      >
+        {body}
+      </p>
     </div>
   );
 }

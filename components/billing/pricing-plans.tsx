@@ -7,10 +7,34 @@ import { useLocale, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckoutButton } from "@/components/billing/checkout-button";
-import { PLANS } from "@/lib/constants";
-import { TRIAL_DAYS, YEARLY_SAVINGS_CHF } from "@/lib/stripe/config";
+import {
+  PLANS,
+  type PlanTierId,
+  type PlanIntervalId,
+  type PlanId,
+} from "@/lib/constants";
+import {
+  TRIAL_DAYS,
+  YEARLY_SAVINGS_CHF,
+  STRIPE_PLANS,
+} from "@/lib/stripe/config";
 import { getLocaleForLanguage } from "@/lib/locale/languages";
 import { cn } from "@/lib/utils";
+
+/**
+ * Phase 6 — Pricing UI 2 tiers × 2 intervalles.
+ *
+ * Affichage : 4 cartes en grille 2×2 sur desktop, 1 colonne en mobile.
+ * L'utilisateur voit immédiatement le différentiel Standard ↔ Premium
+ * et le différentiel Mensuel ↔ Annuel (avec économie annuelle visible).
+ *
+ * Notes business (cf. lib/constants/index.ts) :
+ *   - Pas de plan gratuit.
+ *   - Essai 14 jours, carte requise à l'inscription.
+ *   - Aucun prélèvement pendant l'essai. Annulable avant la fin pour
+ *     ne rien payer.
+ *   - Démo accessible sans compte (/demo) — données non sauvegardées.
+ */
 
 type Variant = "marketing" | "in-app";
 
@@ -20,65 +44,69 @@ interface PricingPlansProps {
   currentPriceId?: string | null;
 }
 
+const TIER_ORDER: readonly PlanTierId[] = ["standard", "premium"];
+const INTERVAL_ORDER: readonly PlanIntervalId[] = ["monthly", "yearly"];
+
 export function PricingPlans({
   variant = "marketing",
   isAuthenticated = false,
   currentPriceId = null,
 }: PricingPlansProps) {
   return (
-    <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2">
-      <PlanCard
-        planKey="monthly"
-        plan={PLANS.monthly}
-        variant={variant}
-        isAuthenticated={isAuthenticated}
-        isCurrent={isCurrentPlan("premium_monthly", currentPriceId)}
-      />
-      <PlanCard
-        planKey="yearly"
-        plan={PLANS.yearly}
-        variant={variant}
-        highlight
-        isAuthenticated={isAuthenticated}
-        isCurrent={isCurrentPlan("premium_yearly", currentPriceId)}
-      />
+    <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-2">
+      {TIER_ORDER.map((tier) =>
+        INTERVAL_ORDER.map((interval) => {
+          const plan = PLANS[tier];
+          const sku = plan[interval];
+          const planId = sku.id as PlanId;
+          return (
+            <PlanCard
+              key={planId}
+              tier={tier}
+              interval={interval}
+              planId={planId}
+              variant={variant}
+              isAuthenticated={isAuthenticated}
+              isCurrent={isCurrentPlan(planId, currentPriceId)}
+            />
+          );
+        }),
+      )}
     </div>
   );
 }
 
 function isCurrentPlan(
-  planId: "premium_monthly" | "premium_yearly",
+  planId: PlanId,
   currentPriceId: string | null,
 ): boolean {
   if (!currentPriceId) return false;
-  const expected =
-    planId === "premium_monthly"
-      ? process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY
-      : process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY;
+  const expected = STRIPE_PLANS[planId]?.priceId;
   return Boolean(expected) && expected === currentPriceId;
 }
 
-type PlanKey = "monthly" | "yearly";
-type PlanData = (typeof PLANS)["monthly"] | (typeof PLANS)["yearly"];
-
 function PlanCard({
-  planKey,
-  plan,
+  tier,
+  interval,
+  planId,
   variant,
-  highlight,
   isAuthenticated,
   isCurrent,
 }: {
-  planKey: PlanKey;
-  plan: PlanData;
+  tier: PlanTierId;
+  interval: PlanIntervalId;
+  planId: PlanId;
   variant: Variant;
-  highlight?: boolean;
   isAuthenticated: boolean;
   isCurrent: boolean;
 }) {
   const t = useTranslations("app.billing");
   const locale = useLocale();
-  const isYearly = plan.interval === "year";
+  const plan = PLANS[tier];
+  const sku = plan[interval];
+  const isYearly = interval === "yearly";
+  // Premium yearly est l'offre la plus attractive (mise en avant gold).
+  const isHighlight = tier === "premium" && interval === "yearly";
 
   // Subscription is billed in CHF for launch (note on the subscription
   // page), but we format the displayed amount in the user's locale for
@@ -91,14 +119,22 @@ function PlanCard({
       maximumFractionDigits: 2,
     }).format(n);
 
-  const features = t.raw(`plans.${planKey}.features`) as string[];
-  const badge = planKey === "yearly" ? t("plans.yearly.badge") : undefined;
+  // i18n keys structurées par tier+intervalle :
+  //   app.billing.plans.standard.name / .monthly.description /
+  //   .features etc.
+  const features = t.raw(`plans.${tier}.features`) as string[];
+  const tierName = t(`plans.${tier}.name`);
+  const intervalLabel = isYearly ? t("perYear") : t("perMonth");
+  const intervalSlug = isYearly ? t("intervalYearly") : t("intervalMonthly");
+  const description = t(`plans.${tier}.${interval}.description`);
+  const badge = isHighlight ? t("plans.recommendedBadge") : undefined;
+  const yearlySavings = YEARLY_SAVINGS_CHF[tier];
 
   return (
     <div
       className={cn(
         "relative rounded-2xl border p-7 backdrop-blur-sm",
-        highlight
+        isHighlight
           ? "border-[hsl(var(--gold)/0.4)] bg-gradient-to-br from-[hsl(var(--gold)/0.06)] via-card/40 to-card/40 shadow-[0_30px_80px_-40px_hsl(var(--gold)/0.35)]"
           : "border-border/60 bg-card/40",
       )}
@@ -120,27 +156,23 @@ function PlanCard({
       )}
 
       <p className="text-sm font-medium text-muted-foreground">
-        {t(`plans.${planKey}.name`)}
+        {tierName} · {intervalSlug}
       </p>
       <div className="mt-1.5 flex items-baseline gap-1">
         <span className="font-display text-4xl font-semibold">
-          {fmt(plan.priceCHF)}
+          {fmt(sku.priceCHF)}
         </span>
-        <span className="text-sm text-muted-foreground">
-          / {isYearly ? t("perYear") : t("perMonth")}
-        </span>
+        <span className="text-sm text-muted-foreground">/ {intervalLabel}</span>
       </div>
       {isYearly ? (
         <p className="mt-1 text-xs text-[hsl(var(--gold))]">
           {t("yearlySavings", {
-            monthly: fmt(plan.monthlyEquivalentCHF),
-            savings: fmt(YEARLY_SAVINGS_CHF),
+            monthly: fmt(sku.monthlyEquivalentCHF),
+            savings: fmt(yearlySavings),
           })}
         </p>
       ) : null}
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t(`plans.${planKey}.description`)}
-      </p>
+      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
 
       <div className="mt-6">
         {isCurrent ? (
@@ -149,14 +181,14 @@ function PlanCard({
           </Button>
         ) : variant === "in-app" && isAuthenticated ? (
           <CheckoutButton
-            planId={plan.id}
+            planId={planId}
             label={isYearly ? t("ctaStartYearly") : t("ctaStartMonthly")}
-            variant={highlight ? "gold" : "outline"}
+            variant={isHighlight ? "gold" : "outline"}
           />
         ) : (
           <Button
             asChild
-            variant={highlight ? "gold" : "outline"}
+            variant={isHighlight ? "gold" : "outline"}
             className="w-full"
             size="lg"
           >
@@ -173,7 +205,7 @@ function PlanCard({
             <span
               className={cn(
                 "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
-                highlight
+                isHighlight
                   ? "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]"
                   : "bg-secondary text-foreground",
               )}

@@ -14,7 +14,6 @@ import {
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StabilityCard } from "@/components/dashboard/stability-card";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -92,18 +91,72 @@ export default async function DemoDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.06)] p-4 text-sm">
-        <p className="font-medium text-[hsl(var(--gold))]">
+      {/* Bannière mode démo V3 — navy/blanc cohérent avec le shell V3. */}
+      <div
+        style={{
+          padding: "16px 18px",
+          borderRadius: 14,
+          backgroundColor: "#EDF2FD",
+          border: "1px solid rgba(37, 99, 235, 0.18)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13.5,
+            fontWeight: 600,
+            color: "#011E5F",
+          }}
+        >
           {t("banner.title")}
         </p>
-        <p className="text-muted-foreground">{t("banner.body")}</p>
-        <div className="mt-3 flex gap-2">
-          <Button asChild variant="gold" size="sm">
-            <Link href={ROUTES.register}>{t("banner.createCta")}</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={ROUTES.login}>{t("banner.loginCta")}</Link>
-          </Button>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12.5,
+            color: "#64748B",
+            lineHeight: 1.5,
+          }}
+        >
+          {t("banner.body")}
+        </p>
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+          <Link
+            href={ROUTES.register}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "8px 14px",
+              backgroundColor: "#011E5F",
+              color: "white",
+              fontSize: 12.5,
+              fontWeight: 600,
+              borderRadius: 9,
+              textDecoration: "none",
+            }}
+          >
+            {t("banner.createCta")}
+          </Link>
+          <Link
+            href={ROUTES.login}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "8px 14px",
+              backgroundColor: "white",
+              color: "#0F172A",
+              fontSize: 12.5,
+              fontWeight: 500,
+              borderRadius: 9,
+              border: "1px solid #E5E9F0",
+              textDecoration: "none",
+            }}
+          >
+            {t("banner.loginCta")}
+          </Link>
         </div>
       </div>
 
@@ -220,7 +273,10 @@ export default async function DemoDashboardPage() {
 function RecoTip({ label, text }: { label: string; text: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--gold))]" />
+      <span
+        className="mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full"
+        style={{ backgroundColor: "#2563EB" }}
+      />
       <p>
         <span className="font-medium text-foreground">{label}.</span> {text}
       </p>

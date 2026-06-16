@@ -1,27 +1,10 @@
-import { Hero } from "@/components/marketing/hero";
-import {
-  CtaSection,
-  FaqSection,
-  FeaturesSection,
-  HowItWorks,
-  ProblemSection,
-  SecuritySection,
-  SolutionSection,
-} from "@/components/marketing/sections";
-import { PricingPreview } from "@/components/marketing/pricing-preview";
+import { LandingV3, LandingV3Styles } from "@/components/marketing/landing-v3";
 
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <ProblemSection />
-      <SolutionSection />
-      <HowItWorks />
-      <FeaturesSection />
-      <SecuritySection />
-      <PricingPreview />
-      <FaqSection />
-      <CtaSection />
+      <LandingV3Styles />
+      <LandingV3 />
     </>
   );
 }

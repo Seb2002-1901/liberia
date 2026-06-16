@@ -5,27 +5,53 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   resetPasswordSchema,
   type ResetPasswordInput,
 } from "@/lib/validations/auth";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ROUTES } from "@/lib/constants";
+import { V3Field, V3Input, V3PrimaryButton } from "./login-form";
+import { localizeAuthError } from "@/lib/auth/error-messages";
+
+/**
+ * Refonte V3 — Phase Auth-V3.
+ *
+ * Logique CRITIQUE inchangée :
+ *  - useEffect getSession + onAuthStateChange listener PASSWORD_RECOVERY
+ *  - 3 états : "checking" / "ready" / "missing"
+ *  - Cleanup sub.subscription.unsubscribe()
+ *  - supabase.auth.updateUser({ password })
+ *  - router.push(ROUTES.dashboard) après succès
+ *
+ * JSX visuel : charte navy V3 inline.
+ */
 
 type SessionState = "checking" | "ready" | "missing";
+
+const C = {
+  navy: "#011E5F",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  textLight: "#94A3B8",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+  danger: "#DC2626",
+};
+
+const FONT_DISPLAY = "Outfit, Inter, system-ui";
 
 export function ResetPasswordForm() {
   const tForm = useTranslations("auth.reset");
   const tErr = useTranslations();
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
-  const [sessionState, setSessionState] = React.useState<SessionState>("checking");
+  const [sessionState, setSessionState] =
+    React.useState<SessionState>("checking");
 
   React.useEffect(() => {
     let mounted = true;
@@ -72,7 +98,9 @@ export function ResetPasswordForm() {
       const supabase = createClient();
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        toast.error(tForm("failedTitle"), { description: error.message });
+        toast.error(tForm("failedTitle"), {
+          description: localizeAuthError(error.message, tErr),
+        });
         return;
       }
       toast.success(tForm("successTitle"));
@@ -85,71 +113,160 @@ export function ResetPasswordForm() {
 
   if (sessionState === "checking") {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          fontSize: 13,
+          color: C.textMuted,
+        }}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          aria-hidden
+          style={{ animation: "v3-spin 0.7s linear infinite" }}
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            fill="none"
+            stroke={C.textLight}
+            strokeWidth="2.5"
+          />
+          <path
+            d="M12 3a9 9 0 0 1 9 9"
+            fill="none"
+            stroke={C.primary}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
         {tForm("checking")}
+        <style>{`@keyframes v3-spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   if (sessionState === "missing") {
     return (
-      <div className="space-y-4">
-        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: FONT_DISPLAY,
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: C.textDark,
+            lineHeight: 1.15,
+          }}
+        >
           {tForm("invalidTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground">{tForm("invalidBody")}</p>
-        <Button asChild variant="gold" size="lg">
-          <Link href={ROUTES.forgotPassword}>{tForm("requestNew")}</Link>
-        </Button>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: C.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          {tForm("invalidBody")}
+        </p>
+        <Link
+          href={ROUTES.forgotPassword}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "13px 22px",
+            backgroundColor: C.navy,
+            color: "white",
+            fontSize: 14,
+            fontWeight: 600,
+            borderRadius: 11,
+            textDecoration: "none",
+            marginTop: 6,
+          }}
+        >
+          {tForm("requestNew")}
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+      <header style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: FONT_DISPLAY,
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: C.textDark,
+            lineHeight: 1.15,
+          }}
+        >
           {tForm("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">{tForm("subtitle")}</p>
-      </div>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: C.textMuted,
+            lineHeight: 1.5,
+          }}
+        >
+          {tForm("subtitle")}
+        </p>
+      </header>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <div className="space-y-1.5">
-          <Label htmlFor="password">{tForm("labels.password")}</Label>
-          <Input
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        style={{ display: "flex", flexDirection: "column", gap: 16 }}
+      >
+        <V3Field
+          label={tForm("labels.password")}
+          htmlFor="password"
+          error={
+            errors.password?.message ? tErr(errors.password.message) : undefined
+          }
+        >
+          <V3Input
             id="password"
             type="password"
             autoComplete="new-password"
             placeholder={tForm("placeholders.password")}
             {...register("password")}
           />
-          {errors.password?.message && (
-            <p className="text-xs text-[hsl(var(--destructive))]">
-              {tErr(errors.password.message)}
-            </p>
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="confirmPassword">{tForm("labels.confirmPassword")}</Label>
-          <Input
+        </V3Field>
+        <V3Field
+          label={tForm("labels.confirmPassword")}
+          htmlFor="confirmPassword"
+          error={
+            errors.confirmPassword?.message
+              ? tErr(errors.confirmPassword.message)
+              : undefined
+          }
+        >
+          <V3Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             placeholder={tForm("placeholders.confirmPassword")}
             {...register("confirmPassword")}
           />
-          {errors.confirmPassword?.message && (
-            <p className="text-xs text-[hsl(var(--destructive))]">
-              {tErr(errors.confirmPassword.message)}
-            </p>
-          )}
-        </div>
-        <Button type="submit" size="lg" variant="gold" className="w-full" disabled={submitting}>
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+        </V3Field>
+        <V3PrimaryButton type="submit" disabled={submitting} loading={submitting}>
           {tForm("submit")}
-        </Button>
+        </V3PrimaryButton>
       </form>
     </div>
   );

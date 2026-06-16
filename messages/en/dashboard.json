@@ -2,6 +2,241 @@
   "metadata": {
     "title": "Dashboard"
   },
+  "scoreCard": {
+    "eyebrow": "Financial health score",
+    "outOf": "/100",
+    "ariaOpen": "Score {score} out of 100. Click to open details.",
+    "deltaUp": "+{points} pts since last week",
+    "deltaDown": "-{points} pts since last week",
+    "deltaStable": "Score stable this week",
+    "deltaUnavailable": "First reading — come back Sunday for your delta",
+    "emptyTitle": "Score being built",
+    "emptyBody": "Complete your profile to unlock your score.",
+    "delta": {
+      "up": "Improving",
+      "down": "Watch closely",
+      "stable": "Stable"
+    }
+  },
+  "priorityCard": {
+    "eyebrow": "Your current priority",
+    "whyLink": "See why",
+    "title": {
+      "no_goal": "Set a first concrete goal",
+      "low_resilience": "Build your emergency fund",
+      "incomplete_expenses": "Complete your main expenses",
+      "fhs_recommendation": "Follow your best lead",
+      "none": "Keep doing what works"
+    },
+    "subline": {
+      "no_goal": "Without a clear target, your savings have no direction.",
+      "low_resilience": "{months} months of safety available. The minimum target is 1 month.",
+      "incomplete_expenses": "Your profile is incomplete. Add your main expenses for reliable analysis.",
+      "fhs_recommendation": "Your advisor has identified a high-impact action.",
+      "none": "Your foundations are solid. Refine to reach the next level."
+    }
+  },
+  "missionCard": {
+    "eyebrow": "Mission of the moment",
+    "cta": "Take action now",
+    "no_goal": {
+      "title": "Set a first concrete goal",
+      "subline": "A goal gives meaning to every CHF set aside."
+    },
+    "low_resilience": {
+      "title": "Build your first emergency fund",
+      "subline": "Start by saving {suggestedAmount} CHF this month."
+    },
+    "incomplete_expenses": {
+      "title": "Complete your main expenses",
+      "subline": "Add {missingArea} to make your score reliable."
+    },
+    "fhs_recommendation": {
+      "title": "Follow the advisor's recommendation",
+      "subline": "A concrete action to implement this week."
+    },
+    "none": {
+      "title": "Refine to reach the next level",
+      "subline": "Your foundations are solid. Time to optimise."
+    }
+  },
+  "roadmap": {
+    "title": "Your future, our roadmap",
+    "seeAllLink": "See all projections",
+    "eyebrow": {
+      "today": "Today",
+      "fourMonths": "In 4 months",
+      "twelveMonths": "In 12 months",
+      "threeYears": "In 3 years"
+    },
+    "today": {
+      "scoreLabel": "Score {score}",
+      "gettingStartedTitle": "Lay the foundations",
+      "gettingStartedSubtitle": "Complete your profile to unlock your score."
+    },
+    "steps": {
+      "no_goal": {
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
+        "fourMonths": {
+          "title": "First goal set",
+          "subtitle": "You know where you're heading"
+        },
+        "twelveMonths": {
+          "title": "Savings in motion",
+          "subtitle": "Your goal is taking shape"
+        }
+      },
+      "low_resilience": {
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
+        "fourMonths": {
+          "title": "Emergency fund complete",
+          "subtitle": "3 months of expenses covered"
+        },
+        "twelveMonths": {
+          "title": "Savings accelerating",
+          "subtitle": "Your savings are gaining momentum"
+        }
+      },
+      "incomplete_expenses": {
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
+        "fourMonths": {
+          "title": "Complete profile",
+          "subtitle": "Your situation is clear and reliable"
+        },
+        "twelveMonths": {
+          "title": "Expense optimisation",
+          "subtitle": "Your costs are under control"
+        }
+      },
+      "fhs_recommendation": {
+        "today": {
+          "subtitle": "Lay solid foundations"
+        },
+        "fourMonths": {
+          "title": "Action engaged",
+          "subtitle": "Your weak point is being addressed"
+        },
+        "twelveMonths": {
+          "title": "Score strengthened",
+          "subtitle": "Your axes are balanced"
+        }
+      },
+      "none": {
+        "today": {
+          "subtitle": "Your foundations are in place"
+        },
+        "fourMonths": {
+          "title": "Continuous optimisation",
+          "subtitle": "You're refining calmly"
+        },
+        "twelveMonths": {
+          "title": "Comfortable margin",
+          "subtitle": "Your situation is solid"
+        }
+      }
+    },
+    "threeYears": {
+      "emergency_fund": {
+        "title": "Reinforced coverage",
+        "subtitle": "12 months of safety reached"
+      },
+      "debt_payoff": {
+        "title": "Debt repaid",
+        "subtitle": "Your monthly margin is freed up"
+      },
+      "savings": {
+        "title": "Consolidated savings",
+        "subtitle": "Your wealth is taking shape"
+      },
+      "purchase": {
+        "title": "Down payment ready",
+        "subtitle": "Your purchase project is fundable"
+      },
+      "travel": {
+        "title": "Trip funded",
+        "subtitle": "Your project is within reach"
+      },
+      "increase_income": {
+        "title": "Diversified income",
+        "subtitle": "Your income sources have grown"
+      },
+      "other": {
+        "title": "Goal reached",
+        "subtitle": "Your personal project is realised"
+      },
+      "fallback": {
+        "title": "Long-term horizon",
+        "subtitle": "Define your 3-year project"
+      }
+    }
+  },
+  "kpi": {
+    "income": {
+      "label": "Monthly income",
+      "hint": "After tax",
+      "emptyHint": "No income recorded yet"
+    },
+    "expenses": {
+      "label": "Monthly expenses",
+      "hintShare": "{share}% of your income",
+      "emptyHint": "No expense recorded yet"
+    },
+    "remainder": {
+      "label": "Disposable income",
+      "hintShare": "{share}% of your income",
+      "emptyHint": "Not yet comparable"
+    },
+    "emergency": {
+      "label": "Emergency fund",
+      "monthsValue": "{months} months",
+      "hintSavings": "{amount} available",
+      "emptyHint": "Build your first cushion"
+    }
+  },
+  "opportunityHighlight": {
+    "eyebrow": "Opportunity of the moment",
+    "badgeImpact": "Highest impact for you",
+    "impactLabel": "Potential impact:",
+    "impactLevel": {
+      "high": "high",
+      "medium": "medium",
+      "low": "low"
+    },
+    "pointsLabel": "+{points} points on your score",
+    "cta": "Explore how",
+    "emptyTitle": "Your foundations are in place",
+    "emptyBody": "No urgent opportunity detected. Keep doing what works.",
+    "emptyCta": "See my plan"
+  },
+  "repartition": {
+    "eyebrow": "Expense breakdown",
+    "period": "This month",
+    "centerLabel": "this month",
+    "detailLink": "See details",
+    "emptyTitle": "No expense this month",
+    "emptyBody": "Add your expenses to see their breakdown.",
+    "emptyCta": "Add an expense"
+  },
+  "scoreEvolution": {
+    "eyebrow": "Score evolution",
+    "progression": "Your progression",
+    "historyLink": "See history",
+    "ariaChart": "Score evolution, current value {score} out of 100",
+    "calloutLabel": "Current score",
+    "emptyTitle": "No curve yet",
+    "emptyBody": "Come back next week to see your first progression."
+  },
+  "talkToAdvisor": {
+    "title": "Talk to my advisor",
+    "body": "Ask a question, get personalised advice.",
+    "cta": "Start a conversation"
+  },
   "firstMission": {
     "label": "Mission of the moment",
     "whyLabel": "Why:",
@@ -773,5 +1008,8 @@
       "rental": "Rental income",
       "other": "Other"
     }
+  },
+  "topbar": {
+    "subtitle": "Here's your situation, updated today."
   }
 }

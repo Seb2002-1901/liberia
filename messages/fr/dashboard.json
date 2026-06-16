@@ -2,6 +2,241 @@
   "metadata": {
     "title": "Tableau de bord"
   },
+  "scoreCard": {
+    "eyebrow": "Score de santé financière",
+    "outOf": "/100",
+    "ariaOpen": "Score {score} sur 100. Cliquez pour ouvrir le détail.",
+    "deltaUp": "+{points} pts depuis la semaine dernière",
+    "deltaDown": "-{points} pts depuis la semaine dernière",
+    "deltaStable": "Score stable cette semaine",
+    "deltaUnavailable": "Première lecture — reviens dimanche pour ton delta",
+    "emptyTitle": "Score en construction",
+    "emptyBody": "Complète ton profil pour débloquer ton score.",
+    "delta": {
+      "up": "En progression",
+      "down": "À surveiller",
+      "stable": "Stable"
+    }
+  },
+  "priorityCard": {
+    "eyebrow": "Votre priorité actuelle",
+    "whyLink": "Voir pourquoi",
+    "title": {
+      "no_goal": "Poser un premier objectif",
+      "low_resilience": "Construire votre fonds d'urgence",
+      "incomplete_expenses": "Compléter vos charges principales",
+      "fhs_recommendation": "Suivre votre meilleure piste",
+      "none": "Continuer ce que vous faites bien"
+    },
+    "subline": {
+      "no_goal": "Sans cap clair, votre épargne n'a pas de direction.",
+      "low_resilience": "{months} mois de sécurité disponibles. La cible minimale est 1 mois.",
+      "incomplete_expenses": "Votre profil est incomplet. Ajoutez vos dépenses principales pour une analyse fiable.",
+      "fhs_recommendation": "Votre conseiller a identifié une action concrète à fort impact.",
+      "none": "Vos fondations sont en place. Affinez pour passer au palier suivant."
+    }
+  },
+  "missionCard": {
+    "eyebrow": "Mission du moment",
+    "cta": "Agir maintenant",
+    "no_goal": {
+      "title": "Posez un premier objectif chiffré",
+      "subline": "Un objectif donne du sens à chaque CHF mis de côté."
+    },
+    "low_resilience": {
+      "title": "Constituez votre premier fonds d'urgence",
+      "subline": "Commencez par économiser {suggestedAmount} CHF ce mois-ci."
+    },
+    "incomplete_expenses": {
+      "title": "Complétez vos charges principales",
+      "subline": "Ajoutez {missingArea} pour fiabiliser votre score."
+    },
+    "fhs_recommendation": {
+      "title": "Suivez la recommandation du conseiller",
+      "subline": "Une action concrète à mettre en place cette semaine."
+    },
+    "none": {
+      "title": "Affinez pour passer au palier suivant",
+      "subline": "Vos fondations sont solides. Place à l'optimisation."
+    }
+  },
+  "roadmap": {
+    "title": "Votre avenir, notre feuille de route",
+    "seeAllLink": "Voir toutes les projections",
+    "eyebrow": {
+      "today": "Aujourd'hui",
+      "fourMonths": "Dans 4 mois",
+      "twelveMonths": "Dans 12 mois",
+      "threeYears": "Dans 3 ans"
+    },
+    "today": {
+      "scoreLabel": "Score {score}",
+      "gettingStartedTitle": "Posez les bases",
+      "gettingStartedSubtitle": "Complétez votre profil pour débloquer votre score."
+    },
+    "steps": {
+      "no_goal": {
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
+        "fourMonths": {
+          "title": "Premier objectif fixé",
+          "subtitle": "Vous savez où vous allez"
+        },
+        "twelveMonths": {
+          "title": "Épargne en mouvement",
+          "subtitle": "Votre objectif prend forme"
+        }
+      },
+      "low_resilience": {
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
+        "fourMonths": {
+          "title": "Fonds d'urgence complet",
+          "subtitle": "3 mois de dépenses couvertes"
+        },
+        "twelveMonths": {
+          "title": "Épargne en accélération",
+          "subtitle": "Votre épargne prend de l'élan"
+        }
+      },
+      "incomplete_expenses": {
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
+        "fourMonths": {
+          "title": "Profil complet",
+          "subtitle": "Votre situation est claire et fiable"
+        },
+        "twelveMonths": {
+          "title": "Optimisation des dépenses",
+          "subtitle": "Vos charges sont sous contrôle"
+        }
+      },
+      "fhs_recommendation": {
+        "today": {
+          "subtitle": "Posez les bases solides"
+        },
+        "fourMonths": {
+          "title": "Action engagée",
+          "subtitle": "Votre point faible est traité"
+        },
+        "twelveMonths": {
+          "title": "Score renforcé",
+          "subtitle": "Vos axes sont équilibrés"
+        }
+      },
+      "none": {
+        "today": {
+          "subtitle": "Vos fondations sont en place"
+        },
+        "fourMonths": {
+          "title": "Optimisation continue",
+          "subtitle": "Vous affinez sereinement"
+        },
+        "twelveMonths": {
+          "title": "Marge confortable",
+          "subtitle": "Votre situation est solide"
+        }
+      }
+    },
+    "threeYears": {
+      "emergency_fund": {
+        "title": "Couverture renforcée",
+        "subtitle": "12 mois de sécurité atteints"
+      },
+      "debt_payoff": {
+        "title": "Dette remboursée",
+        "subtitle": "Votre marge mensuelle est libérée"
+      },
+      "savings": {
+        "title": "Épargne consolidée",
+        "subtitle": "Votre patrimoine prend forme"
+      },
+      "purchase": {
+        "title": "Apport constitué",
+        "subtitle": "Votre projet d'achat est finançable"
+      },
+      "travel": {
+        "title": "Voyage financé",
+        "subtitle": "Votre projet est à portée de main"
+      },
+      "increase_income": {
+        "title": "Revenus diversifiés",
+        "subtitle": "Vos sources de revenu se sont étoffées"
+      },
+      "other": {
+        "title": "Objectif atteint",
+        "subtitle": "Votre projet personnel est concrétisé"
+      },
+      "fallback": {
+        "title": "Cap long terme",
+        "subtitle": "Définissez votre projet à 3 ans"
+      }
+    }
+  },
+  "kpi": {
+    "income": {
+      "label": "Revenus mensuels",
+      "hint": "Après impôts",
+      "emptyHint": "Pas encore de revenu enregistré"
+    },
+    "expenses": {
+      "label": "Dépenses mensuelles",
+      "hintShare": "{share}% de vos revenus",
+      "emptyHint": "Pas encore de dépense enregistrée"
+    },
+    "remainder": {
+      "label": "Reste à vivre",
+      "hintShare": "{share}% de vos revenus",
+      "emptyHint": "Pas encore comparable"
+    },
+    "emergency": {
+      "label": "Fonds d'urgence",
+      "monthsValue": "{months} mois",
+      "hintSavings": "{amount} disponibles",
+      "emptyHint": "Constituez votre premier coussin"
+    }
+  },
+  "opportunityHighlight": {
+    "eyebrow": "Opportunité du moment",
+    "badgeImpact": "Le plus grand impact pour vous",
+    "impactLabel": "Impact potentiel :",
+    "impactLevel": {
+      "high": "élevé",
+      "medium": "moyen",
+      "low": "faible"
+    },
+    "pointsLabel": "+{points} points sur votre score",
+    "cta": "Explorer comment",
+    "emptyTitle": "Vos fondations sont en place",
+    "emptyBody": "Aucune opportunité urgente détectée. Continuez ce que vous faites bien.",
+    "emptyCta": "Voir mon plan"
+  },
+  "repartition": {
+    "eyebrow": "Répartition des dépenses",
+    "period": "Ce mois-ci",
+    "centerLabel": "ce mois",
+    "detailLink": "Voir le détail",
+    "emptyTitle": "Aucune dépense ce mois-ci",
+    "emptyBody": "Ajoutez vos dépenses pour visualiser leur répartition.",
+    "emptyCta": "Ajouter une dépense"
+  },
+  "scoreEvolution": {
+    "eyebrow": "Évolution du score",
+    "progression": "Votre progression",
+    "historyLink": "Voir l'historique",
+    "ariaChart": "Évolution du score, valeur actuelle {score} sur 100",
+    "calloutLabel": "Score actuel",
+    "emptyTitle": "Pas encore de courbe",
+    "emptyBody": "Revenez la semaine prochaine pour voir votre première progression."
+  },
+  "talkToAdvisor": {
+    "title": "Parler à mon conseiller",
+    "body": "Posez une question, obtenez des conseils personnalisés.",
+    "cta": "Démarrer une conversation"
+  },
   "firstMission": {
     "label": "Mission du moment",
     "whyLabel": "Pourquoi :",
@@ -773,5 +1008,8 @@
       "rental": "Revenus locatifs",
       "other": "Autre"
     }
+  },
+  "topbar": {
+    "subtitle": "Voici votre situation mise à jour aujourd'hui."
   }
 }

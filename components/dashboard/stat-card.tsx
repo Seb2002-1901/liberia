@@ -1,6 +1,20 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+const C = {
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+  success: "#10A37F",
+  successBg: "#ECFDF5",
+  danger: "#DC2626",
+  dangerBg: "#FEF2F2",
+  pageBg: "#F9FAFD",
+};
+
 interface StatCardProps {
   label: string;
   value: string;
@@ -10,6 +24,9 @@ interface StatCardProps {
   className?: string;
 }
 
+/**
+ * Sprint S1 — refonte V3 navy. `gold` mappé sur primary navy/blue (charte V3).
+ */
 export function StatCard({
   label,
   value,
@@ -18,44 +35,69 @@ export function StatCard({
   hint,
   className,
 }: StatCardProps) {
+  const iconStyle = (() => {
+    if (tone === "positive") return { backgroundColor: C.successBg, color: C.success };
+    if (tone === "negative") return { backgroundColor: C.dangerBg, color: C.danger };
+    if (tone === "gold") return { backgroundColor: C.primaryBg, color: C.primary };
+    return { backgroundColor: C.pageBg, color: C.textMuted };
+  })();
+  const valueColor = tone === "negative" ? C.danger : C.textDark;
   return (
     <div
-      className={cn(
-        "rounded-2xl border border-border/60 bg-card/50 p-5 backdrop-blur-sm",
-        className,
-      )}
+      className={cn("rounded-2xl", className)}
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.borderGhost}`,
+        padding: 20,
+      }}
     >
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 11,
+            fontWeight: 600,
+            color: C.textMuted,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
           {label}
         </p>
         {icon && (
           <span
-            className={cn(
-              "inline-flex h-7 w-7 items-center justify-center rounded-lg",
-              tone === "positive"
-                ? "bg-[hsl(var(--success)/0.12)] text-[hsl(var(--success))]"
-                : tone === "negative"
-                ? "bg-[hsl(var(--destructive)/0.12)] text-[hsl(var(--destructive))]"
-                : tone === "gold"
-                ? "bg-[hsl(var(--gold)/0.12)] text-[hsl(var(--gold))]"
-                : "bg-secondary/60 text-muted-foreground",
-            )}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              ...iconStyle,
+            }}
           >
             {icon}
           </span>
         )}
       </div>
       <p
-        className={cn(
-          "mt-3 font-display text-2xl font-semibold sm:text-3xl",
-          tone === "negative" && "text-[hsl(var(--destructive))]",
-          tone === "positive" && "text-foreground",
-        )}
+        style={{
+          margin: "12px 0 0 0",
+          fontFamily: "Outfit, Inter, system-ui",
+          fontSize: 28,
+          fontWeight: 700,
+          color: valueColor,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+        }}
       >
         {value}
       </p>
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
+      {hint && (
+        <p style={{ margin: "6px 0 0 0", fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

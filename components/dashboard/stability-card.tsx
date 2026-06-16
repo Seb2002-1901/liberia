@@ -5,11 +5,29 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { getStabilityTier, type ScoreTierColor } from "@/lib/calculations/finance";
 
+const C = {
+  navy: "#011E5F",
+  cardBg: "#FFFFFF",
+  borderGhost: "#E5E9F0",
+  textDark: "#0F172A",
+  textMuted: "#64748B",
+  primary: "#2563EB",
+  primaryBg: "#EDF2FD",
+  success: "#10A37F",
+  amber: "#F59E0B",
+  danger: "#DC2626",
+  pageBg: "#F9FAFD",
+};
+
 interface StabilityCardProps {
   score: number;
   className?: string;
 }
 
+/**
+ * Sprint S1 — refonte V3 navy. Plus de palette gold/var(--secondary).
+ * Score Ring V3 avec navy/primary/success/amber/danger selon tier.
+ */
 export function StabilityCard({ score, className }: StabilityCardProps) {
   const t = useTranslations("dashboard.stability");
   const tier = getStabilityTier(score);
@@ -20,29 +38,57 @@ export function StabilityCard({ score, className }: StabilityCardProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur-md",
-        className,
-      )}
+      className={cn("relative overflow-hidden rounded-2xl", className)}
+      style={{
+        backgroundColor: C.cardBg,
+        border: `1px solid ${C.borderGhost}`,
+        padding: 24,
+      }}
     >
       <div
-        className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[hsl(var(--gold)/0.06)] blur-3xl"
         aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 55%)",
+          pointerEvents: "none",
+        }}
       />
-      <div className="relative flex items-center gap-6">
+      <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 24 }}>
         <ScoreRing score={score} angle={angle} color={tier.color} />
-        <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11,
+              fontWeight: 600,
+              color: C.textMuted,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
+          >
             {t("label")}
           </p>
-          <div className="flex items-baseline gap-1">
-            <span className="font-display text-4xl font-semibold gold-text">
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+            <span
+              style={{
+                fontFamily: "Outfit, Inter, system-ui",
+                fontSize: 36,
+                fontWeight: 700,
+                color: C.navy,
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
               {score}
             </span>
-            <span className="text-sm text-muted-foreground">/ 100</span>
+            <span style={{ fontSize: 13, color: C.textMuted }}>/ 100</span>
           </div>
-          <p className="text-sm font-medium">{t(`tiers.${tier.color}.label`)}</p>
-          <p className="text-xs text-muted-foreground">
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: C.textDark }}>
+            {t(`tiers.${tier.color}.label`)}
+          </p>
+          <p style={{ margin: 0, fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>
             {t(`tiers.${tier.color}.description`)}
           </p>
         </div>
@@ -62,25 +108,47 @@ function ScoreRing({
 }) {
   const color =
     tierColor === "gold"
-      ? "hsl(var(--gold))"
+      ? C.primary
       : tierColor === "success"
-      ? "hsl(var(--success))"
-      : tierColor === "warning"
-      ? "hsl(var(--warning))"
-      : tierColor === "danger"
-      ? "hsl(var(--destructive))"
-      : "hsl(var(--foreground))";
+        ? C.success
+        : tierColor === "warning"
+          ? C.amber
+          : tierColor === "danger"
+            ? C.danger
+            : C.textDark;
 
   return (
-    <div className="relative h-24 w-24 shrink-0">
+    <div style={{ position: "relative", width: 96, height: 96, flexShrink: 0 }}>
       <div
-        className="absolute inset-0 rounded-full"
         style={{
-          background: `conic-gradient(${color} ${angle}deg, hsl(var(--secondary)) 0deg)`,
+          position: "absolute",
+          inset: 0,
+          borderRadius: 999,
+          background: `conic-gradient(${color} ${angle}deg, ${C.pageBg} 0deg)`,
         }}
       />
-      <div className="absolute inset-1.5 flex items-center justify-center rounded-full bg-card">
-        <span className="font-display text-xl font-semibold">{score}</span>
+      <div
+        style={{
+          position: "absolute",
+          inset: 6,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 999,
+          backgroundColor: C.cardBg,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "Outfit, Inter, system-ui",
+            fontSize: 20,
+            fontWeight: 700,
+            color: C.textDark,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {score}
+        </span>
       </div>
     </div>
   );

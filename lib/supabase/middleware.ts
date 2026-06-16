@@ -19,7 +19,42 @@ const PROTECTED_PREFIXES = [
   "/profile",
   "/settings",
   "/onboarding",
+  "/design-match",
 ];
+
+/**
+ * Mapping route prod → route V3 cible.
+ *
+ * Critique : ces redirections sont effectuées par le middleware AVANT
+ * que les layouts Next.js ne se montent. Sans ça, /dashboard rend
+ * d'abord (app)/layout.tsx (AppShell ancien visuel) puis exécute le
+ * redirect du page.tsx → flash visible ~500 ms après le login.
+ *
+ * Avec ce mapping côté middleware, l'utilisateur passe directement
+ * de /login à /design-match/dashboard-v3 sans jamais matérialiser
+ * un rendu intermédiaire avec AppShell. Zéro flash.
+ *
+ * Les sous-routes prod (ex: /coach/[id], /settings/subscription,
+ * /expenses/analytics, /settings/memory) ne sont PAS mappées ici car
+ * elles vivent hors du groupe (app)/ (donc pas d'AppShell) et restent
+ * accessibles directement.
+ */
+const PROD_TO_V3_REDIRECTS: Record<string, string> = {
+  "/dashboard": "/design-match/dashboard-v3",
+  "/coach": "/design-match/coach-v3",
+  "/mon-analyse": "/design-match/mon-analyse-v3",
+  "/plan": "/design-match/plan-v3",
+  "/incomes": "/design-match/revenus-v3",
+  "/expenses": "/design-match/depenses-v3",
+  "/budget": "/design-match/budget-v3",
+  "/goals": "/design-match/objectifs-v3",
+  "/savings": "/design-match/epargne-v3",
+  // Sprint S1 — module Investissements masqué (page redirect → /epargne).
+  "/investments": "/design-match/epargne-v3",
+  "/opportunities": "/design-match/opportunites-v3",
+  "/profile": "/design-match/profil-v3",
+  "/settings": "/design-match/parametres-v3",
+};
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -27,9 +62,19 @@ export async function updateSession(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Without Supabase configured, fall through (build/dev still works; routes
-  // that need data will show empty / demo-only states).
-  if (!url || !key) return response;
+  // Without Supabase configured (build/dev/demo), Supabase auth checks
+  // are skipped — but on est encore tenu d'appliquer la redirection
+  // prod → V3 sur les stubs (app)/ sinon /dashboard rend l'AppShell
+  // ancien (flash). Ce redirect est une pure réécriture d'URL et ne
+  // dépend pas de l'auth.
+  if (!url || !key) {
+    if (PROD_TO_V3_REDIRECTS[request.nextUrl.pathname]) {
+      const redirect = request.nextUrl.clone();
+      redirect.pathname = PROD_TO_V3_REDIRECTS[request.nextUrl.pathname];
+      return NextResponse.redirect(redirect);
+    }
+    return response;
+  }
 
   const supabase = createServerClient(url, key, {
     cookies: {
@@ -72,14 +117,33 @@ export async function updateSession(request: NextRequest) {
   if (!user && isProtected) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = "/login";
-    redirect.searchParams.set("next", pathname);
+    // Pour le `next` : on enregistre la cible V3 finale si pathname
+    // est une route prod stub. Évite que post-login l'utilisateur
+    // atterrisse sur /dashboard (avec flash AppShell) avant de
+    // re-rebondir sur /design-match/dashboard-v3.
+    const nextTarget = PROD_TO_V3_REDIRECTS[pathname] ?? pathname;
+    redirect.searchParams.set("next", nextTarget);
     return NextResponse.redirect(redirect);
   }
 
   if (user && isAuthRoute) {
     const redirect = request.nextUrl.clone();
-    redirect.pathname = "/dashboard";
+    // Redirection directe vers le dashboard V3 pour éviter le flash
+    // AppShell entre /dashboard stub et /design-match/dashboard-v3.
+    redirect.pathname = "/design-match/dashboard-v3";
     redirect.searchParams.delete("next");
+    return NextResponse.redirect(redirect);
+  }
+
+  // Mapping prod → V3 côté middleware pour les routes stub (app)/.
+  // Critique : sans ce redirect early, le layout (app)/layout.tsx
+  // se monte (AppShell ancien visuel) avant que le redirect de la
+  // page.tsx ne s'exécute. Résultat : flash de l'ancien shell ~500 ms.
+  // Avec ce redirect au niveau middleware, l'utilisateur ne voit
+  // jamais l'AppShell pour ces routes.
+  if (user && PROD_TO_V3_REDIRECTS[pathname]) {
+    const redirect = request.nextUrl.clone();
+    redirect.pathname = PROD_TO_V3_REDIRECTS[pathname];
     return NextResponse.redirect(redirect);
   }
 

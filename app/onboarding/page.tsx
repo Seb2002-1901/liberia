@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { ROUTES } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Bienvenue",
@@ -23,7 +24,9 @@ export default async function OnboardingPage() {
         .select("onboarding_completed")
         .eq("id", user.id)
         .maybeSingle();
-      if (profile?.onboarding_completed) redirect("/dashboard");
+      // ROUTES.dashboard pointe directement sur le dashboard V3 —
+      // évite un hop supplémentaire via le middleware prod → V3.
+      if (profile?.onboarding_completed) redirect(ROUTES.dashboard);
     }
   }
 

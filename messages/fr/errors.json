@@ -35,7 +35,21 @@
     "coachStreamError": "Une erreur temporaire est survenue. Réessaie dans quelques instants.",
     "premiumRequired": "Cette fonction est réservée aux comptes Premium. Démarre ton essai 14 jours pour l'activer.",
     "premiumLapsed": "Ton abonnement n'est plus actif. Reprends ton abonnement pour utiliser cette fonction — tes données restent accessibles.",
-    "newConversationDefaultTitle": "Nouvelle conversation"
+    "newConversationDefaultTitle": "Nouvelle conversation",
+    "transcriptionUnavailable": "Transcription audio non configurée.",
+    "transcribeFailed": "Transcription impossible. Réessaie.",
+    "audioTooLarge": "Audio trop volumineux (max 25 Mo).",
+    "goalNotFound": "Aucun objectif ne correspond à ce nom. Sois plus précis.",
+    "goalAmbiguous": "Plusieurs objectifs correspondent. Précise le titre exact.",
+    "expenseNotFound": "Aucune dépense ne correspond. Précise le label.",
+    "expenseAmbiguous": "Plusieurs dépenses correspondent. Précise le label exact ou la catégorie.",
+    "incomeNotFound": "Aucun revenu ne correspond. Précise le label.",
+    "incomeAmbiguous": "Plusieurs revenus correspondent. Précise le label exact.",
+    "planStepNotFound": "Aucune étape de plan ne correspond.",
+    "planStepAmbiguous": "Plusieurs étapes correspondent. Précise le numéro ou le titre exact.",
+    "memoryNotFound": "Aucune note de mémoire ne correspond.",
+    "memoryAmbiguous": "Plusieurs notes correspondent. Précise.",
+    "csvParseFailed": "Impossible de lire le fichier CSV — vérifie le format ou contacte ta banque pour exporter un fichier valide."
   },
   "validation": {
     "emailRequired": "Email requis",
