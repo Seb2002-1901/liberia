@@ -22,6 +22,7 @@ import {
   confirmProposedDeleteIncomeAction,
   confirmProposedDeleteBudgetAction,
   confirmProposedAddMemoryAction,
+  confirmProposedDeleteMemoryAction,
   confirmProposedTogglePlanStepAction,
 } from "@/app/actions/coach-actions";
 import type { PendingAction } from "./proposed-action-types";
@@ -57,6 +58,7 @@ const COLORS = {
   delete_income: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
   delete_budget: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
   add_memory: { accent: "#0EA5E9", bg: "#E0F2FE", text: "#075985" },
+  delete_memory: { accent: "#DC2626", bg: "#FEE2E2", text: "#991B1B" },
   toggle_plan_step: { accent: "#16A34A", bg: "#DCFCE7", text: "#15803D" },
 } as const;
 
@@ -171,6 +173,11 @@ export function ProposedActionCard({ action, onResolved }: Props) {
           res = await confirmProposedAddMemoryAction({
             kind: action.memoryKind,
             summary: action.summary,
+          });
+          break;
+        case "delete_memory":
+          res = await confirmProposedDeleteMemoryAction({
+            match_summary: action.match_summary,
           });
           break;
         case "toggle_plan_step":
@@ -392,6 +399,8 @@ function renderHeadline(
     }
     case "add_memory":
       return a.summary;
+    case "delete_memory":
+      return a.match_summary;
     case "toggle_plan_step":
       return a.match_query;
   }
@@ -460,6 +469,8 @@ function renderSubline(
       return t("deleteSubline");
     case "add_memory":
       return t(`memoryKind.${a.memoryKind}`);
+    case "delete_memory":
+      return t("deleteSubline");
     case "toggle_plan_step":
       return a.completed ? t("toggleCompleted") : t("toggleUncompleted");
   }

@@ -46,7 +46,9 @@
     "incomeNotFound": "No matching income. Be more specific.",
     "incomeAmbiguous": "Several incomes match. Specify the exact label.",
     "planStepNotFound": "No matching plan step.",
-    "planStepAmbiguous": "Several steps match. Specify the number or exact title."
+    "planStepAmbiguous": "Several steps match. Specify the number or exact title.",
+    "memoryNotFound": "No memory note matches.",
+    "memoryAmbiguous": "Several notes match. Be more specific."
   },
   "validation": {
     "emailRequired": "Email required",

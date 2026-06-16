@@ -473,7 +473,8 @@
         "delete_income": "Einnahme löschen",
         "delete_budget": "Budget entfernen",
         "add_memory": "Im Gedächtnis speichern",
-        "toggle_plan_step": "Planschritt"
+        "toggle_plan_step": "Planschritt",
+        "delete_memory": "Notiz löschen"
       },
       "frequency": {
         "one_time": "Einmalig",
@@ -496,7 +497,8 @@
         "delete_income": "Einnahme gelöscht.",
         "delete_budget": "Budget entfernt.",
         "add_memory": "Notiz im Gedächtnis gespeichert.",
-        "toggle_plan_step": "Schritt aktualisiert."
+        "toggle_plan_step": "Schritt aktualisiert.",
+        "delete_memory": "Notiz gelöscht."
       },
       "savedInline": {
         "expense": "Ausgabe gespeichert.",
@@ -511,7 +513,8 @@
         "delete_income": "Einnahme gelöscht.",
         "delete_budget": "Budget entfernt.",
         "add_memory": "Notiz gespeichert.",
-        "toggle_plan_step": "Schritt aktualisiert."
+        "toggle_plan_step": "Schritt aktualisiert.",
+        "delete_memory": "Notiz gelöscht."
       },
       "cancelledInline": "Vorschlag abgebrochen.",
       "goalDeadline": "Frist {date}",

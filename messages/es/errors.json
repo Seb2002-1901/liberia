@@ -46,7 +46,9 @@
     "incomeNotFound": "Ningún ingreso coincide. Sé más preciso.",
     "incomeAmbiguous": "Varios ingresos coinciden. Especifica la etiqueta exacta.",
     "planStepNotFound": "Ninguna etapa del plan coincide.",
-    "planStepAmbiguous": "Varias etapas coinciden. Especifica el número o título exacto."
+    "planStepAmbiguous": "Varias etapas coinciden. Especifica el número o título exacto.",
+    "memoryNotFound": "Ninguna nota de memoria coincide.",
+    "memoryAmbiguous": "Varias notas coinciden. Sé más preciso."
   },
   "validation": {
     "emailRequired": "Email requerido",

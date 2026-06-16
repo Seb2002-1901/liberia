@@ -46,7 +46,9 @@
     "incomeNotFound": "Keine passende Einnahme gefunden. Bitte präzisiere.",
     "incomeAmbiguous": "Mehrere Einnahmen passen. Bitte präzisiere die Bezeichnung.",
     "planStepNotFound": "Kein passender Planschritt gefunden.",
-    "planStepAmbiguous": "Mehrere Schritte passen. Bitte präzisiere Nummer oder Titel."
+    "planStepAmbiguous": "Mehrere Schritte passen. Bitte präzisiere Nummer oder Titel.",
+    "memoryNotFound": "Keine passende Gedächtnisnotiz gefunden.",
+    "memoryAmbiguous": "Mehrere Notizen passen. Bitte präzisiere."
   },
   "validation": {
     "emailRequired": "E-Mail erforderlich",

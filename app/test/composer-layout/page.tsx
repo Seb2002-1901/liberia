@@ -89,6 +89,7 @@ export default function ComposerLayoutFixture() {
             data-testid="cl-topbar"
             style={{
               height: 64,
+              flexShrink: 0,
               padding: "0 24px",
               borderBottom: `1px solid ${C.borderGhost}`,
               background: C.cardBg,
@@ -147,6 +148,7 @@ function ChatColumn() {
           background: C.cardBg,
           borderRadius: 12,
           boxShadow: SHADOW.card,
+          flexShrink: 0,
         }}
       >
         <strong>Conversation fixture</strong>
@@ -159,6 +161,7 @@ function ChatColumn() {
           color: C.textMuted,
           textAlign: "center",
           padding: 8,
+          flexShrink: 0,
         }}
       >
         © Test fixture
@@ -190,6 +193,8 @@ function ConversationClient() {
           borderRadius: 18,
           boxShadow: SHADOW.card,
           overflowY: "auto",
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         <div
@@ -217,6 +222,7 @@ function ConversationClient() {
           flexDirection: "column",
           gap: 8,
           paddingBottom: "max(12px, env(safe-area-inset-bottom))",
+          flexShrink: 0,
         }}
       >
         <textarea

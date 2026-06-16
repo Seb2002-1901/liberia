@@ -473,7 +473,8 @@
         "delete_income": "Eliminar un ingreso",
         "delete_budget": "Eliminar presupuesto",
         "add_memory": "Guardar en memoria",
-        "toggle_plan_step": "Etapa del plan"
+        "toggle_plan_step": "Etapa del plan",
+        "delete_memory": "Eliminar una nota"
       },
       "frequency": {
         "one_time": "Puntual",
@@ -496,7 +497,8 @@
         "delete_income": "Ingreso eliminado.",
         "delete_budget": "Presupuesto eliminado.",
         "add_memory": "Nota añadida a memoria.",
-        "toggle_plan_step": "Etapa actualizada."
+        "toggle_plan_step": "Etapa actualizada.",
+        "delete_memory": "Nota eliminada."
       },
       "savedInline": {
         "expense": "Gasto guardado.",
@@ -511,7 +513,8 @@
         "delete_income": "Ingreso eliminado.",
         "delete_budget": "Presupuesto eliminado.",
         "add_memory": "Nota guardada.",
-        "toggle_plan_step": "Etapa actualizada."
+        "toggle_plan_step": "Etapa actualizada.",
+        "delete_memory": "Nota eliminada."
       },
       "cancelledInline": "Propuesta cancelada.",
       "goalDeadline": "Fecha {date}",

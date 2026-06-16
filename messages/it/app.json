@@ -473,7 +473,8 @@
         "delete_income": "Elimina un'entrata",
         "delete_budget": "Rimuovi budget",
         "add_memory": "Salva in memoria",
-        "toggle_plan_step": "Fase del piano"
+        "toggle_plan_step": "Fase del piano",
+        "delete_memory": "Elimina una nota"
       },
       "frequency": {
         "one_time": "Una tantum",
@@ -496,7 +497,8 @@
         "delete_income": "Entrata eliminata.",
         "delete_budget": "Budget rimosso.",
         "add_memory": "Nota aggiunta alla memoria.",
-        "toggle_plan_step": "Fase aggiornata."
+        "toggle_plan_step": "Fase aggiornata.",
+        "delete_memory": "Nota eliminata."
       },
       "savedInline": {
         "expense": "Spesa salvata.",
@@ -511,7 +513,8 @@
         "delete_income": "Entrata eliminata.",
         "delete_budget": "Budget rimosso.",
         "add_memory": "Nota salvata.",
-        "toggle_plan_step": "Fase aggiornata."
+        "toggle_plan_step": "Fase aggiornata.",
+        "delete_memory": "Nota eliminata."
       },
       "cancelledInline": "Proposta annullata.",
       "goalDeadline": "Scadenza {date}",

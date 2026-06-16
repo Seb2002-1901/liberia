@@ -592,6 +592,29 @@ export interface ProposeAddMemoryInput {
   summary: string;
 }
 
+export const PROPOSE_DELETE_MEMORY_TOOL_NAME = "propose_delete_memory" as const;
+
+export const PROPOSE_DELETE_MEMORY_TOOL: Tool = {
+  name: PROPOSE_DELETE_MEMORY_TOOL_NAME,
+  description:
+    "Call this tool to ARCHIVE (soft-delete) a personal memory entry. Use when the user explicitly asks to forget or remove a note. Examples: 'oublie ma note moto', 'efface la mémoire sur la voiture'. Server lookup by ILIKE on the summary. The UI shows a confirmation card.",
+  input_schema: {
+    type: "object",
+    properties: {
+      match_summary: {
+        type: "string",
+        description:
+          "Substring of the memory summary to match (ILIKE lookup server-side).",
+      },
+    },
+    required: ["match_summary"],
+  },
+};
+
+export interface ProposeDeleteMemoryInput {
+  match_summary: string;
+}
+
 export const PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME = "propose_toggle_plan_step" as const;
 
 export const PROPOSE_TOGGLE_PLAN_STEP_TOOL: Tool = {
@@ -634,6 +657,7 @@ export const COACH_TOOLS: Tool[] = [
   PROPOSE_DELETE_INCOME_TOOL,
   PROPOSE_DELETE_BUDGET_TOOL,
   PROPOSE_ADD_MEMORY_TOOL,
+  PROPOSE_DELETE_MEMORY_TOOL,
   PROPOSE_TOGGLE_PLAN_STEP_TOOL,
 ];
 
@@ -650,6 +674,7 @@ export const COACH_TOOL_NAMES = [
   PROPOSE_DELETE_INCOME_TOOL_NAME,
   PROPOSE_DELETE_BUDGET_TOOL_NAME,
   PROPOSE_ADD_MEMORY_TOOL_NAME,
+  PROPOSE_DELETE_MEMORY_TOOL_NAME,
   PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME,
 ] as const;
 

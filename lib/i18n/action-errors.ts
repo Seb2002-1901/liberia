@@ -57,7 +57,9 @@ export type ActionErrorKey =
   | "incomeNotFound"
   | "incomeAmbiguous"
   | "planStepNotFound"
-  | "planStepAmbiguous";
+  | "planStepAmbiguous"
+  | "memoryNotFound"
+  | "memoryAmbiguous";
 
 export async function getActionErrors(): Promise<
   (key: ActionErrorKey) => string

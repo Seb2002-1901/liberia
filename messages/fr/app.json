@@ -372,7 +372,8 @@
         "delete_income": "Supprimer un revenu",
         "delete_budget": "Supprimer un budget",
         "add_memory": "Mémoriser",
-        "toggle_plan_step": "Étape du plan"
+        "toggle_plan_step": "Étape du plan",
+        "delete_memory": "Supprimer une note"
       },
       "frequency": {
         "one_time": "Ponctuel",
@@ -395,7 +396,8 @@
         "delete_income": "Revenu supprimé.",
         "delete_budget": "Budget supprimé.",
         "add_memory": "Note ajoutée à ta mémoire IA.",
-        "toggle_plan_step": "Étape mise à jour."
+        "toggle_plan_step": "Étape mise à jour.",
+        "delete_memory": "Note supprimée."
       },
       "savedInline": {
         "expense": "Dépense enregistrée.",
@@ -410,7 +412,8 @@
         "delete_income": "Revenu supprimé.",
         "delete_budget": "Budget supprimé.",
         "add_memory": "Note ajoutée.",
-        "toggle_plan_step": "Étape mise à jour."
+        "toggle_plan_step": "Étape mise à jour.",
+        "delete_memory": "Note supprimée."
       },
       "cancelledInline": "Proposition annulée.",
       "goalDeadline": "Échéance {date}",

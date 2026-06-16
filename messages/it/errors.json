@@ -46,7 +46,9 @@
     "incomeNotFound": "Nessuna entrata corrisponde. Sii più preciso.",
     "incomeAmbiguous": "Più entrate corrispondono. Specifica l'etichetta esatta.",
     "planStepNotFound": "Nessuna fase del piano corrisponde.",
-    "planStepAmbiguous": "Più fasi corrispondono. Specifica il numero o il titolo esatto."
+    "planStepAmbiguous": "Più fasi corrispondono. Specifica il numero o il titolo esatto.",
+    "memoryNotFound": "Nessuna nota di memoria corrisponde.",
+    "memoryAmbiguous": "Più note corrispondono. Sii più preciso."
   },
   "validation": {
     "emailRequired": "Email richiesta",

@@ -845,6 +845,56 @@ export async function confirmProposedAddMemoryAction(
   return { ok: true };
 }
 
+const deleteMemorySchema = z.object({
+  match_summary: z.string().min(1).max(280),
+});
+
+export type CoachDeleteMemoryPayload = z.infer<typeof deleteMemorySchema>;
+
+export async function confirmProposedDeleteMemoryAction(
+  input: CoachDeleteMemoryPayload,
+): Promise<ActionResult> {
+  const tErr = await getActionErrors();
+  const parsed = deleteMemorySchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: tErr("invalidData") };
+  if (!isSupabaseConfigured()) return { ok: false, error: tErr("authRequired") };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: tErr("authRequired") };
+
+  const { data: matches, error: lookupError } = await supabase
+    .from("user_memory_entries")
+    .select("id, summary")
+    .eq("user_id", user.id)
+    .is("archived_at", null)
+    .ilike("summary", `%${parsed.data.match_summary}%`)
+    .limit(5);
+  if (lookupError) return { ok: false, error: lookupError.message };
+  if (!matches || matches.length === 0)
+    return { ok: false, error: tErr("memoryNotFound") };
+  if (matches.length > 1)
+    return { ok: false, error: tErr("memoryAmbiguous") };
+
+  const existing = matches[0] as { id: string; summary: string };
+  // Soft-delete : archive plutôt que delete dur. Le user peut désarchiver
+  // depuis /settings/memory si regret.
+  const { error: updateError } = await supabase
+    .from("user_memory_entries")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", existing.id)
+    .eq("user_id", user.id);
+  if (updateError) return { ok: false, error: updateError.message };
+
+  revalidatePath("/settings/memory");
+  revalidatePath("/coach");
+  console.log(
+    `[coach/propose_delete_memory] archived: ${existing.summary.slice(0, 60)}`,
+  );
+  return { ok: true };
+}
+
 const togglePlanStepSchema = z.object({
   match_query: z.string().min(1).max(120),
   completed: z.boolean(),

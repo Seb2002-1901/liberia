@@ -473,7 +473,8 @@
         "delete_income": "Delete an income",
         "delete_budget": "Remove budget",
         "add_memory": "Save to memory",
-        "toggle_plan_step": "Plan step"
+        "toggle_plan_step": "Plan step",
+        "delete_memory": "Delete a memory"
       },
       "frequency": {
         "one_time": "One-time",
@@ -496,7 +497,8 @@
         "delete_income": "Income deleted.",
         "delete_budget": "Budget removed.",
         "add_memory": "Note added to memory.",
-        "toggle_plan_step": "Step updated."
+        "toggle_plan_step": "Step updated.",
+        "delete_memory": "Memory deleted."
       },
       "savedInline": {
         "expense": "Expense saved.",
@@ -511,7 +513,8 @@
         "delete_income": "Income deleted.",
         "delete_budget": "Budget removed.",
         "add_memory": "Note saved.",
-        "toggle_plan_step": "Step updated."
+        "toggle_plan_step": "Step updated.",
+        "delete_memory": "Memory deleted."
       },
       "cancelledInline": "Proposal cancelled.",
       "goalDeadline": "Due {date}",

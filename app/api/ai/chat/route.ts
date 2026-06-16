@@ -43,6 +43,7 @@ import {
   PROPOSE_DELETE_INCOME_TOOL_NAME,
   PROPOSE_DELETE_BUDGET_TOOL_NAME,
   PROPOSE_ADD_MEMORY_TOOL_NAME,
+  PROPOSE_DELETE_MEMORY_TOOL_NAME,
   PROPOSE_TOGGLE_PLAN_STEP_TOOL_NAME,
   type ProposeExpenseInput,
   type ProposeIncomeInput,
@@ -56,6 +57,7 @@ import {
   type ProposeDeleteIncomeInput,
   type ProposeDeleteBudgetInput,
   type ProposeAddMemoryInput,
+  type ProposeDeleteMemoryInput,
   type ProposeTogglePlanStepInput,
 } from "@/lib/coach/tools";
 import { isAnthropicConfigured } from "@/lib/env";
@@ -631,6 +633,17 @@ export async function POST(request: Request) {
                     toolUseId: block.id,
                     kind: input.kind,
                     summary: input.summary,
+                  });
+                  break;
+                }
+                case PROPOSE_DELETE_MEMORY_TOOL_NAME: {
+                  const input = block.input as ProposeDeleteMemoryInput;
+                  console.log(
+                    `[coach/propose_delete_memory] match="${input.match_summary.slice(0, 40)}"`,
+                  );
+                  send("propose_delete_memory", {
+                    toolUseId: block.id,
+                    match_summary: input.match_summary,
                   });
                   break;
                 }

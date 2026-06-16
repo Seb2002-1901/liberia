@@ -46,7 +46,9 @@
     "incomeNotFound": "Nenhuma receita corresponde. Sê mais preciso.",
     "incomeAmbiguous": "Várias receitas correspondem. Especifica o rótulo exato.",
     "planStepNotFound": "Nenhuma etapa do plano corresponde.",
-    "planStepAmbiguous": "Várias etapas correspondem. Especifica o número ou título exato."
+    "planStepAmbiguous": "Várias etapas correspondem. Especifica o número ou título exato.",
+    "memoryNotFound": "Nenhuma nota de memória corresponde.",
+    "memoryAmbiguous": "Várias notas correspondem. Sê mais preciso."
   },
   "validation": {
     "emailRequired": "Email obrigatório",

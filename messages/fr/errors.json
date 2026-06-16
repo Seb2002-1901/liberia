@@ -46,7 +46,9 @@
     "incomeNotFound": "Aucun revenu ne correspond. Précise le label.",
     "incomeAmbiguous": "Plusieurs revenus correspondent. Précise le label exact.",
     "planStepNotFound": "Aucune étape de plan ne correspond.",
-    "planStepAmbiguous": "Plusieurs étapes correspondent. Précise le numéro ou le titre exact."
+    "planStepAmbiguous": "Plusieurs étapes correspondent. Précise le numéro ou le titre exact.",
+    "memoryNotFound": "Aucune note de mémoire ne correspond.",
+    "memoryAmbiguous": "Plusieurs notes correspondent. Précise."
   },
   "validation": {
     "emailRequired": "Email requis",

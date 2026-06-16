@@ -133,6 +133,12 @@ export interface PendingAddMemoryAction {
   summary: string;
 }
 
+export interface PendingDeleteMemoryAction {
+  kind: "delete_memory";
+  toolUseId: string;
+  match_summary: string;
+}
+
 export interface PendingTogglePlanStepAction {
   kind: "toggle_plan_step";
   toolUseId: string;
@@ -153,6 +159,7 @@ export type PendingAction =
   | PendingDeleteIncomeAction
   | PendingDeleteBudgetAction
   | PendingAddMemoryAction
+  | PendingDeleteMemoryAction
   | PendingTogglePlanStepAction;
 
 /**
@@ -435,6 +442,19 @@ export function parseSseProposedAction(
       toolUseId,
       memoryKind: kind,
       summary: payload.summary,
+    };
+  }
+
+  if (event === "propose_delete_memory") {
+    if (
+      typeof payload.match_summary !== "string" ||
+      payload.match_summary.length === 0
+    )
+      return null;
+    return {
+      kind: "delete_memory",
+      toolUseId,
+      match_summary: payload.match_summary,
     };
   }
 

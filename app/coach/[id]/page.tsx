@@ -390,7 +390,10 @@ export default async function CoachConversationPage({ params }: PageProps) {
               recentConversationsCount={recentConversationsCount}
               conversationTitle={conversation.title}
             />
-            <div data-coachid-rail>
+            <div
+              data-coachid-rail
+              style={{ minHeight: 0, overflow: "hidden" }}
+            >
               <RightRail wired={wired} />
             </div>
           </main>
@@ -484,6 +487,7 @@ function CoachHero({
     <div
       style={{
         height: H.coachHero,
+        flexShrink: 0,
         padding: "0 16px",
         backgroundColor: C.cardBg,
         borderRadius: 14,
@@ -659,6 +663,7 @@ function PrivacyFooter() {
     <p
       style={{
         height: 24,
+        flexShrink: 0,
         margin: 0,
         fontSize: 10.5,
         color: C.textLight,
@@ -991,6 +996,7 @@ function Topbar({
       data-coachid-topbar
       style={{
         height: H.topbar,
+        flexShrink: 0,
         padding: "0 42px",
         display: "flex",
         alignItems: "center",

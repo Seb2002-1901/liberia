@@ -460,6 +460,13 @@ export function CoachConversationV3Client({
       <form
         onSubmit={onSubmit}
         style={{
+          // Sprint Iris — composer verrouillé. flexShrink:0 = ne peut
+          // PAS être réduit par le thread qui grossit. Le seul élément
+          // élastique de la colonne est le thread (flex:1 minHeight:0
+          // overflow auto). Conséquence : composer reste TOUJOURS à
+          // sa position en bas de la colonne chat, indépendamment du
+          // nombre de messages.
+          flexShrink: 0,
           backgroundColor: C.cardBg,
           borderRadius: 16,
           boxShadow: SHADOW.card,
